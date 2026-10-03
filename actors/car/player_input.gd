@@ -63,7 +63,7 @@ func _physics_process(_delta: float) -> void:
 
 func _helped(steer: float) -> float:
 	var pos := car.global_position
-	var here := track.progress_at(pos)
+	var here := track.progress_of(car)
 	var limit := track.road_half_width - EDGE_MARGIN
 	var lane := clampf(track.side_of_line(pos, here), -limit, limit)
 	var target := track.line_point(here + HELP_LOOKAHEAD + car.velocity.length() * HELP_LOOKAHEAD_PER_SPEED, lane)

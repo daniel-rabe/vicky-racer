@@ -57,7 +57,7 @@ func _physics_process(delta: float) -> void:
 	if _handle_stuck(speed, delta):
 		return
 	var length := track.lap_length()
-	var here := track.progress_at(car.global_position)
+	var here := track.progress_of(car)
 	_update_lane(delta)
 
 	# Steer at a point ahead on the line, shifted sideways into our lane.
@@ -124,7 +124,7 @@ func _handle_stuck(speed: float, delta: float) -> bool:
 		_stuck_time += delta
 	else:
 		_stuck_time = 0.0
-	if track.distance_to_line(car.global_position) > RESCUE_DISTANCE:
+	if track.distance_of(car) > RESCUE_DISTANCE:
 		_rescue()
 		return true
 	if _stuck_time > STUCK_SECONDS:

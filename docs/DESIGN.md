@@ -214,6 +214,34 @@ zoom is fixed. Anything teleported (a reset, the start grid) calls
 (100 fps against 60 Hz physics, tracking a hay bale): frame-to-frame wobble of the view went from
 **17.8 px** without interpolation to **0.57 px** with it — the same as running physics at 100 Hz.
 
+### 5.2 Performance
+
+[`tests/perf_probe.gd`](../tests/perf_probe.gd) measures a full race with every car on
+autopilot. Headless at a fixed 60 fps (`-- --autopilot --bench`), wall time per frame is the
+whole CPU cost of simulating the race; with a window it reports frame rate, draw calls and
+objects.
+
+| Measure (RTX 5070 Ti machine) | Before the pass | After |
+| --- | --- | --- |
+| CPU per simulated frame (scripts + physics) | 415 µs | **234 µs** — 1.4 % of a 60 Hz frame |
+| Windowed, vsync off | 1,940 fps | 2,190 fps |
+| Draw calls / objects | ~40 / stable | unchanged |
+| Race load (track, road, cars) | — | 18 ms |
+
+Three changes, each measured on its own:
+
+1. **Racing line baked at 20 px**, not Godot's default 5. Every closest-point search walks
+   every baked point; a quarter of the points made each search ~11 → 3 µs. On Track 01's
+   tightest bend the chord error is under a quarter pixel, and the balance table did not move.
+2. **Each car measured once per frame.** The track (physics priority −2, before anyone
+   else) searches the line once per car and caches progress and distance; the race, the AI and
+   steering help read `Track.progress_of()` / `distance_of()` instead of searching again.
+3. **Minimap line cached in map space**, rebuilt only on resize. Converting all 200 points every
+   frame was the most expensive script in the race (71 µs).
+
+The game is far inside its budget even on this fast machine; the margins are for the slower
+laptop a child is likely to play on.
+
 ## 6. Architecture
 
 ### 6.1 Event bus

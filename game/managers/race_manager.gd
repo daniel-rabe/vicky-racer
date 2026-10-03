@@ -98,7 +98,7 @@ func _on_finish_crossed(car: Car) -> void:
 ## Progress in px from the start of the race: negative while still behind the line on the grid.
 func _progress(r: Dictionary) -> float:
 	var length := track.lap_length()
-	var rel := fposmod(track.progress_at(r["car"].global_position) - _finish_offset, length)
+	var rel := fposmod(track.progress_of(r["car"]) - _finish_offset, length)
 	if not r["crossed_start"]:
 		return rel - length
 	return r["laps"] * length + rel

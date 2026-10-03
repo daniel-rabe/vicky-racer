@@ -10,6 +10,10 @@ extends Node2D
 ## The track also owns surfaces: every physics frame it tells each car in the "cars" group
 ## what it is driving on. On the road means within road_half_width (plus kerbs) of the line;
 ## anywhere else, the ground tile decides.
+##
+## It also measures every car against the racing line once per frame, before anything else
+## runs (process_physics_priority -2), so the race, the AI and steering help read
+## progress_of() / distance_of() instead of each searching the curve again.
 
 signal finish_crossed(car: Car)
 signal checkpoint_crossed(car: Car)
@@ -42,6 +46,7 @@ const BR := 1
 @export var kerb_min_length := 320.0
 
 var _surface_of := {}  # car -> surface id
+var _measured := {}  # car -> Vector2(progress along the line, distance from it), this frame
 
 @onready var ground: TileMapLayer = $Ground
 @onready var road: Node2D = $Road  # sits above Ground; the generated road lines go inside it
@@ -53,6 +58,7 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		racing_line.curve.changed.connect(_build_road.call_deferred)
 		return
+	process_physics_priority = -2  # measure the cars before the drivers and the race read them
 	$FinishLine.body_entered.connect(func(body: Node2D) -> void:
 		if body is Car:
 			finish_crossed.emit(body))
@@ -64,8 +70,11 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
+	_measured.clear()
 	for car: Car in get_tree().get_nodes_in_group(&"cars"):
-		var surface := surface_at(car.global_position)
+		var measure := _measure(car.global_position)
+		_measured[car] = measure
+		var surface := surface_at(car.global_position, measure.y)
 		if _surface_of.get(car) != surface:
 			_surface_of[car] = surface
 			car.surface_speed_mult = SURFACES[surface]["speed_mult"]
@@ -73,9 +82,28 @@ func _physics_process(_delta: float) -> void:
 			EventSystem.CAR_surface_changed.emit(car, surface)
 
 
-## What a car at this point drives on: &"asphalt", &"grass" or &"sand".
-func surface_at(global_pos: Vector2) -> StringName:
-	if distance_to_line(global_pos) <= road_half_width + KERB_WIDTH - 8.0:
+## How far `car` is along the racing line, px, as measured at the start of this physics frame.
+func progress_of(car: Node2D) -> float:
+	return _measured[car].x if _measured.has(car) else progress_at(car.global_position)
+
+
+## How far `car` is from the racing line, px, as measured at the start of this physics frame.
+func distance_of(car: Node2D) -> float:
+	return _measured[car].y if _measured.has(car) else distance_to_line(car.global_position)
+
+
+## Progress along the line and distance from it, from a single search of the curve.
+func _measure(global_pos: Vector2) -> Vector2:
+	var here := progress_at(global_pos)
+	return Vector2(here, global_pos.distance_to(line_point(here)))
+
+
+## What a car at this point drives on: &"asphalt", &"grass" or &"sand". Pass `distance`
+## (from the racing line) when it is already known, to skip a search.
+func surface_at(global_pos: Vector2, distance := -1.0) -> StringName:
+	if distance < 0.0:
+		distance = distance_to_line(global_pos)
+	if distance <= road_half_width + KERB_WIDTH - 8.0:
 		return &"asphalt"
 	var local := ground.to_local(global_pos)
 	var cell := ground.local_to_map(local)
