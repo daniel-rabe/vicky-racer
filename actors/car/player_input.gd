@@ -65,7 +65,7 @@ func _helped(steer: float) -> float:
 	var pos := car.global_position
 	var here := track.progress_at(pos)
 	var limit := track.road_half_width - EDGE_MARGIN
-	var lane := clampf(track.side_of_line(pos), -limit, limit)
+	var lane := clampf(track.side_of_line(pos, here), -limit, limit)
 	var target := track.line_point(here + HELP_LOOKAHEAD + car.velocity.length() * HELP_LOOKAHEAD_PER_SPEED, lane)
 	var angle := Vector2.RIGHT.rotated(car.rotation).angle_to(target - pos)
 	var help := clampf(angle / HELP_FULL_ANGLE, -1.0, 1.0)

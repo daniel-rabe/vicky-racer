@@ -123,8 +123,10 @@ func line_tangent(offset: float) -> Vector2:
 
 
 ## Signed distance from the racing line: positive to its right, negative to its left.
-func side_of_line(global_pos: Vector2) -> float:
-	var here := progress_at(global_pos)
+## Pass `here` (progress_at of the same point) when it is already known, to skip a search.
+func side_of_line(global_pos: Vector2, here := -1.0) -> float:
+	if here < 0.0:
+		here = progress_at(global_pos)
 	return (global_pos - line_point(here)).dot(line_tangent(here).orthogonal())
 
 

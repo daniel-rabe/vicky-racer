@@ -38,4 +38,3 @@ signal UI_screen_requested(screen_name: StringName)
 signal UI_settings_requested
 signal UI_settings_changed(settings: Dictionary)
 signal UI_setting_change_requested(key: StringName, value: Variant)
-signal UI_pause_changed(paused: bool)

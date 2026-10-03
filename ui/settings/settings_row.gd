@@ -5,6 +5,7 @@ extends Button
 ## up and down rows and changes the focused one with left / right (or A for toggles and
 ## choices). It only reports the step; the panel turns it into a setting change.
 
+## direction: -1 / 1 for left / right, 0 for a press (A, Enter or a click).
 signal stepped(key: StringName, direction: int)
 
 const YELLOW := Color(1, 0.824, 0.247)
@@ -83,9 +84,7 @@ func show_value(value: Variant) -> void:
 
 
 func _ready() -> void:
-	pressed.connect(func() -> void:
-		if kind != &"volume":
-			stepped.emit(key, 1))
+	pressed.connect(func() -> void: stepped.emit(key, 0))
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -98,13 +97,13 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 
-func _label(text: String, size: int, colour: Color) -> Label:
+func _label(text: String, font_size: int, colour: Color) -> Label:
 	var label := Label.new()
 	label.text = text
-	label.add_theme_font_size_override("font_size", size)
+	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", colour)
 	label.add_theme_color_override("font_outline_color", DARK)
-	label.add_theme_constant_override("outline_size", 6 if size >= 26 else 0)
+	label.add_theme_constant_override("outline_size", 6 if font_size >= 26 else 0)
 	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label

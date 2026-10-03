@@ -52,9 +52,14 @@ func setup(track: Track, racers: Array[Dictionary], laps: int) -> void:
 	_update_lap_label()
 
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	# On the physics clock, like RaceManager's lap times, so the clock on screen stops at
+	# exactly the lap time the results will show.
 	if _running:
 		_lap_clock += delta
+
+
+func _process(_delta: float) -> void:
 	_time.text = _format(_lap_clock)
 	if _player_car:
 		_speed.value = _player_car.velocity.length() / _player_car.config.max_speed

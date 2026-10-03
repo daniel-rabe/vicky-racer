@@ -18,6 +18,7 @@ extends CanvasLayer
 @onready var _settings: SettingsPanel = %SettingsPanel
 
 var _confirmed_action: Callable
+var _asked_from: Button  # focus returns here when SURE? is answered NO
 
 
 func _ready() -> void:
@@ -64,7 +65,6 @@ func pause() -> void:
 	_confirm.visible = false
 	get_tree().paused = true
 	_resume.grab_focus()
-	EventSystem.UI_pause_changed.emit(true)
 
 
 func resume() -> void:
@@ -73,12 +73,11 @@ func resume() -> void:
 	_settings.visible = false
 	visible = false
 	get_tree().paused = false
-	EventSystem.UI_pause_changed.emit(false)
 
 
 func _ask(action: Callable, from: Button) -> void:
 	_confirmed_action = action
-	_confirm.set_meta(&"from", from)
+	_asked_from = from
 	_menu.visible = false
 	_confirm.visible = true
 	_no.grab_focus()
@@ -87,11 +86,9 @@ func _ask(action: Callable, from: Button) -> void:
 func _close_confirm() -> void:
 	_confirm.visible = false
 	_menu.visible = true
-	var from: Button = _confirm.get_meta(&"from", _resume)
-	from.grab_focus()
+	(_asked_from if _asked_from else _resume).grab_focus()
 
 
 func _leave_to(screen: StringName) -> void:
 	get_tree().paused = false
-	EventSystem.UI_pause_changed.emit(false)
 	EventSystem.UI_screen_requested.emit(screen)

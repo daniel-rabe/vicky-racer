@@ -108,6 +108,8 @@ def normalise(x: np.ndarray, peak_db: float) -> np.ndarray:
 def oneshot(x: np.ndarray, sound: dict) -> np.ndarray:
     """From the first sound above the noise floor, at most max_seconds, ending in a fade."""
     env = envelope(x)
+    if env.max() <= 1e-6:
+        raise SystemExit(f"{sound['id']}: the clip is silent - pick another seed")
     loud = np.nonzero(env > env.max() * 10 ** (-30 / 20))[0]
     start = max(loud[0] - int(0.005 * RATE), 0)
     end = min(loud[-1], start + int(sound["max_seconds"] * RATE))
@@ -120,6 +122,9 @@ def loop(x: np.ndarray, sound: dict) -> np.ndarray:
     length = int(sound["loop_seconds"] * RATE)
     overlap = int(0.25 * RATE)
     span = length + overlap
+    if len(x) < span + RATE:
+        raise SystemExit(f"{sound['id']}: {len(x) / RATE:.1f}s clip is too short for a "
+                         f"{sound['loop_seconds']}s loop; raise 'seconds' in the manifest")
     env = envelope(x, 2205)
     # Skip the first and last half second, where generated clips swell in and die out.
     best, best_score = None, np.inf

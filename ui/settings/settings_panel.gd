@@ -66,10 +66,16 @@ func _on_stepped(key: StringName, direction: int) -> void:
 	var value: Variant = _settings[String(key)]
 	match _rows[key].kind:
 		&"volume":
-			value = clampf(float(value) + direction * Settings.VOLUME_STEP, 0.0, 1.0)
+			# Left / right stop at the ends; a press steps up and wraps round to silent, so
+			# A or a click alone can reach every level.
+			if direction == 0:
+				value = 0.0 if float(value) >= 1.0 - 0.01 else float(value) + Settings.VOLUME_STEP
+			else:
+				value = clampf(float(value) + direction * Settings.VOLUME_STEP, 0.0, 1.0)
 		&"toggle":
 			value = not value
 		&"choice":
 			var i := Settings.DIFFICULTIES.find(StringName(value))
-			value = Settings.DIFFICULTIES[posmod(i + direction, Settings.DIFFICULTIES.size())]
+			var step := direction if direction != 0 else 1
+			value = Settings.DIFFICULTIES[posmod(i + step, Settings.DIFFICULTIES.size())]
 	EventSystem.UI_setting_change_requested.emit(key, value)

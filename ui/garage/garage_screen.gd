@@ -6,8 +6,8 @@ extends Control
 
 const CARD_SCENE := preload("res://ui/garage/setup_card.tscn")
 const MESSAGE_SECONDS := 2.2
-const HINTS_KEYBOARD := "ENTER  BUY / EQUIP      R  RACE"
-const HINTS_GAMEPAD := "A  BUY / EQUIP      Y  RACE"
+const HINTS_KEYBOARD := "ENTER  BUY / EQUIP      R  RACE      ESC  BACK"
+const HINTS_GAMEPAD := "A  BUY / EQUIP      Y  RACE      B  BACK"
 
 var _state := {}
 var _cards := {}  # setup id -> SetupCard

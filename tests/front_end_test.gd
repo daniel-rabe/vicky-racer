@@ -136,6 +136,20 @@ func _test_settings_apply() -> void:
 	_check(is_equal_approx(manager.settings.sound_volume, 0.6), "two steps left: volume 0.8 -> 0.6 (%.2f)" % manager.settings.sound_volume)
 	var bus_db := AudioServer.get_bus_volume_db(AudioServer.get_bus_index(&"SFX"))
 	_check(is_equal_approx(bus_db, linear_to_db(0.6)), "the SFX bus follows (%.1f dB)" % bus_db)
+	sound.pressed.emit()
+	await _frames(2)
+	_check(is_equal_approx(manager.settings.sound_volume, 0.7), "pressing A on SOUND steps it up (%.2f)" % manager.settings.sound_volume)
+	for i in 4:  # 0.8, 0.9, 1.0, then round to silent
+		sound.pressed.emit()
+	await _frames(2)
+	_check(is_zero_approx(manager.settings.sound_volume), "and wraps round to silent past full (%.2f)" % manager.settings.sound_volume)
+	for i in 12:
+		sound.stepped.emit(&"sound_volume", 1)
+	await _frames(2)
+	_check(is_equal_approx(manager.settings.sound_volume, 1.0), "right stops at full instead of wrapping")
+	for i in 4:
+		sound.stepped.emit(&"sound_volume", -1)
+	await _frames(2)
 	var choice: SettingsRow = panel.get_node("%Rows").get_child(4)
 	choice.stepped.emit(&"difficulty", -1)
 	await _frames(2)

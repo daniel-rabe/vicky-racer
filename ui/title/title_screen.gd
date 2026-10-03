@@ -34,7 +34,9 @@ func _ready() -> void:
 	_settings.closed.connect(func() -> void:
 		_menu.visible = true
 		_settings_button.grab_focus())
-	_quit.pressed.connect(func() -> void: get_tree().quit())
+	# Quit like closing the window does, so main.gd can let the sound stop cleanly first.
+	_quit.pressed.connect(func() -> void:
+		get_tree().root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST))
 	_play.grab_focus()
 	var bob := create_tween().set_loops().set_trans(Tween.TRANS_SINE)
 	bob.tween_property(_logo, "position:y", _logo.position.y - 6.0, 1.0)
@@ -52,7 +54,9 @@ func _build_attract_mode() -> void:
 		var car: Car = CAR_SCENE.instantiate()
 		car.body_texture = bodies[i]
 		car.transform = grid[i]
-		car.get_node("Audio").queue_free()  # a quiet menu: no engines
+		var audio := car.get_node("Audio")  # a quiet menu: no engines
+		car.remove_child(audio)
+		audio.free()  # before the car enters the tree, so its loops never start
 		var driver := AIDriver.new()
 		driver.skill = SKILLS[i]
 		driver.line_offset = LANES[i]

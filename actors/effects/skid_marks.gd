@@ -54,7 +54,7 @@ func _on_drift_ended(car: Node, _duration: float) -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	for car: Node2D in _active.keys():
+	for car in _active.keys():  # untyped: a freed car must reach is_instance_valid()
 		if not is_instance_valid(car):
 			_active.erase(car)
 			continue
@@ -73,10 +73,12 @@ func _drop_oldest() -> void:
 	for lines: Array in _active.values():
 		for line in lines:
 			drawing[line] = true
-	var excess := get_child_count() - MAX_MARKS
-	for child in get_children():
+	# Marks already on their way out do not count toward the cap.
+	var live := get_children().filter(func(c: Node) -> bool: return not c.is_queued_for_deletion())
+	var excess := live.size() - MAX_MARKS
+	for child in live:
 		if excess <= 0:
 			break
-		if not drawing.has(child) and not child.is_queued_for_deletion():
+		if not drawing.has(child):
 			child.queue_free()
 			excess -= 1

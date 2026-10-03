@@ -47,6 +47,8 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
+	# Closing the window (or QUIT on the title) goes through _quit_quietly, below.
+	get_tree().set_auto_accept_quit(false)
 	if _args.has("dev-coins"):
 		garage_manager.profile.coins = int(_args["dev-coins"])
 	if _args.has("fake-race"):
@@ -77,6 +79,11 @@ func _fake_race_finish(player_position: int) -> void:
 		results.append({"name": entry[0], "body": entry[1], "is_player": is_player, "position": position,
 			"time": 115.0 + position * 2.6, "best_lap": 37.5 + position * 0.7})
 	EventSystem.RAC_race_finished.emit(results, &"test_drive")
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_quit_quietly()
 
 
 ## Quit without leak warnings: a sound still playing at quit is only released by the audio

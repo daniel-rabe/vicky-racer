@@ -36,7 +36,8 @@ func save_to(path := DEFAULT_PATH) -> Error:
 	var file := ConfigFile.new()
 	var values := to_dict()
 	for key in values:
-		file.set_value("settings", key, values[key] if not values[key] is StringName else String(values[key]))
+		var value: Variant = values[key]
+		file.set_value("settings", key, String(value) if value is StringName else value)
 	return file.save(path)
 
 

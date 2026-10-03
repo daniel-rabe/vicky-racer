@@ -122,11 +122,11 @@ func _make_line(key: String, amount: int, player_position: int) -> HBoxContainer
 	return line
 
 
-func _label(text: String, size: int, colour := Color.WHITE) -> Label:
+func _label(text: String, font_size: int, colour := Color.WHITE) -> Label:
 	var label := Label.new()
 	label.text = text
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", size)
+	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", colour)
 	return label
 
