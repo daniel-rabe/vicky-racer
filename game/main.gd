@@ -14,8 +14,9 @@ extends Node
 
 const SCREENS := {
 	&"garage": preload("res://ui/garage/garage_screen.tscn"),
-	# The real race arrives in Phase 7; until then "race" is the test drive.
-	&"race": preload("res://game/screens/test_drive.tscn"),
+	&"race": preload("res://game/screens/race.tscn"),
+	# Dev: the open field for tuning handling (--screen=test_drive).
+	&"test_drive": preload("res://game/screens/test_drive.tscn"),
 	&"results": preload("res://ui/results/results_screen.tscn"),
 }
 const FIRST_SCREEN := &"garage"

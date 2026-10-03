@@ -41,6 +41,7 @@ var _touching_wall := false
 
 
 func _ready() -> void:
+	add_to_group(&"cars")  # the track updates the surface multipliers of every car in it
 	motion_mode = MOTION_MODE_FLOATING
 	wall_min_slide_angle = 0.0
 	if body_texture:

@@ -210,7 +210,7 @@ autoload rule while still surviving every screen swap.
 nothing about who sets them. `player_input.gd` and `ai_driver.gd` are interchangeable children that
 write into those fields. The same car scene is used for all four racers.
 
-## 7. Track **(not implemented)**
+## 7. Track
 
 ### 7.1 Track 01
 
@@ -244,6 +244,30 @@ track is two layers:
 
   Moving a control point moves the road, the kerbs, the racing line and the surface detection
   together. Nothing about the road is painted by hand, so it can never disagree with the AI's line.
+  Kerbs are continuous strips: gaps under 160 px between tight stretches are bridged and pieces
+  under 320 px dropped, so gentle bends at the threshold do not fragment.
+
+**Built:** [`screenshots/track_overview.png`](screenshots/track_overview.png),
+[`screenshots/track_grid.png`](screenshots/track_grid.png).
+
+| Piece | File |
+| --- | --- |
+| Ground tileset: 16 corner tiles, Grass/Sand terrain in Match Corners mode | [`tools/layouts/build_tileset.py`](../tools/layouts/build_tileset.py) → `art/tiles/ground_atlas.png`, `track/ground_tiles.tres` |
+| Track logic and road drawing (`@tool`, so the road also shows in the editor) | [`track/track.gd`](../track/track.gd) |
+| Scene builder: layout points → `track_01.tscn` (curve, painted sand traps, grid, gates, walls, trees, tyre stacks) | [`track/build/build_track.gd`](../track/build/build_track.gd) |
+| Checks: surfaces, progress, grid, gates | [`tests/track_test.gd`](../tests/track_test.gd) |
+
+Inside a ground tile, sand is where the bilinear blend of its four corners exceeds 0.5. The tiles
+are drawn with that rule and `Track.surface_at()` tests with it, so what you see is what you drive
+on. Neighbouring tiles share corners, so edges continue across tile borders without a seam.
+
+To change Track 01: edit `CONTROL_POINTS` and friends in `tools/layouts/track_layout.py`, run it,
+then rebuild the scene (this overwrites hand edits to `track_01.tscn`):
+
+```bash
+python tools/layouts/track_layout.py
+Godot_v4.7.1-stable_win64_console.exe --path . --headless res://track/build/build_track.tscn
+```
 
 Image generation makes none of this geometry — it is exactly what diffusion does worst. Generated
 art is limited to the cars, props and UI illustrations.
@@ -254,6 +278,10 @@ The car checks what it is on every physics frame:
 
 1. **On the road?** Distance from the car to the racing line (`Curve2D.get_closest_point`) is under
    the road's half-width → asphalt. Kerbs count as asphalt.
+
+The track, not the car, does this: each physics frame it sets the surface multipliers of every
+node in the `cars` group and emits `CAR_surface_changed` when a car's surface changes. Cars stay
+unaware of tracks.
 2. **Otherwise**, the ground tile beneath it, read from the TileSet's custom data layer `surface`.
 
 | Surface | `speed_mult` | `lateral_grip` × | Feel |
