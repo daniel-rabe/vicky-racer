@@ -148,7 +148,7 @@ the setup *feels*, which is what the garage needs to communicate.
 | Viewport | 1920 × 1080, `canvas_items` / `expand` | Already set in `project.godot` |
 | Camera zoom | 1.0, easing to 0.85 at top speed | About 15 × 8 tiles visible. Matches the chosen style frame, where cars read at ~130–160 px on screen; 0.75 made them feel distant. The camera leads toward the direction of travel and zooms out with speed, which gives back the lookahead |
 
-## 6. Architecture **(not implemented)**
+## 6. Architecture
 
 ### 6.1 Event bus
 
@@ -158,17 +158,25 @@ single autoload (`EventSystem`) and declares every cross-system signal. Managers
 
 | Prefix | Domain | Signals |
 | --- | --- | --- |
-| `RAC_` | Race | `countdown_tick(n)`, `race_started()`, `lap_completed(racer, lap, lap_time)`, `positions_updated(order)`, `race_finished(results)` |
+| `RAC_` | Race | `countdown_tick(n)`, `race_started()`, `lap_completed(racer, lap, lap_time)`, `positions_updated(order)`, `race_finished(results, track_id)` |
 | `CAR_` | Car | `drift_started(car)`, `drift_ended(car, duration)`, `surface_changed(car, surface)`, `wall_hit(car, impact_speed)` |
-| `PRO_` | Progression | `coins_changed(total)`, `coins_awarded(amount, breakdown)`, `setup_purchased(id)`, `setup_equipped(id)`, `purchase_refused(id, reason)` |
+| `PRO_` | Progression | `state_requested()`, `state_changed(state)`, `buy_requested(id)`, `equip_requested(id)`, `coins_changed(total)`, `coins_awarded(amount, breakdown)`, `setup_purchased(id)`, `setup_equipped(id)`, `purchase_refused(id, reason)` |
 | `UI_` | Screens | `show_message(text, duration)`, `screen_requested(name)` |
+
+Screens never reach into managers. Following Vicky's Game's inventory pattern, a screen emits
+`PRO_state_requested` and `GarageManager` answers synchronously with `PRO_state_changed`, carrying
+the whole garage state: coins, owned and equipped setups, best laps and the last race. Buying and
+equipping are requests (`PRO_buy_requested`, `PRO_equip_requested`); the manager decides.
+
+Each `RAC_race_finished` result is a Dictionary: `name`, `body` (car sprite path), `is_player`,
+`position`, `time`, `best_lap`.
 
 ### 6.2 Scenes and managers
 
 ```
 main.tscn  (persistent shell — never unloaded)
-├── GarageManager        wallet, ownership, equipped setup; pays out on RAC_race_finished
-└── ScreenSlot           swaps between:
+├── GarageManager        wallet, ownership, equipped setup, last race; pays out on RAC_race_finished
+└── ScreenSlot           swaps on UI_screen_requested(&"garage" | &"race" | &"results"):
     ├── garage_screen.tscn
     ├── race.tscn
     │   ├── Track (track_01.tscn)
@@ -262,7 +270,7 @@ Each AI car runs `ai_driver.gd`, writing the same three inputs a player would:
 5. **Rubber-banding** — `RaceManager` gives each AI a speed multiplier from its gap to the player:
    cars far ahead ease off, cars far behind push. The pack stays in sight; the player can still win.
 
-## 9. Garage and economy **(not implemented)**
+## 9. Garage and economy
 
 ### 9.1 Earning
 
@@ -289,21 +297,34 @@ schema_version=1
 coins=240
 owned_setups=PackedStringArray("starter", "slider")
 equipped_setup="slider"
+completed_tracks=PackedStringArray("track_01")
 
 [best_laps]
 track_01=38.90
 ```
 
-Loading is defensive: a missing, unreadable or unknown-version file yields a fresh profile instead
-of an error. A broken save must never stand between a child and the game.
+`completed_tracks` records which tracks have paid their one-off first-finish bonus.
 
-## 10. Screens **(not implemented)**
+Loading is defensive: a missing, unreadable or unknown-version file yields a fresh profile instead
+of an error, and an unreadable file is kept as `vicky_racer.cfg.bak` rather than overwritten.
+Values are sanitised on load — negative coins become 0, Starter is always owned, and an equipped
+setup the player does not own falls back to Starter. A broken save must never stand between a
+child and the game.
+
+A purchase equips the setup straight away: a child who just bought something wants to drive it.
+
+Implemented in [`game/save_game.gd`](../game/save_game.gd) and
+[`game/managers/garage_manager.gd`](../game/managers/garage_manager.gd); checked by
+[`tests/economy_test.gd`](../tests/economy_test.gd), which also proves the design promise that two
+last places afford Grippy.
+
+## 10. Screens
 
 | Screen | Spec |
 | --- | --- |
-| Race HUD | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown |
-| Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, 3 × 2 setup cards, preview with Grip / Slide / Speed bars |
-| Results | [`mockups/results_layout.png`](mockups/results_layout.png) — finishing order, payout count-up, Race Again |
+| Race HUD **(not implemented)** | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown |
+| Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, 3 × 2 setup cards, preview with Grip / Slide / Speed bars. Built: [`screenshots/garage.png`](screenshots/garage.png) |
+| Results | [`mockups/results_layout.png`](mockups/results_layout.png) — finishing order, payout count-up, Race Again. Built: [`screenshots/results.png`](screenshots/results.png) |
 
 Pink annotations on each spec give anchors, sizes and animation timings; they are meant to be
 built verbatim with `Control` anchors. All menus are fully navigable with a gamepad alone.

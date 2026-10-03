@@ -1,0 +1,224 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://ui/garage/garage_screen.gd" id="1_screen"]
+[ext_resource type="Theme" path="res://ui/theme/vicky_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://art/ui/coin.png" id="3_coin"]
+
+[sub_resource type="StyleBoxFlat" id="fill_grip"]
+bg_color = Color(0.18, 0.769, 0.42, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="fill_slide"]
+bg_color = Color(0.227, 0.525, 1, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="fill_speed"]
+bg_color = Color(0.902, 0.224, 0.275, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="GarageScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_screen")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.078, 0.125, 0.18, 1)
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 56.0
+offset_right = 600.0
+offset_bottom = 132.0
+theme_override_font_sizes/font_size = 56
+text = "GARAGE"
+
+[node name="CoinPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -368.0
+offset_top = 48.0
+offset_right = -48.0
+offset_bottom = 144.0
+grow_horizontal = 0
+
+[node name="Row" type="HBoxContainer" parent="CoinPanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="CoinIcon" type="TextureRect" parent="CoinPanel/Row"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("3_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Coins" type="Label" parent="CoinPanel/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 44
+text = "0"
+
+[node name="Preview" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 176.0
+offset_right = 688.0
+offset_bottom = 896.0
+
+[node name="Column" type="VBoxContainer" parent="Preview"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PreviewArt" type="TextureRect" parent="Preview/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 330)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PreviewCaption" type="Label" parent="Preview/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.624, 0.69, 0.769, 1)
+theme_override_font_sizes/font_size = 22
+text = "EQUIPPED"
+horizontal_alignment = 1
+
+[node name="PreviewName" type="Label" parent="Preview/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 44
+text = "STARTER"
+horizontal_alignment = 1
+
+[node name="Bars" type="GridContainer" parent="Preview/Column"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 28
+columns = 2
+
+[node name="GripLabel" type="Label" parent="Preview/Column/Bars"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "GRIP"
+
+[node name="BarGrip" type="ProgressBar" parent="Preview/Column/Bars"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/fill = SubResource("fill_grip")
+max_value = 1.0
+step = 0.0
+show_percentage = false
+
+[node name="SlideLabel" type="Label" parent="Preview/Column/Bars"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "SLIDE"
+
+[node name="BarSlide" type="ProgressBar" parent="Preview/Column/Bars"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/fill = SubResource("fill_slide")
+max_value = 1.0
+step = 0.0
+show_percentage = false
+
+[node name="SpeedLabel" type="Label" parent="Preview/Column/Bars"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "SPEED"
+
+[node name="BarSpeed" type="ProgressBar" parent="Preview/Column/Bars"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/fill = SubResource("fill_speed")
+max_value = 1.0
+step = 0.0
+show_percentage = false
+
+[node name="Cards" type="GridContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 736.0
+offset_top = 176.0
+offset_right = 1872.0
+offset_bottom = 880.0
+theme_override_constants/h_separation = 28
+theme_override_constants/v_separation = 24
+columns = 3
+
+[node name="Message" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 736.0
+offset_top = 896.0
+offset_right = 1480.0
+offset_bottom = 940.0
+theme_override_colors/font_color = Color(1, 0.824, 0.247, 1)
+theme_override_colors/font_outline_color = Color(0.055, 0.078, 0.11, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 28
+text = "MESSAGE"
+
+[node name="Hints" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 48.0
+offset_top = 980.0
+offset_right = 1200.0
+offset_bottom = 1032.0
+theme_override_colors/font_color = Color(0.624, 0.69, 0.769, 1)
+theme_override_font_sizes/font_size = 22
+text = "ENTER  BUY / EQUIP      R  RACE"
+vertical_alignment = 1
+
+[node name="Race" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -408.0
+offset_top = -128.0
+offset_right = -48.0
+offset_bottom = -48.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_type_variation = &"RaceButton"
+text = "RACE!"

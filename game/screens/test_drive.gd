@@ -1,7 +1,11 @@
 extends Node2D
 ## Dev screen for tuning the handling before any track exists: an open grass field with
 ## a tyre wall round the edge and hay bales to bump into. Keys 1–6 swap the drift setup
-## live; Backspace puts the car back in the middle.
+## live; Backspace puts the car back in the middle. Escape returns to the garage.
+## The car starts with whatever setup is equipped in the garage.
+##
+## Dev, until the real race exists (Phase 7): F fakes a race finish in a random position
+## and opens the results screen. It pays real coins into the save.
 ##
 ## Dev check: `-- --autodrive-screenshot=<path.png>` circles with the handbrake for a few
 ## seconds, saves a screenshot and quits, so the look can be verified without a person.
@@ -34,6 +38,16 @@ var _autodrive_done := false
 @onready var readout: Label = %Readout
 
 
+func _enter_tree() -> void:
+	EventSystem.PRO_state_changed.connect(_on_state_changed)
+
+
+func _on_state_changed(state: Dictionary) -> void:
+	for setup: DriftSetup in _setups:
+		if setup.id == state["equipped"]:
+			car.setup = setup
+
+
 func _ready() -> void:
 	for path in SETUP_PATHS:
 		_setups.append(load(path))
@@ -44,6 +58,7 @@ func _ready() -> void:
 	_build_walls()
 	_build_bales()
 	_reset_car()
+	EventSystem.PRO_state_requested.emit()
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--autodrive-screenshot="):
 			_autodrive_path = arg.get_slice("=", 1)
@@ -116,6 +131,17 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		car.setup = _setups[key.physical_keycode - KEY_1]
 	elif key.physical_keycode == KEY_BACKSPACE:
 		_reset_car()
+	elif key.physical_keycode == KEY_ESCAPE:
+		EventSystem.UI_screen_requested.emit(&"garage")
+	elif key.physical_keycode == KEY_F:
+		_fake_finish()
+
+
+func _fake_finish() -> void:
+	var main := get_tree().root.get_node_or_null("Main")
+	if main and main.has_method("_fake_race_finish"):
+		main._fake_race_finish(randi_range(1, 4))
+		EventSystem.UI_screen_requested.emit(&"results")
 
 
 func _process(_delta: float) -> void:
@@ -129,7 +155,8 @@ func _process(_delta: float) -> void:
 		"SLIDE  %4d %s" % [car.lateral_speed, "DRIFT!" if car.is_drifting else ""],
 		"",
 		"  ".join(names),
-		"1-6 setup   SPACE handbrake   BACKSPACE reset",
+		"1-6 setup   SPACE handbrake   BACKSPACE reset   ESC garage",
+		"F  fake race finish (dev, pays real coins)",
 	])
 
 

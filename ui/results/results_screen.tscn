@@ -1,0 +1,136 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ui/results/results_screen.gd" id="1_screen"]
+[ext_resource type="Theme" path="res://ui/theme/vicky_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://art/ui/coin.png" id="3_coin"]
+
+[node name="ResultsScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_screen")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.078, 0.125, 0.18, 1)
+
+[node name="Headline" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 70.0
+offset_bottom = 170.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.824, 0.247, 1)
+theme_override_colors/font_outline_color = Color(0.055, 0.078, 0.11, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 72
+text = "YOU CAME 2ND!"
+horizontal_alignment = 1
+
+[node name="Rows" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 160.0
+offset_top = 240.0
+offset_right = 1160.0
+offset_bottom = 780.0
+theme_override_constants/separation = 20
+
+[node name="Payout" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 1220.0
+offset_top = 240.0
+offset_right = 1760.0
+offset_bottom = 780.0
+
+[node name="Column" type="VBoxContainer" parent="Payout"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Heading" type="Label" parent="Payout/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.624, 0.69, 0.769, 1)
+theme_override_font_sizes/font_size = 26
+text = "COINS WON"
+
+[node name="Lines" type="VBoxContainer" parent="Payout/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Divider" type="ColorRect" parent="Payout/Column"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+color = Color(0.239, 0.314, 0.408, 1)
+
+[node name="TotalRow" type="HBoxContainer" parent="Payout/Column"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_constants/separation = 24
+
+[node name="Coin" type="TextureRect" parent="Payout/Column/TotalRow"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("3_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Total" type="Label" parent="Payout/Column/TotalRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.824, 0.247, 1)
+theme_override_colors/font_outline_color = Color(0.055, 0.078, 0.11, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 80
+text = "+0"
+horizontal_alignment = 2
+
+[node name="Balance" type="Label" parent="Payout/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.624, 0.69, 0.769, 1)
+theme_override_font_sizes/font_size = 22
+text = "TOTAL 0"
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -180.0
+offset_right = 400.0
+offset_bottom = -88.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 80
+
+[node name="Garage" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 92)
+layout_mode = 2
+theme_type_variation = &"NavButton"
+text = "GARAGE"
+
+[node name="Again" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 92)
+layout_mode = 2
+theme_type_variation = &"RaceButton"
+theme_override_font_sizes/font_size = 32
+text = "RACE AGAIN"

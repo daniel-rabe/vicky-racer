@@ -1,0 +1,84 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ui/garage/setup_card.gd" id="1_card"]
+[ext_resource type="Texture2D" path="res://art/ui/coin.png" id="2_coin"]
+
+[sub_resource type="StyleBoxFlat" id="badge"]
+bg_color = Color(1, 0.824, 0.247, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 16.0
+content_margin_top = 6.0
+content_margin_right = 16.0
+content_margin_bottom = 6.0
+
+[node name="SetupCard" type="Button"]
+custom_minimum_size = Vector2(360, 340)
+script = ExtResource("1_card")
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 336.0
+offset_bottom = 320.0
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="Art" type="TextureRect" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(312, 190)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "SETUP"
+
+[node name="PriceRow" type="HBoxContainer" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Coin" type="TextureRect" parent="Content/PriceRow"]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Price" type="Label" parent="Content/PriceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "100"
+
+[node name="Owned" type="Label" parent="Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18, 0.769, 0.42, 1)
+theme_override_font_sizes/font_size = 24
+text = "OWNED"
+
+[node name="Equipped" type="PanelContainer" parent="Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("badge")
+
+[node name="Label" type="Label" parent="Content/Equipped"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.055, 0.078, 0.11, 1)
+theme_override_font_sizes/font_size = 20
+text = "EQUIPPED"
