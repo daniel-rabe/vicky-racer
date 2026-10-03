@@ -557,7 +557,5 @@ python tools/comfy/generate_sfx.py build                      # write art/sfx/*.
 
 ## 12. Out of scope for v1
 
-- More than one track
-- Music during the race
-- Lap ghosts, time-trial mode, split-screen
-- Touch controls
+More tracks, more cars, tournaments, music, split screen, time trial and ghosts are planned as
+Phases 9–17 in [`ROADMAP.md`](ROADMAP.md). Touch controls remain out of scope.
