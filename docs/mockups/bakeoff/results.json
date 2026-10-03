@@ -1,0 +1,1927 @@
+{
+  "sd35_neg": {
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes, pointing straight up, perfectly symmetrical, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 20.4,
+      "flatness": 84.25,
+      "model": "sd3.5-medium",
+      "sd35": {
+        "checkpoint": "stable-diffusion-3.5-medium\\sd3.5_medium.safetensors",
+        "clip_g": "stable-diffusion-3.5-medium\\text_encoders\\clip_g.safetensors",
+        "clip_l": "stable-diffusion-3.5-medium\\text_encoders\\clip_l.safetensors",
+        "t5": "stable-diffusion-3.5-medium\\text_encoders\\t5xxl_fp8_e4m3fn.safetensors",
+        "steps": 28,
+        "cfg": 4.5,
+        "shift": 3.0,
+        "sampler": "dpmpp_2m",
+        "scheduler": "sgm_uniform"
+      },
+      "negative": "3d render, photo, realistic, gradient shading, glossy, shine, reflections, drop shadow, perspective, isometric, side view, text, watermark, border, frame, vignette"
+    },
+    "tyres": {
+      "prompt": "a stack of three black racing tyres, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 14.5,
+      "flatness": 60.86,
+      "model": "sd3.5-medium",
+      "sd35": {
+        "checkpoint": "stable-diffusion-3.5-medium\\sd3.5_medium.safetensors",
+        "clip_g": "stable-diffusion-3.5-medium\\text_encoders\\clip_g.safetensors",
+        "clip_l": "stable-diffusion-3.5-medium\\text_encoders\\clip_l.safetensors",
+        "t5": "stable-diffusion-3.5-medium\\text_encoders\\t5xxl_fp8_e4m3fn.safetensors",
+        "steps": 28,
+        "cfg": 4.5,
+        "shift": 3.0,
+        "sampler": "dpmpp_2m",
+        "scheduler": "sgm_uniform"
+      },
+      "negative": "3d render, photo, realistic, gradient shading, glossy, shine, reflections, drop shadow, perspective, isometric, side view, text, watermark, border, frame, vignette"
+    },
+    "hay": {
+      "prompt": "a rectangular golden hay bale, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 16.2,
+      "flatness": 85.35,
+      "model": "sd3.5-medium",
+      "sd35": {
+        "checkpoint": "stable-diffusion-3.5-medium\\sd3.5_medium.safetensors",
+        "clip_g": "stable-diffusion-3.5-medium\\text_encoders\\clip_g.safetensors",
+        "clip_l": "stable-diffusion-3.5-medium\\text_encoders\\clip_l.safetensors",
+        "t5": "stable-diffusion-3.5-medium\\text_encoders\\t5xxl_fp8_e4m3fn.safetensors",
+        "steps": 28,
+        "cfg": 4.5,
+        "shift": 3.0,
+        "sampler": "dpmpp_2m",
+        "scheduler": "sgm_uniform"
+      },
+      "negative": "3d render, photo, realistic, gradient shading, glossy, shine, reflections, drop shadow, perspective, isometric, side view, text, watermark, border, frame, vignette"
+    },
+    "tree": {
+      "prompt": "a round bushy green tree, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 16.1,
+      "flatness": 90.4,
+      "model": "sd3.5-medium",
+      "sd35": {
+        "checkpoint": "stable-diffusion-3.5-medium\\sd3.5_medium.safetensors",
+        "clip_g": "stable-diffusion-3.5-medium\\text_encoders\\clip_g.safetensors",
+        "clip_l": "stable-diffusion-3.5-medium\\text_encoders\\clip_l.safetensors",
+        "t5": "stable-diffusion-3.5-medium\\text_encoders\\t5xxl_fp8_e4m3fn.safetensors",
+        "steps": 28,
+        "cfg": 4.5,
+        "shift": 3.0,
+        "sampler": "dpmpp_2m",
+        "scheduler": "sgm_uniform"
+      },
+      "negative": "3d render, photo, realistic, gradient shading, glossy, shine, reflections, drop shadow, perspective, isometric, side view, text, watermark, border, frame, vignette"
+    },
+    "grass": {
+      "prompt": "short green lawn, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 15.4,
+      "flatness": 51.44,
+      "model": "sd3.5-medium",
+      "sd35": {
+        "checkpoint": "stable-diffusion-3.5-medium\\sd3.5_medium.safetensors",
+        "clip_g": "stable-diffusion-3.5-medium\\text_encoders\\clip_g.safetensors",
+        "clip_l": "stable-diffusion-3.5-medium\\text_encoders\\clip_l.safetensors",
+        "t5": "stable-diffusion-3.5-medium\\text_encoders\\t5xxl_fp8_e4m3fn.safetensors",
+        "steps": 28,
+        "cfg": 4.5,
+        "shift": 3.0,
+        "sampler": "dpmpp_2m",
+        "scheduler": "sgm_uniform"
+      },
+      "negative": "3d render, photo, realistic, gradient shading, glossy, shine, reflections, drop shadow, perspective, isometric, side view, text, watermark, border, frame, vignette"
+    },
+    "asphalt": {
+      "prompt": "dark grey asphalt road surface, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 18.2,
+      "flatness": 129.8,
+      "model": "sd3.5-medium",
+      "sd35": {
+        "checkpoint": "stable-diffusion-3.5-medium\\sd3.5_medium.safetensors",
+        "clip_g": "stable-diffusion-3.5-medium\\text_encoders\\clip_g.safetensors",
+        "clip_l": "stable-diffusion-3.5-medium\\text_encoders\\clip_l.safetensors",
+        "t5": "stable-diffusion-3.5-medium\\text_encoders\\t5xxl_fp8_e4m3fn.safetensors",
+        "steps": 28,
+        "cfg": 4.5,
+        "shift": 3.0,
+        "sampler": "dpmpp_2m",
+        "scheduler": "sgm_uniform"
+      },
+      "negative": "3d render, photo, realistic, gradient shading, glossy, shine, reflections, drop shadow, perspective, isometric, side view, text, watermark, border, frame, vignette"
+    }
+  },
+  "redux_strong": {
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes, pointing straight up, perfectly symmetrical, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 48.4,
+      "flatness": 69.29,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0
+      }
+    },
+    "tyres": {
+      "prompt": "a stack of three black racing tyres, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 44.4,
+      "flatness": 52.34,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0
+      }
+    },
+    "hay": {
+      "prompt": "a rectangular golden hay bale, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 40.4,
+      "flatness": 28.28,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0
+      }
+    },
+    "tree": {
+      "prompt": "a round bushy green tree, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 41.4,
+      "flatness": 34.96,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0
+      }
+    },
+    "grass": {
+      "prompt": "short green lawn, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 39.4,
+      "flatness": 27.18,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0
+      }
+    },
+    "asphalt": {
+      "prompt": "dark grey asphalt road surface, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 39.3,
+      "flatness": 25.41,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0
+      }
+    }
+  },
+  "redux_med": {
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes, pointing straight up, perfectly symmetrical, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 51.2,
+      "flatness": 54.48,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.0,
+        "weight": 0.8
+      }
+    },
+    "tyres": {
+      "prompt": "a stack of three black racing tyres, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 40.6,
+      "flatness": 38.16,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.0,
+        "weight": 0.8
+      }
+    },
+    "hay": {
+      "prompt": "a rectangular golden hay bale, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 47.4,
+      "flatness": 28.28,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.0,
+        "weight": 0.8
+      }
+    },
+    "tree": {
+      "prompt": "a round bushy green tree, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 47.5,
+      "flatness": 22.34,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.0,
+        "weight": 0.8
+      }
+    },
+    "grass": {
+      "prompt": "short green lawn, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 43.4,
+      "flatness": 12.88,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.0,
+        "weight": 0.8
+      }
+    },
+    "asphalt": {
+      "prompt": "dark grey asphalt road surface, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 43.4,
+      "flatness": 22.68,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.0,
+        "weight": 0.8
+      }
+    }
+  },
+  "redux_light": {
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes, pointing straight up, perfectly symmetrical, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 48.5,
+      "flatness": 52.53,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7
+      }
+    },
+    "tyres": {
+      "prompt": "a stack of three black racing tyres, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 41.4,
+      "flatness": 32.83,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7
+      }
+    },
+    "hay": {
+      "prompt": "a rectangular golden hay bale, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 46.5,
+      "flatness": 23.89,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7
+      }
+    },
+    "tree": {
+      "prompt": "a round bushy green tree, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 45.7,
+      "flatness": 19.33,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7
+      }
+    },
+    "grass": {
+      "prompt": "short green lawn, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 35.3,
+      "flatness": 9.09,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7
+      }
+    },
+    "asphalt": {
+      "prompt": "dark grey asphalt road surface, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 52.6,
+      "flatness": 10.96,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7
+      }
+    }
+  },
+  "flux_g2": {
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes, pointing straight up, perfectly symmetrical, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 50.6,
+      "flatness": 47.77,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 2.0,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "tyres": {
+      "prompt": "a stack of three black racing tyres, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 44.6,
+      "flatness": 28.78,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 2.0,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "hay": {
+      "prompt": "a rectangular golden hay bale, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 52.6,
+      "flatness": 27.14,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 2.0,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "tree": {
+      "prompt": "a round bushy green tree, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 390.6,
+      "flatness": 25.17,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 2.0,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "grass": {
+      "prompt": "short green lawn, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 34.5,
+      "flatness": 16.74,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 2.0,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "asphalt": {
+      "prompt": "dark grey asphalt road surface, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 46.7,
+      "flatness": 15.93,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 2.0,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    }
+  },
+  "flux_base": {
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes, pointing straight up, perfectly symmetrical, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 44.6,
+      "flatness": 51.65,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "tyres": {
+      "prompt": "a stack of three black racing tyres, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 37.6,
+      "flatness": 33.35,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "hay": {
+      "prompt": "a rectangular golden hay bale, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 35.5,
+      "flatness": 23.0,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "tree": {
+      "prompt": "a round bushy green tree, seen from directly above, top-down plan view, 2D video game sprite, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 34.4,
+      "flatness": 20.37,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "grass": {
+      "prompt": "short green lawn, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 39.4,
+      "flatness": 8.81,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "asphalt": {
+      "prompt": "dark grey asphalt road surface, uniform seamless ground texture filling the whole image, viewed from directly above, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines, no objects, no borders, no vignette",
+      "seed": 11,
+      "seconds": 47.6,
+      "flatness": 9.48,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    }
+  },
+  "r2_board_med": {
+    "_probe_set": "r2",
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 45.6,
+      "flatness": 42.45,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 39.5,
+      "flatness": 10.4,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 38.4,
+      "flatness": 35.09,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "the round puffy crown of a tree seen from directly above, made of soft bubbly green clumps, no trunk visible, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 38.3,
+      "flatness": 34.31,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    }
+  },
+  "r2_board_light": {
+    "_probe_set": "r2",
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 37.4,
+      "flatness": 46.79,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 5.0,
+        "weight": 0.75,
+        "image": "board"
+      }
+    },
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 38.5,
+      "flatness": 14.04,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 5.0,
+        "weight": 0.75,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 44.5,
+      "flatness": 20.2,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 5.0,
+        "weight": 0.75,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "the round puffy crown of a tree seen from directly above, made of soft bubbly green clumps, no trunk visible, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 34.4,
+      "flatness": 32.39,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 5.0,
+        "weight": 0.75,
+        "image": "board"
+      }
+    }
+  },
+  "r2_board_strong": {
+    "_probe_set": "r2",
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 37.7,
+      "flatness": 44.13,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0,
+        "image": "board"
+      }
+    },
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 34.4,
+      "flatness": 13.93,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 41.4,
+      "flatness": 23.5,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "the round puffy crown of a tree seen from directly above, made of soft bubbly green clumps, no trunk visible, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 39.2,
+      "flatness": 20.55,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.0,
+        "weight": 1.0,
+        "image": "board"
+      }
+    }
+  },
+  "r2_base": {
+    "_probe_set": "r2",
+    "car": {
+      "prompt": "a red classic sports car with white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 37.2,
+      "flatness": 48.5,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 35.3,
+      "flatness": 16.02,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 53.4,
+      "flatness": 21.72,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    },
+    "tree": {
+      "prompt": "the round puffy crown of a tree seen from directly above, made of soft bubbly green clumps, no trunk visible, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 36.3,
+      "flatness": 38.72,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": null
+    }
+  },
+  "r3_board_med": {
+    "_probe_set": "r3",
+    "tree_a": {
+      "prompt": "a round green tree canopy seen from directly overhead like a satellite view, a circle of soft bubbly green clumps, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 38.4,
+      "flatness": 33.36,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "tree_b": {
+      "prompt": "a round green bush viewed from straight above, a circular blob of puffy leaf clusters, flat lay, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 39.4,
+      "flatness": 19.95,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "tree_c": {
+      "prompt": "bird's eye view of a single round puffy green treetop, only the top of the leaves is visible, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 38.3,
+      "flatness": 10.32,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "car_re45": {
+      "prompt": "a red classic sports car with white racing stripes seen from directly above, pointing straight down, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 37.4,
+      "flatness": 74.28,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "car_re60": {
+      "prompt": "a red classic sports car with white racing stripes seen from directly above, pointing straight down, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 34.3,
+      "flatness": 81.05,
+      "model": "flux1-dev",
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    }
+  },
+  "r4_base": {
+    "_probe_set": "r4",
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 40.3,
+      "flatness": 9.42,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 36.3,
+      "flatness": 20.65,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "a round green bush viewed from straight above, a circular blob of puffy leaf clusters, flat lay, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 35.3,
+      "flatness": 20.77,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "car_toy": {
+      "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 38.3,
+      "flatness": 28.41,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    }
+  },
+  "r4_steps30": {
+    "_probe_set": "r4",
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 46.4,
+      "flatness": 10.55,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 30,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 45.6,
+      "flatness": 22.39,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 30,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "a round green bush viewed from straight above, a circular blob of puffy leaf clusters, flat lay, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 45.6,
+      "flatness": 28.19,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 30,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "car_toy": {
+      "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 50.9,
+      "flatness": 27.49,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 30,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    }
+  },
+  "r4_1536": {
+    "_probe_set": "r4",
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 78.0,
+      "flatness": 8.85,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 75.7,
+      "flatness": 17.53,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "a round green bush viewed from straight above, a circular blob of puffy leaf clusters, flat lay, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 73.6,
+      "flatness": 15.52,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "car_toy": {
+      "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 72.9,
+      "flatness": 30.59,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "fp8_e4m3fn",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    }
+  },
+  "r4_bf16": {
+    "_probe_set": "r4",
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 51.7,
+      "flatness": 8.63,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 45.6,
+      "flatness": 20.88,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "a round green bush viewed from straight above, a circular blob of puffy leaf clusters, flat lay, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 51.5,
+      "flatness": 20.44,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "car_toy": {
+      "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 43.5,
+      "flatness": 25.27,
+      "model": "flux1-dev",
+      "size": 1024,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    }
+  },
+  "r4_all": {
+    "_probe_set": "r4",
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 113.4,
+      "flatness": 9.53,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 30,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 114.3,
+      "flatness": 18.33,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 30,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "a round green bush viewed from straight above, a circular blob of puffy leaf clusters, flat lay, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 116.3,
+      "flatness": 12.13,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 30,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    },
+    "car_toy": {
+      "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 114.4,
+      "flatness": 28.56,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 30,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 3.5,
+        "weight": 0.85,
+        "image": "board"
+      }
+    }
+  },
+  "r5_1536_board_a": {
+    "_probe_set": "r5",
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 82.9,
+      "flatness": 9.74,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.5,
+        "weight": 0.75,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 79.0,
+      "flatness": 15.49,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.5,
+        "weight": 0.75,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "a round green bush viewed from straight above, a circular blob of puffy leaf clusters, flat lay, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 80.8,
+      "flatness": 16.83,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.5,
+        "weight": 0.75,
+        "image": "board"
+      }
+    },
+    "car_toy": {
+      "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 78.2,
+      "flatness": 33.83,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 4.5,
+        "weight": 0.75,
+        "image": "board"
+      }
+    }
+  },
+  "r5_1536_board_b": {
+    "_probe_set": "r5",
+    "ring": {
+      "prompt": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 78.9,
+      "flatness": 10.22,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7,
+        "image": "board"
+      }
+    },
+    "bale": {
+      "prompt": "a soft square golden hay bale seen from above at a slight angle, rounded edges, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 74.9,
+      "flatness": 12.58,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7,
+        "image": "board"
+      }
+    },
+    "tree": {
+      "prompt": "a round green bush viewed from straight above, a circular blob of puffy leaf clusters, flat lay, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 76.9,
+      "flatness": 18.35,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7,
+        "image": "board"
+      }
+    },
+    "car_toy": {
+      "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+      "seed": 11,
+      "seconds": 80.1,
+      "flatness": 41.23,
+      "model": "flux1-dev",
+      "size": 1536,
+      "flux": {
+        "unet": "flux1-dev.safetensors",
+        "weight_dtype": "default",
+        "clip_l": "clip_l.safetensors",
+        "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "vae": "ae.safetensors",
+        "guidance": 3.5,
+        "steps": 20,
+        "sampler": "euler",
+        "scheduler": "beta"
+      },
+      "style_ref": {
+        "downsampling_factor": 6.0,
+        "weight": 0.7,
+        "image": "board"
+      }
+    }
+  }
+}

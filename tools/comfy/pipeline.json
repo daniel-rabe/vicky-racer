@@ -1,0 +1,106 @@
+{
+  "_about": "Frozen Phase 2 recipe. Every production asset is generated from this, via recipe.py. Change it only through a new bake-off.",
+  "frozen": "2026-10-03",
+  "chosen_from": "bake-off rounds 1-5, docs/mockups/bakeoff/ (winner: r5_1536_board_a)",
+  "generator": {
+    "unet": "flux1-dev.safetensors",
+    "weight_dtype": "fp8_e4m3fn",
+    "_weight_dtype_note": "bf16 ('default') was tested and rejected: at 1536 px it spills past 16 GB VRAM and the varying offload makes runs non-reproducible (mean pixel diff ~22 between identical runs), a variation as large as any bf16-vs-fp8 difference. fp8 at 1536 is pixel-identical run to run.",
+    "clip_l": "clip_l.safetensors",
+    "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+    "vae": "ae.safetensors",
+    "size": 1536,
+    "steps": 20,
+    "sampler": "euler",
+    "scheduler": "beta",
+    "guidance": 3.5
+  },
+  "style_lock": {
+    "node": "ReduxAdvanced",
+    "reference": "docs/mockups/style_board.png",
+    "downsampling_factor": 4.5,
+    "weight": 0.75,
+    "mode": "keep aspect ratio",
+    "style_model": "flux1-redux-dev.safetensors",
+    "clip_vision": "sigclip_vision_patch14_384.safetensors"
+  },
+  "prompt": {
+    "style": "soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines",
+    "sprite_template": "{subject}, 2D top-down video game sprite, {style}, centred on a plain white background"
+  },
+  "matting": {
+    "model": "BiRefNet-general",
+    "sensitivity": 1.0,
+    "refine_foreground": true,
+    "crop_padding": 8
+  },
+  "variants": {
+    "_about": "Recolours and finish edits of an already-chosen asset, so silhouettes stay identical.",
+    "unet": "flux1-dev-kontext_fp8_scaled.safetensors",
+    "weight_dtype": "default",
+    "guidance": 2.5
+  },
+  "ground": {
+    "_about": "Not generated: flat procedural fills (postprocess.flat_fill — wrap-around blotch noise, no direction, so no banding), colours sampled from the style anchor. Summed sine waves were tried first and showed diagonal banding. See tools/comfy/ground_check.py.",
+    "tile_px": 128,
+    "asphalt": {
+      "base": [
+        102,
+        109,
+        116
+      ],
+      "variation": 0.02,
+      "speckle_density": 0.002,
+      "speckle_shift": 8,
+      "waves": 4
+    },
+    "grass": {
+      "base": [
+        168,
+        190,
+        68
+      ],
+      "variation": 0.045,
+      "waves": 6,
+      "speckle_density": 0.0015,
+      "speckle_shift": 14
+    },
+    "sand": {
+      "base": [
+        232,
+        204,
+        122
+      ],
+      "variation": 0.04,
+      "waves": 5,
+      "speckle_density": 0.004,
+      "speckle_shift": 10
+    },
+    "kerb": {
+      "red": [
+        196,
+        47,
+        47
+      ],
+      "cream": [
+        231,
+        231,
+        171
+      ],
+      "thickness": 38,
+      "block": 48
+    }
+  },
+  "selection": {
+    "candidates_per_asset": 4,
+    "_about": "Quality over speed: every asset is generated from several seeds and the best is picked and pinned in asset_manifest.json."
+  },
+  "prompt_lessons": [
+    "Describe what a prop LOOKS LIKE from above ('a round bush viewed from straight above, puffy leaf clusters, flat lay'); 'seen from directly above' alone yields side views.",
+    "'pointing straight up, perfectly symmetrical' gets true top-down cars, but facing is unreliable: record facing per asset and rotate in post.",
+    "Reproducibility verified: the frozen recipe regenerates a probe pixel-identically (max diff 0), so a pinned seed fully defines an asset.",
+    "Never use the full style frame as the Redux reference: it leaks the track into every asset. Use the object-only style board.",
+    "At 1536 px the board pulls in extra objects unless the lock is light (factor >= 4.5, weight <= 0.75).",
+    "FLUX cannot make tileable ground ('a picture of a tile'); the style's ground is flat colour anyway, so it is procedural."
+  ]
+}

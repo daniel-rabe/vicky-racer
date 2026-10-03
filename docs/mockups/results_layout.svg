@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="Public Pixel, Consolas, monospace">
+  <title>Results screen layout spec — 1920 x 1080</title>
+  <defs>
+    <style>
+      .panel { fill: #1E2A3A; stroke: #0E141C; stroke-width: 4; }
+      .row { fill: #2B3A4E; stroke: #0E141C; stroke-width: 4; }
+      .row-you { fill: #2B3A4E; stroke: #FFD23F; stroke-width: 6; }
+      .big { fill: #FFFFFF; }
+      .dim { fill: #9FB0C4; }
+      .coin { fill: #FFD23F; stroke: #B8860B; stroke-width: 4; }
+      .spec { fill: none; stroke: #FF2BD6; stroke-width: 2; stroke-dasharray: 10 6; }
+      .spec-text { fill: #FF2BD6; font-family: Consolas, monospace; font-size: 18px; stroke: #14202E; stroke-width: 5px; paint-order: stroke; }
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#14202E"/>
+  <rect class="spec" x="48" y="48" width="1824" height="984"/>
+
+  <!-- Headline: always celebratory, whatever the result -->
+  <text x="960" y="150" text-anchor="middle" font-size="72" fill="#FFD23F" stroke="#0E141C" stroke-width="6" paint-order="stroke">YOU CAME 2ND!</text>
+  <text class="spec-text" x="560" y="190">HEADLINE · 72 px · 1st "YOU WON!" · 2nd–4th "YOU CAME Nth!" · never "you lost"</text>
+
+  <!-- Finishing order -->
+  <g>
+    <rect class="row" x="160" y="240" width="1000" height="120" rx="24"/>
+    <text class="big" x="200" y="320" font-size="52">1</text>
+    <rect x="290" y="264" width="128" height="72" rx="22" fill="#3A86FF" stroke="#0E141C" stroke-width="4"/>
+    <text class="big" x="450" y="316" font-size="34">BLUE</text>
+    <text class="dim" x="830" y="300" font-size="20">TIME</text>
+    <text class="big" x="830" y="334" font-size="28">1:58.40</text>
+
+    <rect class="row-you" x="160" y="380" width="1000" height="120" rx="24"/>
+    <text class="big" x="200" y="460" font-size="52">2</text>
+    <rect x="290" y="404" width="128" height="72" rx="22" fill="#E63946" stroke="#0E141C" stroke-width="4"/>
+    <text x="450" y="456" font-size="34" fill="#FFD23F">YOU</text>
+    <text class="dim" x="830" y="440" font-size="20">TIME</text>
+    <text class="big" x="830" y="474" font-size="28">2:01.12</text>
+    <rect x="590" y="422" width="190" height="36" rx="18" fill="#2EC46B"/>
+    <text x="685" y="448" text-anchor="middle" font-size="16" fill="#0E141C">BEST LAP!</text>
+
+    <rect class="row" x="160" y="520" width="1000" height="120" rx="24"/>
+    <text class="big" x="200" y="600" font-size="52">3</text>
+    <rect x="290" y="544" width="128" height="72" rx="22" fill="#FFD23F" stroke="#0E141C" stroke-width="4"/>
+    <text class="big" x="450" y="596" font-size="34">YELLOW</text>
+    <text class="dim" x="830" y="580" font-size="20">TIME</text>
+    <text class="big" x="830" y="614" font-size="28">2:03.77</text>
+
+    <rect class="row" x="160" y="660" width="1000" height="120" rx="24"/>
+    <text class="big" x="200" y="740" font-size="52">4</text>
+    <rect x="290" y="684" width="128" height="72" rx="22" fill="#2EC46B" stroke="#0E141C" stroke-width="4"/>
+    <text class="big" x="450" y="736" font-size="34">GREEN</text>
+    <text class="dim" x="830" y="720" font-size="20">TIME</text>
+    <text class="big" x="830" y="754" font-size="28">2:06.05</text>
+  </g>
+  <text class="spec-text" x="160" y="812">ORDER · rows 1000×120 · 20 px gap · player row = yellow outline · rows slide in one by one, 0.15 s apart</text>
+  <text class="spec-text" x="160" y="836">"BEST LAP!" tag only when the player beat their saved best on this track</text>
+
+  <!-- Payout -->
+  <rect class="panel" x="1220" y="240" width="540" height="540" rx="32"/>
+  <text class="dim" x="1260" y="300" font-size="26">COINS WON</text>
+  <text class="big" x="1260" y="380" font-size="26">2ND PLACE</text>
+  <text x="1720" y="380" text-anchor="end" font-size="30" fill="#FFD23F">+75</text>
+  <text class="big" x="1260" y="440" font-size="26">FIRST FINISH</text>
+  <text x="1720" y="440" text-anchor="end" font-size="30" fill="#FFD23F">+100</text>
+  <line x1="1260" y1="480" x2="1720" y2="480" stroke="#3D5068" stroke-width="4"/>
+  <circle class="coin" cx="1310" cy="580" r="44"/>
+  <text x="1310" y="596" text-anchor="middle" font-size="40" fill="#B8860B">C</text>
+  <text x="1720" y="610" text-anchor="end" font-size="80" fill="#FFD23F" stroke="#0E141C" stroke-width="5" paint-order="stroke">+175</text>
+  <text class="dim" x="1260" y="720" font-size="22">TOTAL 415</text>
+  <text class="spec-text" x="1220" y="812">PAYOUT · 540×540 · lines appear after the order rows,</text>
+  <text class="spec-text" x="1220" y="836">then the big total counts up from 0 with a coin tick sound</text>
+
+  <!-- Buttons -->
+  <rect x="560" y="900" width="360" height="92" rx="46" fill="#3A86FF" stroke="#0E141C" stroke-width="5"/>
+  <text x="740" y="960" text-anchor="middle" font-size="34" fill="#FFFFFF" stroke="#0E141C" stroke-width="3" paint-order="stroke">GARAGE</text>
+  <rect x="1000" y="900" width="360" height="92" rx="46" fill="#2EC46B" stroke="#FFD23F" stroke-width="8"/>
+  <text x="1180" y="960" text-anchor="middle" font-size="34" fill="#FFFFFF" stroke="#0E141C" stroke-width="3" paint-order="stroke">RACE AGAIN</text>
+  <text class="spec-text" x="560" y="1022">Buttons only become focusable once the count-up finishes · "RACE AGAIN" focused by default</text>
+</svg>

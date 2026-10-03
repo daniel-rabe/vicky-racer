@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="Public Pixel, Consolas, monospace">
+  <title>Garage screen layout spec — 1920 x 1080</title>
+  <defs>
+    <style>
+      .panel { fill: #1E2A3A; stroke: #0E141C; stroke-width: 4; }
+      .card { fill: #2B3A4E; stroke: #0E141C; stroke-width: 4; }
+      .card-focus { fill: #2B3A4E; stroke: #FFD23F; stroke-width: 8; }
+      .art { fill: #3D5068; }
+      .big { fill: #FFFFFF; }
+      .dim { fill: #9FB0C4; }
+      .coin { fill: #FFD23F; stroke: #B8860B; stroke-width: 4; }
+      .spec { fill: none; stroke: #FF2BD6; stroke-width: 2; stroke-dasharray: 10 6; }
+      .spec-text { fill: #FF2BD6; font-family: Consolas, monospace; font-size: 18px; stroke: #14202E; stroke-width: 5px; paint-order: stroke; }
+      .bar-bg { fill: #0E141C; }
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#14202E"/>
+  <rect class="spec" x="48" y="48" width="1824" height="984"/>
+
+  <!-- Header -->
+  <text class="big" x="48" y="120" font-size="56">GARAGE</text>
+  <rect class="panel" x="1552" y="48" width="320" height="96" rx="28"/>
+  <circle class="coin" cx="1610" cy="96" r="28"/>
+  <text x="1610" y="106" text-anchor="middle" font-size="26" fill="#B8860B">C</text>
+  <text class="big" x="1660" y="114" font-size="44">240</text>
+  <text class="spec-text" x="1180" y="40">COIN BALANCE · anchor top-right · 320×96 · counts up/down on change</text>
+
+  <!-- Left: preview of the equipped setup -->
+  <rect class="panel" x="48" y="176" width="640" height="720" rx="32"/>
+  <ellipse cx="368" cy="420" rx="220" ry="70" fill="#2B3A4E"/>
+  <rect x="268" y="330" width="200" height="112" rx="34" fill="#E63946" stroke="#0E141C" stroke-width="6"/>
+  <text class="dim" x="368" y="540" text-anchor="middle" font-size="22">EQUIPPED</text>
+  <text class="big" x="368" y="590" text-anchor="middle" font-size="44">SLIDER</text>
+
+  <text class="big" x="96" y="680" font-size="26">GRIP</text>
+  <rect class="bar-bg" x="300" y="656" width="340" height="32" rx="16"/>
+  <rect x="300" y="656" width="110" height="32" rx="16" fill="#2EC46B"/>
+  <text class="big" x="96" y="752" font-size="26">SLIDE</text>
+  <rect class="bar-bg" x="300" y="728" width="340" height="32" rx="16"/>
+  <rect x="300" y="728" width="300" height="32" rx="16" fill="#3A86FF"/>
+  <text class="big" x="96" y="824" font-size="26">SPEED</text>
+  <rect class="bar-bg" x="300" y="800" width="340" height="32" rx="16"/>
+  <rect x="300" y="800" width="200" height="32" rx="16" fill="#E63946"/>
+  <text class="spec-text" x="48" y="918">PREVIEW · 640×720 · car tinted to setup · three bars from DriftSetup.bar_grip / bar_slide / bar_speed (0–1)</text>
+  <text class="spec-text" x="48" y="944">Bars, not numbers: readable before reading is. Bars animate to the focused card while browsing.</text>
+
+  <!-- Right: setup cards, 3 x 2 -->
+  <g>
+    <!-- Row 1 -->
+    <rect class="card" x="736" y="176" width="360" height="340" rx="28"/>
+    <rect class="art" x="760" y="200" width="312" height="190" rx="18"/>
+    <text class="big" x="760" y="440" font-size="30">STARTER</text>
+    <text x="760" y="490" font-size="22" fill="#2EC46B">OWNED</text>
+
+    <rect class="card-focus" x="1124" y="176" width="360" height="340" rx="28"/>
+    <rect class="art" x="1148" y="200" width="312" height="190" rx="18"/>
+    <text class="big" x="1148" y="440" font-size="30">SLIDER</text>
+    <rect x="1148" y="466" width="200" height="36" rx="18" fill="#FFD23F"/>
+    <text x="1248" y="492" text-anchor="middle" font-size="20" fill="#0E141C">EQUIPPED</text>
+
+    <rect class="card" x="1512" y="176" width="360" height="340" rx="28"/>
+    <rect class="art" x="1536" y="200" width="312" height="190" rx="18"/>
+    <text class="big" x="1536" y="440" font-size="30">GRIPPY</text>
+    <circle class="coin" cx="1552" cy="482" r="16"/>
+    <text class="big" x="1580" y="494" font-size="28">100</text>
+
+    <!-- Row 2 -->
+    <rect class="card" x="736" y="540" width="360" height="340" rx="28"/>
+    <rect class="art" x="760" y="564" width="312" height="190" rx="18"/>
+    <text class="big" x="760" y="804" font-size="30">ROCKET</text>
+    <circle class="coin" cx="776" cy="846" r="16"/>
+    <text class="big" x="804" y="858" font-size="28">250</text>
+
+    <rect class="card" x="1124" y="540" width="360" height="340" rx="28"/>
+    <rect class="art" x="1148" y="564" width="312" height="190" rx="18"/>
+    <text class="big" x="1148" y="804" font-size="30">KART</text>
+    <circle class="coin" cx="1164" cy="846" r="16"/>
+    <text class="big" x="1192" y="858" font-size="28">250</text>
+
+    <rect class="card" x="1512" y="540" width="360" height="340" rx="28" opacity="0.55"/>
+    <rect class="art" x="1536" y="564" width="312" height="190" rx="18" opacity="0.55"/>
+    <text class="big" x="1536" y="804" font-size="30" opacity="0.55">BANANA</text>
+    <circle class="coin" cx="1552" cy="846" r="16" opacity="0.55"/>
+    <text x="1580" y="858" font-size="28" fill="#E63946">600</text>
+  </g>
+  <text class="spec-text" x="736" y="164">SETUP CARDS · 3×2 grid · 360×340 each · 28 px gap · focus = 8 px yellow outline + 1.05× scale</text>
+  <text class="spec-text" x="1124" y="906">Unaffordable: card at 55 %, price in red. Still focusable,</text>
+  <text class="spec-text" x="1124" y="930">so its stats can be browsed before saving up.</text>
+
+  <!-- Race button -->
+  <rect x="1512" y="952" width="360" height="80" rx="40" fill="#2EC46B" stroke="#0E141C" stroke-width="5"/>
+  <text x="1692" y="1006" text-anchor="middle" font-size="40" fill="#FFFFFF" stroke="#0E141C" stroke-width="3" paint-order="stroke">RACE!</text>
+
+  <!-- Controller hints -->
+  <circle cx="84" cy="1000" r="22" fill="#2EC46B"/><text x="84" y="1009" text-anchor="middle" font-size="22" fill="#0E141C">A</text>
+  <text class="dim" x="120" y="1010" font-size="22">BUY / EQUIP</text>
+  <circle cx="420" cy="1000" r="22" fill="#FFD23F"/><text x="420" y="1009" text-anchor="middle" font-size="22" fill="#0E141C">Y</text>
+  <text class="dim" x="456" y="1010" font-size="22">RACE</text>
+  <text class="spec-text" x="48" y="970">HINTS swap glyphs to keyboard (Enter / R) when the last input was a key press</text>
+</svg>

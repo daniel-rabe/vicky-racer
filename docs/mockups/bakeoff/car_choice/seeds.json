@@ -1,0 +1,26 @@
+{
+  "toy_seed21": {
+    "subject": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical",
+    "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+    "seed": 21,
+    "recipe": "tools/comfy/pipeline.json"
+  },
+  "toy_seed22": {
+    "subject": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical",
+    "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+    "seed": 22,
+    "recipe": "tools/comfy/pipeline.json"
+  },
+  "toy_seed23": {
+    "subject": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical",
+    "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+    "seed": 23,
+    "recipe": "tools/comfy/pipeline.json"
+  },
+  "toy_seed24": {
+    "subject": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical",
+    "prompt": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical, 2D top-down video game sprite, soft children's picture book illustration, smooth matte clay toy look, rounded chunky friendly shapes, warm bright colours, gentle soft shading, no outlines, centred on a plain white background",
+    "seed": 24,
+    "recipe": "tools/comfy/pipeline.json"
+  }
+}

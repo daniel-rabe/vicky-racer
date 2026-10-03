@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DriftSetup" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cards/kart.png" id="2_card"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"kart"
+display_name = "Kart"
+card_art = ExtResource("2_card")
+price = 250
+lateral_grip_mult = 1.2
+handbrake_grip_mult = 1.0
+engine_power_mult = 1.1
+max_speed_mult = 0.85
+steer_rate_mult = 1.35
+bar_grip = 0.8
+bar_slide = 0.35
+bar_speed = 0.35

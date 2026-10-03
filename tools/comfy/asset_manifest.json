@@ -1,0 +1,213 @@
+{
+  "_about": "Every game asset and how it is made. Generated with the frozen recipe in pipeline.json by generate_assets.py. A null seed means 'not picked yet': run `candidates` for it, then `pick`.",
+  "candidate_seeds": [
+    11,
+    12,
+    13,
+    14
+  ],
+  "sprites": [
+    {
+      "id": "car_red",
+      "subject": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical",
+      "seed": 22,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/car_red.png",
+      "_note": "Chosen by the user as B2 in docs/mockups/bakeoff/car_choice/sheet.png"
+    },
+    {
+      "id": "straw_ring",
+      "subject": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        96,
+        96
+      ],
+      "out": "art/props/straw_ring.png"
+    },
+    {
+      "id": "hay_bale",
+      "subject": "a soft square golden hay bale seen from above at a slight angle, rounded edges",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        112,
+        112
+      ],
+      "out": "art/props/hay_bale.png"
+    },
+    {
+      "id": "tree",
+      "subject": "a round green bush viewed from straight above, a circular blob of puffy leaf clusters, flat lay",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        192,
+        192
+      ],
+      "out": "art/props/tree.png"
+    },
+    {
+      "id": "tyre_stack",
+      "subject": "a stack of black rubber tyres viewed from straight above, concentric black rings with a hole in the middle, flat lay",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        80,
+        80
+      ],
+      "out": "art/props/tyre_stack.png",
+      "post": [
+        "punch_hole"
+      ],
+      "_note": "Seed 12 is the only true top-down tyre, but the model filled the hole; punch_hole makes it see-through."
+    },
+    {
+      "id": "coin",
+      "subject": "a shiny round gold coin with a big star in the middle, lying flat, viewed from straight above",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        128,
+        128
+      ],
+      "out": "art/ui/coin.png"
+    }
+  ],
+  "variants": [
+    {
+      "id": "car_blue",
+      "source": "car_red",
+      "seed": 11,
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/car_blue.png",
+      "instruction": "Change the car's red paint to bright blue. Keep the white racing stripes, the exact shape, the wheels, the windows, the viewing angle and the plain white background exactly the same."
+    },
+    {
+      "id": "car_yellow",
+      "source": "car_red",
+      "seed": 11,
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/car_yellow.png",
+      "instruction": "Change the car's red paint to sunny yellow and make the racing stripes dark navy blue. Keep the exact shape, the wheels, the windows, the viewing angle and the plain white background exactly the same.",
+      "_note": "Navy stripes: white stripes on yellow had too little contrast in Phase 1."
+    },
+    {
+      "id": "car_green",
+      "source": "car_red",
+      "seed": 11,
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/car_green.png",
+      "instruction": "Change the car's red paint to bright green. Keep the white racing stripes, the exact shape, the wheels, the windows, the viewing angle and the plain white background exactly the same."
+    },
+    {
+      "id": "card_grippy",
+      "source": "car_red",
+      "seed": 11,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/grippy.png",
+      "instruction": "Give this car extra-wide chunky knobbly tyres. Keep the red paint, the white racing stripes, the top-down view and the plain white background."
+    },
+    {
+      "id": "card_slider",
+      "source": "car_red",
+      "seed": 13,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/slider.png",
+      "instruction": "Draw three curved light-blue motion swooshes beside the left side of the car, showing it sliding sideways. Keep the car exactly the same, pointing straight up, the top-down view and the plain white background.",
+      "_note": "No seed drew the requested motion lines, but every one showed the car at a drift angle, which is what Slider does."
+    },
+    {
+      "id": "card_rocket",
+      "source": "car_red",
+      "seed": 11,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/rocket.png",
+      "instruction": "Add two big rocket boosters with orange flames at the back of the car, at the bottom of the picture. Keep the red paint, the white stripes, the top-down view and the plain white background."
+    },
+    {
+      "id": "card_kart",
+      "source": "car_red",
+      "seed": 13,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/kart.png",
+      "instruction": "Turn this car into a small open-top red go-kart seen from directly above, pointing straight up, with a driver wearing a red helmet in the seat. Keep the plain white background."
+    },
+    {
+      "id": "card_banana",
+      "source": "car_red",
+      "seed": 12,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/banana.png",
+      "instruction": "Repaint this car bright banana yellow with just a few small brown marks at the front and back like the tips of a banana, and put a peeled banana on the roof. Keep the shape, the top-down view and the plain white background."
+    }
+  ],
+  "copies": [
+    {
+      "id": "card_starter",
+      "source": "car_red",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/starter.png",
+      "_note": "The Starter setup is the plain car."
+    }
+  ],
+  "procedural": [
+    {
+      "id": "ground_asphalt",
+      "fill": "asphalt",
+      "out": "art/tiles/asphalt.png"
+    },
+    {
+      "id": "ground_grass",
+      "fill": "grass",
+      "out": "art/tiles/grass.png"
+    },
+    {
+      "id": "ground_sand",
+      "fill": "sand",
+      "out": "art/tiles/sand.png"
+    },
+    {
+      "id": "kerb",
+      "kind": "kerb",
+      "out": "art/tiles/kerb.png"
+    },
+    {
+      "id": "finish_line",
+      "kind": "chequer",
+      "out": "art/tiles/finish_line.png"
+    }
+  ]
+}

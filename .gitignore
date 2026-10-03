@@ -1,0 +1,13 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Python
+__pycache__/
+
+# Regenerable image intermediates. The recipe (tools/comfy/pipeline.json) is reproducible
+# from pinned seeds, so only the picks, masters and review sheets are kept.
+tools/comfy/masters/candidates/
+docs/mockups/bakeoff/*/*
+!docs/mockups/bakeoff/*/sheet.png
+!docs/mockups/bakeoff/*/seeds.json

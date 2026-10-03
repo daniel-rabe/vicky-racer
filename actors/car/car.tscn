@@ -1,0 +1,21 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://actors/car/car.gd" id="1_car"]
+[ext_resource type="Resource" path="res://game/configs/cars/base_car.tres" id="2_base"]
+[ext_resource type="Resource" path="res://game/configs/setups/starter.tres" id="3_setup"]
+[ext_resource type="Texture2D" path="res://art/cars/car_red.png" id="4_body"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(110, 60)
+
+[node name="Car" type="CharacterBody2D"]
+script = ExtResource("1_car")
+base_config = ExtResource("2_base")
+setup = ExtResource("3_setup")
+body_texture = ExtResource("4_body")
+
+[node name="Body" type="Sprite2D" parent="."]
+texture = ExtResource("4_body")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_body")

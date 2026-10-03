@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DriftSetup" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cards/slider.png" id="2_card"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"slider"
+display_name = "Slider"
+card_art = ExtResource("2_card")
+price = 250
+lateral_grip_mult = 0.55
+handbrake_grip_mult = 0.6
+engine_power_mult = 1.0
+max_speed_mult = 1.0
+steer_rate_mult = 1.15
+bar_grip = 0.3
+bar_slide = 0.9
+bar_speed = 0.5

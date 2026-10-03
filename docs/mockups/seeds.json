@@ -1,0 +1,418 @@
+{
+  "style_frame_01.png": {
+    "flavour": "bold_outline",
+    "prompt": "top-down view from directly above of a winding race track for a children's racing video game: grey asphalt road with red and white kerbs, green grass, a few round trees, tyre stacks and hay bales, four small colourful race cars (red, blue, yellow, green) driving around a bend, 2D video game screenshot, flat vector cartoon illustration, thick black outlines, bright saturated flat colours, no gradients",
+    "seed": 101,
+    "size": [
+      1344,
+      768
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": null,
+    "seconds": 49.3
+  },
+  "style_frame_02.png": {
+    "flavour": "bold_outline",
+    "prompt": "top-down view from directly above of a winding race track for a children's racing video game: grey asphalt road with red and white kerbs, green grass, a few round trees, tyre stacks and hay bales, four small colourful race cars (red, blue, yellow, green) driving around a bend, 2D video game screenshot, flat vector cartoon illustration, thick black outlines, bright saturated flat colours, no gradients",
+    "seed": 202,
+    "size": [
+      1344,
+      768
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": null,
+    "seconds": 41.3
+  },
+  "style_frame_03.png": {
+    "flavour": "picture_book",
+    "prompt": "top-down view from directly above of a winding race track for a children's racing video game: grey asphalt road with red and white kerbs, green grass, a few round trees, tyre stacks and hay bales, four small colourful race cars (red, blue, yellow, green) driving around a bend, 2D video game screenshot, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines",
+    "seed": 101,
+    "size": [
+      1344,
+      768
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": null,
+    "seconds": 56.7
+  },
+  "style_frame_04.png": {
+    "flavour": "picture_book",
+    "prompt": "top-down view from directly above of a winding race track for a children's racing video game: grey asphalt road with red and white kerbs, green grass, a few round trees, tyre stacks and hay bales, four small colourful race cars (red, blue, yellow, green) driving around a bend, 2D video game screenshot, soft flat children's picture book illustration, rounded friendly shapes, warm bright flat colours, no outlines",
+    "seed": 202,
+    "size": [
+      1344,
+      768
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": null,
+    "seconds": 50.6
+  },
+  "style_frame_05.png": {
+    "flavour": "toy_playmat",
+    "prompt": "top-down view from directly above of a winding race track for a children's racing video game: grey asphalt road with red and white kerbs, green grass, a few round trees, tyre stacks and hay bales, four small colourful race cars (red, blue, yellow, green) driving around a bend, 2D video game screenshot, minimal geometric flat design like a children's toy car playmat, simple shapes, bold primary colours",
+    "seed": 101,
+    "size": [
+      1344,
+      768
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": null,
+    "seconds": 58.6
+  },
+  "style_frame_06.png": {
+    "flavour": "toy_playmat",
+    "prompt": "top-down view from directly above of a winding race track for a children's racing video game: grey asphalt road with red and white kerbs, green grass, a few round trees, tyre stacks and hay bales, four small colourful race cars (red, blue, yellow, green) driving around a bend, 2D video game screenshot, minimal geometric flat design like a children's toy car playmat, simple shapes, bold primary colours",
+    "seed": 202,
+    "size": [
+      1344,
+      768
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": null,
+    "seconds": 36.3
+  },
+  "raw/car_chunky.png": {
+    "prompt": "a chunky cute red race car with big round wheels, seen from directly above, top-down plan view, pointing straight up, perfectly symmetrical, 2D video game car sprite, flat vector cartoon style, bold clean outlines, flat saturated colours, no shading, no shadow, centred on a plain white background",
+    "seed": 11,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": {
+      "model": "BiRefNet-general",
+      "sensitivity": 1.0,
+      "padding": 8
+    },
+    "seconds": 52.5
+  },
+  "raw/car_kart.png": {
+    "prompt": "a red go-kart with a driver wearing a helmet, seen from directly above, top-down plan view, pointing straight up, perfectly symmetrical, 2D video game car sprite, flat vector cartoon style, bold clean outlines, flat saturated colours, no shading, no shadow, centred on a plain white background",
+    "seed": 11,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": {
+      "model": "BiRefNet-general",
+      "sensitivity": 1.0,
+      "padding": 8
+    },
+    "seconds": 43.4
+  },
+  "raw/car_formula.png": {
+    "prompt": "a red formula racing car, seen from directly above, top-down plan view, pointing straight up, perfectly symmetrical, 2D video game car sprite, flat vector cartoon style, bold clean outlines, flat saturated colours, no shading, no shadow, centred on a plain white background",
+    "seed": 11,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": {
+      "model": "BiRefNet-general",
+      "sensitivity": 1.0,
+      "padding": 8
+    },
+    "seconds": 36.2
+  },
+  "raw/car_rally.png": {
+    "prompt": "a red rally hatchback with a roof spoiler, seen from directly above, top-down plan view, pointing straight up, perfectly symmetrical, 2D video game car sprite, flat vector cartoon style, bold clean outlines, flat saturated colours, no shading, no shadow, centred on a plain white background",
+    "seed": 11,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": {
+      "model": "BiRefNet-general",
+      "sensitivity": 1.0,
+      "padding": 8
+    },
+    "seconds": 35.4
+  },
+  "raw/car_buggy.png": {
+    "prompt": "a red beach buggy with a roll cage, seen from directly above, top-down plan view, pointing straight up, perfectly symmetrical, 2D video game car sprite, flat vector cartoon style, bold clean outlines, flat saturated colours, no shading, no shadow, centred on a plain white background",
+    "seed": 11,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": {
+      "model": "BiRefNet-general",
+      "sensitivity": 1.0,
+      "padding": 8
+    },
+    "seconds": 40.3
+  },
+  "raw/car_stock.png": {
+    "prompt": "a red stock car with a racing number on the roof, seen from directly above, top-down plan view, pointing straight up, perfectly symmetrical, 2D video game car sprite, flat vector cartoon style, bold clean outlines, flat saturated colours, no shading, no shadow, centred on a plain white background",
+    "seed": 11,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": {
+      "model": "BiRefNet-general",
+      "sensitivity": 1.0,
+      "padding": 8
+    },
+    "seconds": 47.3
+  },
+  "raw/car_bubble.png": {
+    "prompt": "a red bubble-shaped toy car, seen from directly above, top-down plan view, pointing straight up, perfectly symmetrical, 2D video game car sprite, flat vector cartoon style, bold clean outlines, flat saturated colours, no shading, no shadow, centred on a plain white background",
+    "seed": 11,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": {
+      "model": "BiRefNet-general",
+      "sensitivity": 1.0,
+      "padding": 8
+    },
+    "seconds": 46.6
+  },
+  "raw/car_sports.png": {
+    "prompt": "a red classic sports car with white racing stripes, seen from directly above, top-down plan view, pointing straight up, perfectly symmetrical, 2D video game car sprite, flat vector cartoon style, bold clean outlines, flat saturated colours, no shading, no shadow, centred on a plain white background",
+    "seed": 11,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": {
+      "model": "BiRefNet-general",
+      "sensitivity": 1.0,
+      "padding": 8
+    },
+    "seconds": 37.5
+  },
+  "raw/tile_asphalt.png": {
+    "prompt": "dark grey asphalt road surface with subtle speckles, seamless texture, viewed from directly above, flat vector cartoon style, flat colours, uniform, no objects, no borders",
+    "seed": 31,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": null,
+    "seconds": 36.3
+  },
+  "raw/tile_grass.png": {
+    "prompt": "short bright green lawn grass, seamless texture, viewed from directly above, flat vector cartoon style, flat colours, uniform, no objects, no borders",
+    "seed": 31,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": null,
+    "seconds": 62.5
+  },
+  "raw/tile_sand.png": {
+    "prompt": "warm yellow beach sand with small ripples, seamless texture, viewed from directly above, flat vector cartoon style, flat colours, uniform, no objects, no borders",
+    "seed": 31,
+    "size": [
+      1024,
+      1024
+    ],
+    "flux": {
+      "unet": "flux1-dev.safetensors",
+      "weight_dtype": "fp8_e4m3fn",
+      "clip_l": "clip_l.safetensors",
+      "t5": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "vae": "ae.safetensors",
+      "guidance": 3.5,
+      "steps": 20,
+      "sampler": "euler",
+      "scheduler": "beta"
+    },
+    "cutout": null,
+    "seconds": 34.2
+  },
+  "raw/car_sports_blue.png": {
+    "source": "raw/car_sports.png",
+    "instruction": "Change the car's red paint to bright blue. Keep the white racing stripes, the exact shape, the wheels, the windows, the viewing angle and the plain white background exactly the same.",
+    "seed": 11,
+    "model": "flux1-dev-kontext_fp8_scaled.safetensors",
+    "seconds": 55.9
+  },
+  "raw/car_sports_yellow.png": {
+    "source": "raw/car_sports.png",
+    "instruction": "Change the car's red paint to sunny yellow. Keep the white racing stripes, the exact shape, the wheels, the windows, the viewing angle and the plain white background exactly the same.",
+    "seed": 11,
+    "model": "flux1-dev-kontext_fp8_scaled.safetensors",
+    "seconds": 52.3
+  },
+  "raw/car_sports_green.png": {
+    "source": "raw/car_sports.png",
+    "instruction": "Change the car's red paint to bright green. Keep the white racing stripes, the exact shape, the wheels, the windows, the viewing angle and the plain white background exactly the same.",
+    "seed": 11,
+    "model": "flux1-dev-kontext_fp8_scaled.safetensors",
+    "seconds": 51.6
+  }
+}
