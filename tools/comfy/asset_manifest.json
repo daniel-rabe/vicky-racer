@@ -11,13 +11,13 @@
       "id": "car_red",
       "subject": "a chunky red toy sports car with big round wheels and white racing stripes seen from directly above, pointing straight up, perfectly symmetrical",
       "seed": 22,
-      "facing": "up",
+      "facing": "down",
       "box": [
         128,
         72
       ],
       "out": "art/cars/car_red.png",
-      "_note": "Chosen by the user as B2 in docs/mockups/bakeoff/car_choice/sheet.png"
+      "_note": "Chosen by the user as B2 in docs/mockups/bakeoff/car_choice/sheet.png. Faces DOWN: windscreen and round headlights at the bottom, amber tail lights at the top (first recorded as 'up', which made every car drive backwards)."
     },
     {
       "id": "straw_ring",
@@ -140,13 +140,14 @@
     {
       "id": "card_rocket",
       "source": "car_red",
-      "seed": 11,
+      "seed": 14,
       "box": [
         312,
         190
       ],
       "out": "art/ui/cards/rocket.png",
-      "instruction": "Add two big rocket boosters with orange flames at the back of the car, at the bottom of the picture. Keep the red paint, the white stripes, the top-down view and the plain white background."
+      "instruction": "Add two big rocket boosters with orange flames at the back of the car, which is the top of the picture, with the flames pointing up. Keep the red paint, the white stripes, the top-down view and the plain white background.",
+      "_note": "Redone after the facing fix: the first version put the boosters on the car's nose."
     },
     {
       "id": "card_kart",

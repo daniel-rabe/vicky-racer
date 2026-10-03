@@ -98,6 +98,7 @@
   "prompt_lessons": [
     "Describe what a prop LOOKS LIKE from above ('a round bush viewed from straight above, puffy leaf clusters, flat lay'); 'seen from directly above' alone yields side views.",
     "'pointing straight up, perfectly symmetrical' gets true top-down cars, but facing is unreliable: record facing per asset and rotate in post.",
+    "Judge a car's facing by its windscreen and headlights, never by light colour: B2's amber lights are TAIL lights, and recording it 'up' made every car drive backwards. Edit instructions must name the real end ('the back of the car, the top of the picture').",
     "Reproducibility verified: the frozen recipe regenerates a probe pixel-identically (max diff 0), so a pinned seed fully defines an asset.",
     "Never use the full style frame as the Redux reference: it leaks the track into every asset. Use the object-only style board.",
     "At 1536 px the board pulls in extra objects unless the lock is light (factor >= 4.5, weight <= 0.75).",
