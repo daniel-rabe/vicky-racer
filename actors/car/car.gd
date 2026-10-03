@@ -16,6 +16,9 @@ const OVERSPEED_DECEL := 1500.0
 	set(value):
 		setup = value
 		_resolve_config()
+		# A setup changes how the car looks as well as how it drives (its garage card's car).
+		if value and value.body:
+			body_texture = value.body
 @export var body_texture: Texture2D:
 	set(value):
 		body_texture = value

@@ -25,6 +25,9 @@ RETRIES = {
     "card_rocket": ("Add two big rocket boosters with orange flames at the back of the car, which is the top of the "
                     "picture, with the flames pointing up. Keep the red paint, the white stripes, the top-down view "
                     "and the plain white background."),
+    "body_slider": ("Paint bold light-blue swirl decals on the bonnet, roof and sides of this car, like wind "
+                    "rushing past, and give it shiny slick tyres. Keep the red paint, the exact shape, the top-down "
+                    "view and the plain white background."),
     "card_banana": ("Repaint this car bright banana yellow with just a few small brown marks at the front and back like "
                     "the tips of a banana, and put a peeled banana on the roof. Keep the shape, the top-down view and the plain white background."),
 }

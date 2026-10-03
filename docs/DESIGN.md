@@ -134,7 +134,14 @@ none is a strict upgrade — each is a different trade.
 | **Banana** | 0.45 | 0.5 | 1.3 | 1.25 | 1.0 | 0.2 / 1.0 / 1.0 | 600 |
 
 Resolved values are clamped — `lateral_grip` never below 3.0, `max_speed` never above 1500 px/s — so
-even Banana stays drivable. The three **bar values** are authored, not computed: they describe how
+even Banana stays drivable.
+
+**A setup also changes how the car looks:** in the race the player drives the car from its garage
+card — knobbly tyres for Grippy, light-blue swirls for Slider, boosters for Rocket, the go-kart, the
+banana car ([`screenshots/setup_cars.png`](screenshots/setup_cars.png)). Setups were first
+handling-only, which left a child who bought Banana still driving the plain red car. Because the
+player's car can now share a colour with an opponent (Banana and Yellow), a small white arrow
+always floats above the player's car. The three **bar values** are authored, not computed: they describe how
 the setup *feels*, which is what the garage needs to communicate.
 
 ## 5. Scale
@@ -475,7 +482,6 @@ facing is unreliable and must be recorded per asset — are kept in `pipeline.js
 ## 12. Out of scope for v1
 
 - More than one track
-- Car body selection (setups change handling, not the car)
 - Engine and tyre sounds (stretch goal — a local SFX model is installed)
 - Lap ghosts, time-trial mode, split-screen
 - Touch controls

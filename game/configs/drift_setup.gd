@@ -6,6 +6,8 @@ extends Resource
 @export var id: StringName
 @export var display_name := ""
 @export var card_art: Texture2D
+## What the player's car looks like with this setup equipped (128 x 72, facing +X).
+@export var body: Texture2D
 ## Coins; 0 means owned from the start.
 @export var price := 0
 

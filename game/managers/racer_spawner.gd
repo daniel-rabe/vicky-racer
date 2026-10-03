@@ -8,6 +8,7 @@ extends Node
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
 const PLAYER_INPUT := preload("res://actors/car/player_input.gd")
+const PLAYER_MARKER := preload("res://actors/car/player_marker.gd")
 const PLAYER_BODY := preload("res://art/cars/car_red.png")
 const PLAYER_COLOUR := Color(0.902, 0.224, 0.275)
 ## AI lanes, px either side of the racing line, so the pack spreads across the road.
@@ -25,9 +26,9 @@ func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: 
 		var is_player := slot + 1 == config.player_slot
 		var racer := {"car": car, "is_player": is_player}
 		if is_player:
-			car.setup = player_setup
 			car.body_texture = PLAYER_BODY
-			racer.merge({"name": "YOU", "body": PLAYER_BODY.resource_path, "colour": PLAYER_COLOUR})
+			car.setup = player_setup  # also swaps in the setup's own car body
+			racer.merge({"name": "YOU", "body": car.body_texture.resource_path, "colour": PLAYER_COLOUR})
 			if autopilot:
 				racer["driver"] = _ai(car, track, 1.0, 0.0)
 			else:
@@ -36,6 +37,10 @@ func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: 
 				input.set_script(PLAYER_INPUT)
 				car.add_child(input)
 			car.add_child(_camera_rig())
+			var marker := Node2D.new()
+			marker.name = "PlayerMarker"
+			marker.set_script(PLAYER_MARKER)
+			car.add_child(marker)
 		else:
 			var body: Texture2D = config.opponent_bodies[opponent]
 			car.body_texture = body

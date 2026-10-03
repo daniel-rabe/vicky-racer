@@ -126,18 +126,6 @@
       "instruction": "Give this car extra-wide chunky knobbly tyres. Keep the red paint, the white racing stripes, the top-down view and the plain white background."
     },
     {
-      "id": "card_slider",
-      "source": "car_red",
-      "seed": 13,
-      "box": [
-        312,
-        190
-      ],
-      "out": "art/ui/cards/slider.png",
-      "instruction": "Draw three curved light-blue motion swooshes beside the left side of the car, showing it sliding sideways. Keep the car exactly the same, pointing straight up, the top-down view and the plain white background.",
-      "_note": "No seed drew the requested motion lines, but every one showed the car at a drift angle, which is what Slider does."
-    },
-    {
       "id": "card_rocket",
       "source": "car_red",
       "seed": 14,
@@ -170,6 +158,18 @@
       ],
       "out": "art/ui/cards/banana.png",
       "instruction": "Repaint this car bright banana yellow with just a few small brown marks at the front and back like the tips of a banana, and put a peeled banana on the roof. Keep the shape, the top-down view and the plain white background."
+    },
+    {
+      "id": "body_slider",
+      "source": "car_red",
+      "seed": 12,
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/slider.png",
+      "instruction": "Paint bold light-blue swirl decals on the bonnet, roof and sides of this car, like wind rushing past, and give it shiny slick tyres. Keep the red paint, the exact shape, the top-down view and the plain white background.",
+      "_note": "A straight Slider car: the earlier card showed the car at a drift angle, which cannot be a driving sprite."
     }
   ],
   "copies": [
@@ -182,6 +182,66 @@
       ],
       "out": "art/ui/cards/starter.png",
       "_note": "The Starter setup is the plain car."
+    },
+    {
+      "id": "card_slider",
+      "source": "body_slider",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/slider.png",
+      "_note": "The card shows the same car the player drives."
+    },
+    {
+      "id": "body_starter",
+      "source": "car_red",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/starter.png",
+      "_note": "In-race look of this setup: the same car as its garage card."
+    },
+    {
+      "id": "body_grippy",
+      "source": "card_grippy",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/grippy.png",
+      "_note": "In-race look of this setup: the same car as its garage card."
+    },
+    {
+      "id": "body_rocket",
+      "source": "card_rocket",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/rocket.png",
+      "_note": "In-race look of this setup: the same car as its garage card."
+    },
+    {
+      "id": "body_kart",
+      "source": "card_kart",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/kart.png",
+      "_note": "In-race look of this setup: the same car as its garage card."
+    },
+    {
+      "id": "body_banana",
+      "source": "card_banana",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/banana.png",
+      "_note": "In-race look of this setup: the same car as its garage card."
     }
   ],
   "procedural": [

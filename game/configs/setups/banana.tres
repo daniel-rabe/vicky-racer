@@ -1,13 +1,15 @@
-[gd_resource type="Resource" script_class="DriftSetup" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="DriftSetup" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://art/ui/cards/banana.png" id="2_card"]
+[ext_resource type="Texture2D" path="res://art/cars/setups/banana.png" id="3_body"]
 
 [resource]
 script = ExtResource("1_script")
 id = &"banana"
 display_name = "Banana"
 card_art = ExtResource("2_card")
+body = ExtResource("3_body")
 price = 600
 lateral_grip_mult = 0.45
 handbrake_grip_mult = 0.5
