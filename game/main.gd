@@ -61,7 +61,7 @@ func show_screen(screen_name: StringName) -> void:
 	screen_slot.add_child(SCREENS[screen_name].instantiate())
 
 
-## Dev only, until the real race exists (Phase 7): a finish with made-up times.
+## Dev only (--fake-race): a finish with made-up times, for screenshots of the results screen.
 func _fake_race_finish(player_position: int) -> void:
 	var others := [["BLUE", "res://art/cars/car_blue.png"], ["YELLOW", "res://art/cars/car_yellow.png"],
 		["GREEN", "res://art/cars/car_green.png"]]

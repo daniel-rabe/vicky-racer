@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=13 format=3]
+[gd_resource type="Theme" load_steps=14 format=3]
 
 [ext_resource type="FontFile" path="res://ui/fonts/PublicPixel.ttf" id="1_font"]
 
@@ -144,6 +144,22 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
+[sub_resource type="StyleBoxFlat" id="hud_panel"]
+bg_color = Color(0.118, 0.165, 0.227, 0.85)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.055, 0.078, 0.11, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+content_margin_left = 28.0
+content_margin_top = 16.0
+content_margin_right = 28.0
+content_margin_bottom = 16.0
+
 [resource]
 default_font = ExtResource("1_font")
 default_font_size = 28
@@ -158,6 +174,8 @@ Button/styles/focus = SubResource("focus")
 Button/styles/hover = SubResource("button_hover")
 Button/styles/normal = SubResource("button_normal")
 Button/styles/pressed = SubResource("button_pressed")
+HudPanel/base_type = &"PanelContainer"
+HudPanel/styles/panel = SubResource("hud_panel")
 Label/colors/font_color = Color(1, 1, 1, 1)
 NavButton/base_type = &"Button"
 NavButton/font_sizes/font_size = 34

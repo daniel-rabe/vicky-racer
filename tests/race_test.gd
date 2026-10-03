@@ -1,0 +1,95 @@
+extends Node
+## Headless race smoke test (plan verification step 4): a full race on Track 01 with the
+## player's car on autopilot, checking the countdown, laps, positions and the finish.
+##   Godot_console.exe --path . --headless --fixed-fps 60 res://tests/race_test.tscn -- --autopilot
+## Exit code 0 = all passed. Prints every lap time, which doubles as an AI pace report.
+
+const RACE_SCENE := preload("res://game/screens/race.tscn")
+const TIMEOUT_SECONDS := 180.0
+
+var _failures: PackedStringArray = []
+var _ticks: Array[int] = []
+var _started := false
+var _laps := {}            # racer name -> lap times
+var _bad_orders := 0
+var _results: Array = []
+var race: Node2D
+
+
+func _enter_tree() -> void:
+	EventSystem.RAC_countdown_tick.connect(func(n: int) -> void: _ticks.append(n))
+	EventSystem.RAC_race_started.connect(func() -> void: _started = true)
+	EventSystem.RAC_lap_completed.connect(_on_lap)
+	EventSystem.RAC_positions_updated.connect(_on_positions)
+	EventSystem.RAC_race_finished.connect(func(results: Array, _id: StringName) -> void: _results = results)
+	# The race asks the garage for the equipped setup; answer like GarageManager would.
+	EventSystem.PRO_state_requested.connect(func() -> void:
+		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/starter.tres")],
+			"equipped": &"starter"}))
+
+
+func _ready() -> void:
+	if not Array(OS.get_cmdline_user_args()).any(func(a: String) -> bool: return a.begins_with("--autopilot")):
+		printerr("run with -- --autopilot, or the player's car never moves")
+		get_tree().quit(2)
+		return
+	race = RACE_SCENE.instantiate()
+	add_child(race)
+	var start_progress := {}
+	await get_tree().create_timer(5.0).timeout  # countdown + a moment of racing
+	for r in race.racers:
+		start_progress[r["name"]] = r["progress"]
+	var waited := 5.0
+	while _results.is_empty() and waited < TIMEOUT_SECONDS:
+		await get_tree().create_timer(1.0).timeout
+		waited += 1.0
+	_report(start_progress)
+
+
+func _on_lap(car: Node, lap: int, lap_time: float) -> void:
+	_laps.get_or_add(car.name, []).append(lap_time)
+	print("  lap %d  %-7s %.2fs" % [lap, car.name, lap_time])
+
+
+func _on_positions(order: Array) -> void:
+	var positions := order.map(func(e: Dictionary) -> int: return e["position"])
+	positions.sort()
+	if positions != [1, 2, 3, 4]:
+		_bad_orders += 1
+
+
+func _check(condition: bool, message: String) -> void:
+	print(("  ok   " if condition else "  FAIL ") + message)
+	if not condition:
+		_failures.append(message)
+
+
+func _report(start_progress: Dictionary) -> void:
+	print("results")
+	_check(_ticks == [3, 2, 1, 0] and _started, "countdown ran 3-2-1-GO, then the race started (%s)" % [_ticks])
+	_check(not _results.is_empty(), "the race finished within %ds" % TIMEOUT_SECONDS)
+	for r in race.racers:
+		var moved: float = r["progress"] - start_progress.get(r["name"], 0.0)
+		_check(moved > 5000.0, "%s made progress (%d px after the start)" % [r["name"], moved])
+		var name: String = r["car"].name
+		var laps: Array = _laps.get(name, [])
+		if not r["is_player"]:
+			_check(laps.size() >= 2, "%s completed validated laps (%d)" % [name, laps.size()])
+			var ok_times := laps.all(func(t: float) -> bool: return t > 12.0 and t < 45.0)
+			_check(ok_times, "%s lap times are sensible (%s)" % [name, laps.map(func(t: float) -> String: return "%.1f" % t)])
+			_check(r["driver"].rescues == 0, "%s never needed rescuing (%d)" % [name, r["driver"].rescues])
+	_check(_bad_orders == 0, "positions were always a clean 1-4 (%d bad updates)" % _bad_orders)
+	if not _results.is_empty():
+		var positions := _results.map(func(e: Dictionary) -> int: return e["position"])
+		var times := _results.map(func(e: Dictionary) -> float: return e["time"])
+		var sorted_times := times.duplicate()
+		sorted_times.sort()
+		_check(positions == [1, 2, 3, 4] and times == sorted_times, "results are in finishing order (%s)" % [
+			_results.map(func(e: Dictionary) -> String: return "%s %.1fs" % [e["name"], e["time"]])])
+	if _failures.is_empty():
+		print("ALL RACE TESTS PASSED")
+		get_tree().quit(0)
+	else:
+		for f in _failures:
+			printerr("FAIL: ", f)
+		get_tree().quit(1)

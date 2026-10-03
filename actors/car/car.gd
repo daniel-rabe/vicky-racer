@@ -31,6 +31,9 @@ var handbrake := false
 var surface_speed_mult := 1.0
 var surface_grip_mult := 1.0
 
+## Held still, ignoring its driver: during the countdown, and after the race.
+var frozen := false
+
 ## The handling actually in use: base_config with the setup's multipliers applied.
 var config: CarConfig
 var is_drifting := false
@@ -59,6 +62,9 @@ func forward_speed() -> float:
 
 
 func _physics_process(delta: float) -> void:
+	if frozen:
+		velocity = Vector2.ZERO
+		return
 	var speed_along := forward_speed()
 	_steer(speed_along, delta)
 	var forward := Vector2.RIGHT.rotated(rotation)

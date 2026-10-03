@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TrackConfig" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/configs/track_config.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://track/tracks/track_01.tscn" id="2_track"]
+[ext_resource type="Texture2D" path="res://art/cars/car_blue.png" id="3_blue"]
+[ext_resource type="Texture2D" path="res://art/cars/car_yellow.png" id="4_yellow"]
+[ext_resource type="Texture2D" path="res://art/cars/car_green.png" id="5_green"]
+
+[resource]
+script = ExtResource("1_script")
+track_id = &"track_01"
+track_scene = ExtResource("2_track")
+laps = 3
+player_slot = 3
+opponent_names = PackedStringArray("BLUE", "YELLOW", "GREEN")
+opponent_bodies = Array[Texture2D]([ExtResource("3_blue"), ExtResource("4_yellow"), ExtResource("5_green")])
+opponent_colours = PackedColorArray(0.227, 0.525, 1, 1, 1, 0.824, 0.247, 1, 0.18, 0.769, 0.42, 1)
+opponent_skills = PackedFloat32Array(0.85, 0.7, 0.55)

@@ -1,0 +1,73 @@
+class_name RacerSpawner
+extends Node
+## Puts the four cars on the grid: the player with their equipped setup, camera and
+## controls, and the opponents from the TrackConfig with AI drivers in staggered lanes.
+## Returns one Dictionary per racer, the shape RaceManager and the HUD work with:
+## car, name, body (sprite path), colour, is_player, driver.
+
+const CAR_SCENE := preload("res://actors/car/car.tscn")
+const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
+const PLAYER_INPUT := preload("res://actors/car/player_input.gd")
+const PLAYER_BODY := preload("res://art/cars/car_red.png")
+const PLAYER_COLOUR := Color(0.902, 0.224, 0.275)
+## AI lanes, px either side of the racing line, so the pack spreads across the road.
+const LANES: Array[float] = [-70.0, 70.0, 0.0]
+
+
+## `autopilot`: the player's car is driven by an AIDriver too (headless race tests).
+func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: Node,
+		autopilot := false) -> Array[Dictionary]:
+	var grid := track.grid_transforms()
+	var racers: Array[Dictionary] = []
+	var opponent := 0
+	for slot in grid.size():
+		var car: Car = CAR_SCENE.instantiate()
+		var is_player := slot + 1 == config.player_slot
+		var racer := {"car": car, "is_player": is_player}
+		if is_player:
+			car.setup = player_setup
+			car.body_texture = PLAYER_BODY
+			racer.merge({"name": "YOU", "body": PLAYER_BODY.resource_path, "colour": PLAYER_COLOUR})
+			if autopilot:
+				racer["driver"] = _ai(car, track, 1.0, 0.0)
+			else:
+				var input := Node.new()
+				input.name = "PlayerInput"
+				input.set_script(PLAYER_INPUT)
+				car.add_child(input)
+			car.add_child(_camera_rig())
+		else:
+			var body: Texture2D = config.opponent_bodies[opponent]
+			car.body_texture = body
+			racer.merge({"name": config.opponent_names[opponent], "body": body.resource_path,
+				"colour": config.opponent_colours[opponent]})
+			racer["driver"] = _ai(car, track, config.opponent_skills[opponent], LANES[opponent % LANES.size()])
+			opponent += 1
+		car.name = racer["name"].capitalize()
+		car.frozen = true
+		car.transform = grid[slot]
+		parent.add_child(car)
+		car.reset_physics_interpolation()
+		racers.append(racer)
+	return racers
+
+
+func _ai(car: Car, track: Track, skill: float, lane: float) -> AIDriver:
+	var driver := AIDriver.new()
+	driver.name = "AIDriver"
+	driver.skill = skill
+	driver.line_offset = lane
+	driver.track = track
+	car.add_child(driver)
+	return driver
+
+
+func _camera_rig() -> Node2D:
+	var rig := Node2D.new()
+	rig.name = "ChaseCamera"
+	rig.set_script(CAMERA_SCRIPT)
+	var camera := Camera2D.new()
+	camera.name = "Camera"
+	camera.process_callback = Camera2D.CAMERA2D_PROCESS_PHYSICS
+	rig.add_child(camera)
+	return rig

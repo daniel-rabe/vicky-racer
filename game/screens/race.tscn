@@ -1,39 +1,19 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://game/screens/race.gd" id="1_race"]
-[ext_resource type="PackedScene" path="res://track/tracks/track_01.tscn" id="2_track"]
-[ext_resource type="PackedScene" path="res://actors/car/car.tscn" id="3_car"]
-[ext_resource type="Script" path="res://actors/car/player_input.gd" id="4_input"]
-[ext_resource type="Script" path="res://actors/car/chase_camera.gd" id="5_camera"]
-[ext_resource type="FontFile" path="res://ui/fonts/PublicPixel.ttf" id="6_font"]
+[ext_resource type="Script" path="res://game/managers/race_manager.gd" id="2_manager"]
+[ext_resource type="Script" path="res://game/managers/racer_spawner.gd" id="3_spawner"]
+[ext_resource type="PackedScene" path="res://ui/hud/race_hud.tscn" id="4_hud"]
 
 [node name="Race" type="Node2D"]
 script = ExtResource("1_race")
 
-[node name="Track" parent="." instance=ExtResource("2_track")]
+[node name="Racers" type="Node2D" parent="."]
 
-[node name="Car" parent="." instance=ExtResource("3_car")]
+[node name="RaceManager" type="Node" parent="."]
+script = ExtResource("2_manager")
 
-[node name="PlayerInput" type="Node" parent="Car"]
-script = ExtResource("4_input")
+[node name="RacerSpawner" type="Node" parent="."]
+script = ExtResource("3_spawner")
 
-[node name="ChaseCamera" type="Node2D" parent="Car"]
-script = ExtResource("5_camera")
-
-[node name="Camera" type="Camera2D" parent="Car/ChaseCamera"]
-process_callback = 0
-
-[node name="Debug" type="CanvasLayer" parent="."]
-
-[node name="Readout" type="Label" parent="Debug"]
-unique_name_in_owner = true
-offset_left = 32.0
-offset_top = 28.0
-offset_right = 1400.0
-offset_bottom = 220.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.055, 0.078, 0.11, 1)
-theme_override_constants/outline_size = 8
-theme_override_fonts/font = ExtResource("6_font")
-theme_override_font_sizes/font_size = 18
-text = "SURFACE"
+[node name="RaceHUD" parent="." instance=ExtResource("4_hud")]

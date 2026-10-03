@@ -299,19 +299,51 @@ The map edge is a tyre wall: solid, but it slides you along it.
 - **Lap validation** uses two `Area2D`s: the mid-lap checkpoint must be crossed before the
   start/finish line counts. This blocks reverse driving and cutting across the infield.
 
-## 8. AI **(not implemented)**
+## 8. AI and the race
 
-Each AI car runs `ai_driver.gd`, writing the same three inputs a player would:
+### 8.1 AI drivers
 
-1. **Steer** toward a point on the racing line, a speed-scaled distance ahead.
-2. **Read the road ahead** — sample the curve further on, measure how sharply it turns, lift and
-   brake into tight corners, full throttle on straights.
-3. **Spread out** — each car has its own `line_offset` so the pack does not drive in single file; a
-   short forward ray nudges that offset sideways to avoid rear-ending.
-4. **Skill** — `skill` 0–1 scales top speed, lookahead and line accuracy. Default spread for track
-   01: 0.55 / 0.7 / 0.85.
-5. **Rubber-banding** — `RaceManager` gives each AI a speed multiplier from its gap to the player:
-   cars far ahead ease off, cars far behind push. The pack stays in sight; the player can still win.
+Each AI car runs [`actors/car/ai_driver.gd`](../actors/car/ai_driver.gd), writing the same three
+inputs a player would:
+
+1. **Steer** at a point on the racing line 150 px + 0.3 s of speed ahead, shifted sideways into
+   its own lane (−70 / 0 / +70 px), so the pack does not drive in single file.
+2. **Read the road ahead** — the sharpest bend in the next 250 / 500 / 800 px sets a target speed
+   between its straight pace (0.80 + 0.15 × skill of top speed) and corner pace (0.45 + 0.15 ×
+   skill); it lifts or brakes to meet it.
+3. **Avoid** — a car close in front pushes it into the other half of the road until clear.
+4. **Never strand** — stuck (slow with the throttle down) for 1.2 s, it backs out steering the
+   other way; after three back-outs, or 900 px off the line, it is put back on the line. The race
+   test expects no rescues in a normal race, and sees none.
+5. **Skill** — 0.85 / 0.70 / 0.55 for Blue / Yellow / Green on Track 01
+   ([`game/configs/tracks/track_01.tres`](../game/configs/tracks/track_01.tres)).
+
+### 8.2 Race flow
+
+[`RaceManager`](../game/managers/race_manager.gd) holds the cars still through 3-2-1-GO, then:
+
+- **Laps** count on the finish line only after the mid-lap checkpoint. The grid is behind the
+  line, so the first crossing *starts* lap 1. Lap 1 is timed from GO.
+- **Positions** sort finished cars by finish time, the rest by progress (laps × lap length + distance
+  past the line; negative on the grid).
+- **The race ends when the player finishes** (after a 2.5 s FINISH! moment). Opponents still racing
+  get a time from their average pace carried over the distance left, so a child never waits on a
+  race that is over for them. Results go out on `RAC_race_finished`; `GarageManager` pays out.
+- The player starts **3rd of 4** — something to chase, nobody to lap.
+
+### 8.3 Rubber-banding
+
+Each AI's pace is scaled by its gap to the player: 1,800 px ahead it eases to **70 %**, the same
+distance behind it pushes to **112 %**. Tuned with [`tests/race_test.gd`](../tests/race_test.gd),
+using the player's car on autopilot as a stand-in:
+
+| Stand-in player | First tuning (85 % / 2,500 px) | Shipped (70 % / 1,800 px) |
+| --- | --- | --- |
+| Full pace | 2nd, all four within 1.4 s | 2nd, all four within 0.9 s |
+| 70 % pace — a struggling child | last, 7 s behind 3rd | last, **2.3 s** behind 3rd; field within 2.8 s |
+
+The pack now stays in sight of a slow player. A consistently slow player still finishes last —
+whether they should sometimes win is open for the Phase 8 balance pass.
 
 ## 9. Garage and economy
 
@@ -365,12 +397,16 @@ last places afford Grippy.
 
 | Screen | Spec |
 | --- | --- |
-| Race HUD **(not implemented)** | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown |
+| Race HUD | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown. Built: [`screenshots/race.png`](screenshots/race.png), [`screenshots/race_countdown.png`](screenshots/race_countdown.png). The countdown sits above screen centre rather than on it, so it never hides the player's own car |
 | Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, 3 × 2 setup cards, preview with Grip / Slide / Speed bars. Built: [`screenshots/garage.png`](screenshots/garage.png) |
 | Results | [`mockups/results_layout.png`](mockups/results_layout.png) — finishing order, payout count-up, Race Again. Built: [`screenshots/results.png`](screenshots/results.png) |
 
 Pink annotations on each spec give anchors, sizes and animation timings; they are meant to be
 built verbatim with `Control` anchors. All menus are fully navigable with a gamepad alone.
+
+The HUD takes race state from the `RAC_` signals. The speed bar and the minimap are the exception:
+the race screen hands them the cars, because they need positions every frame and no signal should
+carry that 60 times a second.
 
 ## 11. Art direction and asset pipeline
 

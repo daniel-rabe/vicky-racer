@@ -8,9 +8,6 @@ extends Node2D
 ## camera never hits its limits), for measuring how smoothly the car moves on screen
 ## (tools/dev/motion_check.py).
 ##
-## Dev, until the real race exists (Phase 7): F fakes a race finish in a random position
-## and opens the results screen. It pays real coins into the save.
-##
 ## Dev check: `-- --autodrive-screenshot=<path.png>` circles with the handbrake for a few
 ## seconds, saves a screenshot and quits, so the look can be verified without a person.
 
@@ -148,15 +145,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		_reset_car()
 	elif key.physical_keycode == KEY_ESCAPE:
 		EventSystem.UI_screen_requested.emit(&"garage")
-	elif key.physical_keycode == KEY_F:
-		_fake_finish()
-
-
-func _fake_finish() -> void:
-	var main := get_tree().root.get_node_or_null("Main")
-	if main and main.has_method("_fake_race_finish"):
-		main._fake_race_finish(randi_range(1, 4))
-		EventSystem.UI_screen_requested.emit(&"results")
 
 
 func _process(_delta: float) -> void:
@@ -174,7 +162,6 @@ func _process(_delta: float) -> void:
 		"",
 		"  ".join(names),
 		"1-6 setup   SPACE handbrake   BACKSPACE reset   ESC garage",
-		"F  fake race finish (dev, pays real coins)",
 	])
 
 
