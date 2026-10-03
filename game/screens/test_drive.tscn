@@ -22,8 +22,10 @@ region_rect = Rect2(0, 0, 3072, 2048)
 [node name="PlayerInput" type="Node" parent="Car"]
 script = ExtResource("4_input")
 
-[node name="ChaseCamera" type="Camera2D" parent="Car"]
+[node name="ChaseCamera" type="Node2D" parent="Car"]
 script = ExtResource("5_camera")
+
+[node name="Camera" type="Camera2D" parent="Car/ChaseCamera"]
 
 [node name="Debug" type="CanvasLayer" parent="."]
 

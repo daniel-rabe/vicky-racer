@@ -146,7 +146,22 @@ the setup *feels*, which is what the garage needs to communicate.
 | Car sprite | 128 × 72 px, facing +X | Godot 2D's zero rotation; reads clearly against a 384 px road |
 | Car collision | 110 × 60 px rectangle | Slightly inside the sprite so contact looks fair |
 | Viewport | 1920 × 1080, `canvas_items` / `expand` | Already set in `project.godot` |
-| Camera zoom | 1.0, easing to 0.85 at top speed | About 15 × 8 tiles visible. Matches the chosen style frame, where cars read at ~130–160 px on screen; 0.75 made them feel distant. The camera leads toward the direction of travel and zooms out with speed, which gives back the lookahead |
+| Camera zoom | 0.92, fixed | About 16 × 9 tiles visible. Close enough to match the chosen style frame, where cars read at ~130–160 px; the camera's 260 px lead toward the direction of travel shows about a second of road ahead at top speed. A speed-dependent zoom-out was dropped: changing zoom while driving defeats physics interpolation and made the view judder (see below) |
+
+### 5.1 Smooth motion on fast monitors
+
+Physics runs at 60 Hz, but monitors refresh at 100–165 Hz. Without help the car and camera only
+move on physics ticks, so on a 100 Hz screen the view moves on three frames in five and stands
+still on the other two — a judder that reads as flicker. The fix is Godot's **physics
+interpolation** (`project.godot`), which draws everything between ticks. It only smooths node
+*positions*, so the chase camera ([`actors/car/chase_camera.gd`](../actors/car/chase_camera.gd))
+is built from positions alone: a rig node holds the lead, the Camera2D has no smoothing, and the
+zoom is fixed. Anything teleported (a reset, the start grid) calls
+`reset_physics_interpolation()` so it does not glide.
+
+[`tools/dev/motion_check.py`](../tools/dev/motion_check.py) measures this on rendered frames
+(100 fps against 60 Hz physics, tracking a hay bale): frame-to-frame wobble of the view went from
+**17.8 px** without interpolation to **0.57 px** with it — the same as running physics at 100 Hz.
 
 ## 6. Architecture
 

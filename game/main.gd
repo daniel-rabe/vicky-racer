@@ -9,6 +9,8 @@ extends Node
 ##   --dev-coins=<n>         set the coin balance after loading
 ##   --fake-race=<position>  pretend a race just finished in that position
 ##   --screenshot=<path>     save a screenshot after --wait seconds (default 2.5) and quit
+##   --no-interp             turn physics interpolation off (to measure what it fixes)
+##   --physics-hz=<n>        run physics at n ticks per second instead of 60
 
 const SCREENS := {
 	&"garage": preload("res://ui/garage/garage_screen.tscn"),
@@ -33,6 +35,10 @@ func _enter_tree() -> void:
 	if _args.has("save"):
 		$GarageManager.save_path = _args["save"]
 	EventSystem.UI_screen_requested.connect(show_screen)
+	if _args.has("no-interp"):
+		get_tree().physics_interpolation = false
+	if _args.has("physics-hz"):
+		Engine.physics_ticks_per_second = int(_args["physics-hz"])
 
 
 func _ready() -> void:

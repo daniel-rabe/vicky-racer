@@ -4,6 +4,10 @@ extends Node2D
 ## live; Backspace puts the car back in the middle. Escape returns to the garage.
 ## The car starts with whatever setup is equipped in the garage.
 ##
+## Dev check: `-- --drive-circle` drives a steady, wide circle clear of every edge (so the
+## camera never hits its limits), for measuring how smoothly the car moves on screen
+## (tools/dev/motion_check.py).
+##
 ## Dev, until the real race exists (Phase 7): F fakes a race finish in a random position
 ## and opens the results screen. It pays real coins into the save.
 ##
@@ -33,6 +37,7 @@ var _setups: Array[DriftSetup] = []
 var _autodrive_path := ""
 var _autodrive_time := 0.0
 var _autodrive_done := false
+var _drive_circle := false
 
 @onready var car: Car = $Car
 @onready var readout: Label = %Readout
@@ -60,6 +65,13 @@ func _ready() -> void:
 	_reset_car()
 	EventSystem.PRO_state_requested.emit()
 	for arg in OS.get_cmdline_user_args():
+		if arg == "--drive-circle":
+			_drive_circle = true
+			car.get_node("PlayerInput").queue_free()
+			# Full lock: a ~340 px circle round the field centre, far from the camera limits.
+			car.position = Vector2(FIELD.x / 2.0, FIELD.y / 2.0 - 340.0)
+			car.reset_physics_interpolation()
+			car.get_node("ChaseCamera").snap_to_car()
 		if arg.begins_with("--autodrive-screenshot="):
 			_autodrive_path = arg.get_slice("=", 1)
 			car.get_node("PlayerInput").queue_free()
@@ -121,6 +133,9 @@ func _reset_car() -> void:
 	car.position = FIELD / 2.0
 	car.rotation = 0.0
 	car.velocity = Vector2.ZERO
+	# A teleport: without this, physics interpolation would draw the car gliding back.
+	car.reset_physics_interpolation()
+	car.get_node("ChaseCamera").snap_to_car()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -145,6 +160,9 @@ func _fake_finish() -> void:
 
 
 func _process(_delta: float) -> void:
+	if _drive_circle:
+		car.throttle_input = 1.0
+		car.steer_input = 1.0
 	var names := PackedStringArray()
 	for i in _setups.size():
 		var marker := ">" if _setups[i] == car.setup else " "
@@ -172,3 +190,4 @@ func _physics_process(delta: float) -> void:
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png(_autodrive_path)
 		get_tree().quit()
+
