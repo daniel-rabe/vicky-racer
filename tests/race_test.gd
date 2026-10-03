@@ -3,6 +3,8 @@ extends Node
 ## player's car on autopilot, checking the countdown, laps, positions and the finish.
 ##   Godot_console.exe --path . --headless --fixed-fps 60 res://tests/race_test.tscn -- --autopilot
 ## Exit code 0 = all passed. Prints every lap time, which doubles as an AI pace report.
+## `--setup=<id>` races the player with that drift setup (default starter), for the balance
+## pass: tools/dev/balance_report.py runs every setup at several paces.
 
 const RACE_SCENE := preload("res://game/screens/race.tscn")
 const TIMEOUT_SECONDS := 180.0
@@ -23,9 +25,13 @@ func _enter_tree() -> void:
 	EventSystem.RAC_positions_updated.connect(_on_positions)
 	EventSystem.RAC_race_finished.connect(func(results: Array, _id: StringName) -> void: _results = results)
 	# The race asks the garage for the equipped setup; answer like GarageManager would.
+	var setup_id := "starter"
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--setup="):
+			setup_id = arg.get_slice("=", 1)
 	EventSystem.PRO_state_requested.connect(func() -> void:
-		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/starter.tres")],
-			"equipped": &"starter"}))
+		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/%s.tres" % setup_id)],
+			"equipped": StringName(setup_id)}))
 
 
 func _ready() -> void:
@@ -73,7 +79,9 @@ func _report(start_progress: Dictionary) -> void:
 		_check(moved > 5000.0, "%s made progress (%d px after the start)" % [r["name"], moved])
 		var name: String = r["car"].name
 		var laps: Array = _laps.get(name, [])
-		if not r["is_player"]:
+		if r["is_player"]:
+			print("  player rescues %d" % r["driver"].rescues)
+		else:
 			_check(laps.size() >= 2, "%s completed validated laps (%d)" % [name, laps.size()])
 			var ok_times := laps.all(func(t: float) -> bool: return t > 12.0 and t < 45.0)
 			_check(ok_times, "%s lap times are sensible (%s)" % [name, laps.map(func(t: float) -> String: return "%.1f" % t)])

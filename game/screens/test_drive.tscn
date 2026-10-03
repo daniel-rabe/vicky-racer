@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://game/screens/test_drive.gd" id="1_screen"]
 [ext_resource type="Texture2D" path="res://art/tiles/grass.png" id="2_grass"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://actors/car/player_input.gd" id="4_input"]
 [ext_resource type="Script" path="res://actors/car/chase_camera.gd" id="5_camera"]
 [ext_resource type="FontFile" path="res://ui/fonts/PublicPixel.ttf" id="6_font"]
+[ext_resource type="Script" path="res://actors/effects/skid_marks.gd" id="7_skids"]
 
 [node name="TestDrive" type="Node2D"]
 script = ExtResource("1_screen")
@@ -16,6 +17,9 @@ texture = ExtResource("2_grass")
 centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 3072, 2048)
+
+[node name="SkidMarks" type="Node2D" parent="."]
+script = ExtResource("7_skids")
 
 [node name="Car" parent="." instance=ExtResource("3_car")]
 

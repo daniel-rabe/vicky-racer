@@ -1,0 +1,72 @@
+extends Node2D
+## Engine, tyre squeal and wall bump for its parent car. Positional (AudioStreamPlayer2D),
+## so opponents are heard when they are near the camera and fade out when far away.
+##
+## The engine is one steady loop whose pitch follows speed; the squeal loop fades in with
+## sideways speed while the car drifts. Sounds are art/sfx/, made by
+## tools/comfy/generate_sfx.py.
+
+const ENGINE := preload("res://art/sfx/engine_loop.wav")
+const SKID := preload("res://art/sfx/skid_loop.wav")
+const BUMP := preload("res://art/sfx/wall_bump.wav")
+## Engine pitch at a standstill and at top speed.
+const PITCH_IDLE := 0.6
+const PITCH_TOP := 1.5
+const ENGINE_DB := -10.0
+const SKID_DB := -9.0
+## Quieter than this is treated as silent, dB.
+const SILENT_DB := -40.0
+const HEARING_DISTANCE := 1800.0
+
+var _engine: AudioStreamPlayer2D
+var _skid: AudioStreamPlayer2D
+var _bump: AudioStreamPlayer2D
+var _skid_level := 0.0
+
+@onready var car: Car = get_parent()
+
+
+func _enter_tree() -> void:
+	EventSystem.CAR_wall_hit.connect(_on_wall_hit)
+
+
+func _ready() -> void:
+	_engine = _player(ENGINE, ENGINE_DB)
+	_skid = _player(SKID, SILENT_DB)
+	_bump = _player(BUMP, -4.0)
+	if not SoundManager.audible():
+		set_physics_process(false)
+		return
+	_engine.play()
+	_skid.play()
+
+
+func _physics_process(delta: float) -> void:
+	var fraction := clampf(car.velocity.length() / car.config.max_speed, 0.0, 1.0)
+	var throttle := maxf(car.throttle_input, 0.0)
+	# A little extra pitch under throttle, so pressing the pedal is heard straight away.
+	_engine.pitch_scale = lerpf(PITCH_IDLE, PITCH_TOP, fraction) + 0.08 * throttle
+	_engine.volume_db = ENGINE_DB - 4.0 * (1.0 - maxf(fraction, throttle))
+	var target := 0.0
+	if car.is_drifting:
+		target = clampf(car.lateral_speed / (car.config.drift_threshold * 2.0), 0.4, 1.0)
+	_skid_level = move_toward(_skid_level, target, delta * 6.0)
+	_skid.volume_db = lerpf(SILENT_DB, SKID_DB, _skid_level) if _skid_level > 0.0 else SILENT_DB - 20.0
+	_skid.pitch_scale = 0.9 + 0.2 * fraction
+
+
+func _on_wall_hit(hit_car: Node, impact_speed: float) -> void:
+	if hit_car == car and SoundManager.audible():
+		_bump.volume_db = lerpf(-14.0, -3.0, clampf(impact_speed / 800.0, 0.0, 1.0))
+		_bump.pitch_scale = randf_range(0.9, 1.1)
+		_bump.play()
+
+
+func _player(stream: AudioStream, volume_db: float) -> AudioStreamPlayer2D:
+	var player := AudioStreamPlayer2D.new()
+	player.stream = stream
+	player.volume_db = volume_db
+	player.max_distance = HEARING_DISTANCE
+	player.attenuation = 1.6
+	add_child(player)
+	return player

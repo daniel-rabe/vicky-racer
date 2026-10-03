@@ -1,0 +1,93 @@
+{
+  "recipe": {
+    "checkpoint": "stable_audio_3_medium_base.safetensors",
+    "text_encoder": "t5gemma_b_b_ul2.safetensors",
+    "steps": 50,
+    "cfg": 7.0,
+    "sampler": "lcm",
+    "scheduler": "simple",
+    "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
+    "candidates": 4,
+    "note": "Bake-off 2026-10-03 on a tyre-squeal probe: medium_base at 50 steps / cfg 7 gave the cleanest tonal squeal. small_sfx is distilled (cfg 1 only; cfg 7 clips to a flat line) and noisier; medium (distilled, 8 steps) sits between."
+  },
+  "sounds": [
+    {
+      "id": "engine_loop",
+      "prompt": "steady continuous hum of a small cartoon toy race car engine at medium revs, constant even pitch, smooth purr, no revving, no gear changes, close up, clean, sound effect",
+      "seconds": 6.0,
+      "kind": "loop",
+      "loop_seconds": 1.6,
+      "peak_db": -3.0,
+      "out": "art/sfx/engine_loop.wav",
+      "seed": 102
+    },
+    {
+      "id": "skid_loop",
+      "prompt": "continuous sustained car tyre squeal on asphalt, steady screech of rubber sliding, constant, no engine, no crash, clean sound effect",
+      "seconds": 6.0,
+      "kind": "loop",
+      "loop_seconds": 1.4,
+      "peak_db": -4.0,
+      "out": "art/sfx/skid_loop.wav",
+      "seed": 101
+    },
+    {
+      "id": "wall_bump",
+      "prompt": "one single dull soft thump of a small toy car hitting a rubber tyre wall, a single impact with no bouncing and no repeats, short, muffled, cartoon sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 0.45,
+      "peak_db": -2.0,
+      "out": "art/sfx/wall_bump.wav",
+      "seed": 102
+    },
+    {
+      "id": "coin",
+      "prompt": "bright cheerful video game coin pickup chime, single sparkling ding, short, clean, retro arcade sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.0,
+      "peak_db": -4.0,
+      "out": "art/sfx/coin.wav",
+      "seed": 104
+    },
+    {
+      "id": "finish_fanfare",
+      "prompt": "short happy victory jingle for a children's racing video game, bright xylophone and trumpets, cheerful ending flourish, 3 seconds",
+      "negative": "speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, sad",
+      "seconds": 4.0,
+      "kind": "oneshot",
+      "max_seconds": 3.5,
+      "peak_db": -3.0,
+      "out": "art/sfx/finish_fanfare.wav",
+      "seed": 101
+    },
+    {
+      "id": "ui_click",
+      "prompt": "soft short pop click of a button in a children's video game menu, gentle bubbly tick, clean user interface sound effect",
+      "seconds": 1.0,
+      "kind": "oneshot",
+      "max_seconds": 0.25,
+      "peak_db": -6.0,
+      "out": "art/sfx/ui_click.wav",
+      "seed": 103
+    }
+  ],
+  "synth": [
+    {
+      "id": "countdown_beep",
+      "freq": 523.25,
+      "seconds": 0.28,
+      "peak_db": -6.0,
+      "out": "art/sfx/countdown_beep.wav",
+      "note": "Synthesised, not generated: three identical clean beeps then a higher GO, as in every kart racer. A pure tone is what this needs, and diffusion adds nothing."
+    },
+    {
+      "id": "go_beep",
+      "freq": 1046.5,
+      "seconds": 0.6,
+      "peak_db": -5.0,
+      "out": "art/sfx/go_beep.wav"
+    }
+  ]
+}

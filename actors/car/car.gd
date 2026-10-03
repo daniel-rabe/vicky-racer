@@ -34,6 +34,10 @@ var handbrake := false
 var surface_speed_mult := 1.0
 var surface_grip_mult := 1.0
 
+## Written by an AI driver while rubber-banded forward: lets an opponent go a little past
+## its top speed, so it can keep a player on a faster setup in sight.
+var catch_up_mult := 1.0
+
 ## Held still, ignoring its driver: during the countdown, and after the race.
 var frozen := false
 
@@ -107,7 +111,7 @@ func _apply_grip(forward: Vector2, delta: float) -> void:
 
 
 func _limit_speed(speed_along: float, delta: float) -> void:
-	var limit := config.max_speed * surface_speed_mult if speed_along >= 0.0 else config.max_reverse_speed
+	var limit := config.max_speed * surface_speed_mult * catch_up_mult if speed_along >= 0.0 		else config.max_reverse_speed
 	var speed := velocity.length()
 	if speed > limit:
 		velocity = velocity / speed * move_toward(speed, limit, OVERSPEED_DECEL * delta)

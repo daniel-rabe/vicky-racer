@@ -5,8 +5,9 @@ player races three AI cars around tile-built circuits, earns coins by finishing,
 a garage on drift setups that change how the car handles. All art is generated locally with
 ComfyUI from a single frozen recipe.
 
-This document is written ahead of the code. Every system is marked **(not implemented)** until it
-lands, and the markers come off as it does. Mockups referenced here live in
+This document was written ahead of the code, with every system marked **(not implemented)** until
+it landed. All of v1 is now built — the last markers came off with Phase 8 (effects, sound and the
+balance pass) — and the document describes the game as it is. Mockups referenced here live in
 [`mockups/`](mockups/); every generated image there is reproducible from
 [`mockups/seeds.json`](mockups/seeds.json).
 
@@ -100,7 +101,7 @@ Godot_v4.7.1-stable_win64_console.exe --path . --headless --fixed-fps 60 res://t
 - The **handbrake** swaps in a much lower grip to kick the tail out on demand.
 - **Speed-scaled steering** stops the car pirouetting on the spot and keeps it calm at speed.
 - `CAR_drift_started` / `CAR_drift_ended` fire when `lat_v.length()` crosses a threshold; skid
-  marks and the drift sound hang off those signals.
+  marks and the drift sound hang off those signals (§4.3).
 
 ### 4.1 `CarConfig` — the base car
 
@@ -143,6 +144,28 @@ handling-only, which left a child who bought Banana still driving the plain red 
 player's car can now share a colour with an opponent (Banana and Yellow), a small white arrow
 always floats above the player's car. The three **bar values** are authored, not computed: they describe how
 the setup *feels*, which is what the garage needs to communicate.
+
+### 4.3 Feedback: marks, puffs, shake and sound
+
+Drift is the fun, so a drift has to be *seen and heard* — the payoff for buying a slippery setup.
+
+![Skid marks, tyre smoke and grass dust](screenshots/drift_effects.png)
+
+| Effect | Trigger | Built in |
+| --- | --- | --- |
+| **Skid marks** — two dark lines from the rear wheels, fading out 6 s after the drift, at most 80 kept | `CAR_drift_started` / `_ended`, any car | [`actors/effects/skid_marks.gd`](../actors/effects/skid_marks.gd), one node per race between the track and the cars, so marks lie under every car |
+| **Tyre smoke** — white puffs while drifting on the road | the car's drift state | [`actors/car/car_effects.gd`](../actors/car/car_effects.gd) |
+| **Dust** — earth-coloured on grass (green would vanish against it), sand-coloured on sand | `CAR_surface_changed` | same; the puff texture is a generated soft disc, no art file |
+| **Wall shake** — the view jolts by up to 9 px and settles within a second; a bump to feel, not a jolt to frighten | `CAR_wall_hit` for the camera's own car | [`actors/car/chase_camera.gd`](../actors/car/chase_camera.gd), added to the rig's position so physics interpolation still smooths it |
+| **Engine** — one steady loop, pitch from 0.6× at rest to 1.5× at top speed, a touch higher under throttle | every frame | [`actors/car/car_audio.gd`](../actors/car/car_audio.gd), positional: opponents are heard near the camera and fade with distance |
+| **Tyre squeal** — a loop that fades in with sideways speed | the car's drift state | same |
+| **Bump** — a soft thump, louder for harder hits | `CAR_wall_hit` | same |
+| **Beeps** — three low beeps and a high GO | `RAC_countdown_tick` | [`game/managers/sound_manager.gd`](../game/managers/sound_manager.gd), in the main shell |
+| **Fanfare**, **coin chime**, **menu click** | `RAC_race_finished`; `PRO_setup_purchased` and the results count-up; menu focus moving | same, and [`ui/results/results_screen.gd`](../ui/results/results_screen.gd) |
+
+[`tests/effects_test.gd`](../tests/effects_test.gd) checks the visual effects headlessly. Sounds
+are skipped under the dummy audio driver of headless runs: it never mixes, so a played sound would
+never finish and be reported as leaked at exit. Where the sounds come from: §11.2.
 
 ## 5. Scale
 
@@ -316,8 +339,11 @@ inputs a player would:
 1. **Steer** at a point on the racing line 150 px + 0.3 s of speed ahead, shifted sideways into
    its own lane (−70 / 0 / +70 px), so the pack does not drive in single file.
 2. **Read the road ahead** — the sharpest bend in the next 250 / 500 / 800 px sets a target speed
-   between its straight pace (0.80 + 0.15 × skill of top speed) and corner pace (0.45 + 0.15 ×
-   skill); it lifts or brakes to meet it.
+   between its straight pace (0.80 + 0.15 × skill of its top speed) and corner pace (0.45 + 0.15 ×
+   skill of the *base* car's top speed, times its setup's steering multiplier); it lifts or brakes
+   to meet it. Corner speed follows how fast the car turns, not how fast it goes: a Kart carries
+   more speed through a bend, a Rocket must lift more. Opponents drive the base car, so for them
+   nothing changes; it matters when the player's car is on autopilot for the balance pass (§8.3).
 3. **Avoid** — a car close in front pushes it into the other half of the road until clear.
 4. **Never strand** — stuck (slow with the throttle down) for 1.2 s, it backs out steering the
    other way; after three back-outs, or 900 px off the line, it is put back on the line. The race
@@ -338,19 +364,50 @@ inputs a player would:
   race that is over for them. Results go out on `RAC_race_finished`; `GarageManager` pays out.
 - The player starts **3rd of 4** — something to chase, nobody to lap.
 
-### 8.3 Rubber-banding
+### 8.3 Rubber-banding and the balance pass
 
-Each AI's pace is scaled by its gap to the player: 1,800 px ahead it eases to **70 %**, the same
-distance behind it pushes to **112 %**. Tuned with [`tests/race_test.gd`](../tests/race_test.gd),
-using the player's car on autopilot as a stand-in:
+Each AI's pace is scaled by how far it is from **where it wants to be**: 1,500 px ahead of that
+spot it eases to **60 %**, the same distance behind it pushes to **112 %**, and may then pass its
+own top speed by as much (`Car.catch_up_mult`), so a player on a faster setup cannot simply drive
+away. Where it wants to be: level with the player for Blue, the best driver; the others hang back
+5,000 px per point of skill below 0.85, so Yellow 750 px and Green 1,500 px. The best opponent
+always makes the player work for a win, and the weaker two leave room on the podium for a child who
+is still learning ([`race_manager.gd`](../game/managers/race_manager.gd)).
 
-| Stand-in player | First tuning (85 % / 2,500 px) | Shipped (70 % / 1,800 px) |
-| --- | --- | --- |
-| Full pace | 2nd, all four within 1.4 s | 2nd, all four within 0.9 s |
-| 70 % pace — a struggling child | last, 7 s behind 3rd | last, **2.3 s** behind 3rd; field within 2.8 s |
+Tuned with [`tools/dev/balance_report.py`](../tools/dev/balance_report.py), which races every setup
+with the player's car on autopilot at three paces: 1.0 = clean driving, 0.85 = a decent child,
+0.7 = a struggling one. Each cell is the player's place and the gap to the winner (negative = the
+winning margin). Runs are deterministic, so before and after compare directly.
 
-The pack now stays in sight of a slow player. A consistently slow player still finishes last —
-whether they should sometimes win is open for the Phase 8 balance pass.
+Before Phase 8 (70 % / 1,800 px, every AI banded level with the player, capped at its own top
+speed):
+
+| Setup | 1.0 | 0.85 | 0.7 |
+| --- | --- | --- | --- |
+| Starter | 2nd +0.2 s | 4th +1.0 s | 4th +2.8 s |
+| Grippy | 2nd +0.3 s | 4th +1.4 s | 4th +4.1 s |
+| Slider | 2nd +0.1 s | 4th +1.2 s | 4th +3.0 s |
+| Rocket | 1st −4.3 s | 1st −0.6 s | 4th +1.1 s |
+| Kart | 4th +0.6 s | 4th +2.2 s | 4th +7.1 s |
+| Banana | 1st −4.5 s | 1st −0.8 s | 3rd +0.8 s |
+
+Three problems: a decent child came last on every setup but the two fastest; Rocket and Banana won
+by over 4 s, because nothing could catch them on the straights; and Kart looked strictly worse, only
+because the autopilot ignored its sharper steering. Shipped:
+
+| Setup | 1.0 | 0.85 | 0.7 |
+| --- | --- | --- | --- |
+| Starter | 1st −0.8 s | 2nd +0.4 s | 3rd +1.4 s |
+| Grippy | 1st −0.6 s | 2nd +0.6 s | 3rd +1.5 s |
+| Slider | 1st −1.0 s | 3rd +1.0 s | 3rd +1.5 s |
+| Rocket | 1st −1.7 s | 1st −0.1 s | 3rd +1.0 s |
+| Kart | 1st −0.8 s | 2nd +0.6 s | 3rd +1.3 s |
+| Banana | 1st −3.0 s | 1st −0.5 s | 2nd +0.6 s |
+
+Clean driving wins narrowly on anything; a decent child fights for 2nd and 3rd; a struggling child
+reaches the podium. Setups are worth buying without trivialising the race. The autopilot never
+uses the handbrake, so the table cannot show what a slippery setup costs a child in control:
+Banana's margin is deliberately the largest because it is also the hardest car to keep on the road.
 
 ## 9. Garage and economy
 
@@ -364,7 +421,8 @@ whether they should sometimes win is open for the Phase 8 balance pass.
 | 4th | 50 |
 | First time finishing a track | +100 once |
 
-The floor is deliberately generous: a child finishing last every time still affords **Grippy**
+The Phase 8 balance pass left these numbers alone: with the retuned rubber-banding a decent child
+finishes 2nd or 3rd (60–75 coins), which keeps the pacing below. The floor is deliberately generous: a child finishing last every time still affords **Grippy**
 after two races and a 250-coin setup after about five. Winning just gets there faster. Owning
 everything costs 1,450 coins — roughly 15 races for a strong player, 25 for a struggling one. All of
 these numbers live in one `EconomyConfig` resource.
@@ -479,9 +537,27 @@ The recipe is **verified reproducible**: an identical request regenerates pixel-
 pinned seed fully defines an asset. Prompt lessons — how to get props truly top-down, and that car
 facing is unreliable and must be recorded per asset — are kept in `pipeline.json` itself.
 
+### 11.2 Sound (Phase 8)
+
+Six sounds are generated with **Stable Audio 3** through the same ComfyUI client, declared with
+prompts and pinned seeds in [`tools/comfy/sfx_manifest.json`](../tools/comfy/sfx_manifest.json) and
+built by [`tools/comfy/generate_sfx.py`](../tools/comfy/generate_sfx.py) into `art/sfx/` as mono
+16-bit WAVs. Recipe: `stable_audio_3_medium_base`, 50 steps, cfg 7. A bake-off on a tyre-squeal
+probe found it gave the cleanest tonal squeal; `small_sfx` is distilled (cfg 1 only) and noisier.
+Four candidates per sound were picked from spectrogram sheets in [`mockups/sfx/`](mockups/sfx/).
+One-shots are trimmed and faded; the two loops (engine, squeal) are cut from the steadiest stretch
+of their clip and cross-faded so they repeat without a click, and imported with looping on. The
+countdown beeps are synthesised: a pure tone is what they need.
+
+```bash
+python tools/comfy/generate_sfx.py candidates [--only coin]   # render candidates + review sheet
+python tools/comfy/generate_sfx.py pick coin 104              # pin a seed
+python tools/comfy/generate_sfx.py build                      # write art/sfx/*.wav
+```
+
 ## 12. Out of scope for v1
 
 - More than one track
-- Engine and tyre sounds (stretch goal — a local SFX model is installed)
+- Music during the race
 - Lap ghosts, time-trial mode, split-screen
 - Touch controls

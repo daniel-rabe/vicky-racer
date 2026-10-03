@@ -9,6 +9,7 @@ const ORDINALS := {1: "1ST", 2: "2ND", 3: "3RD", 4: "4TH"}
 const BREAKDOWN_LABELS := {"place": "%s PLACE", "first_finish": "FIRST FINISH"}
 const YELLOW := Color(1, 0.824, 0.247)
 const DIM := Color(0.624, 0.69, 0.769)
+const COIN := preload("res://art/sfx/coin.wav")
 
 @onready var _headline: Label = %Headline
 @onready var _rows: VBoxContainer = %Rows
@@ -61,6 +62,7 @@ func _play(race: Dictionary) -> void:
 		line.modulate.a = 0.0
 		_lines.add_child(line)
 		tween.tween_property(line, "modulate:a", 1.0, 0.2)
+	tween.tween_callback(_chime)
 	tween.tween_method(func(v: float) -> void: _total.text = "+%d" % roundi(v), 0.0, float(race["amount"]), COUNT_UP_SECONDS)
 	tween.tween_callback(func() -> void: _balance.text = "TOTAL %d" % int(_state["coins"]))
 	tween.tween_callback(_enable_buttons)
@@ -138,3 +140,14 @@ func _enable_buttons() -> void:
 
 static func _format_time(seconds: float) -> String:
 	return "%d:%05.2f" % [int(seconds) / 60, fmod(seconds, 60.0)]
+
+
+## The payout count-up gets the coin chime, so earning is something you hear.
+func _chime() -> void:
+	if not SoundManager.audible():
+		return
+	var player := AudioStreamPlayer.new()
+	player.stream = COIN
+	add_child(player)
+	player.play()
+	player.finished.connect(player.queue_free)

@@ -19,11 +19,21 @@ extends Node2D
 ## How far ahead of the car the view leads at top speed, px.
 @export var lead_distance := 260.0
 @export var lead_smoothing := 2.5
+## Wall-hit shake: px of shake per px/s of impact, capped, dying away at shake_decay per
+## second. Kept small on purpose — a bump to feel, not a jolt to frighten.
+@export var shake_per_impact := 0.012
+@export var shake_max := 9.0
+@export var shake_decay := 8.0
 
 var _lead := Vector2.ZERO
+var _shake := 0.0
 
 @onready var car: Car = get_parent()
 @onready var camera: Camera2D = $Camera
+
+
+func _enter_tree() -> void:
+	EventSystem.CAR_wall_hit.connect(_on_wall_hit)
 
 
 func _ready() -> void:
@@ -36,13 +46,21 @@ func _physics_process(delta: float) -> void:
 	var speed_fraction := clampf(car.velocity.length() / car.config.max_speed, 0.0, 1.0)
 	var target_lead := car.velocity.normalized() * lead_distance * speed_fraction
 	_lead = _lead.lerp(target_lead, 1.0 - exp(-lead_smoothing * delta))
+	_shake *= exp(-shake_decay * delta)
+	var jitter := Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * _shake
 	# A child of the rotating car: undo the car's rotation so the world offset is _lead.
-	position = _lead.rotated(-car.rotation)
+	position = (_lead + jitter).rotated(-car.rotation)
+
+
+func _on_wall_hit(hit_car: Node, impact_speed: float) -> void:
+	if hit_car == get_parent():
+		_shake = maxf(_shake, minf(impact_speed * shake_per_impact, shake_max))
 
 
 ## Jump straight to the car, e.g. after it is placed on the grid or reset.
 func snap_to_car() -> void:
 	_lead = Vector2.ZERO
+	_shake = 0.0
 	position = Vector2.ZERO
 	reset_physics_interpolation()
 	camera.reset_physics_interpolation()

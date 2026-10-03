@@ -12,13 +12,18 @@ signal race_over
 const COUNTDOWN_FROM := 3
 ## After the player crosses the line, the race keeps running this long before results.
 const FINISH_HOLD_SECONDS := 2.5
-## Rubber-banding: an AI this many px ahead of the player eases to EASE_OFF of its pace;
-## the same distance behind, it pushes to PUSH. Tuned with tests/race_test.gd against a
-## stand-in for a struggling child (--autopilot=0.7): at 0.85 / 2500 px that player was
-## left 7 s behind in last; these values keep the pack in sight.
-const BAND_DISTANCE := 1800.0
-const EASE_OFF := 0.7
+## Rubber-banding: an AI this many px ahead of where it wants to be eases to EASE_OFF of
+## its pace; the same distance behind, it pushes to PUSH (and may then pass its own top
+## speed by as much, so a faster setup does not simply drive away). Where it wants to be:
+## level with the player for the best opponent, and BAND_HANG_BACK_PER_SKILL px behind per
+## point of skill below BAND_CENTRE_SKILL for the others — so even a struggling child can
+## reach the podium, while the best opponent still makes them work for the win. Tuned with
+## tools/dev/balance_report.py (docs/DESIGN.md §8.3).
+const BAND_DISTANCE := 1500.0
+const EASE_OFF := 0.6
 const PUSH := 1.12
+const BAND_CENTRE_SKILL := 0.85
+const BAND_HANG_BACK_PER_SKILL := 5000.0
 
 var track: Track
 var config: TrackConfig
@@ -132,7 +137,8 @@ func _update_positions() -> void:
 func _rubber_band() -> void:
 	for r in racers:
 		if r.has("driver") and not r["is_player"]:
-			var gap: float = r["progress"] - _player["progress"]
+			var wanted: float = minf(0.0, (r["driver"].skill - BAND_CENTRE_SKILL) * BAND_HANG_BACK_PER_SKILL)
+			var gap: float = r["progress"] - _player["progress"] - wanted
 			var t := clampf(gap / BAND_DISTANCE, -1.0, 1.0)
 			r["driver"].rubber_band = lerpf(1.0, EASE_OFF, t) if t > 0.0 else lerpf(1.0, PUSH, -t)
 

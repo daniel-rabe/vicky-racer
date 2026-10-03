@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://game/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://game/managers/garage_manager.gd" id="2_garage"]
 [ext_resource type="Resource" path="res://game/configs/economy.tres" id="3_economy"]
+[ext_resource type="Script" path="res://game/managers/sound_manager.gd" id="4_sound"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_main")
@@ -10,5 +11,8 @@ script = ExtResource("1_main")
 [node name="GarageManager" type="Node" parent="."]
 script = ExtResource("2_garage")
 economy = ExtResource("3_economy")
+
+[node name="SoundManager" type="Node" parent="."]
+script = ExtResource("4_sound")
 
 [node name="ScreenSlot" type="Node" parent="."]

@@ -71,10 +71,16 @@ func _physics_process(delta: float) -> void:
 	var bend := 0.0
 	for d in BEND_SAMPLES:
 		bend = maxf(bend, absf(heading.angle_to(_tangent(fposmod(here + d, length)))))
-	var straight_pace := 0.80 + 0.15 * skill
-	var corner_pace := 0.45 + 0.15 * skill
-	var pace := lerpf(straight_pace, corner_pace, clampf(bend / SHARP_BEND, 0.0, 1.0)) * rubber_band
-	var target_speed := clampf(pace, 0.3, 1.0) * car.config.max_speed * car.surface_speed_mult
+	# Corner speed depends on how quickly the car turns, not on its top speed: a sharp-
+	# steering setup (Kart) carries more speed through a bend, a lazy one (Rocket) lifts more.
+	var straight_speed := (0.80 + 0.15 * skill) * car.config.max_speed
+	var turn_factor := car.config.max_steer_rate / car.base_config.max_steer_rate
+	var corner_speed := minf((0.45 + 0.15 * skill) * car.base_config.max_speed * turn_factor, straight_speed)
+	var bend_fraction := clampf(bend / SHARP_BEND, 0.0, 1.0)
+	var top := car.config.max_speed * maxf(rubber_band, 1.0)
+	car.catch_up_mult = maxf(rubber_band, 1.0)
+	var target_speed := clampf(lerpf(straight_speed, corner_speed, bend_fraction) * rubber_band,
+		0.3 * car.config.max_speed, top) * car.surface_speed_mult
 	if speed < target_speed - 30.0:
 		car.throttle_input = 1.0
 	elif speed > target_speed + 60.0:

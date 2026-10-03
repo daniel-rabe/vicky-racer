@@ -52,7 +52,7 @@ func _ready() -> void:
 		await get_tree().create_timer(float(_args.get("wait", 2.5))).timeout
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png(_args["screenshot"])
-		get_tree().quit()
+		await _quit_quietly()
 
 
 func show_screen(screen_name: StringName) -> void:
@@ -72,3 +72,12 @@ func _fake_race_finish(player_position: int) -> void:
 		results.append({"name": entry[0], "body": entry[1], "is_player": is_player, "position": position,
 			"time": 115.0 + position * 2.6, "best_lap": 37.5 + position * 0.7})
 	EventSystem.RAC_race_finished.emit(results, &"test_drive")
+
+
+## Quit without leak warnings: a sound still playing at quit is only released by the audio
+## server's next mix, which comes after Godot's leak check. Free the screen, let audio mix.
+func _quit_quietly() -> void:
+	for child in screen_slot.get_children():
+		child.queue_free()
+	await get_tree().create_timer(0.5).timeout
+	get_tree().quit()

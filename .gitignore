@@ -11,3 +11,12 @@ tools/comfy/masters/candidates/
 docs/mockups/bakeoff/*/*
 !docs/mockups/bakeoff/*/sheet.png
 !docs/mockups/bakeoff/*/seeds.json
+
+# Sound candidates: only the picked masters are kept (seeds in tools/comfy/sfx_manifest.json).
+tools/comfy/masters/sfx/*
+!tools/comfy/masters/sfx/engine_loop_102.flac
+!tools/comfy/masters/sfx/skid_loop_101.flac
+!tools/comfy/masters/sfx/wall_bump_102.flac
+!tools/comfy/masters/sfx/coin_104.flac
+!tools/comfy/masters/sfx/finish_fanfare_101.flac
+!tools/comfy/masters/sfx/ui_click_103.flac
