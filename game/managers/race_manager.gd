@@ -12,21 +12,12 @@ signal race_over
 const COUNTDOWN_FROM := 3
 ## After the player crosses the line, the race keeps running this long before results.
 const FINISH_HOLD_SECONDS := 2.5
-## Rubber-banding: an AI this many px ahead of where it wants to be eases to EASE_OFF of
-## its pace; the same distance behind, it pushes to PUSH (and may then pass its own top
-## speed by as much, so a faster setup does not simply drive away). Where it wants to be:
-## level with the player for the best opponent, and BAND_HANG_BACK_PER_SKILL px behind per
-## point of skill below BAND_CENTRE_SKILL for the others — so even a struggling child can
-## reach the podium, while the best opponent still makes them work for the win. Tuned with
-## tools/dev/balance_report.py (docs/DESIGN.md §8.3).
-const BAND_DISTANCE := 1500.0
-const EASE_OFF := 0.6
-const PUSH := 1.12
-const BAND_CENTRE_SKILL := 0.85
-const BAND_HANG_BACK_PER_SKILL := 5000.0
 
 var track: Track
 var config: TrackConfig
+## Rubber-band tuning (docs/DESIGN.md §8.3): an AI ahead of where it wants to be eases off,
+## behind it pushes, and the weaker opponents want to be a little behind the player.
+var difficulty: DifficultyConfig
 var racers: Array[Dictionary] = []
 var running := false
 var race_time := 0.0
@@ -37,9 +28,11 @@ var _order: Array[Dictionary] = []
 var _ended := false
 
 
-func start(race_track: Track, race_config: TrackConfig, race_racers: Array[Dictionary]) -> void:
+func start(race_track: Track, race_config: TrackConfig, race_racers: Array[Dictionary],
+		race_difficulty: DifficultyConfig) -> void:
 	track = race_track
 	config = race_config
+	difficulty = race_difficulty
 	racers = race_racers
 	_finish_offset = track.progress_at(track.get_node("FinishLine").global_position)
 	for r in racers:
@@ -137,10 +130,11 @@ func _update_positions() -> void:
 func _rubber_band() -> void:
 	for r in racers:
 		if r.has("driver") and not r["is_player"]:
-			var wanted: float = minf(0.0, (r["driver"].skill - BAND_CENTRE_SKILL) * BAND_HANG_BACK_PER_SKILL)
+			var d := difficulty
+			var wanted: float = minf(0.0, (r["driver"].skill - d.band_centre_skill) * d.hang_back_per_skill)
 			var gap: float = r["progress"] - _player["progress"] - wanted
-			var t := clampf(gap / BAND_DISTANCE, -1.0, 1.0)
-			r["driver"].rubber_band = lerpf(1.0, EASE_OFF, t) if t > 0.0 else lerpf(1.0, PUSH, -t)
+			var t := clampf(gap / d.band_distance, -1.0, 1.0)
+			r["driver"].rubber_band = lerpf(1.0, d.ease_off, t) if t > 0.0 else lerpf(1.0, d.push, -t)
 
 
 func position_of(r: Dictionary) -> int:

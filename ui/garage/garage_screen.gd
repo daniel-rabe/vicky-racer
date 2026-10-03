@@ -120,3 +120,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("race_start"):
 		_start_race()
 		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_cancel"):
+		EventSystem.UI_screen_requested.emit(&"title")
+		get_viewport().set_input_as_handled()

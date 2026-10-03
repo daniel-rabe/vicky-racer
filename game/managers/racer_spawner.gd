@@ -16,8 +16,10 @@ const LANES: Array[float] = [-70.0, 70.0, 0.0]
 
 
 ## `autopilot`: the player's car is driven by an AIDriver too (headless race tests).
+## `difficulty` shifts every opponent's skill (DifficultyConfig.skill_offset).
 func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: Node,
-		autopilot := false) -> Array[Dictionary]:
+		autopilot := false, difficulty: DifficultyConfig = null) -> Array[Dictionary]:
+	var skill_offset := difficulty.skill_offset if difficulty else 0.0
 	var grid := track.grid_transforms()
 	var racers: Array[Dictionary] = []
 	var opponent := 0
@@ -35,6 +37,7 @@ func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: 
 				var input := Node.new()
 				input.name = "PlayerInput"
 				input.set_script(PLAYER_INPUT)
+				input.track = track  # for steering help
 				car.add_child(input)
 			car.add_child(_camera_rig())
 			var marker := Node2D.new()
@@ -46,7 +49,8 @@ func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: 
 			car.body_texture = body
 			racer.merge({"name": config.opponent_names[opponent], "body": body.resource_path,
 				"colour": config.opponent_colours[opponent]})
-			racer["driver"] = _ai(car, track, config.opponent_skills[opponent], LANES[opponent % LANES.size()])
+			var skill := clampf(config.opponent_skills[opponent] + skill_offset, 0.0, 1.0)
+			racer["driver"] = _ai(car, track, skill, LANES[opponent % LANES.size()])
 			opponent += 1
 		car.name = racer["name"].capitalize()
 		car.frozen = true

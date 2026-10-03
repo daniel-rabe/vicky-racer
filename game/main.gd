@@ -1,10 +1,11 @@
 extends Node
-## The persistent shell: loaded once and never unloaded. Holds GarageManager, which must
-## survive screen changes, and swaps screens in and out of ScreenSlot when anything emits
+## The persistent shell: loaded once and never unloaded. Holds GarageManager,
+## SettingsManager and SoundManager, which must survive screen changes, and swaps screens in and out of ScreenSlot when anything emits
 ## EventSystem.UI_screen_requested.
 ##
 ## Dev flags, after `--` on the command line:
 ##   --save=<path>           use another save file (keeps screenshots off the real profile)
+##   --settings=<path>       use another settings file, likewise
 ##   --screen=<name>         open this screen first
 ##   --dev-coins=<n>         set the coin balance after loading
 ##   --fake-race=<position>  pretend a race just finished in that position
@@ -13,13 +14,14 @@ extends Node
 ##   --physics-hz=<n>        run physics at n ticks per second instead of 60
 
 const SCREENS := {
+	&"title": preload("res://ui/title/title_screen.tscn"),
 	&"garage": preload("res://ui/garage/garage_screen.tscn"),
 	&"race": preload("res://game/screens/race.tscn"),
 	# Dev: the open field for tuning handling (--screen=test_drive).
 	&"test_drive": preload("res://game/screens/test_drive.tscn"),
 	&"results": preload("res://ui/results/results_screen.tscn"),
 }
-const FIRST_SCREEN := &"garage"
+const FIRST_SCREEN := &"title"
 
 var _args := {}
 
@@ -35,6 +37,8 @@ func _enter_tree() -> void:
 	# Children are not ready yet, so this lands before GarageManager loads the profile.
 	if _args.has("save"):
 		$GarageManager.save_path = _args["save"]
+	if _args.has("settings"):
+		$SettingsManager.settings_path = _args["settings"]
 	EventSystem.UI_screen_requested.connect(show_screen)
 	if _args.has("no-interp"):
 		get_tree().physics_interpolation = false
@@ -56,6 +60,7 @@ func _ready() -> void:
 
 
 func show_screen(screen_name: StringName) -> void:
+	get_tree().paused = false  # never carry a pause into the next screen
 	for child in screen_slot.get_children():
 		child.queue_free()
 	screen_slot.add_child(SCREENS[screen_name].instantiate())

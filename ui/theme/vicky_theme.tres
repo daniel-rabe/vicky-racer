@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=14 format=3]
+[gd_resource type="Theme" load_steps=15 format=3]
 
 [ext_resource type="FontFile" path="res://ui/fonts/PublicPixel.ttf" id="1_font"]
 
@@ -160,6 +160,17 @@ content_margin_top = 16.0
 content_margin_right = 28.0
 content_margin_bottom = 16.0
 
+[sub_resource type="StyleBoxFlat" id="row_normal"]
+bg_color = Color(0.149, 0.204, 0.29, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+content_margin_left = 28.0
+content_margin_top = 12.0
+content_margin_right = 28.0
+content_margin_bottom = 12.0
+
 [resource]
 default_font = ExtResource("1_font")
 default_font_size = 28
@@ -186,6 +197,10 @@ Panel/styles/panel = SubResource("panel")
 PanelContainer/styles/panel = SubResource("panel")
 ProgressBar/styles/background = SubResource("bar_background")
 ProgressBar/styles/fill = SubResource("bar_fill")
+SettingsRow/base_type = &"Button"
+SettingsRow/styles/hover = SubResource("row_normal")
+SettingsRow/styles/normal = SubResource("row_normal")
+SettingsRow/styles/pressed = SubResource("row_normal")
 RaceButton/base_type = &"Button"
 RaceButton/font_sizes/font_size = 40
 RaceButton/styles/hover = SubResource("race_hover")

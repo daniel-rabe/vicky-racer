@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DifficultyConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/configs/difficulty_config.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"fast"
+display_name = "Fast"
+skill_offset = 0.1
+band_distance = 1500.0
+ease_off = 0.75
+push = 1.15
+band_centre_skill = 0.85
+hang_back_per_skill = 2500.0

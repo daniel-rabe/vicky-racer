@@ -154,13 +154,8 @@ func _rescue() -> void:
 
 
 func _line_point(offset: float, sideways: float) -> Vector2:
-	var curve := track.racing_line.curve
-	var p := track.racing_line.to_global(curve.sample_baked(offset))
-	return p + _tangent(offset).orthogonal() * sideways
+	return track.line_point(offset, sideways)
 
 
 func _tangent(offset: float) -> Vector2:
-	var curve := track.racing_line.curve
-	var a := curve.sample_baked(offset)
-	var b := curve.sample_baked(fposmod(offset + 10.0, curve.get_baked_length()))
-	return (b - a).normalized()
+	return track.line_tangent(offset)

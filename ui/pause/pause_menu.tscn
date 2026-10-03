@@ -1,0 +1,139 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ui/pause/pause_menu.gd" id="1_pause"]
+[ext_resource type="Theme" path="res://ui/theme/vicky_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" path="res://ui/settings/settings_panel.tscn" id="3_settings"]
+
+[node name="PauseMenu" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_pause")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="Dim" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.078, 0.125, 0.18, 0.6)
+
+[node name="Menu" type="PanelContainer" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -360.0
+offset_right = 310.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Column" type="VBoxContainer" parent="Root/Menu"]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="Title" type="Label" parent="Root/Menu/Column"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.055, 0.078, 0.11, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 64
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="Resume" type="Button" parent="Root/Menu/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 110)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"RaceButton"
+text = "RESUME"
+
+[node name="Restart" type="Button" parent="Root/Menu/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 90)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"NavButton"
+text = "RESTART"
+
+[node name="Settings" type="Button" parent="Root/Menu/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 90)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"NavButton"
+text = "SETTINGS"
+
+[node name="Garage" type="Button" parent="Root/Menu/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 90)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"NavButton"
+text = "GARAGE"
+
+[node name="Confirm" type="PanelContainer" parent="Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -200.0
+offset_right = 360.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Column" type="VBoxContainer" parent="Root/Confirm"]
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Question" type="Label" parent="Root/Confirm/Column"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.055, 0.078, 0.11, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 56
+text = "SURE?"
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="Root/Confirm/Column"]
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="No" type="Button" parent="Root/Confirm/Column/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 100)
+layout_mode = 2
+theme_type_variation = &"RaceButton"
+text = "NO"
+
+[node name="Yes" type="Button" parent="Root/Confirm/Column/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 100)
+layout_mode = 2
+theme_type_variation = &"NavButton"
+text = "YES"
+
+[node name="SettingsPanel" parent="Root" instance=ExtResource("3_settings")]
+unique_name_in_owner = true
+layout_mode = 1

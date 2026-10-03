@@ -68,5 +68,6 @@ func _player(stream: AudioStream, volume_db: float) -> AudioStreamPlayer2D:
 	player.volume_db = volume_db
 	player.max_distance = HEARING_DISTANCE
 	player.attenuation = 1.6
+	player.bus = &"SFX"
 	add_child(player)
 	return player

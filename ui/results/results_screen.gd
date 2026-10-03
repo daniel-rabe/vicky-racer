@@ -148,6 +148,7 @@ func _chime() -> void:
 		return
 	var player := AudioStreamPlayer.new()
 	player.stream = COIN
+	player.bus = &"SFX"
 	add_child(player)
 	player.play()
 	player.finished.connect(player.queue_free)

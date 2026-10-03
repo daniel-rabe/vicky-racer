@@ -1,7 +1,7 @@
 extends Node2D
 ## The race screen: loads the track from the TrackConfig, puts four cars on the grid, runs
-## the race and hands over to the results screen when it is over. Escape abandons the race
-## and returns to the garage (no coins).
+## the race and hands over to the results screen when it is over. Escape / Start opens the
+## pause menu (its own scene, PauseMenu); leaving from there pays no coins.
 ##
 ## Dev flags, after `--`:
 ##   --autopilot[=pace]  the player's car drives itself (headless race tests, demos);
@@ -13,6 +13,7 @@ const CONFIG := preload("res://game/configs/tracks/track_01.tres")
 var track: Track
 var racers: Array[Dictionary] = []
 var _player_setup: DriftSetup
+var _difficulty_id: StringName = &"normal"
 
 @onready var manager: RaceManager = $RaceManager
 @onready var spawner: RacerSpawner = $RacerSpawner
@@ -21,6 +22,8 @@ var _player_setup: DriftSetup
 
 func _enter_tree() -> void:
 	EventSystem.PRO_state_changed.connect(_on_state_changed)
+	EventSystem.UI_settings_changed.connect(func(settings: Dictionary) -> void:
+		_difficulty_id = settings.get("difficulty", &"normal"))
 
 
 func _ready() -> void:
@@ -28,9 +31,11 @@ func _ready() -> void:
 	add_child(track)
 	move_child(track, 0)
 	EventSystem.PRO_state_requested.emit()  # answered synchronously: sets _player_setup
+	EventSystem.UI_settings_requested.emit()  # likewise: sets _difficulty_id
+	var difficulty := DifficultyConfig.named(_difficulty_id)
 	var args := OS.get_cmdline_user_args()
 	var autopilot := Array(args).filter(func(a: String) -> bool: return a.begins_with("--autopilot"))
-	racers = spawner.spawn(track, CONFIG, _player_setup, $Racers, not autopilot.is_empty())
+	racers = spawner.spawn(track, CONFIG, _player_setup, $Racers, not autopilot.is_empty(), difficulty)
 	for r in racers:
 		if r["is_player"]:
 			r["car"].get_node("ChaseCamera").set_world_bounds(track.world_rect())
@@ -38,7 +43,7 @@ func _ready() -> void:
 				r["driver"].rubber_band = float(autopilot[0].get_slice("=", 1))
 	hud.setup(track, racers, CONFIG.laps)
 	manager.race_over.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"results"))
-	manager.start(track, CONFIG, racers)
+	manager.start(track, CONFIG, racers, difficulty)
 	if "--overview" in args:
 		_show_overview()
 
@@ -47,11 +52,6 @@ func _on_state_changed(state: Dictionary) -> void:
 	for setup: DriftSetup in state["setups"]:
 		if setup.id == state["equipped"]:
 			_player_setup = setup
-
-
-func _unhandled_key_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		EventSystem.UI_screen_requested.emit(&"garage")
 
 
 func _show_overview() -> void:

@@ -33,3 +33,9 @@ signal PRO_purchase_refused(setup_id: StringName, reason: StringName)
 # Screens
 signal UI_show_message(text: String, duration: float)
 signal UI_screen_requested(screen_name: StringName)
+## Settings follow the same request/answer pattern as the garage: ask with
+## UI_settings_requested, get the whole set (Settings.to_dict()) on UI_settings_changed.
+signal UI_settings_requested
+signal UI_settings_changed(settings: Dictionary)
+signal UI_setting_change_requested(key: StringName, value: Variant)
+signal UI_pause_changed(paused: bool)

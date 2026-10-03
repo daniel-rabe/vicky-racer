@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="Public Pixel, Consolas, monospace">
+  <title>Title screen layout spec — 1920 x 1080</title>
+  <defs>
+    <style>
+      .panel { fill: #1E2A3A; stroke: #0E141C; stroke-width: 4; }
+      .button { fill: #2B3A4E; stroke: #0E141C; stroke-width: 4; }
+      .race { fill: #2EC46B; stroke: #0E141C; stroke-width: 4; }
+      .focus { fill: none; stroke: #FFD23F; stroke-width: 8; }
+      .big { fill: #FFFFFF; stroke: #0E141C; stroke-width: 6; paint-order: stroke; }
+      .spec { fill: none; stroke: #FF2BD6; stroke-width: 2; stroke-dasharray: 10 6; }
+      .spec-text { fill: #FF2BD6; font-family: Consolas, monospace; font-size: 18px; stroke: #14202E; stroke-width: 5px; paint-order: stroke; }
+    </style>
+  </defs>
+
+  <!-- Attract mode: the real Track 01, four AI cars racing, camera following the leader -->
+  <rect width="1920" height="1080" fill="#9DC243"/>
+  <path d="M -40 760 C 300 640, 520 900, 900 820 S 1500 560, 1980 700" fill="none" stroke="#1B1E23" stroke-width="396"/>
+  <path d="M -40 760 C 300 640, 520 900, 900 820 S 1500 560, 1980 700" fill="none" stroke="#5F6670" stroke-width="384"/>
+  <rect x="520" y="760" width="128" height="72" rx="22" fill="#3A86FF" stroke="#0E141C" stroke-width="4" transform="rotate(8 584 796)"/>
+  <rect x="760" y="800" width="128" height="72" rx="22" fill="#E63946" stroke="#0E141C" stroke-width="4"/>
+  <rect x="1010" y="740" width="128" height="72" rx="22" fill="#FFD23F" stroke="#0E141C" stroke-width="4" transform="rotate(-10 1074 776)"/>
+  <rect x="1250" y="690" width="128" height="72" rx="22" fill="#2EC46B" stroke="#0E141C" stroke-width="4" transform="rotate(-14 1314 726)"/>
+  <rect width="1920" height="1080" fill="#14202E" opacity="0.35"/>
+  <text class="spec-text" x="60" y="1040">BACKGROUND · live attract mode: Track 01 + 4 AI cars, camera follows the leader, dimmed 35 %, no HUD</text>
+
+  <!-- Logo -->
+  <text x="960" y="250" text-anchor="middle" font-size="150" fill="#FFD23F" stroke="#0E141C" stroke-width="14" paint-order="stroke">VICKY</text>
+  <text x="960" y="410" text-anchor="middle" font-size="150" fill="#E63946" stroke="#0E141C" stroke-width="14" paint-order="stroke">RACER</text>
+  <rect class="spec" x="400" y="110" width="1120" height="330"/>
+  <text class="spec-text" x="1540" y="140">LOGO · 150 px font</text>
+  <text class="spec-text" x="1540" y="164">VICKY yellow, RACER red</text>
+  <text class="spec-text" x="1540" y="188">14 px dark outline</text>
+  <text class="spec-text" x="1540" y="212">gentle bob ±6 px, 2 s</text>
+
+  <!-- Menu -->
+  <rect class="race" x="760" y="520" width="400" height="110" rx="28"/>
+  <rect class="focus" x="752" y="512" width="416" height="126" rx="32"/>
+  <text class="big" x="960" y="592" text-anchor="middle" font-size="48">PLAY</text>
+  <rect class="button" x="760" y="660" width="400" height="90" rx="28"/>
+  <text class="big" x="960" y="720" text-anchor="middle" font-size="34">SETTINGS</text>
+  <rect class="button" x="760" y="780" width="400" height="90" rx="28"/>
+  <text class="big" x="960" y="840" text-anchor="middle" font-size="34">QUIT</text>
+  <text class="spec-text" x="1190" y="580">PLAY · RaceButton 400×110 · focused on open</text>
+  <text class="spec-text" x="1190" y="712">SETTINGS → settings panel over the title</text>
+  <text class="spec-text" x="1190" y="832">QUIT · NavButton 400×90 · 30 px gaps</text>
+
+  <text x="960" y="960" text-anchor="middle" font-size="24" fill="#FFFFFF" stroke="#0E141C" stroke-width="5" paint-order="stroke">A  PLAY</text>
+  <text class="spec-text" x="1110" y="960">HINTS · keyboard or gamepad, whichever was used last</text>
+</svg>

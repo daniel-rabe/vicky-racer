@@ -31,37 +31,22 @@ Milestones are in the recommended order. Each one is playable on its own when it
 
 ---
 
-## Phase 9 — Front end, pause and assists
+## Phase 9 — Front end, pause and assists ✅ done
 
-The game currently boots into the garage, and Escape during a race abandons it with no coins:
-one wrong button and a child loses a race they were winning. Fix the frame around the game first.
+Built as planned, with three changes found on the way, all in [`DESIGN.md`](DESIGN.md) §3.1,
+§8.3 and §10:
 
-**Art gate:** a title-screen mockup (logo + the four cars on the style anchor's track) and
-layouts for the title, pause and settings screens in the same SVG-spec style as
-[`mockups/garage_layout.svg`](mockups/garage_layout.svg).
+- **Settings got their own file** (`user://vicky_settings.cfg`) instead of a save-schema bump:
+  machine settings and the child's progress should not be able to break each other.
+- **One SOUND slider for now**; the `Music` bus exists and gets its slider with Phase 13.
+- **AUTO GO cruises at 65 %** of top speed rather than flooring it: at full throttle, AUTO GO plus
+  STEER HELP won races with no input at all. Now that combination finishes 3rd.
+- Difficulty is **EASY / NORMAL / FAST** (not "hard": the word is for a child).
+- Found and fixed on the way: car-to-car contact counted as a wall hit, scrubbing speed and shaking
+  the camera every time two cars touched.
 
-1. **Title screen** — `ui/title/title_screen.tscn`: logo, big PLAY, SETTINGS, QUIT. PLAY goes to the
-   garage. Becomes `main.gd`'s first screen.
-2. **Pause menu** — `ui/pause/pause_menu.tscn`, a `CanvasLayer` with `process_mode = ALWAYS`.
-   Escape / Start / the window losing focus pauses (`get_tree().paused`); RESUME is focused by
-   default, so pressing the same button twice never quits. RESTART and GARAGE ask "Are you sure?"
-   with NO focused.
-3. **Settings** — music and effects volume (two new audio buses, `Music` and `SFX`, in
-   `default_bus_layout.tres`; `SoundManager` and `car_audio.gd` route to `SFX`), fullscreen toggle,
-   and the assists below. Saved in the profile (`[settings]` section, `schema_version` 2 with a
-   migration from 1).
-4. **Assists**, all on the settings screen and all off by default except where noted:
-   - **Auto-accelerate** — the car drives itself forward; the child only steers. The single
-     biggest help for a very young player.
-   - **Steering help** — gently nudges steering toward the racing line when off it (uses
-     `Track.racing_line`, already there for the AI).
-   - **Difficulty** — Easy / Normal / Hard scales the opponents' skills and the rubber band.
-     Normal is today's tuning.
-5. **Event bus** — `UI_pause_requested`, `UI_settings_changed(settings)`.
-
-**Done when:** a child can start the game, race, pause, resume and quit with a gamepad only; the
-economy test covers the schema 1 → 2 migration; `balance_report.py` gets an `--assist` flag and Easy
-lets the 0.7-pace stand-in win sometimes.
+Tests: `front_end_test` (title, settings file, settings apply/save, pause, confirm, auto
+accelerate, difficulty) and `assist_test` (hands-off laps).
 
 ---
 

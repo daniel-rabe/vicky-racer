@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="Public Pixel, Consolas, monospace">
+  <title>Pause menu and settings panel layout spec — 1920 x 1080</title>
+  <defs>
+    <style>
+      .panel { fill: #1E2A3A; stroke: #0E141C; stroke-width: 4; }
+      .button { fill: #2B3A4E; stroke: #0E141C; stroke-width: 4; }
+      .race { fill: #2EC46B; stroke: #0E141C; stroke-width: 4; }
+      .focus { fill: none; stroke: #FFD23F; stroke-width: 8; }
+      .big { fill: #FFFFFF; stroke: #0E141C; stroke-width: 6; paint-order: stroke; }
+      .dim { fill: #9FB0C4; }
+      .on { fill: #2EC46B; stroke: #0E141C; stroke-width: 4; }
+      .off { fill: #3A4A5E; stroke: #0E141C; stroke-width: 4; }
+      .spec { fill: none; stroke: #FF2BD6; stroke-width: 2; stroke-dasharray: 10 6; }
+      .spec-text { fill: #FF2BD6; font-family: Consolas, monospace; font-size: 18px; stroke: #14202E; stroke-width: 5px; paint-order: stroke; }
+    </style>
+  </defs>
+
+  <!-- The race underneath, frozen and dimmed -->
+  <rect width="1920" height="1080" fill="#9DC243"/>
+  <path d="M -40 600 C 400 420, 900 820, 1980 520" fill="none" stroke="#5F6670" stroke-width="384"/>
+  <rect width="1920" height="1080" fill="#14202E" opacity="0.6"/>
+
+  <!-- LEFT: pause menu -->
+  <rect class="panel" x="120" y="180" width="620" height="720" rx="28"/>
+  <text class="big" x="430" y="290" text-anchor="middle" font-size="64">PAUSED</text>
+  <rect class="race" x="230" y="360" width="400" height="110" rx="28"/>
+  <rect class="focus" x="222" y="352" width="416" height="126" rx="32"/>
+  <text class="big" x="430" y="432" text-anchor="middle" font-size="44">RESUME</text>
+  <rect class="button" x="230" y="500" width="400" height="90" rx="28"/>
+  <text class="big" x="430" y="560" text-anchor="middle" font-size="32">RESTART</text>
+  <rect class="button" x="230" y="620" width="400" height="90" rx="28"/>
+  <text class="big" x="430" y="680" text-anchor="middle" font-size="32">SETTINGS</text>
+  <rect class="button" x="230" y="740" width="400" height="90" rx="28"/>
+  <text class="big" x="430" y="800" text-anchor="middle" font-size="32">GARAGE</text>
+  <text class="spec-text" x="120" y="940">PAUSE · Esc / Start, or the window losing focus</text>
+  <text class="spec-text" x="120" y="964">RESUME focused: pressing pause twice never quits</text>
+  <text class="spec-text" x="120" y="988">B / Esc = resume · race, timers and sound all stop</text>
+  <text class="spec-text" x="120" y="1012">RESTART / GARAGE → "SURE?" with NO focused</text>
+
+  <!-- RIGHT: settings panel, shared by title screen and pause menu -->
+  <rect class="panel" x="840" y="100" width="960" height="880" rx="28"/>
+  <text class="big" x="1320" y="200" text-anchor="middle" font-size="56">SETTINGS</text>
+
+  <text class="big" x="900" y="300" font-size="30">SOUND</text>
+  <rect x="1300" y="272" width="420" height="36" rx="18" fill="#0E141C"/>
+  <rect x="1300" y="272" width="294" height="36" rx="18" fill="#FFD23F"/>
+  <rect class="focus" x="880" y="240" width="880" height="96" rx="30"/>
+  <text class="dim" x="1300" y="350" font-size="18">← →  0–100 %, steps of 10</text>
+
+  <text class="big" x="900" y="420" font-size="30">FULLSCREEN</text>
+  <rect class="on" x="1560" y="388" width="160" height="56" rx="28"/>
+  <text class="big" x="1640" y="428" text-anchor="middle" font-size="26">ON</text>
+
+  <text class="big" x="900" y="530" font-size="30">AUTO GO</text>
+  <text class="dim" x="900" y="566" font-size="18">the car drives forward by itself</text>
+  <rect class="off" x="1560" y="498" width="160" height="56" rx="28"/>
+  <text class="big" x="1640" y="538" text-anchor="middle" font-size="26">OFF</text>
+
+  <text class="big" x="900" y="650" font-size="30">STEER HELP</text>
+  <text class="dim" x="900" y="686" font-size="18">gently keeps the car on the road</text>
+  <rect class="off" x="1560" y="618" width="160" height="56" rx="28"/>
+  <text class="big" x="1640" y="658" text-anchor="middle" font-size="26">OFF</text>
+
+  <text class="big" x="900" y="770" font-size="30">OPPONENTS</text>
+  <text class="big" x="1440" y="770" font-size="30" fill="#FFD23F">&lt;  NORMAL  &gt;</text>
+  <text class="dim" x="900" y="806" font-size="18">EASY · NORMAL · FAST</text>
+
+  <rect class="button" x="1120" y="860" width="400" height="90" rx="28"/>
+  <text class="big" x="1320" y="920" text-anchor="middle" font-size="32">BACK</text>
+
+  <text class="spec-text" x="840" y="1010">ROWS 880×96 · whole row focuses (yellow ring) · ↑ ↓ moves · ← → or A changes · B / Esc = BACK</text>
+  <text class="spec-text" x="840" y="1034">Every change applies and saves at once (user://vicky_settings.cfg) · no "apply" button</text>
+</svg>

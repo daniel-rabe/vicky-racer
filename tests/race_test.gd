@@ -3,8 +3,9 @@ extends Node
 ## player's car on autopilot, checking the countdown, laps, positions and the finish.
 ##   Godot_console.exe --path . --headless --fixed-fps 60 res://tests/race_test.tscn -- --autopilot
 ## Exit code 0 = all passed. Prints every lap time, which doubles as an AI pace report.
-## `--setup=<id>` races the player with that drift setup (default starter), for the balance
-## pass: tools/dev/balance_report.py runs every setup at several paces.
+## `--setup=<id>` races the player with that drift setup (default starter) and
+## `--difficulty=<easy|normal|fast>` sets the opponents, for the balance pass:
+## tools/dev/balance_report.py runs every setup at several paces.
 
 const RACE_SCENE := preload("res://game/screens/race.tscn")
 const TIMEOUT_SECONDS := 180.0
@@ -26,9 +27,16 @@ func _enter_tree() -> void:
 	EventSystem.RAC_race_finished.connect(func(results: Array, _id: StringName) -> void: _results = results)
 	# The race asks the garage for the equipped setup; answer like GarageManager would.
 	var setup_id := "starter"
+	var difficulty := "normal"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--setup="):
 			setup_id = arg.get_slice("=", 1)
+		elif arg.begins_with("--difficulty="):
+			difficulty = arg.get_slice("=", 1)
+	# Likewise the settings, like SettingsManager would; sound off, no assists.
+	EventSystem.UI_settings_requested.connect(func() -> void:
+		EventSystem.UI_settings_changed.emit({"sound_volume": 0.0, "fullscreen": false,
+			"auto_accelerate": false, "steering_help": false, "difficulty": StringName(difficulty)}))
 	EventSystem.PRO_state_requested.connect(func() -> void:
 		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/%s.tres" % setup_id)],
 			"equipped": StringName(setup_id)}))

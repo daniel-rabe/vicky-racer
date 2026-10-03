@@ -3,7 +3,8 @@ extends Node
 ## Sounds that belong to the game rather than to one car: the 3-2-1-GO beeps, the finish
 ## fanfare, the coin chime when a setup is bought, and a soft click whenever menu focus
 ## moves. Lives in the main.tscn shell next to GarageManager, so it survives screen swaps
-## and needs no autoload; listens to the event bus only.
+## and needs no autoload; listens to the event bus only. Runs while the game is paused, so
+## the pause menu still clicks. Everything plays on the SFX bus (the SOUND setting).
 
 const BEEP := preload("res://art/sfx/countdown_beep.wav")
 const GO := preload("res://art/sfx/go_beep.wav")
@@ -41,6 +42,7 @@ func play(stream: AudioStream, volume_db := 0.0) -> void:
 			break
 	if player == null:
 		player = AudioStreamPlayer.new()
+		player.bus = &"SFX"
 		add_child(player)
 		_players.append(player)
 	player.stream = stream

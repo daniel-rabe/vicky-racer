@@ -120,13 +120,19 @@ func _limit_speed(speed_along: float, delta: float) -> void:
 func _move_and_handle_walls() -> void:
 	var before := velocity
 	move_and_slide()
-	var touching := get_slide_collision_count() > 0
+	# Only walls and props count. Cars touching cars is racing: physics already pushes them
+	# apart, and treating each touch as a hit would scrub speed and shake the camera over
+	# and over while two cars run side by side.
+	var touching := false
+	var impact := 0.0
+	for i in get_slide_collision_count():
+		var hit := get_slide_collision(i)
+		if not hit.get_collider() is Car:
+			touching = true
+			impact = maxf(impact, -before.dot(hit.get_normal()))
 	if touching and not _touching_wall:
 		# A fresh hit: scrub a little speed once. move_and_slide has already removed the
 		# part heading into the wall, so the car slides along it instead of stopping.
-		var impact := 0.0
-		for i in get_slide_collision_count():
-			impact = maxf(impact, -before.dot(get_slide_collision(i).get_normal()))
 		if impact > config.wall_hit_threshold:
 			velocity *= 1.0 - config.wall_speed_scrub
 			EventSystem.CAR_wall_hit.emit(self, impact)

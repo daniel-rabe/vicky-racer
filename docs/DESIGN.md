@@ -35,6 +35,7 @@ balance pass) — and the document describes the game as it is. Mockups referenc
   setup)     one)                                                floor)
 ```
 
+0. **Title.** The logo and PLAY / SETTINGS / QUIT over a live race of four AI cars.
 1. **Garage.** Browse six drift-setup cards with a gamepad or keyboard. Buy what you can afford,
    equip what you own, press **RACE!**.
 2. **Grid.** Four cars on a staggered two-wide grid behind the start/finish line.
@@ -54,10 +55,30 @@ balance pass) — and the document describes the game as it is. Mockups referenc
 | Confirm (menus) | Enter | A |
 | Back (menus) | Esc | B |
 | Race from garage | R | Y |
+| Pause (race) | Esc | Start |
+
+Escape and B also go back from the garage to the title. In a race, Escape pauses instead of
+leaving: one wrong button must never throw away a race (§10).
 
 Both keyboard layouts are always live, so two hands can find the controls without being taught.
 Steering reads `Input.get_axis`, which gives analog steering on a stick for free. Menu glyphs swap
 between keyboard and gamepad depending on which was used last.
+
+### 3.1 Assists
+
+Two switches on the settings screen, both off by default, both applied live by
+[`player_input.gd`](../actors/car/player_input.gd):
+
+- **AUTO GO** — the car cruises at 65 % of its top speed with no pedal held, so a very young child
+  only has to steer. Holding accelerate still gives full speed, and braking still brakes.
+- **STEER HELP** — steers toward the road ahead: fully while the child is not steering, as a gentle
+  nudge (30 %) on top of their steering when they are. It keeps whatever lane the child is in and
+  only pulls toward the middle near the edge of the road.
+
+Both on with no input at all, the car laps Track 01 without leaving the road or touching a wall,
+and finishes **3rd** — the assists help, they do not race. At 80 % cruise it won outright, which
+made it an autopilot; 65 % was chosen so that pressing the pedal still pays
+([`tests/assist_test.gd`](../tests/assist_test.gd)).
 
 ## 4. Handling model
 
@@ -206,7 +227,7 @@ single autoload (`EventSystem`) and declares every cross-system signal. Managers
 | `RAC_` | Race | `countdown_tick(n)`, `race_started()`, `lap_completed(racer, lap, lap_time)`, `positions_updated(order)`, `race_finished(results, track_id)` |
 | `CAR_` | Car | `drift_started(car)`, `drift_ended(car, duration)`, `surface_changed(car, surface)`, `wall_hit(car, impact_speed)` |
 | `PRO_` | Progression | `state_requested()`, `state_changed(state)`, `buy_requested(id)`, `equip_requested(id)`, `coins_changed(total)`, `coins_awarded(amount, breakdown)`, `setup_purchased(id)`, `setup_equipped(id)`, `purchase_refused(id, reason)` |
-| `UI_` | Screens | `show_message(text, duration)`, `screen_requested(name)` |
+| `UI_` | Screens | `show_message(text, duration)`, `screen_requested(name)`, `settings_requested()`, `settings_changed(settings)`, `setting_change_requested(key, value)`, `pause_changed(paused)` |
 
 Screens never reach into managers. Following Vicky's Game's inventory pattern, a screen emits
 `PRO_state_requested` and `GarageManager` answers synchronously with `PRO_state_changed`, carrying
@@ -221,18 +242,23 @@ Each `RAC_race_finished` result is a Dictionary: `name`, `body` (car sprite path
 ```
 main.tscn  (persistent shell — never unloaded)
 ├── GarageManager        wallet, ownership, equipped setup, last race; pays out on RAC_race_finished
-└── ScreenSlot           swaps on UI_screen_requested(&"garage" | &"race" | &"results"):
+├── SettingsManager      volume, fullscreen, assists, difficulty; applies and saves every change
+├── SoundManager         beeps, fanfare, coin, menu clicks (runs while paused)
+└── ScreenSlot           swaps on UI_screen_requested(&"title" | &"garage" | &"race" | &"results"):
+    ├── title_screen.tscn     logo + menu over a live attract-mode race; SettingsPanel
     ├── garage_screen.tscn
     ├── race.tscn
     │   ├── Track (track_01.tscn)
+    │   ├── SkidMarks
     │   ├── RacerSpawner      places 4 cars on the grid
     │   ├── RaceManager       countdown, laps, positions, rubber-banding, finish
-    │   └── RaceHUD + Minimap
+    │   ├── RaceHUD + Minimap
+    │   └── PauseMenu         pauses the tree; RESUME / RESTART / SETTINGS / GARAGE
     └── results_screen.tscn
 ```
 
-`GarageManager` lives in the shell rather than becoming a second autoload, keeping to the one-
-autoload rule while still surviving every screen swap.
+The managers live in the shell rather than becoming more autoloads, keeping to the one-autoload
+rule while still surviving every screen swap. Changing screen always unpauses the tree.
 
 ### 6.3 Drivers
 
@@ -374,7 +400,17 @@ away. Where it wants to be: level with the player for Blue, the best driver; the
 always makes the player work for a win, and the weaker two leave room on the podium for a child who
 is still learning ([`race_manager.gd`](../game/managers/race_manager.gd)).
 
-Tuned with [`tools/dev/balance_report.py`](../tools/dev/balance_report.py), which races every setup
+These numbers are **Normal**. The settings screen's OPPONENTS switch picks one of three
+[`DifficultyConfig`](../game/configs/difficulty_config.gd) resources, which shift every
+opponent's skill and retune the band:
+
+| Difficulty | Skill | Ease off / push | Hang back per skill point | Struggling child (0.7) | Clean driving |
+| --- | --- | --- | --- | --- | --- |
+| Easy | −0.10 | 55 % / 110 % | 6,000 px | 2nd by a few tenths with Starter, wins with the faster setups | wins by ~2 s |
+| Normal | — | 60 % / 112 % | 5,000 px | 3rd | wins by ~1 s |
+| Fast | +0.10 | 75 % / 115 % | 2,500 px | 4th, 2–6 s back | a close fight for 1st |
+
+Tuned with [`tools/dev/balance_report.py`](../tools/dev/balance_report.py) (`--difficulty`), which races every setup
 with the player's car on autopilot at three paces: 1.0 = clean driving, 0.85 = a decent child,
 0.7 = a struggling one. Each cell is the player's place and the gap to the winner (negative = the
 winning margin). Runs are deterministic, so before and after compare directly.
@@ -462,12 +498,25 @@ last places afford Grippy.
 
 | Screen | Spec |
 | --- | --- |
+| Title | [`mockups/title_layout.png`](mockups/title_layout.png) — logo, PLAY / SETTINGS / QUIT over a live attract-mode race (four AI cars on Track 01, no HUD, no engine sounds). Built: [`screenshots/title.png`](screenshots/title.png) |
+| Pause | [`mockups/pause_settings_layout.png`](mockups/pause_settings_layout.png) — Esc / Start or the window losing focus pauses the whole tree. RESUME is focused, so pausing twice resumes; B resumes too; RESTART and GARAGE ask SURE? with NO focused. Built: [`screenshots/pause.png`](screenshots/pause.png) |
+| Settings | Same spec — SOUND, FULLSCREEN, AUTO GO, STEER HELP, OPPONENTS; one focusable row each, ← → change it. Over the title and over the pause menu. Built: [`screenshots/settings.png`](screenshots/settings.png) |
 | Race HUD | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown. Built: [`screenshots/race.png`](screenshots/race.png), [`screenshots/race_countdown.png`](screenshots/race_countdown.png). The countdown sits above screen centre rather than on it, so it never hides the player's own car |
 | Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, 3 × 2 setup cards, preview with Grip / Slide / Speed bars. Built: [`screenshots/garage.png`](screenshots/garage.png) |
 | Results | [`mockups/results_layout.png`](mockups/results_layout.png) — finishing order, payout count-up, Race Again. Built: [`screenshots/results.png`](screenshots/results.png) |
 
 Pink annotations on each spec give anchors, sizes and animation timings; they are meant to be
 built verbatim with `Control` anchors. All menus are fully navigable with a gamepad alone.
+
+### 10.1 Settings file
+
+`user://vicky_settings.cfg`, separate from the save game: settings belong to the computer and
+the person at it, progress belongs to the child, and neither should be able to break the other.
+[`Settings`](../game/settings.gd) validates every value on load and on change (volume clamped and
+snapped to 10 % steps, unknown keys and mistyped values ignored), so a hand-edited file falls back
+to defaults rather than failing. [`SettingsManager`](../game/managers/settings_manager.gd) applies
+and saves each change at once. Sound goes through an `SFX` bus (`default_bus_layout.tres`; a
+`Music` bus waits for Phase 13). Checked by [`tests/front_end_test.gd`](../tests/front_end_test.gd).
 
 The HUD takes race state from the `RAC_` signals. The speed bar and the minimap are the exception:
 the race screen hands them the cars, because they need positions every frame and no signal should

@@ -107,6 +107,27 @@ func lap_length() -> float:
 	return racing_line.curve.get_baked_length()
 
 
+## The point `offset` px along the racing line, moved `sideways` px to its right (seen in
+## the direction of travel). Offsets wrap round the lap.
+func line_point(offset: float, sideways := 0.0) -> Vector2:
+	var p := racing_line.to_global(racing_line.curve.sample_baked(fposmod(offset, lap_length())))
+	return p + line_tangent(offset).orthogonal() * sideways
+
+
+## Direction of travel along the racing line at `offset`, in world space.
+func line_tangent(offset: float) -> Vector2:
+	var curve := racing_line.curve
+	var a := curve.sample_baked(fposmod(offset, lap_length()))
+	var b := curve.sample_baked(fposmod(offset + 10.0, lap_length()))
+	return racing_line.global_transform.basis_xform(b - a).normalized()
+
+
+## Signed distance from the racing line: positive to its right, negative to its left.
+func side_of_line(global_pos: Vector2) -> float:
+	var here := progress_at(global_pos)
+	return (global_pos - line_point(here)).dot(line_tangent(here).orthogonal())
+
+
 ## Start positions, front of the grid first, each facing the direction of travel.
 func grid_transforms() -> Array[Transform2D]:
 	var out: Array[Transform2D] = []
