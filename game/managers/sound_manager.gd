@@ -18,6 +18,8 @@ var _players: Array[AudioStreamPlayer] = []
 func _enter_tree() -> void:
 	EventSystem.RAC_countdown_tick.connect(func(n: int) -> void: play(GO if n == 0 else BEEP))
 	EventSystem.RAC_race_finished.connect(func(_results: Array, _id: StringName) -> void: play(FANFARE, -2.0))
+	EventSystem.RAC_time_trial_finished.connect(func(_id: StringName, _car: StringName, _laps: Array, _ghost: GhostLap) -> void:
+		play(FANFARE, -2.0))
 	EventSystem.PRO_setup_purchased.connect(func(_id: StringName) -> void: play(COIN))
 
 

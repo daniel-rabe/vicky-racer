@@ -171,7 +171,21 @@ two player cars on autopilot and checks per-player positions and results.
 
 ---
 
-## Phase 16 — Time trial and ghosts
+## Phase 16 — Time trial and ghosts ✅ done
+
+Built as planned (DESIGN.md §16): a RACE / TIME TRIAL switch on PICK A RACE, a three-lap run
+alone with records per track and per car, the player's record ghost and a gold developer ghost
+per track. The ghost replays the recorded lap 0.0000 px from the car's own trace. Changes:
+
+- **A time trial is three laps** with results, not an endless session: a child needs an end.
+  It pays no coins.
+- **Both ghosts at once**: the gold developer ghost is the target, the white one is you.
+- **The ghost records the draw layer too** (one byte a tick) so it stays visible on bridges.
+- **Ghost files are plain data** (`store_var`, no objects), the developer ghosts are `.res`.
+- Found on the way: a save that already qualified for a sticker (e.g. every track finished
+  before Phase 14) crashed the sticker popup at start-up. Fixed.
+
+### Plan as written
 
 1. **Time trial** — the player alone, best lap per track and car, from the track select screen.
 2. **Ghosts** — record the player's position and rotation every physics tick of the best lap

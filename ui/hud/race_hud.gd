@@ -49,7 +49,9 @@ func _ready() -> void:
 	_banner.visible = false
 
 
-func setup(track: Track, racers: Array[Dictionary], laps: int, player_number := 0, split := false) -> void:
+## `time_trial`: the player is alone, so there is no place to show.
+func setup(track: Track, racers: Array[Dictionary], laps: int, player_number := 0, split := false,
+		time_trial := false) -> void:
 	_laps = laps
 	_player_number = player_number
 	_racer_count = racers.size()
@@ -57,6 +59,8 @@ func setup(track: Track, racers: Array[Dictionary], laps: int, player_number := 
 	for r in racers:
 		if r["is_player"] and (player_number == 0 or r.get("player", 0) == player_number):
 			_player_car = r["car"]
+	if time_trial:
+		$Root/PositionPanel.visible = false
 	if split:
 		$Root/MinimapPanel.visible = false
 		$Root/TimerPanel.visible = false

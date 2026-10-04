@@ -8,6 +8,10 @@ extends Node2D
 ## there is one world drawn from two cameras. Each half has its player's HUD; one minimap
 ## sits between them. A player who finishes first is driven on by the AI, out of the way.
 ##
+## Time trial (§16): the player alone, three laps, against ghosts — the developer's gold one
+## and the player's own best lap on this track — while a GhostRecorder records every lap.
+## The end reports the laps (RAC_time_trial_finished) instead of a result.
+##
 ## Dev flags, after `--`:
 ##   --autopilot[=pace]  the player's car drives itself (headless race tests, demos);
 ##                       pace < 1 makes it drive slower, to stand in for a struggling child
@@ -15,6 +19,9 @@ extends Node2D
 
 const HUD_SCENE := preload("res://ui/hud/race_hud.tscn")
 const THEME := preload("res://ui/theme/vicky_theme.tres")
+const DEVELOPER_GHOSTS := "res://game/configs/ghosts/%s.res"
+const OWN_GHOST_TINT := Color(1, 1, 1, 0.45)
+const DEVELOPER_GHOST_TINT := Color(1, 0.84, 0.3, 0.5)
 ## Two players: the line between the halves, px, and the shared minimap.
 const DIVIDER := 8.0
 const DIVIDER_COLOUR := Color(0.055, 0.078, 0.11)
@@ -33,6 +40,13 @@ var _setups := {}  # id -> DriftSetup, from the garage
 var _paints := {}  # setup id -> paint colour
 ## Two players: the halves of the screen, left (player 1) and right.
 var views: Array[SubViewport] = []
+var time_trial := false
+var recorder: GhostRecorder
+## Time trial: the player's own best lap (white) and the developer's (gold), or null.
+var own_ghost: GhostCar
+var developer_ghost: GhostCar
+var _race_mode: StringName = &"race"
+var _ghost_dir := ""
 
 @onready var manager: RaceManager = $RaceManager
 @onready var spawner: RacerSpawner = $RacerSpawner
@@ -56,6 +70,7 @@ func _ready() -> void:
 	EventSystem.PLY_state_requested.emit()
 	if _cup_track:
 		config = _cup_track
+	time_trial = _race_mode == &"time_trial" and not _cup_track and not _party.get("two_player", false)
 	var humans := _humans()
 	var world: Node = self
 	if humans.size() > 1:
@@ -69,7 +84,7 @@ func _ready() -> void:
 	var difficulty := DifficultyConfig.named(_difficulty_id)
 	var args := OS.get_cmdline_user_args()
 	var autopilot := Array(args).filter(func(a: String) -> bool: return a.begins_with("--autopilot"))
-	var with_ai: bool = humans.size() == 1 or _party.get("opponents", true)
+	var with_ai: bool = not time_trial and (humans.size() == 1 or _party.get("opponents", true))
 	racers = spawner.spawn(track, config, humans, world.get_node("Racers"), not autopilot.is_empty(), difficulty, with_ai)
 	for r in racers:
 		if r["is_player"]:
@@ -86,8 +101,11 @@ func _ready() -> void:
 		_split_huds()
 		manager.player_finished.connect(_drive_on)
 	else:
-		hud.setup(track, racers, config.laps)
-	manager.race_over.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"results"))
+		hud.setup(track, racers, config.laps, 0, false, time_trial)
+	if time_trial:
+		_set_up_time_trial(world)
+	manager.time_trial = time_trial
+	manager.race_over.connect(_on_race_over)
 	manager.start(track, config, racers, difficulty)
 	if "--overview" in args:
 		_show_overview()
@@ -100,9 +118,59 @@ func _on_state_changed(state: Dictionary) -> void:
 			_player_setup = setup
 	_paints = state.get("paint", {})
 	_player_paint = _paints.get(state["equipped"], Paint.ORIGINAL)
+	_race_mode = state.get("race_mode", &"race")
+	_ghost_dir = state.get("ghost_dir", "")
 	for entry: Dictionary in state.get("tracks", []):
 		if entry["config"].track_id == state.get("selected_track"):
 			config = entry["config"]
+
+
+## The ghosts on the track and the recorder on the player's car.
+func _set_up_time_trial(world: Node) -> void:
+	var player: Dictionary = racers[0]
+	recorder = GhostRecorder.new()
+	recorder.name = "GhostRecorder"
+	recorder.car = player["car"]
+	recorder.track_id = config.track_id
+	recorder.setup_id = _player_setup.id
+	recorder.paint = _player_paint
+	add_child(recorder)
+	var cars: Node = world.get_node("Racers")
+	var path := DEVELOPER_GHOSTS % config.track_id
+	if ResourceLoader.exists(path):
+		developer_ghost = _ghost_car("DeveloperGhost", load(path), DEVELOPER_GHOST_TINT, cars)
+	var saved := GhostLap.load_file(_ghost_dir.path_join("%s.ghost" % config.track_id)) if _ghost_dir else null
+	own_ghost = _ghost_car("OwnGhost", saved, OWN_GHOST_TINT, cars)
+	recorder.new_best.connect(func(lap: GhostLap) -> void:
+		# The ghost is always the best ever: today's lap once it beats the saved one.
+		if own_ghost.ghost == null or lap.lap_time < own_ghost.ghost.lap_time:
+			own_ghost.ghost = lap)
+	manager.lap_started.connect(func(_r: Dictionary) -> void:
+		recorder.start_lap()
+		for ghost: GhostCar in [own_ghost, developer_ghost]:
+			if ghost:
+				ghost.start())
+	EventSystem.RAC_lap_completed.connect(func(car: Node, _lap: int, lap_time: float) -> void:
+		if car == recorder.car:
+			recorder.finish_lap(lap_time))
+
+
+func _ghost_car(node_name: String, lap: GhostLap, tint: Color, parent: Node) -> GhostCar:
+	var ghost := GhostCar.new()
+	ghost.name = node_name
+	ghost.tint = tint
+	ghost.ghost = lap
+	parent.add_child(ghost)
+	parent.move_child(ghost, 0)  # drawn before the cars, so they cover it
+	return ghost
+
+
+func _on_race_over() -> void:
+	if time_trial:
+		var player: Dictionary = racers[0]
+		EventSystem.RAC_time_trial_finished.emit(config.track_id, _player_setup.id, player["lap_times"],
+			recorder.best)
+	EventSystem.UI_screen_requested.emit(&"results")
 
 
 ## Who drives: the player in their equipped car, or both players of a two-player game in

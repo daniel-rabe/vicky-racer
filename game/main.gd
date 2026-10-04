@@ -10,6 +10,7 @@ extends Node
 ##   --screen=<name>         open this screen first
 ##   --dev-coins=<n>         set the coin balance after loading
 ##   --fake-race=<position>  pretend a race just finished in that position
+##   --race-mode=time_trial  the next race is a time trial (screenshots of ghosts)
 ##   --screenshot=<path>     save a screenshot after --wait seconds (default 2.5) and quit
 ##   --no-interp             turn physics interpolation off (to measure what it fixes)
 ##   --physics-hz=<n>        run physics at n ticks per second instead of 60
@@ -57,6 +58,8 @@ func _ready() -> void:
 	get_tree().set_auto_accept_quit(false)
 	if _args.has("dev-coins"):
 		garage_manager.profile.coins = int(_args["dev-coins"])
+	if _args.has("race-mode"):
+		EventSystem.PRO_race_mode_requested.emit(StringName(_args["race-mode"]))
 	if _args.has("fake-race"):
 		_fake_race_finish(int(_args["fake-race"]))
 	EventSystem.UI_screen_requested.emit(StringName(_args.get("screen", FIRST_SCREEN)))  # so the music hears it too

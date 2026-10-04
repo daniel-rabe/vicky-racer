@@ -35,6 +35,10 @@ var cup_progress := {}
 var trophies := {}
 ## Stickers in the book, in the order they were earned. Optional in the file; never shrinks.
 var stickers: Array[StringName] = []
+## Time-trial records (docs/DESIGN.md §16): track id -> {"best": seconds, "setup": the car that
+## set it, "cars": {setup id: that car's best}}. The record's ghost lives in its own file
+## (GarageManager.ghost_path). Optional in the file.
+var trials := {}
 
 
 static func fresh(starting_coins := 0) -> SaveGame:
@@ -71,6 +75,11 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 			if trophy in [&"gold", &"silver", &"bronze", &"ribbon"]:
 				profile.trophies[StringName(cup)] = trophy
 	profile.stickers = _string_names(file.get_value("stickers", "earned", []))
+	if file.has_section("time_trial"):
+		for track in file.get_section_keys("time_trial"):
+			var entry := _trial(file.get_value("time_trial", track, {}))
+			if not entry.is_empty():
+				profile.trials[StringName(track)] = entry
 	if file.has_section("paint"):  # absent in version 1 files
 		for id in file.get_section_keys("paint"):
 			var colour := StringName(str(file.get_value("paint", id, "")))
@@ -103,6 +112,8 @@ func save_to(path := DEFAULT_PATH) -> Error:
 		file.set_value("trophies", String(cup), String(trophies[cup]))
 	if not stickers.is_empty():
 		file.set_value("stickers", "earned", PackedStringArray(stickers))
+	for track in trials:
+		file.set_value("time_trial", String(track), trials[track])
 	return file.save(path)
 
 
@@ -114,6 +125,19 @@ static func _string_names(value: Variant) -> Array[StringName]:
 			if id not in out:
 				out.append(id)
 	return out
+
+
+## One track's time-trial entry, cleaned: {} unless it has a positive best.
+static func _trial(value: Variant) -> Dictionary:
+	if not value is Dictionary or float(value.get("best", 0.0)) <= 0.0:
+		return {}
+	var cars := {}
+	var raw: Variant = value.get("cars", {})
+	if raw is Dictionary:
+		for id in raw:
+			if float(raw[id]) > 0.0:
+				cars[StringName(str(id))] = float(raw[id])
+	return {"best": float(value["best"]), "setup": StringName(str(value.get("setup", ""))), "cars": cars}
 
 
 static func _keep_unreadable(path: String) -> void:

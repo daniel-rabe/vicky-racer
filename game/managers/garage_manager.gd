@@ -27,6 +27,8 @@ var tracks: Dictionary = {}  # id -> TrackConfig
 var last_race := {}
 ## The cup just finished, for the podium: cup id, trophy, bonus coins.
 var last_cup := {}
+## &"race" or &"time_trial", for the next race (PICK A RACE's switch). Not saved.
+var race_mode: StringName = &"race"
 
 
 func _enter_tree() -> void:
@@ -44,6 +46,11 @@ func _enter_tree() -> void:
 			profile.stickers.append(id)
 			_commit())
 	EventSystem.RAC_race_finished.connect(_on_race_finished)
+	EventSystem.RAC_time_trial_finished.connect(_on_time_trial_finished)
+	EventSystem.PRO_race_mode_requested.connect(func(mode: StringName) -> void:
+		if mode in [&"race", &"time_trial"]:
+			race_mode = mode
+			_publish_state())
 
 
 func _ready() -> void:
@@ -170,6 +177,39 @@ func _on_race_finished(results: Array, track_id: StringName) -> void:
 	_commit()
 
 
+## Where the record ghosts are kept: beside the save file, one file per track, so a test's
+## own save keeps its own ghosts.
+func ghost_dir() -> String:
+	return save_path.get_basename() + "_ghosts"
+
+
+## A time trial pays nothing (nobody else raced) but keeps records: the best lap per track
+## and per car, and the record lap's ghost.
+func _on_time_trial_finished(track_id: StringName, setup_id: StringName, lap_times: Array, ghost: GhostLap) -> void:
+	var best := 0.0
+	for lap in lap_times:
+		if float(lap) > 0.0 and (best == 0.0 or float(lap) < best):
+			best = float(lap)
+	var entry: Dictionary = profile.trials.get(track_id, {"best": 0.0, "setup": setup_id, "cars": {}})
+	var record_before := float(entry["best"])
+	var car_before := float(entry["cars"].get(setup_id, 0.0))
+	var new_record := best > 0.0 and (record_before == 0.0 or best < record_before)
+	var new_car_best := best > 0.0 and (car_before == 0.0 or best < car_before)
+	if new_car_best:
+		entry["cars"][setup_id] = best
+	if new_record:
+		entry["best"] = best
+		entry["setup"] = setup_id
+		if ghost:
+			ghost.save_file(ghost_dir().path_join("%s.ghost" % track_id))
+	if new_record or new_car_best:
+		profile.trials[track_id] = entry
+	last_race = {"mode": &"time_trial", "track_id": track_id, "setup_id": setup_id, "lap_times": lap_times,
+		"best": best, "record_before": record_before, "new_record": new_record,
+		"car_best_before": car_before, "new_car_best": new_car_best}
+	_commit()
+
+
 func _commit() -> void:
 	profile.save_to(save_path)
 	_publish_state()
@@ -192,4 +232,7 @@ func _publish_state() -> void:
 		"setups": SETUP_ORDER.map(func(id: StringName) -> DriftSetup: return setups[id]),
 		"best_laps": profile.best_laps.duplicate(),
 		"last_race": last_race,
+		"race_mode": race_mode,
+		"ghost_dir": ghost_dir(),
+		"trials": profile.trials.duplicate(true),
 	})

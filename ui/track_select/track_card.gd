@@ -18,6 +18,8 @@ var _line := PackedVector2Array()  # the racing line, fitted into SHAPE_RECT
 var _colour := Color(0.36, 0.73, 0.29)
 var _name: Label
 var _info: Label
+var _race_info := ""
+var _race_colour := YELLOW
 
 
 func setup(track_config: TrackConfig, is_unlocked: bool, best_lap: float, completed: bool, previous: String) -> void:
@@ -36,7 +38,9 @@ func setup(track_config: TrackConfig, is_unlocked: bool, best_lap: float, comple
 		info = "BEST %s" % _format(best_lap)
 	elif completed:
 		info = ""
-	_info = _label(info, 22, YELLOW if unlocked else Color(0.75, 0.8, 0.86), Vector2(0, 304))
+	_race_info = info
+	_race_colour = YELLOW if unlocked else Color(0.75, 0.8, 0.86)
+	_info = _label(info, 22, _race_colour, Vector2(0, 304))
 	modulate = Color.WHITE if unlocked else Color(0.7, 0.7, 0.7)
 	pressed.connect(func() -> void: chosen.emit(config))
 
@@ -86,6 +90,17 @@ func _label(text: String, font_size: int, colour: Color, at: Vector2) -> Label:
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(label)
 	return label
+
+
+## What the card says under the name: the race's best lap (as set up), or in time-trial mode
+## the track's record — `record` 0 when there is none yet.
+func show_mode(time_trial: bool, record: float) -> void:
+	if not time_trial or not unlocked:
+		_info.text = _race_info
+		_info.add_theme_color_override("font_color", _race_colour)
+		return
+	_info.text = "RECORD %s" % _format(record) if record > 0.0 else "NO RECORD YET"
+	_info.add_theme_color_override("font_color", Color(1, 0.84, 0.3))
 
 
 static func _format(seconds: float) -> String:

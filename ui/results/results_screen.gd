@@ -4,6 +4,8 @@ extends Control
 ## RACE AGAIN become usable, with RACE AGAIN focused. The headline is always cheerful.
 ## With two players both rows are highlighted, each player's place is paid on its own line,
 ## and the headline names the better of the two.
+## After a time trial (§16) the rows are the laps, the best one marked, and the lines say how
+## it compares with the record and the gold ghost; nothing is paid, and RACE AGAIN is TRY AGAIN.
 
 const ROW_INTERVAL := 0.15
 const COUNT_UP_SECONDS := 1.2
@@ -37,7 +39,7 @@ func _ready() -> void:
 		button.disabled = true
 		button.focus_mode = Control.FOCUS_NONE
 	_garage.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"garage"))
-	_again.pressed.connect(func() -> void:
+	_again.pressed.connect(func() -> void:  # a time trial races again in the same mode
 		EventSystem.UI_screen_requested.emit(&"standings" if _in_cup else &"race"))
 	EventSystem.CUP_state_requested.emit()
 	if _in_cup:
@@ -48,7 +50,70 @@ func _ready() -> void:
 		_headline.text = "NO RACE YET"
 		_enable_buttons()
 		return
-	_play(race)
+	if race.get("mode") == &"time_trial":
+		_play_time_trial(race)
+	else:
+		_play(race)
+
+
+func _play_time_trial(race: Dictionary) -> void:
+	_again.text = "TRY AGAIN"
+	var best := float(race["best"])
+	var ghost_path := "res://game/configs/ghosts/%s.res" % race["track_id"]
+	var gold := (load(ghost_path) as GhostLap).lap_time if ResourceLoader.exists(ghost_path) else 0.0
+	if race["new_record"]:
+		_headline.text = "NEW RECORD!"
+	elif gold > 0.0 and best < gold:
+		_headline.text = "FASTER THAN GOLD!"
+	else:
+		_headline.text = "GREAT DRIVING!"
+	# Nothing is paid: the payout panel becomes the times to beat.
+	$Payout/Column/Heading.text = "TIMES"
+	$Payout/Column/TotalRow.visible = false
+	_balance.visible = false
+	var tween := create_tween()
+	var laps: Array = race["lap_times"]
+	for i in laps.size():
+		var row := _lap_row(i + 1, float(laps[i]), is_equal_approx(float(laps[i]), best))
+		row.modulate.a = 0.0
+		_rows.add_child(row)
+		tween.tween_property(row, "modulate:a", 1.0, ROW_INTERVAL)
+	tween.tween_interval(0.3)
+	var lines: Array = []
+	if race["record_before"] > 0.0:
+		lines.append(["RECORD BEFORE", _format_time(race["record_before"])])
+	if gold > 0.0:
+		lines.append(["GOLD GHOST", _format_time(gold)])
+	if race["new_car_best"] and not race["new_record"]:
+		lines.append(["BEST EVER IN THIS CAR", "!"])
+	for pair: Array in lines:
+		var line := HBoxContainer.new()
+		var name_label := _label(pair[0], 26)
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		line.add_child(name_label)
+		line.add_child(_label(pair[1], 30, YELLOW))
+		line.modulate.a = 0.0
+		_lines.add_child(line)
+		tween.tween_property(line, "modulate:a", 1.0, 0.2)
+	tween.tween_callback(_enable_buttons)
+
+
+## One lap of a time trial: its number and time, the best one highlighted.
+func _lap_row(lap: int, seconds: float, best: bool) -> PanelContainer:
+	var row := PanelContainer.new()
+	row.custom_minimum_size = Vector2(1000, 112)
+	if best:
+		row.add_theme_stylebox_override("panel", _player_row_style())
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 36)
+	row.add_child(line)
+	var name_label := _label("LAP %d" % lap, 40, YELLOW if best else Color.WHITE)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line.add_child(name_label)
+	if best:
+		line.add_child(_label("BEST LAP!", 22, Color(0.18, 0.769, 0.42)))
+	line.add_child(_label(_format_time(seconds), 40))
+	return row
 
 
 func _play(race: Dictionary) -> void:

@@ -13,6 +13,9 @@ extends Node
 signal race_over
 ## A player has crossed the line for the last time (two players: the race goes on).
 signal player_finished(racer: Dictionary)
+## A racer has just crossed the line to start a lap (the first time from the grid, then at
+## every lap completed that is not their last). Ghost recording and replay start here.
+signal lap_started(racer: Dictionary)
 
 const COUNTDOWN_FROM := 3
 ## After the player crosses the line, the race keeps running this long before results.
@@ -28,6 +31,9 @@ var difficulty: DifficultyConfig
 var racers: Array[Dictionary] = []
 var running := false
 var race_time := 0.0
+## A time trial (docs/DESIGN.md §16): the player alone. The end sends no RAC_race_finished —
+## the race screen reports the laps instead — so nothing is paid and no place is given.
+var time_trial := false
 
 var _finish_offset := 0.0
 var _players: Array[Dictionary] = []
@@ -45,7 +51,7 @@ func start(race_track: Track, race_config: TrackConfig, race_racers: Array[Dicti
 	_finish_offset = track.progress_at(track.get_node("FinishLine").global_position)
 	for r in racers:
 		r.merge({"laps": 0, "crossed_start": false, "checkpoint": false, "lap_start": 0.0,
-			"best_lap": 0.0, "finished": false, "finish_time": 0.0, "progress": 0.0})
+			"best_lap": 0.0, "lap_times": [], "finished": false, "finish_time": 0.0, "progress": 0.0})
 		if r["is_player"]:
 			_players.append(r)
 	track.finish_crossed.connect(_on_finish_crossed)
@@ -87,6 +93,7 @@ func _on_finish_crossed(car: Car) -> void:
 	if not r["crossed_start"]:
 		# The grid is behind the line: the first crossing starts lap 1, it does not end one.
 		r["crossed_start"] = true
+		lap_started.emit(r)  # lap 1's time still counts from GO, as the HUD's clock does
 		return
 	if not r["checkpoint"]:
 		return  # no lap without the mid-lap checkpoint: no reversing over the line, no shortcuts
@@ -95,7 +102,10 @@ func _on_finish_crossed(car: Car) -> void:
 	var lap_time: float = race_time - r["lap_start"]
 	r["lap_start"] = race_time
 	r["best_lap"] = lap_time if r["best_lap"] == 0.0 else minf(r["best_lap"], lap_time)
+	r["lap_times"].append(lap_time)
 	EventSystem.RAC_lap_completed.emit(car, r["laps"], lap_time)
+	if r["laps"] < config.laps:
+		lap_started.emit(r)
 	if r["is_player"] and r["laps"] == config.laps - 1 and not _final_lap_announced:
 		_final_lap_announced = true  # once, for whichever player gets there first
 		EventSystem.RAC_final_lap_started.emit()
@@ -177,6 +187,9 @@ func _finish_race() -> void:
 	for r in racers:
 		r["car"].frozen = true
 	_update_positions_final()
+	if time_trial:
+		race_over.emit()
+		return
 	var results := []
 	for i in _order.size():
 		var r: Dictionary = _order[i]

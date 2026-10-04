@@ -13,6 +13,10 @@ signal RAC_positions_updated(order: Array)
 ## results: one Dictionary per racer, in finishing order — name, colour, is_player,
 ## position, time, best_lap. GarageManager pays out on it.
 signal RAC_race_finished(results: Array, track_id: StringName)
+## A time trial is over (instead of RAC_race_finished: nobody else raced, nothing is paid).
+## lap_times in order; ghost: the session's best lap, recorded (GarageManager keeps it if it
+## is a new record for the track).
+signal RAC_time_trial_finished(track_id: StringName, setup_id: StringName, lap_times: Array, ghost: GhostLap)
 
 # Car
 signal CAR_drift_started(car: Node)
@@ -30,6 +34,8 @@ signal PRO_buy_requested(setup_id: StringName)
 signal PRO_equip_requested(setup_id: StringName)
 signal PRO_paint_requested(setup_id: StringName)
 signal PRO_track_select_requested(track_id: StringName)
+## &"race" or &"time_trial": what the next race on the selected track is (PICK A RACE's switch).
+signal PRO_race_mode_requested(mode: StringName)
 signal PRO_track_locked(track_id: StringName)
 signal PRO_coins_changed(total: int)
 signal PRO_coins_awarded(amount: int, breakdown: Dictionary)

@@ -58,6 +58,8 @@ func _ready() -> void:
 	_sound.stream = SOUND
 	_sound.bus = &"SFX"
 	add_child(_sound)
+	if not _queue.is_empty():
+		_show_next()
 
 
 func _on_earned(id: StringName) -> void:
@@ -65,7 +67,8 @@ func _on_earned(id: StringName) -> void:
 	if not ResourceLoader.exists(path):
 		return
 	_queue.append(load(path))
-	if not _showing:
+	# A save that already qualifies earns at start-up, before this node is ready: _ready shows it.
+	if not _showing and is_node_ready():
 		_show_next()
 
 

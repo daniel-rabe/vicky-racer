@@ -276,7 +276,7 @@ single autoload (`EventSystem`) and declares every cross-system signal. Managers
 
 | Prefix | Domain | Signals |
 | --- | --- | --- |
-| `RAC_` | Race | `countdown_tick(n)`, `race_started()`, `lap_completed(racer, lap, lap_time)`, `final_lap_started()`, `positions_updated(order)`, `race_finished(results, track_id)` |
+| `RAC_` | Race | `countdown_tick(n)`, `race_started()`, `lap_completed(racer, lap, lap_time)`, `final_lap_started()`, `positions_updated(order)`, `race_finished(results, track_id)`, `time_trial_finished(track_id, setup_id, lap_times, ghost)` |
 | `CAR_` | Car | `drift_started(car)`, `drift_ended(car, duration)`, `surface_changed(car, surface)`, `wall_hit(car, impact_speed)` |
 | `PRO_` | Progression | `state_requested()`, `state_changed(state)`, `buy_requested(id)`, `equip_requested(id)`, `coins_changed(total)`, `coins_awarded(amount, breakdown)`, `setup_purchased(id)`, `setup_equipped(id)`, `purchase_refused(id, reason)`, `sticker_earned(id)` |
 | `CUP_` | Cups | `state_requested()`, `state_changed(state)`, `start_requested(id)`, `continue_requested()`, `progress_changed(progress)`, `finished(id, standings, trophy)` |
@@ -698,7 +698,7 @@ them all out ([`mockups/candidates/paint_shop.png`](mockups/candidates/paint_sho
 | Settings | Same spec — SOUND, MUSIC, FULLSCREEN, AUTO GO, STEER HELP, OPPONENTS; one focusable row each, ← → change it. Over the title and over the pause menu. Built: [`screenshots/settings.png`](screenshots/settings.png) |
 | Race HUD | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown. Built: [`screenshots/race.png`](screenshots/race.png), [`screenshots/race_countdown.png`](screenshots/race_countdown.png). The countdown sits above screen centre rather than on it, so it never hides the player's own car |
 | Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, cards in pages of 3 × 2 (Q / E or the shoulder buttons, or moving off the edge of a page, turns it; `< 1 / 2 >` above the cards), preview with Grip / Slide / Speed bars and, for owned cars, paint swatches. Built: [`screenshots/garage.png`](screenshots/garage.png) |
-| Pick a race | Four track cards (§7.6) and two cup cards (§12). ← → ↑ ↓ choose, A races, B back to the garage. Built: [`screenshots/pick_a_race.png`](screenshots/pick_a_race.png) |
+| Pick a race | RACE / TIME TRIAL switch (§16), four track cards (§7.6) and two cup cards (§12). ← → ↑ ↓ choose, A races, B back to the garage. Built: [`screenshots/pick_a_race.png`](screenshots/pick_a_race.png) |
 | Standings, podium | §12 |
 | Two players | §15 — 2 PLAYERS on the title: the join screen, then PICK A RACE and a split-screen race. Built: [`screenshots/join.png`](screenshots/join.png), [`screenshots/split_screen.png`](screenshots/split_screen.png) |
 | Trophy shelf | §14 — the trophy button right of PLAY on the title. Built: [`screenshots/shelf.png`](screenshots/shelf.png) |
@@ -1013,7 +1013,44 @@ screen driven by key and pad events, a whole split race on autopilot (two views 
 world, a HUD each showing its own player's place, both players in the results and paid), and a
 race with no opponents.
 
-## 16. Out of scope for v1
+## 16. Time trial and ghosts
 
-Time trial, ghosts and the rest of Phases 16–17 are planned in
+Something to come back to once the cups are won. PICK A RACE has a **RACE / TIME TRIAL** switch
+above the track cards ([`screenshots/pick_a_race_time_trial.png`](screenshots/pick_a_race_time_trial.png));
+in a time trial the cards show each track's record and the cups make way (a cup is always a
+race). Two players have no time trial.
+
+- **The run.** The player alone, three laps, the HUD without a place. Nothing is paid — there is
+  nobody to beat but the clock — and the results list the laps with the best marked, then the
+  record before and the gold ghost's time ([`screenshots/time_trial_results.png`](screenshots/time_trial_results.png)).
+  The headline is NEW RECORD!, FASTER THAN GOLD! or GREAT DRIVING!; RACE AGAIN is TRY AGAIN.
+- **Records.** The best lap per track, and per track *and car* (`[time_trial]` in the save:
+  track = {best, setup, cars}). Lap 1 counts from GO, as the HUD's clock does, so it is rarely
+  the best.
+- **Ghosts** ([`screenshots/ghost_race.png`](screenshots/ghost_race.png)): two see-through cars
+  set off each time the player crosses the line —
+  - **gold**: the developer ghost, the autopilot at full pace in the Starter car, shipped as
+    `game/configs/ghosts/<track>.res` and recorded by
+    [`tools/dev/record_ghosts.tscn`](../tools/dev/record_ghosts.gd) (24.3 / 21.8 / 31.0 / 26.85 s);
+  - **white**: the player's own record lap on the track, in the car and paint it was set in. A
+    lap that beats it during the run becomes the ghost from the next lap on.
+- **Recording.** [`GhostRecorder`](../actors/ghost/ghost_recorder.gd) samples the car on every
+  physics tick from line to line, after the cars have moved: x, y and rotation as floats plus
+  the draw layer as a byte (on a bridge the ghost is drawn above the deck too) — about 20 KB a
+  lap. [`GhostCar`](../actors/ghost/ghost_car.gd) replays sample *k* on the *k*-th tick of the
+  lap, so it is exactly where the car was; at another physics rate it blends the two nearest
+  samples by time. It has no body and collides with nothing, and is drawn under the cars.
+- **Files.** A record ghost is [`GhostLap.to_dict`](../game/ghost_lap.gd) written with
+  `FileAccess.store_var`, which cannot hold objects, so a ghost file can never carry code; one per
+  track beside the save (`user://vicky_racer_ghosts/`). A missing or broken file is simply no ghost.
+
+Checked by [`tests/ghost_test.gd`](../tests/ghost_test.gd): the ghost data alone (samples, file
+round trip, broken files, replay timing); a real time trial where the test traces the car itself
+and the ghost of the best lap then drives that lap again **0.0000 px** from the trace, tick by
+tick, over three laps; no coins, three laps reported, the record and the ghost saved, both
+surviving a reload and the next run racing the saved ghost; and the switch on PICK A RACE.
+
+## 17. Out of scope for v1
+
+The release build (Phase 17) is planned in
 [`ROADMAP.md`](ROADMAP.md). Touch controls remain out of scope.

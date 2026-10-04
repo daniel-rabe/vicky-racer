@@ -51,6 +51,8 @@ func _enter_tree() -> void:
 	EventSystem.RAC_countdown_tick.connect(_on_countdown_tick)
 	EventSystem.RAC_final_lap_started.connect(_on_final_lap)
 	EventSystem.RAC_race_finished.connect(func(_results: Array, _id: StringName) -> void: stop(FADE_OUT))
+	EventSystem.RAC_time_trial_finished.connect(func(_id: StringName, _car: StringName, _laps: Array, _ghost: GhostLap) -> void:
+		stop(FADE_OUT))
 
 
 func _process(_delta: float) -> void:
