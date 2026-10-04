@@ -39,6 +39,10 @@ func _enter_tree() -> void:
 		profile.cup_progress = progress
 		profile.save_to(save_path))
 	EventSystem.CUP_finished.connect(_on_cup_finished)
+	EventSystem.PRO_sticker_earned.connect(func(id: StringName) -> void:
+		if id not in profile.stickers:
+			profile.stickers.append(id)
+			_commit())
 	EventSystem.RAC_race_finished.connect(_on_race_finished)
 
 
@@ -172,6 +176,7 @@ func _publish_state() -> void:
 		"selected_track": profile.selected_track,
 		"cup_progress": profile.cup_progress.duplicate(true),
 		"trophies": profile.trophies.duplicate(),
+		"stickers": profile.stickers.duplicate(),
 		"last_cup": last_cup,
 		"tracks": TRACK_ORDER.map(func(id: StringName) -> Dictionary:
 			return {"config": tracks[id], "unlocked": is_unlocked(id), "best_lap": profile.best_laps.get(id, 0.0),

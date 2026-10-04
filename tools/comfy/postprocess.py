@@ -2,7 +2,7 @@
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 FONT_PATH = Path("G:/Godot/external_assets/fonts/Public_Pixel_Font_1_24/PublicPixel.ttf")
 
@@ -163,3 +163,61 @@ def _checkerboard(size: tuple[int, int], square: int = 16) -> Image.Image:
             if (x // square + y // square) % 2:
                 draw.rectangle((x, y, x + square - 1, y + square - 1), fill=(160, 160, 160))
     return board
+
+
+def sticker_border(img: Image.Image, width: float = 0.045, colour=(255, 255, 255)) -> Image.Image:
+    """Give a cut-out the white die-cut edge of a sticker: the subject's silhouette grown by
+    `width` of its longer side, smoothed into a round outline, filled white underneath.
+
+    The growth is a distance field (a chamfer pass at a quarter of the size), so a thick
+    edge on a 1500 px master costs well under a second.
+    """
+    img = img.convert("RGBA")
+    pad = round(max(img.size) * width) + 4
+    canvas = Image.new("RGBA", (img.width + 2 * pad, img.height + 2 * pad), (0, 0, 0, 0))
+    canvas.paste(img, (pad, pad), img)
+    q = 4
+    small = np.asarray(canvas.getchannel("A").resize((canvas.width // q, canvas.height // q), Image.BILINEAR)) > 96
+    dist = _chamfer(small)
+    grown = Image.fromarray(((dist <= (pad - 4) / q) * 255).astype(np.uint8))
+    # A die-cut sticker has no holes: fill whatever the outside cannot reach.
+    outside = grown.copy()
+    ImageDraw.floodfill(outside, (0, 0), 128)
+    grown = outside.point(lambda v: 0 if v == 128 else 255).resize(canvas.size, Image.BILINEAR)
+    edge = grown.filter(ImageFilter.GaussianBlur(q)).point(lambda v: 255 if v > 127 else round(v * 2))
+    out = Image.new("RGBA", canvas.size, colour + (0,))
+    out.putalpha(edge)
+    out.alpha_composite(canvas)
+    return out
+
+
+def _chamfer(inside: np.ndarray) -> np.ndarray:
+    """Approximate Euclidean distance (in pixels) from every pixel to the nearest True one."""
+    big = 1e9
+    d = np.where(inside, 0.0, big)
+    h, w = d.shape
+    diag = 2 ** 0.5
+    for y in range(h):  # forward pass, row by row (columns vectorised along the row)
+        if y > 0:
+            row = np.minimum(d[y], d[y - 1] + 1)
+            row[1:] = np.minimum(row[1:], d[y - 1, :-1] + diag)
+            row[:-1] = np.minimum(row[:-1], d[y - 1, 1:] + diag)
+            d[y] = row
+        d[y] = np.minimum.accumulate(d[y] - np.arange(w)) + np.arange(w)
+    for y in range(h - 1, -1, -1):
+        if y < h - 1:
+            row = np.minimum(d[y], d[y + 1] + 1)
+            row[1:] = np.minimum(row[1:], d[y + 1, :-1] + diag)
+            row[:-1] = np.minimum(row[:-1], d[y + 1, 1:] + diag)
+            d[y] = row
+        rev = d[y, ::-1]
+        d[y] = (np.minimum.accumulate(rev - np.arange(w)) + np.arange(w))[::-1]
+    return d
+
+
+def cover(img: Image.Image, box: tuple[int, int]) -> Image.Image:
+    """Scale and centre-crop an image so it fills `box` exactly (a background)."""
+    scale = max(box[0] / img.width, box[1] / img.height)
+    resized = img.convert("RGB").resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
+    left, top = (resized.width - box[0]) // 2, (resized.height - box[1]) // 2
+    return resized.crop((left, top, left + box[0], top + box[1]))

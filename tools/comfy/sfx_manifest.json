@@ -132,6 +132,18 @@
       "peak_db": -4.0,
       "out": "art/sfx/boost.wav",
       "seed": 103
+    },
+    {
+      "id": "sticker",
+      "prompt": "a cheerful cartoon pop of a sticker being slapped onto paper followed by a short bright sparkly twinkle, children's video game reward sound effect, clean",
+      "negative": "speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, sad",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.3,
+      "peak_db": -4.0,
+      "out": "art/sfx/sticker.wav",
+      "seed": 103,
+      "_note": "Phase 14: a new sticker pops onto the screen."
     }
   ],
   "synth": [

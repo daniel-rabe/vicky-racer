@@ -33,6 +33,8 @@ var selected_track: StringName = &"track_01"
 ## Both optional in the file.
 var cup_progress := {}
 var trophies := {}
+## Stickers in the book, in the order they were earned. Optional in the file; never shrinks.
+var stickers: Array[StringName] = []
 
 
 static func fresh(starting_coins := 0) -> SaveGame:
@@ -68,6 +70,7 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 			var trophy := StringName(str(file.get_value("trophies", cup, "")))
 			if trophy in [&"gold", &"silver", &"bronze", &"ribbon"]:
 				profile.trophies[StringName(cup)] = trophy
+	profile.stickers = _string_names(file.get_value("stickers", "earned", []))
 	if file.has_section("paint"):  # absent in version 1 files
 		for id in file.get_section_keys("paint"):
 			var colour := StringName(str(file.get_value("paint", id, "")))
@@ -98,6 +101,8 @@ func save_to(path := DEFAULT_PATH) -> Error:
 		file.set_value("cup", "progress", cup_progress)
 	for cup in trophies:
 		file.set_value("trophies", String(cup), String(trophies[cup]))
+	if not stickers.is_empty():
+		file.set_value("stickers", "earned", PackedStringArray(stickers))
 	return file.save(path)
 
 

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StickerConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/configs/sticker_config.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/stickers/long_drift.png" id="2_art"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"long_drift"
+display_name = "Super Drift"
+hint = "DRIFT FOR 3 SECONDS!"
+texture = ExtResource("2_art")

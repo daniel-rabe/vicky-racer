@@ -88,16 +88,23 @@ def facing_of(entry: dict, entries: dict) -> str | None:
     return entry.get("facing")
 
 
-def render_sprite(client: ComfyClient, ref: str, subject: str, seed: int) -> tuple[Image.Image, Image.Image]:
-    images = client.run(recipe.sprite_graph(subject, seed, ref, prefix="vr_asset"))
+def render_sprite(client: ComfyClient, ref: str, entry: dict, seed: int) -> tuple[Image.Image, Image.Image]:
+    """(cut-out, raw) for a sprite. A background (`size` set) has no cut-out: both are the picture."""
+    if "size" in entry:
+        images = client.run(recipe.background_graph(entry["subject"], seed, tuple(entry["size"]), ref))
+        raw = Image.open(io.BytesIO(images["save"][0])).convert("RGB")
+        return raw, raw
+    images = client.run(recipe.sprite_graph(entry["subject"], seed, ref, prefix="vr_asset"))
     return (Image.open(io.BytesIO(images["save_cutout"][0])).convert("RGBA"),
             Image.open(io.BytesIO(images["save"][0])).convert("RGB"))
 
 
-POST_STEPS = {"punch_hole": pp.punch_center_hole}
+POST_STEPS = {"punch_hole": pp.punch_center_hole, "sticker": pp.sticker_border}
 
 
 def finalize(master: Image.Image, entry: dict, entries: dict) -> Image.Image:
+    if "size" in entry:
+        return pp.cover(master, tuple(entry["box"]))
     for step in entry.get("post", []):
         master = POST_STEPS[step](master)
     turned = master.rotate(TO_PLUS_X[facing_of(entry, entries)], expand=True)
@@ -132,16 +139,23 @@ def cmd_candidates(only: list[str] | None) -> None:
             if cut_path.exists():
                 cut = Image.open(cut_path).convert("RGBA")
             else:
-                cut, raw = render_sprite(client, ref, entry["subject"], seed)
+                cut, raw = render_sprite(client, ref, entry, seed)
                 cut.save(cut_path)
                 raw.save(CANDIDATES / f"{entry['id']}_s{seed}_raw.png")
                 print(f"  {entry['id']} seed {seed}", flush=True)
             big.append((cut, f"seed {seed}"))
+            if "size" in entry:
+                continue
             # Shown at final size on grass, scaled 2x so it is inspectable.
             tile = Image.new("RGB", (max(entry["box"]) + 32,) * 2, GRASS)
             sprite = finalize(cut, entry, entries)
             tile.paste(sprite, ((tile.width - sprite.width) // 2, (tile.height - sprite.height) // 2), sprite)
             small.append((tile.resize((tile.width * 2, tile.height * 2), Image.NEAREST), f"seed {seed} in game, 2x"))
+        if "size" in entry:  # a background: the pictures themselves, two to a row
+            pp.contact_sheet([(finalize(c, entry, entries), l) for c, l in big], 2, (768, 432),
+                             f"{entry['id'].upper()}: CANDIDATES").save(SHEETS / f"{entry['id']}.png")
+            print(f"sheet: docs/mockups/candidates/{entry['id']}.png", flush=True)
+            continue
         top = pp.contact_sheet(big, len(big), (256, 256), f"{entry['id'].upper()}: CANDIDATES", checker=True)
         side = max(256, small[0][0].width)
         bottom = pp.contact_sheet(small, len(small), (side, side), "AT GAME SIZE ON GRASS (2x)")
@@ -234,7 +248,7 @@ def cmd_build(only: list[str] | None, force: bool) -> None:
             continue
         master = MASTERS / f"{entry['id']}.png"
         if force or not master.exists():
-            cut, raw = render_sprite(comfy(), ref, entry["subject"], entry["seed"])
+            cut, raw = render_sprite(comfy(), ref, entry, entry["seed"])
             cut.save(master)
             raw.save(MASTERS / f"{entry['id']}_raw.png")
         write_art(finalize(Image.open(master), entry, entries), entry["out"])

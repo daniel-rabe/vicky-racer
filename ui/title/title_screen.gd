@@ -1,6 +1,6 @@
 extends Node2D
 ## The title screen (docs/mockups/title_layout): the logo and PLAY / SETTINGS / QUIT over a
-## live "attract mode" race — the real Track 01 with four AI cars, the camera following
+## live "attract mode" race, and a trophy button beside PLAY for the shelf (docs/DESIGN.md §14) — the real Track 01 with four AI cars, the camera following
 ## the red one. No HUD, no race rules, no car sounds: just something lively to look at.
 
 const TRACK := preload("res://game/configs/tracks/track_01.tres")
@@ -21,6 +21,7 @@ var _cup := {}
 @onready var _play: Button = %Play
 @onready var _settings_button: Button = %Settings
 @onready var _quit: Button = %Quit
+@onready var _shelf: Button = %Shelf
 @onready var _settings: SettingsPanel = %SettingsPanel
 @onready var _menu: Control = %Menu
 @onready var _logo: Control = %Logo
@@ -34,11 +35,18 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	_build_attract_mode()
 	_play.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"garage"))
+	_shelf.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"shelf"))
+	# The shelf button stands beside the menu: right of PLAY goes to it, left comes back.
+	_play.focus_neighbor_right = _play.get_path_to(_shelf)
+	_shelf.focus_neighbor_left = _shelf.get_path_to(_play)
+	_shelf.focus_neighbor_bottom = _shelf.get_path_to(_settings_button)
 	_settings_button.pressed.connect(func() -> void:
 		_menu.visible = false
+		_shelf.visible = false
 		_settings.open())
 	_settings.closed.connect(func() -> void:
 		_menu.visible = true
+		_shelf.visible = true
 		_settings_button.grab_focus())
 	# Quit like closing the window does, so main.gd can let the sound stop cleanly first.
 	_quit.pressed.connect(func() -> void:
@@ -65,6 +73,7 @@ func _add_continue_cup() -> void:
 	_menu.add_child(button)
 	_menu.move_child(button, 0)
 	_menu.offset_top -= 70.0
+	button.focus_neighbor_right = button.get_path_to(_shelf)
 	button.grab_focus()
 
 

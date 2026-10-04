@@ -37,6 +37,8 @@ signal PRO_setup_purchased(setup_id: StringName)
 signal PRO_setup_equipped(setup_id: StringName)
 signal PRO_setup_painted(setup_id: StringName, colour: StringName)
 signal PRO_purchase_refused(setup_id: StringName, reason: StringName)
+## A new sticker for the book (StickerManager decides, GarageManager saves it). Never twice.
+signal PRO_sticker_earned(sticker_id: StringName)
 
 # Cups. Screens ask with CUP_state_requested and get the whole cup state back (as with
 # PRO_). CupManager owns the logic; GarageManager stores progress and pays the trophy.

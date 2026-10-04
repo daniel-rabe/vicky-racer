@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StickerConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/configs/sticker_config.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/stickers/clean_lap.png" id="2_art"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"clean_lap"
+display_name = "Careful Driver"
+hint = "DRIVE A LAP WITHOUT HITTING A WALL!"
+texture = ExtResource("2_art")

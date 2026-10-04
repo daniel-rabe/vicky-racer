@@ -48,3 +48,11 @@ def variant_graph(uploaded_image: str, instruction: str, seed: int, prefix: str 
     settings = wf.FluxSettings(unet=v["unet"], weight_dtype=v["weight_dtype"], guidance=v["guidance"])
     return wf.flux_kontext_edit(uploaded_image, instruction, seed, settings=settings,
                                 cutout=cutout_settings(), prefix=prefix)
+
+
+def background_graph(scene: str, seed: int, size: tuple[int, int], uploaded_reference: str,
+                     prefix: str = "vr_background") -> dict:
+    """A full-screen picture (no cut-out): the scene in the house style, style-locked like sprites."""
+    prompt = f"{scene}, {PIPELINE['prompt']['style']}"
+    return wf.flux_txt2img(prompt, seed, size[0], size[1], settings=flux_settings(),
+                           style=style_ref(uploaded_reference), prefix=prefix)

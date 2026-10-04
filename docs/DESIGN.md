@@ -278,7 +278,7 @@ single autoload (`EventSystem`) and declares every cross-system signal. Managers
 | --- | --- | --- |
 | `RAC_` | Race | `countdown_tick(n)`, `race_started()`, `lap_completed(racer, lap, lap_time)`, `final_lap_started()`, `positions_updated(order)`, `race_finished(results, track_id)` |
 | `CAR_` | Car | `drift_started(car)`, `drift_ended(car, duration)`, `surface_changed(car, surface)`, `wall_hit(car, impact_speed)` |
-| `PRO_` | Progression | `state_requested()`, `state_changed(state)`, `buy_requested(id)`, `equip_requested(id)`, `coins_changed(total)`, `coins_awarded(amount, breakdown)`, `setup_purchased(id)`, `setup_equipped(id)`, `purchase_refused(id, reason)` |
+| `PRO_` | Progression | `state_requested()`, `state_changed(state)`, `buy_requested(id)`, `equip_requested(id)`, `coins_changed(total)`, `coins_awarded(amount, breakdown)`, `setup_purchased(id)`, `setup_equipped(id)`, `purchase_refused(id, reason)`, `sticker_earned(id)` |
 | `CUP_` | Cups | `state_requested()`, `state_changed(state)`, `start_requested(id)`, `continue_requested()`, `progress_changed(progress)`, `finished(id, standings, trophy)` |
 | `UI_` | Screens | `show_message(text, duration)`, `screen_requested(name)`, `settings_requested()`, `settings_changed(settings)`, `setting_change_requested(key, value)`, `music_requested(piece)` |
 
@@ -699,6 +699,7 @@ them all out ([`mockups/candidates/paint_shop.png`](mockups/candidates/paint_sho
 | Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, cards in pages of 3 × 2 (Q / E or the shoulder buttons, or moving off the edge of a page, turns it; `< 1 / 2 >` above the cards), preview with Grip / Slide / Speed bars and, for owned cars, paint swatches. Built: [`screenshots/garage.png`](screenshots/garage.png) |
 | Pick a race | Four track cards (§7.6) and two cup cards (§12). ← → ↑ ↓ choose, A races, B back to the garage. Built: [`screenshots/pick_a_race.png`](screenshots/pick_a_race.png) |
 | Standings, podium | §12 |
+| Trophy shelf | §14 — the trophy button right of PLAY on the title. Built: [`screenshots/shelf.png`](screenshots/shelf.png) |
 | Results | [`mockups/results_layout.png`](mockups/results_layout.png) — finishing order, payout count-up, Race Again. Built: [`screenshots/results.png`](screenshots/results.png) |
 
 Pink annotations on each spec give anchors, sizes and animation timings; they are meant to be
@@ -911,7 +912,54 @@ menu not restarting between menu screens, ducking, last lap, finish, and the MUS
 Music bus. Run with a window, it also checks the podium music is really playing.
 [`tests/race_test.gd`](../tests/race_test.gd) checks the last lap is announced once.
 
-## 14. Out of scope for v1
+## 14. Trophy shelf and stickers
 
-Split screen, time trial, ghosts and the rest of Phases 14–17 are planned in
+Rewards a child who cannot read yet can see and collect. The **trophy button** beside PLAY on
+the title opens the shelf ([`screenshots/shelf.png`](screenshots/shelf.png)): a playroom wall
+with every cup's best trophy standing on a shelf over the cup's picture, and the sticker book
+pinned to the wall above. Anything not won yet shows as a pale outline of itself, so the child can see what is still
+to find. Moving over a prize names it, or says how to win it, for a grown-up to read out.
+
+| Sticker | Earned by |
+| --- | --- |
+| **First Drift** | the first drift in a race |
+| **Super Drift** | a drift of 3 seconds or more (`LONG_DRIFT_SECONDS`) |
+| **First Win** | winning a race |
+| **Careful Driver** | a lap with no wall hit |
+| **Pile of Coins** | 200 coins or more from one race, the cup bonus included (`RICH_RACE_COINS`) |
+| **Explorer** | having finished every track |
+| **Car Collector** | owning every car |
+
+The roadmap said **100** coins in one race, but a win alone pays 100, so that sticker would always
+come with First Win. At 200 it takes a win on a track raced for the first time, or 2nd or better
+in a cup (its bonus counts) — still reachable after every track has been finished.
+
+- **A new sticker pops onto the screen** — [`StickerPopup`](../ui/stickers/sticker_popup.gd) in
+  the shell, so it shows over any screen and carries on through a screen change. It bounces in big
+  under the lap panel, above the middle of the screen (clear of the player's car), with NEW
+  STICKER! ([`screenshots/sticker_popup.png`](screenshots/sticker_popup.png)), holds two seconds and shrinks away, with a pop-and-twinkle sound. Several at once (a
+  win on a new track brings Pile of Coins and First Win) take turns.
+- **[`StickerManager`](../game/managers/sticker_manager.gd)** in the shell decides: it watches
+  the race and car signals for the player's own car (the one with a `PlayerMarker`) and only
+  during a race, so the title's attract mode never earns anything, and the garage state for
+  cars and tracks. It emits `PRO_sticker_earned`; `GarageManager` saves it.
+- **Never twice, never lost.** The manager ignores anything already earned, the save keeps the
+  list in an optional `[stickers] earned` (no schema bump), and nothing ever removes one.
+- Stickers are data: a [`StickerConfig`](../game/configs/sticker_config.gd) per sticker in
+  `game/configs/stickers/` (name, hint, picture); only the rules are code.
+
+**Art.** Seven sticker pictures and the shelf wall, from four candidates each with the frozen
+recipe. The white die-cut edge is not generated: `postprocess.sticker_border` grows each cut-out's
+silhouette, fills its holes and puts it on white, so all seven share one edge. The wall is the
+first full-screen picture through the recipe (`size` in the manifest: no cut-out, style-locked
+like everything else, cropped to 1920 × 1080).
+
+Checked by [`tests/sticker_test.gd`](../tests/sticker_test.gd): each sticker triggered, only by
+the player and only in a race, exactly once, kept across closing the game; both drift stickers
+with a real car's physics; a real race earning stickers; the popup queue; and the shelf from the
+title showing exactly what was earned.
+
+## 15. Out of scope for v1
+
+Split screen, time trial, ghosts and the rest of Phases 15–17 are planned in
 [`ROADMAP.md`](ROADMAP.md). Touch controls remain out of scope.

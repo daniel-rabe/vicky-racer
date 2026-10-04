@@ -209,6 +209,127 @@
       ],
       "out": "art/ui/cups/cup_snow.png",
       "_note": "Phase 12 cup art."
+    },
+    {
+      "id": "sticker_drift",
+      "subject": "a cute little red toy race car skidding sideways in a drift with big round puffs of white smoke behind its back wheels, side view, cheerful children's sticker",
+      "seed": 13,
+      "facing": null,
+      "post": [
+        "sticker"
+      ],
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/drift.png",
+      "_note": "Phase 14 sticker: First drift."
+    },
+    {
+      "id": "sticker_long_drift",
+      "subject": "a cute little red toy race car sliding round a big curly swirl of puffy white smoke clouds, side view, cheerful children's sticker",
+      "seed": 12,
+      "facing": null,
+      "post": [
+        "sticker"
+      ],
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/long_drift.png",
+      "_note": "Phase 14 sticker: A drift of 3 seconds or more."
+    },
+    {
+      "id": "sticker_first_win",
+      "subject": "a shiny gold medal with a big number 1 on it hanging from a red ribbon, front view, cheerful children's sticker",
+      "seed": 13,
+      "facing": null,
+      "post": [
+        "sticker"
+      ],
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/first_win.png",
+      "_note": "Phase 14 sticker: First win."
+    },
+    {
+      "id": "sticker_all_cars",
+      "subject": "a toy garage with its big door open and six small toy cars parked side by side inside, red, blue, yellow, green, purple and pink, front view, cheerful children's sticker",
+      "seed": 14,
+      "facing": null,
+      "post": [
+        "sticker"
+      ],
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/all_cars.png",
+      "_note": "Phase 14 sticker: Every car owned."
+    },
+    {
+      "id": "sticker_clean_lap",
+      "subject": "a shiny red racing helmet with a gold star on the side and little twinkling sparkles around it, side view, cheerful children's sticker",
+      "seed": 14,
+      "facing": null,
+      "post": [
+        "sticker"
+      ],
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/clean_lap.png",
+      "_note": "Phase 14 sticker: A lap with no wall hits."
+    },
+    {
+      "id": "sticker_every_track",
+      "subject": "a little round island seen from above with a winding road on it, a sandy beach, a snowy mountain and tiny toy houses, cheerful children's sticker",
+      "seed": 14,
+      "facing": null,
+      "post": [
+        "sticker"
+      ],
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/every_track.png",
+      "_note": "Phase 14 sticker: Finished every track."
+    },
+    {
+      "id": "sticker_coins",
+      "subject": "a big heap of shiny round gold coins with stars on them, front view, cheerful children's sticker",
+      "seed": 11,
+      "facing": null,
+      "post": [
+        "sticker"
+      ],
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/coins.png",
+      "_note": "Phase 14 sticker: 200 coins from one race."
+    },
+    {
+      "id": "shelf_background",
+      "subject": "front view of the wall of a cosy children's playroom: soft warm cream wallpaper with tiny pale yellow stars, one long empty light-wood shelf running straight across the whole wall a third of the way down, nothing on the shelf, the rest of the wall plain and empty, flat even light",
+      "seed": 12,
+      "facing": null,
+      "size": [
+        1920,
+        1088
+      ],
+      "box": [
+        1920,
+        1080
+      ],
+      "out": "art/ui/shelf/background.png",
+      "_note": "Phase 14: the trophy shelf screen's background."
     }
   ],
   "variants": [

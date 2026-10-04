@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://ui/title/title_screen.gd" id="1_title"]
 [ext_resource type="Theme" path="res://ui/theme/vicky_theme.tres" id="2_theme"]
 [ext_resource type="PackedScene" path="res://ui/settings/settings_panel.tscn" id="3_settings"]
+[ext_resource type="Texture2D" path="res://art/ui/cups/trophy_gold.png" id="4_trophy"]
 
 [node name="TitleScreen" type="Node2D"]
 script = ExtResource("1_title")
@@ -106,6 +107,23 @@ custom_minimum_size = Vector2(400, 90)
 layout_mode = 2
 theme_type_variation = &"NavButton"
 text = "QUIT"
+
+[node name="Shelf" type="Button" parent="UI/Root"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 270.0
+offset_top = 500.0
+offset_right = 420.0
+offset_bottom = 650.0
+grow_horizontal = 2
+theme_type_variation = &"NavButton"
+icon = ExtResource("4_trophy")
+icon_alignment = 1
+expand_icon = true
 
 [node name="Hints" type="Label" parent="UI/Root"]
 unique_name_in_owner = true

@@ -109,7 +109,17 @@ finish and speeds up 6 % on the last lap; MUSIC volume in the settings. Changes:
 
 ---
 
-## Phase 14 — Trophy shelf and stickers
+## Phase 14 — Trophy shelf and stickers ✅ done
+
+Built as planned (DESIGN.md §14): a shelf screen from a trophy button on the title, seven
+stickers, a popup over any screen, saved in an optional `[stickers]` section. Changes:
+
+- **Pile of Coins needs 200**, not 100: a win alone pays 100, so it would always come with
+  First Win. The cup bonus counts toward it.
+- **The shelf is a title-screen room**, not a garage tab: the garage has no room left.
+- **The sticker edge is drawn in post**, not generated, so all seven share one die-cut look.
+
+### Plan as written
 
 Rewards that need no reading.
 
