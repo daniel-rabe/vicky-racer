@@ -237,6 +237,27 @@ func _test_bridges() -> void:
 	_check(levels == [0, 1, 0], "a car driving over goes up onto the bridge and down again (%s)" % [levels])
 	_check(backwards == 0, "its race position never jumps to the other pass at the crossing (%d jumps)" % backwards)
 	car.queue_free()
+	# Just before the deck starts the car is still on the ground but already drawn above
+	# the deck, so the deck's end never cuts the car in half (seen in play: it did).
+	var edge: Car = CAR_SCENE.instantiate()
+	edge.global_position = t.line_point(span.x * length - 50.0)
+	edge.rotation = t.line_tangent(span.x * length).angle()
+	add_child(edge)
+	edge.set_physics_process(false)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_check(edge.level == 0 and edge.z_index == Car.BRIDGE_Z,
+		"a car about to drive onto the deck is drawn above it already (level %d, z %d)" % [edge.level, edge.z_index])
+	edge.global_position = t.line_point((span.x + span.y) * length + 50.0)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_check(edge.level == 0 and edge.z_index == Car.BRIDGE_Z, "and still while its tail leaves the deck")
+	edge.global_position = t.line_point((span.x + span.y) * length + 400.0)
+	edge.reset_physics_interpolation()
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_check(edge.z_index == 0, "clear of the bridge it is back on the ground layer")
+	edge.queue_free()
 	# Two cars at the crossing, one on each level, driven into each other.
 	var crossing := t.line_point((span.x + span.y / 2.0) * length)
 	for same in [false, true]:

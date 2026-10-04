@@ -495,7 +495,7 @@ bridges, so the levels clearly read as one road over another.
 | Problem | Answer |
 | --- | --- |
 | Race position at the crossing: the closest point on the line is ambiguous where two passes meet | `Track` measures each car by searching only a short window of the line (±12 baked points, 240 px) around where it was last frame, so a car keeps to its own pass. A full search runs only when a car is new or was moved (a rescue). Also cheaper: CPU per race frame fell from 249 to 208 µs |
-| Two levels | A car within a bridge span and on the road is **level 1**: drawn above the deck (`z_index` 2; the deck is 1), on its own physics layer. Cars on the two levels never collide; cars on the same level still bump |
+| Two levels | A car within a bridge span and on the road is **level 1**: drawn above the deck (`z_index` 2; the deck is 1), on its own physics layer. Drawing switches 120 px (more than half a car) *before* the deck starts and *after* it ends, collisions at the span itself — first built switching both at once, which cut the car in half at both ends of the deck for a frame (reported in play, now checked by the track test). Cars on the two levels never collide; cars on the same level still bump |
 | Falling off | Solid **railings** along the high middle of each span, on a layer only level-1 cars collide with, so cars below drive under them. Skid marks laid on a bridge lie on its deck |
 | Looking like a bridge | The deck redraws the road above everything below it, with white railings and a shadow on the ground; the AI ignores cars on the other level when choosing its lane |
 

@@ -78,10 +78,11 @@ func _ready() -> void:
 	set_level(0)
 
 
-## Move between the ground and a bridge: drawing order and what the car can touch.
+## Move between the ground and a bridge: what the car can touch, and (with the margin the
+## track allows at the deck's ends) whether it is drawn above the deck.
 func set_level(value: int) -> void:
 	level = value
-	z_index = BRIDGE_Z if value == 1 else 0
+	set_drawn_above_deck(value == 1)
 	collision_layer = LAYER_CARS_BRIDGE if value == 1 else LAYER_CARS_GROUND
 	collision_mask = LAYER_WORLD | (LAYER_CARS_BRIDGE | LAYER_RAILINGS if value == 1 else LAYER_CARS_GROUND)
 
@@ -89,6 +90,10 @@ func set_level(value: int) -> void:
 func _resolve_config() -> void:
 	if base_config:
 		config = base_config.with_setup(setup)
+
+
+func set_drawn_above_deck(above: bool) -> void:
+	z_index = BRIDGE_Z if above else 0
 
 
 ## Driven over a boost pad. Emits CAR_boosted (sound, effects).

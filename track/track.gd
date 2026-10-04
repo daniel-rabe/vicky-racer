@@ -76,7 +76,11 @@ const SEARCH_WINDOW := 12
 const RELOCATE_FACTOR := 3.0
 ## Bridge decks draw above the road and the cars beneath them; cars on a bridge above both.
 const DECK_Z := 1
-const RAILING_HEIGHT_FRACTION := 0.7  # the middle part of a span stands high enough for railings
+const RAILING_HEIGHT_FRACTION := 0.7
+## A car is drawn above the deck from this far before the bridge starts until this far
+## after it ends — more than half a car — so no part of it is ever covered by the deck's
+## end. Collisions switch at the span itself. Nothing passes under a bridge near its ends.
+const DECK_DRAW_MARGIN := 120.0  # the middle part of a span stands high enough for railings
 
 @onready var ground: TileMapLayer = $Ground
 @onready var road: Node2D = $Road  # sits above Ground; the generated road lines go inside it
@@ -117,9 +121,11 @@ func _physics_process(_delta: float) -> void:
 	for car: Car in get_tree().get_nodes_in_group(&"cars"):
 		var measure := _measure_car(car)
 		_measured[car] = measure
-		var level := 1 if on_bridge(measure.x) and measure.y <= road_half_width + KERB_WIDTH else 0
+		var on_road := measure.y <= road_half_width + KERB_WIDTH
+		var level := 1 if on_bridge(measure.x) and on_road else 0
 		if car.level != level:
 			car.set_level(level)
+		car.set_drawn_above_deck(level == 1 or (on_road and on_bridge(measure.x, DECK_DRAW_MARGIN)))
 		var surface := surface_at(car.global_position, measure.y)
 		if _surface_of.get(car) != surface:
 			_surface_of[car] = surface
@@ -138,11 +144,12 @@ func distance_of(car: Node2D) -> float:
 	return _measured[car].y if _measured.has(car) else distance_to_line(car.global_position)
 
 
-## True when `offset` (px along the line) lies on a pass that goes over a bridge.
-func on_bridge(offset: float) -> bool:
-	var at := offset / lap_length()
+## True when `offset` (px along the line) lies on a pass that goes over a bridge, with the
+## span stretched by `margin` px at both ends.
+func on_bridge(offset: float, margin := 0.0) -> bool:
+	var length := lap_length()
 	for span in bridge_spans:
-		if fposmod(at - span.x, 1.0) <= span.y:
+		if fposmod(offset - span.x * length + margin, length) <= span.y * length + 2.0 * margin:
 			return true
 	return false
 
