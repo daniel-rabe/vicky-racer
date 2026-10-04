@@ -1,10 +1,10 @@
 class_name RacerSpawner
 extends Node
-## Puts the four cars on the grid: the player in their equipped car and paint, with camera
-## and controls, and the opponents in the cars and paints from the TrackConfig, with AI
-## drivers in staggered lanes.
+## Puts the cars on the grid: the player (or both players) in their car and paint, with
+## camera and controls, and the opponents in the cars and paints from the TrackConfig, with
+## AI drivers in staggered lanes.
 ## Returns one Dictionary per racer, the shape RaceManager and the HUD work with:
-## car, name, body (sprite path), colour, is_player, driver.
+## car, name, body (sprite path), colour, is_player, player (1 or 2; 0 for the AI), driver.
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
@@ -15,22 +15,28 @@ const PLAYER_COLOUR := Color(0.902, 0.224, 0.275)
 const LANES: Array[float] = [-70.0, 70.0, 0.0]
 
 
-## `autopilot`: the player's car is driven by an AIDriver too (headless race tests).
+## One player's car, in their car and paint (`humans`, one Dictionary per player: setup,
+## paint, and in a two-player race name, colour, number and action_prefix).
+## `autopilot`: the players' cars are driven by AIDrivers too (headless race tests).
 ## `difficulty` shifts every opponent's skill (DifficultyConfig.skill_offset).
-func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: Node,
-		autopilot := false, difficulty: DifficultyConfig = null, player_paint := Paint.ORIGINAL) -> Array[Dictionary]:
+## `with_ai`: false leaves the opponents out (two players racing only each other).
+func spawn(track: Track, config: TrackConfig, humans: Array[Dictionary], parent: Node,
+		autopilot := false, difficulty: DifficultyConfig = null, with_ai := true) -> Array[Dictionary]:
 	var skill_offset := difficulty.skill_offset if difficulty else 0.0
 	var grid := track.grid_transforms()
+	var human_slots := _human_slots(config.player_slot - 1, humans.size(), grid.size())
 	var racers: Array[Dictionary] = []
 	var opponent := 0
 	for slot in grid.size():
 		var car: Car = CAR_SCENE.instantiate()
-		var is_player := slot + 1 == config.player_slot
-		var racer := {"car": car, "is_player": is_player}
-		if is_player:
-			car.setup = player_setup
-			car.body_texture = Paint.body(player_setup, player_paint)
-			racer.merge({"name": "YOU", "body": car.body_texture.resource_path, "colour": PLAYER_COLOUR})
+		var human := human_slots.find(slot)
+		var racer := {"car": car, "is_player": human >= 0, "player": human + 1}
+		if human >= 0:
+			var who: Dictionary = humans[human]
+			car.setup = who["setup"]
+			car.body_texture = Paint.body(who["setup"], who.get("paint", Paint.ORIGINAL))
+			racer.merge({"name": who.get("name", "YOU"), "body": car.body_texture.resource_path,
+				"colour": who.get("colour", PLAYER_COLOUR)})
 			if autopilot:
 				racer["driver"] = _ai(car, track, 1.0, 0.0)
 			else:
@@ -38,13 +44,19 @@ func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: 
 				input.name = "PlayerInput"
 				input.set_script(PLAYER_INPUT)
 				input.track = track  # for steering help
+				input.action_prefix = who.get("action_prefix", "")
 				car.add_child(input)
 			car.add_child(_camera_rig())
 			var marker := Node2D.new()
 			marker.name = "PlayerMarker"
 			marker.set_script(PLAYER_MARKER)
+			if humans.size() > 1:
+				marker.fill = racer["colour"]
 			car.add_child(marker)
 		else:
+			if not with_ai or opponent >= config.opponent_setups.size():
+				car.free()
+				continue
 			var setup: DriftSetup = config.opponent_setups[opponent]
 			car.setup = setup
 			var body := Paint.body(setup, config.opponent_paints[opponent])
@@ -62,6 +74,16 @@ func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: 
 		car.reset_physics_interpolation()
 		racers.append(racer)
 	return racers
+
+
+## Grid slots (0-based) for the players: the track's player slot, and for a second player
+## the slot beside it in the same row (the grid is two wide), so neither starts ahead.
+static func _human_slots(first: int, count: int, slots: int) -> Array[int]:
+	var out: Array[int] = [clampi(first, 0, slots - 1)]
+	if count > 1:
+		var beside := out[0] + 1 if out[0] % 2 == 0 else out[0] - 1
+		out.append(beside if beside < slots else out[0] - 1)
+	return out
 
 
 func _ai(car: Car, track: Track, skill: float, lane: float) -> AIDriver:

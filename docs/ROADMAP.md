@@ -136,7 +136,21 @@ sheets.
 
 ---
 
-## Phase 15 — Two players, split screen
+## Phase 15 — Two players, split screen ✅ done
+
+Built as planned (DESIGN.md §15): a join screen where each player claims a device by pressing
+it, per-player actions, two SubViewports sharing one world, a HUD per half and one minimap,
+rubber-banding to the slower player, both players paid into the family garage. Changes:
+
+- **Opponents ON/OFF is on the join screen** (O / Y), not a setting.
+- **The race waits at most 30 s** for the second player after the first finishes; a finished
+  player's car is driven on by the AI so it never blocks the other.
+- **No cups for two players** — they are one child's progress.
+- **Each HUD is mirrored** about the middle so the shared minimap has room at the bottom.
+- **No particle cut per view**: the split race runs at 100 fps (vsync-limited) here; the
+  release-machine check moves to Phase 17.
+
+### Plan as written
 
 The most social feature: a child racing a parent on the same screen.
 
@@ -199,8 +213,6 @@ Not planned, but worth keeping in mind:
 
 ## Open questions
 
-1. Is two-player split screen wanted early (it changes how HUD and cameras are built), or is the
-   order above right?
-2. Should the Phase 10 roster be the six proposed cars, or does Vicky have favourites to include
+1. Should the Phase 10 roster be the six proposed cars, or does Vicky have favourites to include
    (a specific animal, colour, vehicle)?
-3. Should cups unlock by finishing (current proposal) or by placing third or better?
+2. Should cups unlock by finishing (current proposal) or by placing third or better?

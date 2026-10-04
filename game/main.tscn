@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://game/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://game/managers/garage_manager.gd" id="2_garage"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://game/managers/music_manager.gd" id="7_music"]
 [ext_resource type="Script" path="res://game/managers/sticker_manager.gd" id="8_stickers"]
 [ext_resource type="Script" path="res://ui/stickers/sticker_popup.gd" id="9_popup"]
+[ext_resource type="Script" path="res://game/managers/players_manager.gd" id="10_players"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_main")
@@ -23,6 +24,9 @@ script = ExtResource("6_cup")
 [node name="StickerManager" type="Node" parent="."]
 script = ExtResource("8_stickers")
 economy = ExtResource("3_economy")
+
+[node name="PlayersManager" type="Node" parent="."]
+script = ExtResource("10_players")
 
 [node name="SettingsManager" type="Node" parent="."]
 script = ExtResource("5_settings")

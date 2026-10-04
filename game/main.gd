@@ -1,6 +1,6 @@
 extends Node
 ## The persistent shell: loaded once and never unloaded. Holds GarageManager, CupManager,
-## StickerManager, SettingsManager, SoundManager and MusicManager, which must survive screen
+## StickerManager, PlayersManager, SettingsManager, SoundManager and MusicManager, which must survive screen
 ## changes, and the StickerPopup over every screen; swaps screens in and out of ScreenSlot
 ## when anything emits EventSystem.UI_screen_requested.
 ##
@@ -25,6 +25,7 @@ const SCREENS := {
 	&"standings": preload("res://ui/cup/standings.tscn"),
 	&"podium": preload("res://ui/cup/podium.tscn"),
 	&"shelf": preload("res://ui/shelf/shelf_screen.tscn"),
+	&"join": preload("res://ui/join/join_screen.tscn"),
 }
 const FIRST_SCREEN := &"title"
 

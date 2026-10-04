@@ -24,6 +24,9 @@ const STEER_DEADZONE := 0.15
 ## Lanes kept by the help stay this far inside the road edge, px.
 const EDGE_MARGIN := 80.0
 
+## "" reads the shared actions (one player: every key and gamepad drives); "p1_" / "p2_"
+## reads one player's own actions in a two-player race (PlayersManager binds them).
+var action_prefix := ""
 var auto_accelerate := false
 var steering_help := false
 ## Set by the RacerSpawner; steering help does nothing without a track.
@@ -48,9 +51,9 @@ func _on_settings_changed(settings: Dictionary) -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	var steer := Input.get_axis("steer_left", "steer_right")
-	var accelerate := Input.get_action_strength("accelerate")
-	var brake := Input.get_action_strength("brake")
+	var steer := Input.get_axis(_action(&"steer_left"), _action(&"steer_right"))
+	var accelerate := Input.get_action_strength(_action(&"accelerate"))
+	var brake := Input.get_action_strength(_action(&"brake"))
 	if auto_accelerate and brake < 0.1 and accelerate < 0.1:
 		var cruise := AUTO_GO_PACE * car.config.max_speed * car.surface_speed()
 		accelerate = 1.0 if car.forward_speed() < cruise else 0.0
@@ -58,9 +61,13 @@ func _physics_process(_delta: float) -> void:
 		steer = _helped(steer)
 	car.steer_input = steer
 	car.throttle_input = accelerate - brake
-	car.handbrake = Input.is_action_pressed("handbrake")
-	if Input.is_action_just_pressed("horn"):
+	car.handbrake = Input.is_action_pressed(_action(&"handbrake"))
+	if Input.is_action_just_pressed(_action(&"horn")):
 		EventSystem.CAR_horn.emit(car)
+
+
+func _action(action: StringName) -> StringName:
+	return action if action_prefix.is_empty() else StringName(action_prefix + action)
 
 
 func _helped(steer: float) -> float:

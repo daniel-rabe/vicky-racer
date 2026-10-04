@@ -51,6 +51,17 @@ signal CUP_progress_changed(progress: Dictionary)
 ## trophy: &"gold", &"silver", &"bronze" or &"ribbon".
 signal CUP_finished(cup_id: StringName, standings: Array, trophy: StringName)
 
+# Players: one or two (PlayersManager). Ask with PLY_state_requested, get the whole state
+## ({two_player, players, opponents}) on PLY_state_changed.
+signal PLY_state_requested
+signal PLY_state_changed(state: Dictionary)
+## Start a two-player game with nobody joined yet (the title's 2 PLAYERS).
+signal PLY_two_player_requested
+## device: {"kind": &"keys_left" | &"keys_right" | &"pad", "pad": id}; the next free player takes it.
+signal PLY_join_requested(device: Dictionary, setup_id: StringName)
+signal PLY_car_requested(player_index: int, setup_id: StringName)
+signal PLY_opponents_requested(on: bool)
+
 # Screens
 signal UI_show_message(text: String, duration: float)
 signal UI_screen_requested(screen_name: StringName)

@@ -3,7 +3,8 @@ extends Control
 ## last track raced focused) and, below, the cups (§12). A cup opens when the one before it
 ## has been won; the cup in progress offers CONTINUE. A locked card shakes and says which track to finish first. Choosing
 ## a track goes through EventSystem (PRO_track_select_requested), then straight to the race.
-## B / Escape goes back to the garage.
+## B / Escape goes back to the garage. In a two-player game (§15) there are no cups — they
+## belong to the one player's progress — and B goes back to the join screen.
 
 const HINTS_KEYBOARD := "ENTER RACE    ESC BACK"
 const HINTS_GAMEPAD := "A RACE    B BACK"
@@ -11,6 +12,7 @@ const HINTS_GAMEPAD := "A RACE    B BACK"
 var _cards := {}  # track id -> TrackCard
 var _cup_cards := {}  # cup id -> CupCard
 var _cup := {}
+var _two_player := false
 
 @onready var _row: HBoxContainer = %Cards
 @onready var _cups_row: HBoxContainer = %Cups
@@ -22,6 +24,7 @@ func _enter_tree() -> void:
 	EventSystem.PRO_state_changed.connect(_on_state_changed)
 	EventSystem.PRO_track_locked.connect(_on_locked)
 	EventSystem.CUP_state_changed.connect(func(state: Dictionary) -> void: _cup = state)
+	EventSystem.PLY_state_changed.connect(func(state: Dictionary) -> void: _two_player = state["two_player"])
 
 
 func _ready() -> void:
@@ -29,7 +32,12 @@ func _ready() -> void:
 	_hints.text = HINTS_KEYBOARD
 	EventSystem.PRO_state_requested.emit()
 	EventSystem.CUP_state_requested.emit()
-	_build_cups()
+	EventSystem.PLY_state_requested.emit()
+	if _two_player:
+		_cups_row.visible = false
+		$CupsTitle.visible = false
+	else:
+		_build_cups()
 
 
 func _on_state_changed(state: Dictionary) -> void:
@@ -109,5 +117,5 @@ func _input(event: InputEvent) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
-		EventSystem.UI_screen_requested.emit(&"garage")
+		EventSystem.UI_screen_requested.emit(&"join" if _two_player else &"garage")
 		get_viewport().set_input_as_handled()

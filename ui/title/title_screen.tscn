@@ -82,9 +82,9 @@ anchor_right = 0.5
 offset_left = -200.0
 offset_top = 520.0
 offset_right = 200.0
-offset_bottom = 870.0
+offset_bottom = 930.0
 grow_horizontal = 2
-theme_override_constants/separation = 30
+theme_override_constants/separation = 20
 
 [node name="Play" type="Button" parent="UI/Root/Menu"]
 unique_name_in_owner = true
@@ -94,16 +94,23 @@ theme_type_variation = &"RaceButton"
 theme_override_font_sizes/font_size = 48
 text = "PLAY"
 
+[node name="TwoPlayers" type="Button" parent="UI/Root/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+theme_type_variation = &"NavButton"
+text = "2 PLAYERS"
+
 [node name="Settings" type="Button" parent="UI/Root/Menu"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 90)
+custom_minimum_size = Vector2(400, 80)
 layout_mode = 2
 theme_type_variation = &"NavButton"
 text = "SETTINGS"
 
 [node name="Quit" type="Button" parent="UI/Root/Menu"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 90)
+custom_minimum_size = Vector2(400, 80)
 layout_mode = 2
 theme_type_variation = &"NavButton"
 text = "QUIT"
@@ -134,9 +141,9 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -400.0
-offset_top = -140.0
+offset_top = -96.0
 offset_right = 400.0
-offset_bottom = -100.0
+offset_bottom = -56.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_outline_color = Color(0.055, 0.078, 0.11, 1)

@@ -6,12 +6,19 @@ extends Node
 ##
 ## The race ends when the *player* finishes. Opponents still racing get a time estimated
 ## from their progress, so a child never waits on a race that is already over for them.
+## With two players it ends when both have finished — or LAST_PLAYER_WAIT seconds after the
+## first did, so the winner is never kept waiting long; the other gets an estimated time,
+## like an opponent. The AI is rubber-banded to whichever player is further behind.
 
 signal race_over
+## A player has crossed the line for the last time (two players: the race goes on).
+signal player_finished(racer: Dictionary)
 
 const COUNTDOWN_FROM := 3
 ## After the player crosses the line, the race keeps running this long before results.
 const FINISH_HOLD_SECONDS := 2.5
+## Two players: once the first has finished, the other has this long to finish too.
+const LAST_PLAYER_WAIT := 30.0
 
 var track: Track
 var config: TrackConfig
@@ -23,7 +30,8 @@ var running := false
 var race_time := 0.0
 
 var _finish_offset := 0.0
-var _player: Dictionary
+var _players: Array[Dictionary] = []
+var _final_lap_announced := false
 var _order: Array[Dictionary] = []
 var _ended := false
 
@@ -39,7 +47,7 @@ func start(race_track: Track, race_config: TrackConfig, race_racers: Array[Dicti
 		r.merge({"laps": 0, "crossed_start": false, "checkpoint": false, "lap_start": 0.0,
 			"best_lap": 0.0, "finished": false, "finish_time": 0.0, "progress": 0.0})
 		if r["is_player"]:
-			_player = r
+			_players.append(r)
 	track.finish_crossed.connect(_on_finish_crossed)
 	track.checkpoint_crossed.connect(func(car: Car) -> void: _racer(car)["checkpoint"] = true)
 	_update_positions()
@@ -88,13 +96,18 @@ func _on_finish_crossed(car: Car) -> void:
 	r["lap_start"] = race_time
 	r["best_lap"] = lap_time if r["best_lap"] == 0.0 else minf(r["best_lap"], lap_time)
 	EventSystem.RAC_lap_completed.emit(car, r["laps"], lap_time)
-	if r == _player and r["laps"] == config.laps - 1:
+	if r["is_player"] and r["laps"] == config.laps - 1 and not _final_lap_announced:
+		_final_lap_announced = true  # once, for whichever player gets there first
 		EventSystem.RAC_final_lap_started.emit()
 	if r["laps"] >= config.laps:
 		r["finished"] = true
 		r["finish_time"] = race_time
-		if r == _player:
-			_finish_race()
+		if r["is_player"]:
+			player_finished.emit(r)
+			if _players.all(func(p: Dictionary) -> bool: return p["finished"]):
+				_finish_race()
+			else:
+				_wait_for_last_player()
 
 
 ## Progress in px from the start of the race: negative while still behind the line on the grid.
@@ -125,18 +138,30 @@ func _update_positions() -> void:
 	_order.assign(order)
 	if changed:
 		EventSystem.RAC_positions_updated.emit(_order.map(func(r: Dictionary) -> Dictionary:
-			return {"name": r["name"], "is_player": r["is_player"], "colour": r["colour"],
+			return {"name": r["name"], "is_player": r["is_player"], "player": r.get("player", 0), "colour": r["colour"],
 				"position": _order.find(r) + 1, "lap": r["laps"]}))
 
 
 func _rubber_band() -> void:
+	# Band to the player furthest behind who is still racing, so nobody is left alone.
+	var behind := INF
+	for p in _players:
+		if not p["finished"]:
+			behind = minf(behind, p["progress"])
+	if behind == INF:
+		return
 	for r in racers:
 		if r.has("driver") and not r["is_player"]:
 			var d := difficulty
 			var wanted: float = minf(0.0, (r["driver"].skill - d.band_centre_skill) * d.hang_back_per_skill)
-			var gap: float = r["progress"] - _player["progress"] - wanted
+			var gap: float = r["progress"] - behind - wanted
 			var t := clampf(gap / d.band_distance, -1.0, 1.0)
 			r["driver"].rubber_band = lerpf(1.0, d.ease_off, t) if t > 0.0 else lerpf(1.0, d.push, -t)
+
+
+func _wait_for_last_player() -> void:
+	await get_tree().create_timer(LAST_PLAYER_WAIT, false).timeout
+	_finish_race()
 
 
 func position_of(r: Dictionary) -> int:
@@ -156,12 +181,12 @@ func _finish_race() -> void:
 	for i in _order.size():
 		var r: Dictionary = _order[i]
 		results.append({"name": r["name"], "body": r["body"], "is_player": r["is_player"],
-			"position": i + 1, "time": r["finish_time"], "best_lap": r["best_lap"]})
+			"player": r.get("player", 0), "position": i + 1, "time": r["finish_time"], "best_lap": r["best_lap"]})
 	EventSystem.RAC_race_finished.emit(results, config.track_id)
 	race_over.emit()
 
 
-## Opponents still racing when the player finished get an estimated time: their average
+## Racers still going when the race ends (opponents, or a second player) get an estimated time: their average
 ## pace so far, carried over the distance they still had to go. Order follows those times.
 func _update_positions_final() -> void:
 	var total := config.laps * track.lap_length()

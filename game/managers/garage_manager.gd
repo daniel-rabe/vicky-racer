@@ -136,22 +136,30 @@ func _on_cup_finished(cup_id: StringName, _standings: Array, trophy: StringName)
 	_commit()
 
 
+## Pays for a race. With two players both places are paid into the one family garage
+## ("place_p1", "place_p2" in the breakdown) — racing together still moves the save on —
+## and a new track's bonus is paid once.
 func _on_race_finished(results: Array, track_id: StringName) -> void:
-	var player: Dictionary = {}
-	for entry: Dictionary in results:
-		if entry.get("is_player", false):
-			player = entry
-	if player.is_empty():
+	var players := results.filter(func(entry: Dictionary) -> bool: return entry.get("is_player", false))
+	if players.is_empty():
 		return
 	var first_finish := track_id not in profile.completed_tracks
-	var breakdown := economy.payout(int(player["position"]), first_finish)
+	var breakdown := {}
+	var best := 0.0
+	for entry: Dictionary in players:
+		var key := "place" if players.size() == 1 else "place_p%d" % int(entry.get("player", 1))
+		breakdown[key] = economy.payout(int(entry["position"]), false)["place"]
+		var lap := float(entry.get("best_lap", 0.0))
+		if lap > 0.0 and (best == 0.0 or lap < best):
+			best = lap
+	if first_finish:
+		breakdown["first_finish"] = economy.first_finish_bonus
 	var amount := 0
 	for line in breakdown.values():
 		amount += int(line)
 	profile.coins += amount
 	if first_finish:
 		profile.completed_tracks.append(track_id)
-	var best := float(player.get("best_lap", 0.0))
 	var new_best: bool = best > 0.0 and (not profile.best_laps.has(track_id) or best < float(profile.best_laps[track_id]))
 	if new_best:
 		profile.best_laps[track_id] = best

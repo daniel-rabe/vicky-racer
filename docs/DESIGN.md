@@ -280,6 +280,7 @@ single autoload (`EventSystem`) and declares every cross-system signal. Managers
 | `CAR_` | Car | `drift_started(car)`, `drift_ended(car, duration)`, `surface_changed(car, surface)`, `wall_hit(car, impact_speed)` |
 | `PRO_` | Progression | `state_requested()`, `state_changed(state)`, `buy_requested(id)`, `equip_requested(id)`, `coins_changed(total)`, `coins_awarded(amount, breakdown)`, `setup_purchased(id)`, `setup_equipped(id)`, `purchase_refused(id, reason)`, `sticker_earned(id)` |
 | `CUP_` | Cups | `state_requested()`, `state_changed(state)`, `start_requested(id)`, `continue_requested()`, `progress_changed(progress)`, `finished(id, standings, trophy)` |
+| `PLY_` | Players | `state_requested()`, `state_changed(state)`, `two_player_requested()`, `join_requested(device, setup_id)`, `car_requested(index, setup_id)`, `opponents_requested(on)` |
 | `UI_` | Screens | `show_message(text, duration)`, `screen_requested(name)`, `settings_requested()`, `settings_changed(settings)`, `setting_change_requested(key, value)`, `music_requested(piece)` |
 
 Screens never reach into managers. Following Vicky's Game's inventory pattern, a screen emits
@@ -699,6 +700,7 @@ them all out ([`mockups/candidates/paint_shop.png`](mockups/candidates/paint_sho
 | Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, cards in pages of 3 × 2 (Q / E or the shoulder buttons, or moving off the edge of a page, turns it; `< 1 / 2 >` above the cards), preview with Grip / Slide / Speed bars and, for owned cars, paint swatches. Built: [`screenshots/garage.png`](screenshots/garage.png) |
 | Pick a race | Four track cards (§7.6) and two cup cards (§12). ← → ↑ ↓ choose, A races, B back to the garage. Built: [`screenshots/pick_a_race.png`](screenshots/pick_a_race.png) |
 | Standings, podium | §12 |
+| Two players | §15 — 2 PLAYERS on the title: the join screen, then PICK A RACE and a split-screen race. Built: [`screenshots/join.png`](screenshots/join.png), [`screenshots/split_screen.png`](screenshots/split_screen.png) |
 | Trophy shelf | §14 — the trophy button right of PLAY on the title. Built: [`screenshots/shelf.png`](screenshots/shelf.png) |
 | Results | [`mockups/results_layout.png`](mockups/results_layout.png) — finishing order, payout count-up, Race Again. Built: [`screenshots/results.png`](screenshots/results.png) |
 
@@ -959,7 +961,59 @@ the player and only in a race, exactly once, kept across closing the game; both 
 with a real car's physics; a real race earning stickers; the popup queue; and the shelf from the
 title showing exactly what was earned.
 
-## 15. Out of scope for v1
+## 15. Two players, split screen
 
-Split screen, time trial, ghosts and the rest of Phases 15–17 are planned in
+Racing with a parent or sibling on the same sofa. **2 PLAYERS** on the title opens the join
+screen ([`screenshots/join.png`](screenshots/join.png)):
+
+- **Joining by pressing.** Each player claims a device by pressing its button: **A** on a gamepad,
+  **SPACE** for the left half of the keyboard (W A S D, Space drifts, E horn), **ENTER** for the
+  right half (the arrows, Right Ctrl or Numpad 0 drifts, Right Shift horn). The first to press is
+  player 1 (red), the second player 2 (purple). Any mix works: two gamepads, a gamepad and a
+  keyboard half, or one keyboard shared.
+- **Cars.** Each player picks from the cars the garage owns with their own left / right; player 1
+  starts in the equipped car, player 2 in the next one owned, so the two look different. Each car
+  wears its saved paint.
+- **O / Y** switches the AI opponents off (two players alone) and on (two players and two AI).
+- Pressing the join button again goes to PICK A RACE — tracks only: the cups are one child's
+  progress. B goes back to the join screen, and B there (or any return to the title) ends the
+  two-player game.
+
+**[`PlayersManager`](../game/managers/players_manager.gd)** (in the shell, `PLY_` signals) holds
+who plays on what, and binds each player's own actions — `p1_accelerate`, `p2_steer_left`, … — to
+their device alone; [`PlayerInput`](../actors/car/player_input.gd) reads them through its
+`action_prefix`. A one-player game keeps the shared actions, where every key and pad drives.
+
+**The split** ([`screenshots/split_screen.png`](screenshots/split_screen.png)): two `SubViewport`s
+side by side, left for player 1. The world — track, skid marks, cars — lives in the left one; the
+right one shares its `World2D`, so it is one world seen by two cameras (player 2's chase camera
+draws into the right view through `Camera2D.custom_viewport`). Each half has its player's HUD,
+laid out mirrored about the middle — place on the outside edge, lap inside, speed bar in the
+outside corner — with the timer left out, and one minimap sits between them at the bottom. Car
+sounds are heard from player 1's view.
+
+**The race:**
+
+| Rule | Why |
+| --- | --- |
+| The players start side by side on the same grid row | neither starts ahead |
+| The AI is rubber-banded to the player further behind | nobody is left racing alone |
+| A player who finishes is driven on by the AI at an easy pace | their car never blocks the other |
+| The race ends when both have finished, or 30 s after the first did (`LAST_PLAYER_WAIT`) | the winner is never kept waiting; the other gets an estimated time, like an opponent |
+| Both places are paid into the one garage, each on its own line; a new track's bonus once | racing together still moves the family save on |
+| The results name the better player: P1 WON! / P2 CAME 2ND! | always cheerful, as for one player |
+
+Stickers can be earned by either player. **Performance:** on the development machine the split
+race runs at the monitor's 100 fps (vsync), so there is no particle cut per view yet; a check on
+the release machine belongs to Phase 17.
+
+Checked by [`tests/two_player_test.gd`](../tests/two_player_test.gd): joining (a device once,
+no third player, each action answering its own device only, the title ending it), the join
+screen driven by key and pad events, a whole split race on autopilot (two views sharing one
+world, a HUD each showing its own player's place, both players in the results and paid), and a
+race with no opponents.
+
+## 16. Out of scope for v1
+
+Time trial, ghosts and the rest of Phases 16–17 are planned in
 [`ROADMAP.md`](ROADMAP.md). Touch controls remain out of scope.

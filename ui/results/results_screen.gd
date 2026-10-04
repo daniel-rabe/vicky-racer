@@ -2,11 +2,14 @@ extends Control
 ## End of race (docs/mockups/results_layout): the finishing order slides in row by row,
 ## then the coin payout lines appear and the total counts up. Only then do GARAGE and
 ## RACE AGAIN become usable, with RACE AGAIN focused. The headline is always cheerful.
+## With two players both rows are highlighted, each player's place is paid on its own line,
+## and the headline names the better of the two.
 
 const ROW_INTERVAL := 0.15
 const COUNT_UP_SECONDS := 1.2
 const ORDINALS := {1: "1ST", 2: "2ND", 3: "3RD", 4: "4TH"}
-const BREAKDOWN_LABELS := {"place": "%s PLACE", "first_finish": "FIRST FINISH"}
+const BREAKDOWN_LABELS := {"place": "%s PLACE", "place_p1": "P1  %s PLACE", "place_p2": "P2  %s PLACE",
+	"first_finish": "FIRST FINISH"}
 const YELLOW := Color(1, 0.824, 0.247)
 const DIM := Color(0.624, 0.69, 0.769)
 const COIN := preload("res://art/sfx/coin.wav")
@@ -50,10 +53,19 @@ func _ready() -> void:
 
 func _play(race: Dictionary) -> void:
 	var player_position := 0
+	var positions := {}  # player number -> place
+	var best := {}
 	for entry: Dictionary in race["results"]:
 		if entry["is_player"]:
-			player_position = entry["position"]
-	_headline.text = "YOU WON!" if player_position == 1 else "YOU CAME %s!" % ORDINALS.get(player_position, "")
+			positions[int(entry.get("player", 1))] = entry["position"]
+			if best.is_empty():
+				best = entry  # results are in finishing order: the first player found did best
+	player_position = best.get("position", 0)
+	if positions.size() > 1:
+		_headline.text = "%s WON!" % best["name"] if player_position == 1 \
+			else "%s CAME %s!" % [best["name"], ORDINALS.get(player_position, "")]
+	else:
+		_headline.text = "YOU WON!" if player_position == 1 else "YOU CAME %s!" % ORDINALS.get(player_position, "")
 	_total.text = "+0"
 	_balance.text = "TOTAL %d" % (int(_state["coins"]) - int(race["amount"]))
 
@@ -65,7 +77,9 @@ func _play(race: Dictionary) -> void:
 		tween.tween_property(row, "modulate:a", 1.0, ROW_INTERVAL)
 	tween.tween_interval(0.3)
 	for key: String in race["breakdown"]:
-		var line := _make_line(key, int(race["breakdown"][key]), player_position)
+		var place: int = positions.get(key.get_slice("_p", 1).to_int(), player_position) if key.begins_with("place_p") \
+			else player_position
+		var line := _make_line(key, int(race["breakdown"][key]), place)
 		line.modulate.a = 0.0
 		_lines.add_child(line)
 		tween.tween_property(line, "modulate:a", 1.0, 0.2)

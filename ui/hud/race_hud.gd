@@ -3,12 +3,20 @@ extends CanvasLayer
 ## minimap, the 3-2-1-GO countdown and the FINISH! banner. Race state arrives over the
 ## RAC_ signals; the speed bar and minimap read the cars handed over in setup(), because
 ## they need every frame what no signal should carry 60 times a second.
+##
+## In a two-player race each player has a HUD of their own in their half of the screen
+## (`split`): the timer and the minimap make way — one minimap is shared between the halves
+## (docs/DESIGN.md §15) — and the panels are laid out mirrored about the middle: place on
+## the outside edge, lap on the inside, the speed bar in the outside bottom corner, so the
+## bottom middle is free for the shared minimap.
 
 const SUFFIX := {1: "ST", 2: "ND", 3: "RD", 4: "TH"}
 const GO_COLOUR := Color(0.18, 0.769, 0.42)
 const COUNT_COLOUR := Color(1, 0.824, 0.247)
 
 var _player_car: Car
+## Which player this HUD follows: 1 or 2, or 0 for "the" player of a one-player race.
+var _player_number := 0
 var _racer_count := 4
 var _laps := 3
 var _player_laps := 0
@@ -41,15 +49,43 @@ func _ready() -> void:
 	_banner.visible = false
 
 
-func setup(track: Track, racers: Array[Dictionary], laps: int) -> void:
+func setup(track: Track, racers: Array[Dictionary], laps: int, player_number := 0, split := false) -> void:
 	_laps = laps
+	_player_number = player_number
 	_racer_count = racers.size()
 	_of.text = "/%d" % _racer_count
 	for r in racers:
-		if r["is_player"]:
+		if r["is_player"] and (player_number == 0 or r.get("player", 0) == player_number):
 			_player_car = r["car"]
-	_minimap.setup(track, racers)
+	if split:
+		$Root/MinimapPanel.visible = false
+		$Root/TimerPanel.visible = false
+		var right_half := player_number == 2
+		_pin($Root/LapPanel, not right_half)
+		if right_half:
+			_pin($Root/PositionPanel, true)
+			var speed: Control = $Root/SpeedPanel
+			var width := speed.size.x
+			speed.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+			speed.offset_left = -48.0 - width
+			speed.offset_right = -48.0
+			speed.offset_top = -148.0
+			speed.offset_bottom = -48.0
+	else:
+		_minimap.setup(track, racers)
 	_update_lap_label()
+
+
+## Pin a top panel 48 px in from the left or right edge, keeping its size.
+static func _pin(panel: Control, right: bool) -> void:
+	var width := panel.size.x
+	var top := panel.offset_top
+	var height := panel.offset_bottom - panel.offset_top
+	panel.set_anchors_preset(Control.PRESET_TOP_RIGHT if right else Control.PRESET_TOP_LEFT)
+	panel.offset_left = -48.0 - width if right else 48.0
+	panel.offset_right = -48.0 if right else 48.0 + width
+	panel.offset_top = top
+	panel.offset_bottom = top + height
 
 
 func _physics_process(delta: float) -> void:
@@ -99,7 +135,7 @@ func _on_lap_completed(car: Node, lap: int, lap_time: float) -> void:
 
 func _on_positions_updated(order: Array) -> void:
 	for entry: Dictionary in order:
-		if entry["is_player"]:
+		if entry["is_player"] and (_player_number == 0 or entry.get("player", 0) == _player_number):
 			_position.text = str(entry["position"])
 			_suffix.text = SUFFIX.get(entry["position"], "TH")
 

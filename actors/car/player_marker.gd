@@ -8,8 +8,10 @@ extends Node2D
 
 const HEIGHT := 78.0          # px above the car's centre
 const SIZE := Vector2(34, 26)  # arrow width, height
-const FILL := Color.WHITE
 const OUTLINE := Color(0.055, 0.078, 0.11)
+
+## White for one player; in a two-player race, each player's own colour.
+var fill := Color.WHITE
 
 @onready var car: Car = get_parent()
 
@@ -32,6 +34,6 @@ func _place() -> void:
 func _draw() -> void:
 	var points := PackedVector2Array([Vector2(-SIZE.x / 2.0, -SIZE.y / 2.0),
 		Vector2(SIZE.x / 2.0, -SIZE.y / 2.0), Vector2(0.0, SIZE.y / 2.0)])
-	draw_colored_polygon(points, FILL)
+	draw_colored_polygon(points, fill)
 	points.append(points[0])
 	draw_polyline(points, OUTLINE, 4.0, true)
