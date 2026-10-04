@@ -372,41 +372,83 @@ def cmd_listen(args) -> None:
                 y = np.concatenate([y, y[r["offset"]:r["offset"] + 8 * RATE]])
             name = f"{piece['id']}_{seed}.mp3"
             write_compressed(out / name, y, format="MP3", compression_level=0.45)
-            seam = "" if r["offset"] is None else f" · the seam is at {(len(r['audio'])) / RATE:.0f}s"
-            pick = " <b>← in the game</b>" if piece.get("seed") == seed else ""
-            rows.append(f'<li><span>seed {seed}{pick}<small>{r["summary"]}{seam}</small></span>'
-                        f'<audio controls preload="none" src="{name}"></audio></li>')
-        sections.append(f"<section><h2>{piece['id']} <small>{piece['use']}</small></h2>"
-                        f"<p>{piece['prompt']}</p><ul>{''.join(rows)}</ul></section>")
+            seam = "" if r["offset"] is None else f" · jumps back at {len(r['audio']) / RATE:.0f} s"
+            picked = piece.get("seed") == seed
+            command = f"python tools/comfy/generate_music.py pick {piece['id']} {seed}"
+            rows.append(
+                f'<li class="{"picked" if picked else ""}"><div class="who"><span class="seed">SEED {seed}</span>'
+                f'{"<span class=chip>IN THE GAME</span>" if picked else ""}'
+                f'<small>{r["summary"]}{seam}</small></div>'
+                f'<audio controls preload="none" src="{name}"></audio>'
+                f'<button type="button" data-cmd="{command}" title="{command}">Copy pick</button></li>')
+        sections.append(f'<section><h2>{piece["id"].replace("_", " ").upper()}</h2>'
+                        f'<p class="use">{piece["use"]}</p><p class="prompt">{piece["prompt"]}</p>'
+                        f'<ul>{"".join(rows)}</ul></section>')
     (out / "index.html").write_text(LISTEN_PAGE.replace("{sections}", "\n".join(sections)), encoding="utf-8")
     print(f"{(out / 'index.html').relative_to(ROOT)}")
 
 
-LISTEN_PAGE = """<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vicky Racer Music</title>
+# Written to the claude.ai artifact contract (no document skeleton: it is added on publish),
+# so the same page can be shared; opened locally it still works.
+LISTEN_PAGE = """<title>Vicky Racer Music</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Nunito:wght@400;600;800&display=swap">
 <style>
-:root { --bg: #f6f3ec; --card: #fff; --ink: #1d2430; --dim: #5d6673; --accent: #d9481e; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #14181f; --card: #1e242d; --ink: #e9edf2; --dim: #9aa4b1; --accent: #ff8a5c; } }
-:root[data-theme="dark"] { --bg: #14181f; --card: #1e242d; --ink: #e9edf2; --dim: #9aa4b1; --accent: #ff8a5c; }
-body { margin: 0; padding: 24px 16px; background: var(--bg); color: var(--ink); font: 16px/1.45 system-ui, sans-serif; }
-main { max-width: 860px; margin: 0 auto; }
-h1 { margin: 0 0 4px; } h2 { margin: 0 0 4px; } h2 small { color: var(--dim); font-weight: 400; font-size: 15px; }
-section { background: var(--card); border-radius: 12px; padding: 16px; margin: 16px 0; }
-section > p { color: var(--dim); font-size: 14px; margin: 0 0 8px; }
-ul { list-style: none; padding: 0; margin: 0; }
-li { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; padding: 8px 0; border-top: 1px solid color-mix(in srgb, var(--dim) 25%, transparent); }
-li span { flex: 1 1 260px; } li small { display: block; color: var(--dim); font-size: 13px; }
-li b { color: var(--accent); }
-audio { width: min(100%, 340px); }
-code { background: color-mix(in srgb, var(--dim) 18%, transparent); padding: 1px 5px; border-radius: 4px; }
-</style></head><body><main>
-<h1>Vicky Racer music</h1>
-<p>Every candidate as the game would play it: the lead-in, one loop, then the jump back to the loop start
-and 8 more seconds, so the seam can be heard. To swap one: <code>python tools/comfy/generate_music.py pick &lt;piece&gt; &lt;seed&gt;</code>,
-then <code>build</code>.</p>
+/* The game's own menus: dark navy panels, yellow focus, pixel headings. Dark-first. */
+:root {
+  --bg: #0e1520; --panel: #1b2636; --line: #2c3a4f; --ink: #eef2f7; --dim: #9fb0c4; --yellow: #ffd23f; --blue: #3b8bff;
+  --pixel: "Silkscreen", "Courier New", monospace; --body: "Nunito", system-ui, sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #e9eef5; --panel: #ffffff; --line: #d3dbe6; --ink: #142031; --dim: #55667c; --yellow: #b8860b; --blue: #1f6fe0; color-scheme: light; } }
+:root[data-theme="light"] { --bg: #e9eef5; --panel: #ffffff; --line: #d3dbe6; --ink: #142031; --dim: #55667c; --yellow: #b8860b; --blue: #1f6fe0; color-scheme: light; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); }
+main { max-width: 900px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 48px; display: grid; gap: 20px; }
+h1 { font: 700 clamp(28px, 6vw, 44px)/1.1 var(--pixel); letter-spacing: 0.04em; margin: 0; text-wrap: balance; }
+.intro { color: var(--dim); max-width: 65ch; margin: 0; }
+.intro code { color: var(--ink); background: var(--line); padding: 1px 6px; border-radius: 4px; font-size: 14px; overflow-wrap: anywhere; }
+section { background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 6px; min-width: 0; }
+h2 { font: 700 22px/1.2 var(--pixel); letter-spacing: 0.05em; margin: 0; }
+.use { margin: 0; color: var(--yellow); font-weight: 800; }
+.prompt { margin: 0 0 6px; color: var(--dim); font-size: 14px; max-width: 75ch; }
+ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 320px) auto; gap: 8px 14px; align-items: center;
+  padding: 10px 12px; border: 2px solid var(--line); border-radius: 12px; }
+li.picked { border-color: var(--yellow); }
+.who { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; }
+.seed { font: 700 15px var(--pixel); letter-spacing: 0.05em; }
+.chip { font: 700 11px var(--pixel); letter-spacing: 0.08em; color: var(--bg); background: var(--yellow); padding: 2px 7px; border-radius: 999px; }
+.who small { flex-basis: 100%; color: var(--dim); font-size: 13px; font-variant-numeric: tabular-nums; }
+audio { width: 100%; }
+button { font: 700 14px var(--body); color: #fff; background: var(--blue); border: 0; border-radius: 999px; padding: 8px 14px; cursor: pointer; white-space: nowrap; }
+button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+@media (max-width: 640px) { li { grid-template-columns: minmax(0, 1fr); } button { justify-self: start; } }
+</style>
+<main>
+<h1>VICKY RACER MUSIC</h1>
+<p class="intro">Each candidate plays as the game plays it: the lead-in, one full loop, then the jump back to the loop
+start and 8 more seconds, so you can hear the seam. The yellow one is in the game now. To swap a piece, copy its
+pick command, run it, then run <code>python tools/comfy/generate_music.py build</code>.</p>
 {sections}
-</main></body></html>
+</main>
+<script>
+document.addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-cmd]");
+  if (!button) return;
+  const label = button.textContent;
+  try {
+    await navigator.clipboard.writeText(button.dataset.cmd);
+    button.textContent = "Copied";
+  } catch {
+    button.textContent = button.dataset.cmd;
+  }
+  setTimeout(() => { button.textContent = label; }, 1800);
+});
+document.addEventListener("play", (event) => {
+  for (const audio of document.querySelectorAll("audio")) if (audio !== event.target) audio.pause();
+}, true);
+</script>
 """
 
 
