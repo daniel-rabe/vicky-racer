@@ -40,6 +40,8 @@ func _ready() -> void:
 	track = config.track_scene.instantiate()
 	add_child(track)
 	move_child(track, 0)
+	if track.theme:
+		EventSystem.UI_music_requested.emit(track.theme.music)
 	EventSystem.UI_settings_requested.emit()  # likewise: sets _difficulty_id
 	var difficulty := DifficultyConfig.named(_difficulty_id)
 	var args := OS.get_cmdline_user_args()

@@ -1,6 +1,6 @@
 extends Node
-## The persistent shell: loaded once and never unloaded. Holds GarageManager,
-## SettingsManager and SoundManager, which must survive screen changes, and swaps screens in and out of ScreenSlot when anything emits
+## The persistent shell: loaded once and never unloaded. Holds GarageManager, CupManager,
+## SettingsManager, SoundManager and MusicManager, which must survive screen changes, and swaps screens in and out of ScreenSlot when anything emits
 ## EventSystem.UI_screen_requested.
 ##
 ## Dev flags, after `--` on the command line:
@@ -56,7 +56,7 @@ func _ready() -> void:
 		garage_manager.profile.coins = int(_args["dev-coins"])
 	if _args.has("fake-race"):
 		_fake_race_finish(int(_args["fake-race"]))
-	show_screen(StringName(_args.get("screen", FIRST_SCREEN)))
+	EventSystem.UI_screen_requested.emit(StringName(_args.get("screen", FIRST_SCREEN)))  # so the music hears it too
 	if _args.has("screenshot"):
 		await get_tree().create_timer(float(_args.get("wait", 2.5))).timeout
 		await RenderingServer.frame_post_draw
@@ -94,5 +94,6 @@ func _notification(what: int) -> void:
 func _quit_quietly() -> void:
 	for child in screen_slot.get_children():
 		child.queue_free()
+	$MusicManager.stop(0.2)
 	await get_tree().create_timer(0.5).timeout
 	get_tree().quit()

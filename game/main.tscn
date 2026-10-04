@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://game/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://game/managers/garage_manager.gd" id="2_garage"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://game/managers/sound_manager.gd" id="4_sound"]
 [ext_resource type="Script" path="res://game/managers/settings_manager.gd" id="5_settings"]
 [ext_resource type="Script" path="res://game/managers/cup_manager.gd" id="6_cup"]
+[ext_resource type="Script" path="res://game/managers/music_manager.gd" id="7_music"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_main")
@@ -23,5 +24,9 @@ script = ExtResource("5_settings")
 [node name="SoundManager" type="Node" parent="."]
 process_mode = 3
 script = ExtResource("4_sound")
+
+[node name="MusicManager" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("7_music")
 
 [node name="ScreenSlot" type="Node" parent="."]

@@ -88,6 +88,8 @@ func _on_finish_crossed(car: Car) -> void:
 	r["lap_start"] = race_time
 	r["best_lap"] = lap_time if r["best_lap"] == 0.0 else minf(r["best_lap"], lap_time)
 	EventSystem.RAC_lap_completed.emit(car, r["laps"], lap_time)
+	if r == _player and r["laps"] == config.laps - 1:
+		EventSystem.RAC_final_lap_started.emit()
 	if r["laps"] >= config.laps:
 		r["finished"] = true
 		r["finish_time"] = race_time

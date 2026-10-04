@@ -9,6 +9,7 @@ signal closed
 
 const ROWS := [
 	{"key": &"sound_volume", "kind": &"volume", "title": "SOUND", "hint": ""},
+	{"key": &"music_volume", "kind": &"volume", "title": "MUSIC", "hint": ""},
 	{"key": &"fullscreen", "kind": &"toggle", "title": "FULLSCREEN", "hint": ""},
 	{"key": &"auto_accelerate", "kind": &"toggle", "title": "AUTO GO", "hint": "the car drives forward by itself"},
 	{"key": &"steering_help", "kind": &"toggle", "title": "STEER HELP", "hint": "gently keeps the car on the road"},

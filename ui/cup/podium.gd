@@ -1,6 +1,6 @@
 extends Control
 ## The end of a cup (docs/DESIGN.md §12): the top three cars rise onto a podium, confetti
-## falls, the fanfare plays, then the trophy (or, for 4th, the ribbon) flies in and the cup
+## falls, the podium music opens with its fanfare (MusicManager), then the trophy (or, for 4th, the ribbon) flies in and the cup
 ## bonus counts up. Always a celebration: finishing a cup is something to be proud of.
 ## GARAGE (focused when the show is over) leaves.
 
@@ -16,7 +16,6 @@ const HEADLINES := {
 	&"bronze": "3RD IN THE %s!",
 	&"ribbon": "YOU FINISHED THE %s!",
 }
-const FANFARE := preload("res://art/sfx/finish_fanfare.wav")
 const COIN := preload("res://art/sfx/coin.wav")
 ## Podium blocks left to right: 2nd, 1st, 3rd — height and colour.
 const BLOCKS := [[2, 230.0, Color(0.75, 0.77, 0.8)], [1, 330.0, Color(1, 0.8, 0.25)], [3, 160.0, Color(0.8, 0.5, 0.25)]]
@@ -56,7 +55,6 @@ func _ready() -> void:
 	var trophy: StringName = _cup["trophy"]
 	_headline.text = HEADLINES[trophy] % cup.display_name.to_upper()
 	_trophy.texture = TROPHY_ART[trophy]
-	_play(FANFARE)
 	_add_confetti()
 	var tween := create_tween()
 	for block: Array in BLOCKS:

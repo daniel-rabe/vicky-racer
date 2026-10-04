@@ -19,3 +19,5 @@ extends Resource
 @export var wall_spacing := 76.0
 ## Background of this track's card on the track-select screen.
 @export var card_colour := Color(0.36, 0.73, 0.29)
+## Played during the race (docs/DESIGN.md §13).
+@export var music: MusicPiece

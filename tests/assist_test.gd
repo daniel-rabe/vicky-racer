@@ -18,7 +18,7 @@ func _enter_tree() -> void:
 		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/starter.tres")],
 			"equipped": &"starter"}))
 	EventSystem.UI_settings_requested.connect(func() -> void:
-		EventSystem.UI_settings_changed.emit({"sound_volume": 0.0, "fullscreen": false,
+		EventSystem.UI_settings_changed.emit({"sound_volume": 0.0, "music_volume": 0.0, "fullscreen": false,
 			"auto_accelerate": _assists, "steering_help": _assists, "difficulty": &"normal"}))
 
 

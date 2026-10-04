@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MusicPiece" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/configs/music_piece.gd" id="1_script"]
+[ext_resource type="AudioStream" path="res://art/music/podium.ogg" id="2_stream"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"podium"
+stream = ExtResource("2_stream")
+loops = true
+loop_offset = 4.285714
+bpm = 112.0

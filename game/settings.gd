@@ -1,6 +1,6 @@
 class_name Settings
 extends RefCounted
-## Machine and player settings (docs/DESIGN.md §10.1): sound volume, fullscreen, the two
+## Machine and player settings (docs/DESIGN.md §10.1): sound and music volume, fullscreen, the two
 ## driving assists and how fast the opponents are. A ConfigFile at
 ## user://vicky_settings.cfg, separate from the save game: settings belong to the computer
 ## and the person at it, progress belongs to the child, and neither should be able to
@@ -15,6 +15,7 @@ const DIFFICULTIES: Array[StringName] = [&"easy", &"normal", &"fast"]
 const VOLUME_STEP := 0.1
 
 var sound_volume := 0.8
+var music_volume := 0.6
 var fullscreen := false
 var auto_accelerate := false
 var steering_help := false
@@ -42,7 +43,7 @@ func save_to(path := DEFAULT_PATH) -> Error:
 
 
 func to_dict() -> Dictionary:
-	return {"sound_volume": sound_volume, "fullscreen": fullscreen, "auto_accelerate": auto_accelerate,
+	return {"sound_volume": sound_volume, "music_volume": music_volume, "fullscreen": fullscreen, "auto_accelerate": auto_accelerate,
 		"steering_help": steering_help, "difficulty": difficulty}
 
 
@@ -50,10 +51,10 @@ func to_dict() -> Dictionary:
 ## value of the wrong kind, so a hand-edited or old file can never put nonsense in.
 func set_value(key: StringName, value: Variant) -> bool:
 	match key:
-		&"sound_volume":
+		&"sound_volume", &"music_volume":
 			if not (value is float or value is int):
 				return false
-			sound_volume = snappedf(clampf(float(value), 0.0, 1.0), VOLUME_STEP)
+			set(key, snappedf(clampf(float(value), 0.0, 1.0), VOLUME_STEP))
 		&"fullscreen", &"auto_accelerate", &"steering_help":
 			if not value is bool:
 				return false

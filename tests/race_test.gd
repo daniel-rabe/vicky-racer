@@ -11,6 +11,7 @@ extends Node
 const RACE_SCENE := preload("res://game/screens/race.tscn")
 const TIMEOUT_SECONDS := 180.0
 
+var _final_laps := 0
 var _failures: PackedStringArray = []
 var _ticks: Array[int] = []
 var _started := false
@@ -23,6 +24,7 @@ var race: Node2D
 func _enter_tree() -> void:
 	EventSystem.RAC_countdown_tick.connect(func(n: int) -> void: _ticks.append(n))
 	EventSystem.RAC_race_started.connect(func() -> void: _started = true)
+	EventSystem.RAC_final_lap_started.connect(func() -> void: _final_laps += 1)
 	EventSystem.RAC_lap_completed.connect(_on_lap)
 	EventSystem.RAC_positions_updated.connect(_on_positions)
 	EventSystem.RAC_race_finished.connect(func(results: Array, _id: StringName) -> void: _results = results)
@@ -39,7 +41,7 @@ func _enter_tree() -> void:
 			track_id = arg.get_slice("=", 1)
 	# Likewise the settings, like SettingsManager would; sound off, no assists.
 	EventSystem.UI_settings_requested.connect(func() -> void:
-		EventSystem.UI_settings_changed.emit({"sound_volume": 0.0, "fullscreen": false,
+		EventSystem.UI_settings_changed.emit({"sound_volume": 0.0, "music_volume": 0.0, "fullscreen": false,
 			"auto_accelerate": false, "steering_help": false, "difficulty": StringName(difficulty)}))
 	EventSystem.PRO_state_requested.connect(func() -> void:
 		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/%s.tres" % setup_id)],
@@ -101,6 +103,7 @@ func _report(start_progress: Dictionary) -> void:
 			var ok_times := laps.all(func(t: float) -> bool: return t > length / 2000.0 and t < length / 250.0)
 			_check(ok_times, "%s lap times are sensible (%s)" % [name, laps.map(func(t: float) -> String: return "%.1f" % t)])
 			_check(r["driver"].rescues == 0, "%s never needed rescuing (%d)" % [name, r["driver"].rescues])
+	_check(_final_laps == 1, "the player's last lap was announced once (%d)" % _final_laps)
 	_check(_bad_orders == 0, "positions were always a clean 1-4 (%d bad updates)" % _bad_orders)
 	if not _results.is_empty():
 		var positions := _results.map(func(e: Dictionary) -> int: return e["position"])

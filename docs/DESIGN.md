@@ -276,11 +276,11 @@ single autoload (`EventSystem`) and declares every cross-system signal. Managers
 
 | Prefix | Domain | Signals |
 | --- | --- | --- |
-| `RAC_` | Race | `countdown_tick(n)`, `race_started()`, `lap_completed(racer, lap, lap_time)`, `positions_updated(order)`, `race_finished(results, track_id)` |
+| `RAC_` | Race | `countdown_tick(n)`, `race_started()`, `lap_completed(racer, lap, lap_time)`, `final_lap_started()`, `positions_updated(order)`, `race_finished(results, track_id)` |
 | `CAR_` | Car | `drift_started(car)`, `drift_ended(car, duration)`, `surface_changed(car, surface)`, `wall_hit(car, impact_speed)` |
 | `PRO_` | Progression | `state_requested()`, `state_changed(state)`, `buy_requested(id)`, `equip_requested(id)`, `coins_changed(total)`, `coins_awarded(amount, breakdown)`, `setup_purchased(id)`, `setup_equipped(id)`, `purchase_refused(id, reason)` |
 | `CUP_` | Cups | `state_requested()`, `state_changed(state)`, `start_requested(id)`, `continue_requested()`, `progress_changed(progress)`, `finished(id, standings, trophy)` |
-| `UI_` | Screens | `show_message(text, duration)`, `screen_requested(name)`, `settings_requested()`, `settings_changed(settings)`, `setting_change_requested(key, value)` |
+| `UI_` | Screens | `show_message(text, duration)`, `screen_requested(name)`, `settings_requested()`, `settings_changed(settings)`, `setting_change_requested(key, value)`, `music_requested(piece)` |
 
 Screens never reach into managers. Following Vicky's Game's inventory pattern, a screen emits
 `PRO_state_requested` and `GarageManager` answers synchronously with `PRO_state_changed`, carrying
@@ -694,7 +694,7 @@ them all out ([`mockups/candidates/paint_shop.png`](mockups/candidates/paint_sho
 | --- | --- |
 | Title | [`mockups/title_layout.png`](mockups/title_layout.png) — logo, PLAY / SETTINGS / QUIT over a live attract-mode race (four AI cars on Track 01, no HUD, no engine sounds). Built: [`screenshots/title.png`](screenshots/title.png) |
 | Pause | [`mockups/pause_settings_layout.png`](mockups/pause_settings_layout.png) — Esc / Start or the window losing focus pauses the whole tree. RESUME is focused, so pausing twice resumes; B resumes too; RESTART and GARAGE ask SURE? with NO focused. Built: [`screenshots/pause.png`](screenshots/pause.png) |
-| Settings | Same spec — SOUND, FULLSCREEN, AUTO GO, STEER HELP, OPPONENTS; one focusable row each, ← → change it. Over the title and over the pause menu. Built: [`screenshots/settings.png`](screenshots/settings.png) |
+| Settings | Same spec — SOUND, MUSIC, FULLSCREEN, AUTO GO, STEER HELP, OPPONENTS; one focusable row each, ← → change it. Over the title and over the pause menu. Built: [`screenshots/settings.png`](screenshots/settings.png) |
 | Race HUD | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown. Built: [`screenshots/race.png`](screenshots/race.png), [`screenshots/race_countdown.png`](screenshots/race_countdown.png). The countdown sits above screen centre rather than on it, so it never hides the player's own car |
 | Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, cards in pages of 3 × 2 (Q / E or the shoulder buttons, or moving off the edge of a page, turns it; `< 1 / 2 >` above the cards), preview with Grip / Slide / Speed bars and, for owned cars, paint swatches. Built: [`screenshots/garage.png`](screenshots/garage.png) |
 | Pick a race | Four track cards (§7.6) and two cup cards (§12). ← → ↑ ↓ choose, A races, B back to the garage. Built: [`screenshots/pick_a_race.png`](screenshots/pick_a_race.png) |
@@ -711,8 +711,8 @@ the person at it, progress belongs to the child, and neither should be able to b
 [`Settings`](../game/settings.gd) validates every value on load and on change (volume clamped and
 snapped to 10 % steps, unknown keys and mistyped values ignored), so a hand-edited file falls back
 to defaults rather than failing. [`SettingsManager`](../game/managers/settings_manager.gd) applies
-and saves each change at once. Sound goes through an `SFX` bus (`default_bus_layout.tres`; a
-`Music` bus waits for Phase 13). Checked by [`tests/front_end_test.gd`](../tests/front_end_test.gd).
+and saves each change at once. Sound goes through an `SFX` bus and music through a `Music` bus
+(`default_bus_layout.tres`), set by SOUND and MUSIC (default 80 % and 60 %). Checked by [`tests/front_end_test.gd`](../tests/front_end_test.gd).
 
 The HUD takes race state from the `RAC_` signals. The speed bar and the minimap are the exception:
 the race screen hands them the cars, because they need positions every frame and no signal should
@@ -845,7 +845,73 @@ The art — gold trophy, ribbon, sun and snowflake icons — was generated and p
 candidates each; silver and bronze are Kontext recolours of the gold one, so all three trophies
 share one shape. Reverse tracks (in the roadmap) were left out: four tracks give two cups of three.
 
-## 13. Out of scope for v1
+## 13. Music
 
-More tracks, more cars, tournaments, music, split screen, time trial and ghosts are planned as
-Phases 9–17 in [`ROADMAP.md`](ROADMAP.md). Touch controls remain out of scope.
+Every screen has music, generated like the sound (§11.2) with **Stable Audio 3**, declared in
+[`tools/comfy/music_manifest.json`](../tools/comfy/music_manifest.json) and built by
+[`tools/comfy/generate_music.py`](../tools/comfy/generate_music.py) into `art/music/` as stereo
+Ogg Vorbis (about 6 MB in all).
+
+| Piece | Plays on | Tempo, loop |
+| --- | --- | --- |
+| `menu` — ukulele, glockenspiel, whistling | title, garage, pick a race, results | 108 BPM, 16 bars after a 2-bar lead-in |
+| `race_meadow` — banjo, fiddle, country pop | Meadow Loop | 132 BPM, 16 bars |
+| `race_beach` — steel drums, surf guitar, calypso | Sunny Beach | 126 BPM, 16 bars |
+| `race_town` — toy piano, marimba | Toy Town | 136 BPM, 16 bars |
+| `race_snow` — sleigh bells, celesta, pizzicato | Snowy Peak | 128 BPM, 16 bars |
+| `standings` — a 3-second marimba sting, then `menu` | cup standings | once |
+| `podium` — brass fanfare, timpani | cup podium (replaces the finish fanfare there) | 112 BPM, 8 bars after a 2-bar fanfare |
+
+**Recipe.** `stable_audio_3_medium_base`, 50 steps, **cfg 6**: in a probe at 120 BPM it held the
+prompted tempo exactly and had the firmest beat of the installed models; at cfg 7 two of three
+seeds clipped. ACE-Step, named in the roadmap, turned out not to be installed and was not
+compared. Six candidates per piece.
+
+**Loops cut to whole bars.** The loop length starts as the prompt's `bars` at its tempo and is
+refined (±0.5 %) to the lag at which the music best matches itself; the loop starts on the beat
+whose surroundings sound most like the music one loop later, and is lined up to the sample across
+the seam. The file keeps `intro_bars` of lead-in before the loop, and the last 60 ms before the
+jump are cross-faded with the 60 ms before the loop start, so the seam is the same music both
+ways. `build` writes a [`MusicPiece`](../game/configs/music_piece.gd) per piece
+(`game/configs/music/*.tres`) with the stream, `loop_offset` and tempo; the game plays the file
+from the top and Godot jumps back to `loop_offset` at the end. **Seam check:** the spectral jump
+across the seam as played must be no larger than the music's own 95th-percentile jump from frame
+to frame; `build` refuses a piece that fails. Every pick passes (0.24–0.87). Candidates are also
+scored on tempo held, how well the loop matches and clipped samples; the scores and spectrograms
+are on the sheets in [`mockups/music/`](mockups/music/).
+
+**Picked by ear.** `generate_music.py listen` writes MP3 previews of every candidate — lead-in, one
+loop, then the jump back and 8 more seconds so the seam can be heard — and a page to compare them.
+The picks in the manifest were made from the scores; swapping one is `pick` and `build`.
+
+```bash
+python tools/comfy/generate_music.py candidates [--only menu]   # render, cut, score, sheet
+python tools/comfy/generate_music.py listen                     # previews + page to pick by ear
+python tools/comfy/generate_music.py pick menu 103              # pin a seed
+python tools/comfy/generate_music.py build                      # art/music/*.ogg + game/configs/music/*.tres
+```
+
+**[`MusicManager`](../game/managers/music_manager.gd)**, in the shell next to `SoundManager`:
+
+- A screen change picks the screen's piece and cross-fades to it over a second; a piece shared by
+  the next screen carries on rather than starting over. The race asks for its track theme's piece
+  (`TrackTheme.music`, `UI_music_requested`).
+- The 3-2-1 countdown ducks the music 10 dB under the beeps; GO brings it back.
+- **Last lap** (`RAC_final_lap_started`, when the player starts it): the music speeds up 6 % —
+  tempo and pitch together, about a semitone brighter.
+- The finish fades the race music out, so the fanfare plays alone; the results bring the menu
+  theme in.
+- Pause ducks it 8 dB; it keeps playing under the pause menu.
+- Under the dummy audio driver (headless) nothing plays, but `current` still follows, so the
+  test can check it. Quitting fades it out first (see `main.gd`).
+
+Checked by [`tests/music_test.gd`](../tests/music_test.gd): every piece is an Ogg stream that
+loops past its lead-in on whole bars, every theme has its own race music, each screen's piece, the
+menu not restarting between menu screens, ducking, last lap, finish, and the MUSIC setting on the
+Music bus. Run with a window, it also checks the podium music is really playing.
+[`tests/race_test.gd`](../tests/race_test.gd) checks the last lap is announced once.
+
+## 14. Out of scope for v1
+
+Split screen, time trial, ghosts and the rest of Phases 14–17 are planned in
+[`ROADMAP.md`](ROADMAP.md). Touch controls remain out of scope.

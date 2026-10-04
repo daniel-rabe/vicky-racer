@@ -1,0 +1,93 @@
+{
+  "recipe": {
+    "checkpoint": "stable_audio_3_medium_base.safetensors",
+    "text_encoder": "t5gemma_b_b_ul2.safetensors",
+    "steps": 50,
+    "cfg": 6.0,
+    "sampler": "lcm",
+    "scheduler": "simple",
+    "negative": "speech, voice, vocals, singing, lyrics, choir, sad, dark, scary, minor key, distortion, clipping, low quality, muffled, noise, lo-fi, tape hiss",
+    "candidates": 6,
+    "rms_db": -19.0,
+    "peak_db": -1.0,
+    "note": "Bake-off 2026-10-04 (probe, 32 s at 120 BPM): medium_base at 50 steps holds the prompted tempo exactly and has the firmest beat; the distilled medium is flatter. cfg 7 clips in 2 of 3 seeds (up to 1700 samples), cfg 6 rarely. ACE-Step is not installed, so it was not compared."
+  },
+  "pieces": [
+    {
+      "id": "menu",
+      "use": "title, garage, pick a race, results",
+      "prompt": "cheerful playful theme music for a children's cartoon video game menu, ukulele, glockenspiel, whistled melody, light hand claps, soft drums, bouncy bass, major key, happy and friendly, instrumental, 108 BPM",
+      "seconds": 70.0,
+      "bpm": 108,
+      "bars": 16,
+      "intro_bars": 2,
+      "out": "art/music/menu.ogg",
+      "seed": 103
+    },
+    {
+      "id": "race_meadow",
+      "use": "Meadow Loop",
+      "prompt": "upbeat happy country pop racing music for a children's cartoon video game, banjo, fiddle, strummed acoustic guitar, driving drums, bouncy bass, major key, energetic and sunny, instrumental, 132 BPM",
+      "seconds": 64.0,
+      "bpm": 132,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_meadow.ogg",
+      "seed": 103
+    },
+    {
+      "id": "race_beach",
+      "use": "Sunny Beach",
+      "prompt": "sunny upbeat calypso surf racing music for a children's cartoon video game, steel drums, twangy surf guitar, bongos, shaker, bouncy bass, major key, energetic and carefree, instrumental, 126 BPM",
+      "seconds": 64.0,
+      "bpm": 126,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_beach.ogg",
+      "seed": 106
+    },
+    {
+      "id": "race_town",
+      "use": "Toy Town",
+      "prompt": "playful bouncy toy box racing music for a children's cartoon video game, toy piano, marimba, squeaky synth lead, snappy drums, funky bass, major key, energetic and silly, instrumental, 136 BPM",
+      "seconds": 64.0,
+      "bpm": 136,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_town.ogg",
+      "seed": 104
+    },
+    {
+      "id": "race_snow",
+      "use": "Snowy Peak",
+      "prompt": "bright wintry upbeat racing music for a children's cartoon video game, sleigh bells, glockenspiel, celesta, pizzicato strings, driving drums, bouncy bass, major key, energetic and sparkling, instrumental, 128 BPM",
+      "seconds": 64.0,
+      "bpm": 128,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_snow.ogg",
+      "seed": 103
+    },
+    {
+      "id": "podium",
+      "use": "cup podium",
+      "prompt": "triumphant joyful celebration music for a children's video game award ceremony, brass fanfare, timpani, glockenspiel, marching snare drum, major key, proud and happy, instrumental, 112 BPM",
+      "seconds": 64.0,
+      "bpm": 112,
+      "bars": 8,
+      "intro_bars": 2,
+      "out": "art/music/podium.ogg",
+      "seed": 101
+    },
+    {
+      "id": "standings",
+      "use": "cup standings (a sting, then the menu theme)",
+      "prompt": "short cheerful jingle for a children's video game scoreboard, marimba and glockenspiel, quick rising happy flourish ending on one bright held chord, instrumental",
+      "seconds": 8.0,
+      "kind": "sting",
+      "max_seconds": 4.0,
+      "out": "art/music/standings.ogg",
+      "seed": 101
+    }
+  ]
+}

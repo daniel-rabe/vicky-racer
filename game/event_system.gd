@@ -7,6 +7,8 @@ extends Node
 signal RAC_countdown_tick(seconds_left: int)
 signal RAC_race_started
 signal RAC_lap_completed(racer: Node, lap: int, lap_time: float)
+## The player has just started the last lap (never in a one-lap race).
+signal RAC_final_lap_started
 signal RAC_positions_updated(order: Array)
 ## results: one Dictionary per racer, in finishing order — name, colour, is_player,
 ## position, time, best_lap. GarageManager pays out on it.
@@ -55,3 +57,5 @@ signal UI_screen_requested(screen_name: StringName)
 signal UI_settings_requested
 signal UI_settings_changed(settings: Dictionary)
 signal UI_setting_change_requested(key: StringName, value: Variant)
+## A screen whose music is not fixed by its name (the race: its track's theme) asks for it.
+signal UI_music_requested(piece: MusicPiece)

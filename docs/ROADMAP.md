@@ -93,21 +93,19 @@ bonus coins, progress saved after every race with CONTINUE CUP on the title. Cha
 
 ---
 
-## Phase 13 — Music
+## Phase 13 — Music ✅ done
 
-**Art gate (audio):** candidate tracks per piece, rendered with Stable Audio 3 medium (or ACE-Step,
-also installed — to be compared in a short bake-off like the SFX one), picked by listening.
+Built as planned (DESIGN.md §13): a menu theme, four race themes (one per track theme), a
+standings sting and podium music, cut into whole-bar loops with a seam check; `MusicManager`
+cross-fades on screen changes, ducks under the countdown and the pause menu, fades out at the
+finish and speeds up 6 % on the last lap; MUSIC volume in the settings. Changes:
 
-1. **Pieces** — title / garage theme, one race theme per track theme, a short standings sting and
-   the podium fanfare. Loopable race themes (the same cross-fade loop cutter as the SFX, with
-   bar-aligned loop points).
-2. **`MusicManager`** in the main shell — cross-fades between pieces on screen changes, ducks under
-   the countdown, and gets slightly faster/brighter on the last lap (a second "final lap" stem or a
-   pitch/tempo nudge).
-3. **Music volume** from the Phase 9 settings.
-
-**Done when:** every screen has music, loops are seamless (the seam check from `generate_sfx.py`),
-and nothing plays under the headless dummy driver.
+- **No ACE-Step bake-off**: it is not installed (only Stable Audio is), and a multi-GB download
+  was not worth it before hearing Stable Audio's music. The probe chose cfg 6 over 7 (clipping).
+- **Last lap is a tempo/pitch nudge**, not a second stem.
+- **The podium music replaces the finish fanfare there**: it opens with a fanfare of its own.
+- **Picked from scores, not yet by ear**: the listening page (`generate_music.py listen`) is for
+  the user to confirm or swap them.
 
 ---
 

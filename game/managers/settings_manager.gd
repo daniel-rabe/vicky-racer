@@ -34,10 +34,15 @@ func _publish() -> void:
 
 
 func _apply() -> void:
-	var sfx := AudioServer.get_bus_index(&"SFX")
-	AudioServer.set_bus_mute(sfx, settings.sound_volume <= 0.0)
-	AudioServer.set_bus_volume_db(sfx, linear_to_db(maxf(settings.sound_volume, 0.001)))
+	_apply_volume(&"SFX", settings.sound_volume)
+	_apply_volume(&"Music", settings.music_volume)
 	if DisplayServer.get_name() != "headless":
 		var mode := DisplayServer.WINDOW_MODE_FULLSCREEN if settings.fullscreen else DisplayServer.WINDOW_MODE_WINDOWED
 		if DisplayServer.window_get_mode() != mode:
 			DisplayServer.window_set_mode(mode)
+
+
+func _apply_volume(bus_name: StringName, volume: float) -> void:
+	var bus := AudioServer.get_bus_index(bus_name)
+	AudioServer.set_bus_mute(bus, volume <= 0.0)
+	AudioServer.set_bus_volume_db(bus, linear_to_db(maxf(volume, 0.001)))
