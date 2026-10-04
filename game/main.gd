@@ -11,6 +11,8 @@ extends Node
 ##   --dev-coins=<n>         set the coin balance after loading
 ##   --fake-race=<position>  pretend a race just finished in that position
 ##   --race-mode=time_trial  the next race is a time trial (screenshots of ghosts)
+##   --fps                   show the frame rate in the corner (works in the release .exe:
+##                           VickyRacer.exe -- --fps, to check a new machine keeps up)
 ##   --screenshot=<path>     save a screenshot after --wait seconds (default 2.5) and quit
 ##   --no-interp             turn physics interpolation off (to measure what it fixes)
 ##   --physics-hz=<n>        run physics at n ticks per second instead of 60
@@ -29,6 +31,9 @@ const SCREENS := {
 	&"join": preload("res://ui/join/join_screen.tscn"),
 }
 const FIRST_SCREEN := &"title"
+## The window's title. The project's own name stays "VickyRacer": it names the folder the
+## save lives in (app_userdata/VickyRacer), and changing it would lose every save.
+const WINDOW_TITLE := "Vicky Racer"
 
 var _args := {}
 
@@ -56,8 +61,11 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	# Closing the window (or QUIT on the title) goes through _quit_quietly, below.
 	get_tree().set_auto_accept_quit(false)
+	get_window().title = WINDOW_TITLE
 	if _args.has("dev-coins"):
 		garage_manager.profile.coins = int(_args["dev-coins"])
+	if _args.has("fps"):
+		_add_fps_counter()
 	if _args.has("race-mode"):
 		EventSystem.PRO_race_mode_requested.emit(StringName(_args["race-mode"]))
 	if _args.has("fake-race"):
@@ -75,6 +83,30 @@ func show_screen(screen_name: StringName) -> void:
 	for child in screen_slot.get_children():
 		child.queue_free()
 	screen_slot.add_child(SCREENS[screen_name].instantiate())
+
+
+## Dev (--fps): the frame rate and the slowest frame of the last second, top left, over everything.
+func _add_fps_counter() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 128
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(layer)
+	var label := Label.new()
+	label.name = "FpsCounter"
+	label.position = Vector2(12, 8)
+	label.add_theme_font_size_override("font_size", 22)
+	label.add_theme_color_override("font_outline_color", Color.BLACK)
+	label.add_theme_constant_override("outline_size", 6)
+	layer.add_child(label)
+	var worst := [0.0]
+	var tick := Timer.new()
+	tick.wait_time = 1.0
+	tick.autostart = true
+	tick.timeout.connect(func() -> void:
+		label.text = "%d FPS   slowest %.1f ms" % [Engine.get_frames_per_second(), worst[0] * 1000.0]
+		worst[0] = 0.0)
+	layer.add_child(tick)
+	get_tree().process_frame.connect(func() -> void: worst[0] = maxf(worst[0], get_process_delta_time()))
 
 
 ## Dev only (--fake-race): a finish with made-up times, for screenshots of the results screen.
@@ -98,6 +130,7 @@ func _notification(what: int) -> void:
 ## Quit without leak warnings: a sound still playing at quit is only released by the audio
 ## server's next mix, which comes after Godot's leak check. Free the screen, let audio mix.
 func _quit_quietly() -> void:
+	$SettingsManager.remember_window()
 	for child in screen_slot.get_children():
 		child.queue_free()
 	$MusicManager.stop(0.2)

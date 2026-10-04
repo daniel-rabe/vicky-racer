@@ -1,7 +1,9 @@
 class_name SettingsManager
 extends Node
 ## Owns the Settings, applies them (bus volume, window mode) and saves every change at
-## once — there is no "apply" button. Lives in the main.tscn shell next to GarageManager.
+## once — there is no "apply" button. It also remembers where the window was (remember_window,
+## on quit and before going fullscreen) and opens it there again, if that spot is still on a
+## screen. Lives in the main.tscn shell next to GarageManager.
 ## Screens talk to it only through EventSystem: UI_settings_requested and
 ## UI_setting_change_requested in, UI_settings_changed (the whole set) out.
 
@@ -18,15 +20,39 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	settings = Settings.load_from(settings_path)
 	_apply()
+	_restore_window()
 
 
 func change(key: StringName, value: Variant) -> void:
+	if key == &"fullscreen" and value == true:
+		remember_window()  # so leaving fullscreen goes back to the same window
 	if not settings.set_value(key, value):
 		push_warning("ignored setting %s = %s" % [key, value])
 		return
 	_apply()
 	settings.save_to(settings_path)
 	_publish()
+
+
+## Keep the window's place and size, if it is a window (not fullscreen, not headless).
+func remember_window() -> void:
+	if DisplayServer.get_name() == "headless" or DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
+		return
+	var rect := Rect2i(DisplayServer.window_get_position(), DisplayServer.window_get_size())
+	if rect != settings.window_rect and settings.set_value(&"window_rect", rect):
+		settings.save_to(settings_path)
+
+
+func _restore_window() -> void:
+	var rect := settings.window_rect
+	if DisplayServer.get_name() == "headless" or settings.fullscreen or not rect.has_area():
+		return
+	for screen in DisplayServer.get_screen_count():
+		# Only where it would still be seen: a monitor may have been unplugged since.
+		if DisplayServer.screen_get_usable_rect(screen).has_point(rect.get_center()):
+			DisplayServer.window_set_size(rect.size)
+			DisplayServer.window_set_position(rect.position)
+			return
 
 
 func _publish() -> void:

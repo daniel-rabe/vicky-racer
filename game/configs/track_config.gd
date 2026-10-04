@@ -17,6 +17,8 @@ extends Resource
 ## matches its colour, so the minimap and results stay readable.
 @export var opponent_setups: Array[DriftSetup] = []
 @export var opponent_paints: Array[StringName] = []
-@export var opponent_colours: PackedColorArray = []
+## An Array[Color], not a PackedColorArray: Godot 4.7's export converter left a
+## PackedColorArray in these .tres files empty in the exported game (docs/DESIGN.md §17).
+@export var opponent_colours: Array[Color] = []
 ## 0-1 each; see AIDriver.skill.
 @export var opponent_skills: PackedFloat32Array = [0.85, 0.7, 0.55]

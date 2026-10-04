@@ -58,9 +58,23 @@ func _ready() -> void:
 		get_tree().root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST))
 	_play.grab_focus()
 	_add_continue_cup()
+	_add_version()
 	var bob := create_tween().set_loops().set_trans(Tween.TRANS_SINE)
 	bob.tween_property(_logo, "position:y", _logo.position.y - 6.0, 1.0)
 	bob.tween_property(_logo, "position:y", _logo.position.y + 6.0, 1.0)
+
+
+## The version, small in the corner, so a parent can tell which build is installed.
+func _add_version() -> void:
+	var label := Label.new()
+	label.name = "Version"
+	label.text = "v" + str(ProjectSettings.get_setting("application/config/version", ""))
+	label.add_theme_font_size_override("font_size", 18)
+	label.add_theme_color_override("font_outline_color", Color(0.055, 0.078, 0.11))
+	label.add_theme_constant_override("outline_size", 6)
+	label.modulate.a = 0.7
+	label.position = Vector2(1760, 1036)
+	_menu.get_parent().add_child(label)
 
 
 ## A cup left half-way (even with the game closed) can be picked up from the title.

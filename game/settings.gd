@@ -20,6 +20,11 @@ var fullscreen := false
 var auto_accelerate := false
 var steering_help := false
 var difficulty: StringName = &"normal"
+## Where the window was, windowed: position and size, so the game opens where it was left.
+## Empty until the window has been moved or closed once; not shown on the settings screen.
+var window_rect := Rect2i()
+## The smallest window remembered: anything smaller is a mistake, not a choice.
+const MIN_WINDOW := Vector2i(640, 360)
 
 
 static func load_from(path := DEFAULT_PATH) -> Settings:
@@ -44,7 +49,7 @@ func save_to(path := DEFAULT_PATH) -> Error:
 
 func to_dict() -> Dictionary:
 	return {"sound_volume": sound_volume, "music_volume": music_volume, "fullscreen": fullscreen, "auto_accelerate": auto_accelerate,
-		"steering_help": steering_help, "difficulty": difficulty}
+		"steering_help": steering_help, "difficulty": difficulty, "window_rect": window_rect}
 
 
 ## Set one value, validated. Returns false (and changes nothing) for an unknown key or a
@@ -64,6 +69,10 @@ func set_value(key: StringName, value: Variant) -> bool:
 			if id not in DIFFICULTIES:
 				return false
 			difficulty = id
+		&"window_rect":
+			if not value is Rect2i or (value != Rect2i() and (value.size.x < MIN_WINDOW.x or value.size.y < MIN_WINDOW.y)):
+				return false
+			window_rect = value
 		_:
 			return false
 	return true

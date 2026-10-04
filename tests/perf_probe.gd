@@ -1,6 +1,8 @@
 extends Node
 ## Performance probe (not a pass/fail test): races Track 01 with every car on autopilot and
-## reports where frame time goes, so optimisations are measured, not guessed.
+## reports where frame time goes, so optimisations are measured, not guessed. `--track=track_03`
+## races another track; `--two-player` splits the screen (two players and two AI) — with both,
+## the busiest case the game has: four cars sliding on Snowy Peak's ice in two views.
 ##   with a window (rendering cost, vsync off):
 ##     Godot_console.exe --path . res://tests/perf_probe.tscn -- --autopilot
 ##   headless CPU benchmark (script + physics per simulated frame, nothing rendered):
@@ -15,9 +17,20 @@ var _samples := {"frame": [], "process": [], "physics": [], "draw_calls": [], "o
 
 
 func _enter_tree() -> void:
+	var track_id := &"track_01"
+	var two_player := false
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--track="):
+			track_id = StringName(arg.get_slice("=", 1))
+		two_player = two_player or arg == "--two-player"
+	var config: TrackConfig = load("res://game/configs/tracks/%s.tres" % track_id)
 	EventSystem.PRO_state_requested.connect(func() -> void:
-		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/banana.tres")],
-			"equipped": &"banana"}))
+		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/banana.tres"),
+			load("res://game/configs/setups/slider.tres")], "equipped": &"banana", "selected_track": track_id,
+			"tracks": [{"config": config}]}))
+	EventSystem.PLY_state_requested.connect(func() -> void:
+		EventSystem.PLY_state_changed.emit({"two_player": two_player, "opponents": true, "players": [
+			{"device": {"kind": &"keys_left"}, "setup": &"banana"}, {"device": {"kind": &"keys_right"}, "setup": &"slider"}]}))
 	EventSystem.UI_settings_requested.connect(func() -> void:
 		EventSystem.UI_settings_changed.emit({"sound_volume": 0.0, "music_volume": 0.0, "fullscreen": false,
 			"auto_accelerate": false, "steering_help": false, "difficulty": &"normal"}))
@@ -29,6 +42,9 @@ func _ready() -> void:
 	var load_start := Time.get_ticks_usec()
 	var race: Node2D = RACE_SCENE.instantiate()
 	add_child(race)
+	# No pause menu: it pauses the race when the window loses focus, and a probe started from a
+	# terminal often never has focus. It measures the race, not the menus.
+	race.get_node("PauseMenu").free()
 	print("race load: %.1f ms (instantiate + _ready: track, road, cars)" % ((Time.get_ticks_usec() - load_start) / 1000.0))
 	_time_track_queries(race.track)
 	await get_tree().create_timer(WARMUP).timeout
@@ -37,15 +53,20 @@ func _ready() -> void:
 		return
 	var end := Time.get_ticks_msec() + int(MEASURE * 1000.0)
 	var frames := 0
+	var paused := 0
+	var progress_before: float = race.manager.racers[0]["progress"]
 	var start := Time.get_ticks_usec()
 	while Time.get_ticks_msec() < end:
 		await get_tree().process_frame
 		frames += 1
+		paused += 1 if get_tree().paused else 0
 		_samples["process"].append(Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0)
 		_samples["physics"].append(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0)
 		_samples["draw_calls"].append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
 		_samples["objects"].append(Performance.get_monitor(Performance.OBJECT_COUNT))
 	var elapsed := (Time.get_ticks_usec() - start) / 1e6
+	print("paused frames %d; car 1 drove %.0f px" % [paused,
+		race.manager.racers[0]["progress"] - progress_before])
 	print("frames %d in %.1fs = %.0f fps (%.2f ms/frame)" % [frames, elapsed, frames / elapsed, elapsed * 1000.0 / frames])
 	for key in ["process", "physics"]:
 		print("%-10s avg %.3f ms  p99 %.3f ms  max %.3f ms" % [key, _avg(_samples[key]), _pct(_samples[key], 0.99), _samples[key].max()])
@@ -65,7 +86,7 @@ func _bench(race: Node) -> void:
 	for i in frames:
 		await get_tree().physics_frame
 	var per_frame := (Time.get_ticks_usec() - start) / float(frames)
-	print("bench: %.0f us per simulated frame (%d frames, 4 cars)" % [per_frame, frames])
+	print("bench: %.0f us per simulated frame (%d frames, %d cars)" % [per_frame, frames, race.racers.size()])
 
 	race.queue_free()
 	await get_tree().process_frame

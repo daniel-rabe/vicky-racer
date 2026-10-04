@@ -198,7 +198,23 @@ save/load.
 
 ---
 
-## Phase 17 — Release build
+## Phase 17 — Release build ✅ done
+
+Built as planned (DESIGN.md §17): a 125 MB single-file `VickyRacer.exe` (pack embedded), icon,
+splash, version 1.0.0, window title and remembered window, a performance pass and the playtest
+checklist ([`PLAYTEST.md`](PLAYTEST.md)). It runs from a clean folder with no editor or tools on
+this machine; the other-machine check is the first item of the playtest. Changes:
+
+- **Icon and splash are composed** from the approved car and the title's font, not generated.
+- **The internal project name stays VickyRacer** (it is the save folder); the window and the
+  .exe say *Vicky Racer*.
+- **Found by exporting:** opponent colours stored as a PackedColorArray came out empty in the
+  exported game; now an Array[Color], and all 45 config resources are checked identical in the
+  project and the pack.
+- **No performance cuts needed**: the busiest case (two views, four cars on ice) is 0.6 ms a
+  frame here. `--fps` in the .exe checks a new machine.
+
+### Plan as written
 
 1. **Windows export preset** — icon, product name, version, and an export filter keeping `tools/`,
    `docs/` and `tests/` out of the pack (`docs/mockups/` is imported today, so it would otherwise

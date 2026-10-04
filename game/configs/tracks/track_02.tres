@@ -17,5 +17,5 @@ player_slot = 3
 opponent_names = PackedStringArray("BLUE", "YELLOW", "GREEN")
 opponent_setups = Array[ExtResource("6_setup")]([ExtResource("3_a"), ExtResource("4_b"), ExtResource("5_c")])
 opponent_paints = Array[StringName]([&"blue", &"yellow", &"green"])
-opponent_colours = PackedColorArray(0.227, 0.525, 1, 1, 1, 0.824, 0.247, 1, 0.18, 0.769, 0.42, 1)
+opponent_colours = Array[Color]([Color(0.227, 0.525, 1, 1), Color(1, 0.824, 0.247, 1), Color(0.18, 0.769, 0.42, 1)])
 opponent_skills = PackedFloat32Array(0.85, 0.7, 0.55)

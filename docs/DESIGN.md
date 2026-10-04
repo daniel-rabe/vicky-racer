@@ -1050,7 +1050,49 @@ and the ghost of the best lap then drives that lap again **0.0000 px** from the 
 tick, over three laps; no coins, three laps reported, the record and the ghost saved, both
 surviving a reload and the next run racing the saved ghost; and the switch on PICK A RACE.
 
-## 17. Out of scope for v1
+## 17. Release build
 
-The release build (Phase 17) is planned in
+A Windows build that starts from a desktop icon: **`VickyRacer.exe`**, one file of 125 MB with
+the game inside (the pack embedded), running from any folder with no editor, ComfyUI or Python.
+
+```bash
+Godot_console.exe --path . --headless --export-release "Windows" build/windows/VickyRacer.exe
+```
+
+- **Preset** ([`export_presets.cfg`](../export_presets.cfg)): Windows x86-64, product name *Vicky
+  Racer*, version **1.0.0** (`application/config/version`, also shown small on the title), the
+  icon in the .exe. `tests/`, `tools/` and `docs/` are filtered out (and `tools/`, `docs/`
+  are not even imported: `.gdignore`); `build/` is git-ignored. Needs the 4.7.1 export
+  templates — only the Windows ones are installed here (the full set did not fit on C:).
+- **Art** ([`tools/comfy/make_release_art.py`](../tools/comfy/make_release_art.py)), composed from
+  approved assets, nothing newly generated: the icon is the red car racing up a road on a grass
+  tile ([`art/ui/release/icon.png`](../art/ui/release/icon.png), `.ico` from 16 to 256 px); the boot
+  splash is VICKY RACER in the title's font and colours over the car, shown at least 1.2 s.
+- **Boot polish:** the window is titled *Vicky Racer*. The project's internal name stays
+  `VickyRacer`, because it names the save folder (`%APPDATA%/Godot/app_userdata/VickyRacer`) and
+  renaming it would lose every save. Fullscreen was already remembered; now the window's size
+  and position are too (`window_rect` in the settings file, kept on quit and before going
+  fullscreen, restored only if that spot is still on a screen).
+- **Found by exporting:** Godot 4.7's export converter left the `PackedColorArray` of opponent
+  colours in the track configs **empty** in the .exe (every opponent's minimap dot turned black).
+  They are an `Array[Color]` now, and a probe that loads all 45 config resources in the project
+  and in the exported pack finds them identical.
+- **Performance** (`tests/perf_probe.gd`, now with `--track=` and `--two-player`), on the
+  development machine (RTX 5070 Ti), vsync off:
+
+  | Case | Frame (uncapped) | Simulation per frame (headless) |
+  | --- | --- | --- |
+  | One player, Meadow Loop | 0.54 ms | 210 µs |
+  | One player, Snowy Peak (ice) | 0.54 ms | 235 µs |
+  | Two players split, Snowy Peak, four cars | 0.60 ms | 232 µs |
+
+  The busiest moment uses under 4 % of a 60 fps frame, so nothing was cut. The probe now
+  removes the pause menu (a window that never had focus paused the race mid-measurement), and
+  reports paused frames. On an unknown machine: `VickyRacer.exe -- --fps`.
+- **Playtest:** [`PLAYTEST.md`](PLAYTEST.md) — what to check before, what to watch for per
+  pillar, and what to write down after.
+
+## 18. Out of scope for v1
+
+Ideas parked for later are listed in
 [`ROADMAP.md`](ROADMAP.md). Touch controls remain out of scope.

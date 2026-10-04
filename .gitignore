@@ -30,9 +30,15 @@ tools/comfy/masters/sfx/*
 # in asset_manifest.json's `paints` section. The built cards and bodies in art/ are committed.
 tools/comfy/masters/paint_*
 !tools/comfy/masters/sfx/boost_103.flac
+!tools/comfy/masters/sfx/sticker_103.flac
 
 # Music masters (43 MB for the picks alone) and listening previews: reproducible from the
 # pinned seeds in tools/comfy/music_manifest.json; `build` re-renders a missing master.
 # The built Ogg files in art/music/ are committed.
 tools/comfy/masters/music/
 docs/mockups/music/listen/
+
+# Release builds (Phase 17): export_presets.cfg writes the .exe here.
+build/
+
+# The sticker sound pick (Phase 14) is kept like the other picks.

@@ -105,6 +105,9 @@ func _test_settings_file() -> void:
 	_check(loaded.sound_volume == 1.0, "volume is clamped to 0-1 (%.2f)" % loaded.sound_volume)
 	_check(loaded.difficulty == &"normal" and not loaded.fullscreen, "unknown or mistyped values are ignored")
 	_check(loaded.steering_help, "valid values are kept")
+	_check(not loaded.set_value(&"window_rect", Rect2i(10, 10, 200, 100)), "a window too small to be meant is not remembered")
+	_check(loaded.set_value(&"window_rect", Rect2i(100, 80, 1280, 720)) and loaded.save_to(SETTINGS) == OK
+		and Settings.load_from(SETTINGS).window_rect == Rect2i(100, 80, 1280, 720), "the window's place and size are kept")
 	DirAccess.remove_absolute(SETTINGS)
 
 
