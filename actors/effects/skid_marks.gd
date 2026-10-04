@@ -34,6 +34,8 @@ func _on_drift_started(car: Node) -> void:
 		line.width = WIDTH
 		# Each car can bring its own marks (the Dragon's are fiery); else the dark default.
 		line.default_color = car.setup.skid_colour if car is Car and car.setup else COLOUR
+		if car is Car and car.level == 1:
+			line.z_index = Track.DECK_Z  # marks laid on a bridge lie on its deck
 		line.joint_mode = Line2D.LINE_JOINT_ROUND
 		line.begin_cap_mode = Line2D.LINE_CAP_ROUND
 		line.end_cap_mode = Line2D.LINE_CAP_ROUND

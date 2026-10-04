@@ -16,6 +16,7 @@ const OUTLINE := Color(0.055, 0.078, 0.11)
 
 func _ready() -> void:
 	top_level = true
+	z_index = 10  # above bridges and every car
 	_place()
 	reset_physics_interpolation()
 

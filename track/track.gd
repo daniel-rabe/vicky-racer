@@ -15,7 +15,13 @@ extends Node2D
 ##
 ## It also measures every car against the racing line once per frame, before anything else
 ## runs (process_physics_priority -2), so the race, the AI and steering help read
-## progress_of() / distance_of() instead of each searching the curve again.
+## progress_of() / distance_of() instead of each searching the curve again. The search is
+## local — near where the car was last frame — so where the road crosses itself a car keeps
+## to its own pass of it.
+##
+## Bridges (docs/DESIGN.md §7.7): where the line crosses itself one pass goes over a bridge
+## (bridge_spans). A car on a span is on the upper level: drawn above the deck, colliding
+## only with other upper cars and the railings, while cars below drive under it.
 
 signal finish_crossed(car: Car)
 signal checkpoint_crossed(car: Car)
@@ -47,6 +53,8 @@ const BR := 1
 @export var theme: TrackTheme
 ## Ice lying on the road: x = where it starts, y = how long it is, both as fractions of a lap.
 @export var ice_spans: PackedVector2Array = []
+## Passes of the road that go over a bridge, as (start, length) fractions of a lap.
+@export var bridge_spans: PackedVector2Array = []
 @export var map_size := Vector2(6144, 3584)
 @export var road_half_width := 192.0
 ## A bend tighter than this (radians of turn per 100 px of road) gets kerbs.
@@ -58,6 +66,17 @@ const BR := 1
 
 var _surface_of := {}  # car -> surface id
 var _measured := {}  # car -> Vector2(progress along the line, distance from it), this frame
+var _line_pts := PackedVector2Array()    # the racing line's baked points, world space
+var _line_at := PackedFloat32Array()     # distance along the line of each
+var _last_index := {}  # car -> baked point it was nearest last frame
+
+## A car is searched for within this many baked points (20 px apart) either side of where it
+## was; further than RELOCATE_DISTANCE from the line it was teleported, and a full search runs.
+const SEARCH_WINDOW := 12
+const RELOCATE_FACTOR := 3.0
+## Bridge decks draw above the road and the cars beneath them; cars on a bridge above both.
+const DECK_Z := 1
+const RAILING_HEIGHT_FRACTION := 0.7  # the middle part of a span stands high enough for railings
 
 @onready var ground: TileMapLayer = $Ground
 @onready var road: Node2D = $Road  # sits above Ground; the generated road lines go inside it
@@ -70,6 +89,14 @@ func _ready() -> void:
 		racing_line.curve.changed.connect(_build_road.call_deferred)
 		return
 	process_physics_priority = -2  # measure the cars before the drivers and the race read them
+	_cache_line()
+	_build_railings()
+	var car_layers := Car.LAYER_CARS_GROUND | Car.LAYER_CARS_BRIDGE
+	for gate: Area2D in [$FinishLine, $Checkpoint]:
+		gate.collision_mask = car_layers
+	if has_node(^"BoostPads"):
+		for pad: Area2D in $BoostPads.get_children():
+			pad.collision_mask = car_layers
 	$FinishLine.body_entered.connect(func(body: Node2D) -> void:
 		if body is Car:
 			finish_crossed.emit(body))
@@ -88,8 +115,11 @@ func _physics_process(_delta: float) -> void:
 		return
 	_measured.clear()
 	for car: Car in get_tree().get_nodes_in_group(&"cars"):
-		var measure := _measure(car.global_position)
+		var measure := _measure_car(car)
 		_measured[car] = measure
+		var level := 1 if on_bridge(measure.x) and measure.y <= road_half_width + KERB_WIDTH else 0
+		if car.level != level:
+			car.set_level(level)
 		var surface := surface_at(car.global_position, measure.y)
 		if _surface_of.get(car) != surface:
 			_surface_of[car] = surface
@@ -108,10 +138,51 @@ func distance_of(car: Node2D) -> float:
 	return _measured[car].y if _measured.has(car) else distance_to_line(car.global_position)
 
 
-## Progress along the line and distance from it, from a single search of the curve.
-func _measure(global_pos: Vector2) -> Vector2:
-	var here := progress_at(global_pos)
-	return Vector2(here, global_pos.distance_to(line_point(here)))
+## True when `offset` (px along the line) lies on a pass that goes over a bridge.
+func on_bridge(offset: float) -> bool:
+	var at := offset / lap_length()
+	for span in bridge_spans:
+		if fposmod(at - span.x, 1.0) <= span.y:
+			return true
+	return false
+
+
+## Progress along the line and distance from it, searched near where the car was last frame.
+func _measure_car(car: Node2D) -> Vector2:
+	var pos := car.global_position
+	var n := _line_pts.size()
+	var best := Vector3(INF, 0.0, 0.0)  # distance, offset, index
+	var last: int = _last_index.get(car, -1)
+	if last >= 0:
+		for k in range(-SEARCH_WINDOW, SEARCH_WINDOW + 1):
+			var i := posmod(last + k, n - 1)
+			var a := _line_pts[i]
+			var b := _line_pts[i + 1]
+			var ab := b - a
+			var t := clampf((pos - a).dot(ab) / maxf(ab.length_squared(), 0.001), 0.0, 1.0)
+			var d := pos.distance_to(a + ab * t)
+			if d < best.x:
+				best = Vector3(d, _line_at[i] + (_line_at[i + 1] - _line_at[i]) * t, i)
+	if last < 0 or best.x > road_half_width * RELOCATE_FACTOR:
+		# First sight of this car, or it was put somewhere new: search the whole line.
+		var here := progress_at(pos)
+		best = Vector3(pos.distance_to(line_point(here)), here, mini(_line_at.bsearch(here), n - 2))
+	_last_index[car] = int(best.z)
+	return Vector2(fposmod(best.y, lap_length()), best.x)
+
+
+func _cache_line() -> void:
+	var curve := racing_line.curve
+	_line_pts = PackedVector2Array()
+	_line_at = PackedFloat32Array()
+	var total := 0.0
+	var points := curve.get_baked_points()
+	for i in points.size():
+		var p := racing_line.to_global(points[i])
+		if i > 0:
+			total += p.distance_to(_line_pts[i - 1])
+		_line_pts.append(p)
+		_line_at.append(total)
 
 
 ## What a car at this point drives on: &"asphalt", &"grass" or &"sand". Pass `distance`
@@ -221,6 +292,54 @@ func _build_road() -> void:
 		_add_road(_line(_span_points(span), road_half_width * 2.0 - 8.0, ROAD_ICE, Color.WHITE, false))
 	_add_road(_line(points, 12.0, _dash_texture(), DASH_COLOUR, true))
 	_add_road(_finish_line())
+	for span in bridge_spans:
+		_add_road(_bridge_deck(span, asphalt))
+
+
+## A bridge: the pass of road over the span drawn again, above everything below it — with a
+## shadow on the ground and railings along the part that stands high.
+func _bridge_deck(span: Vector2, asphalt: Texture2D) -> Node2D:
+	var deck := Node2D.new()
+	deck.z_index = DECK_Z
+	var points := _span_points(span)
+	var cut := int(points.size() * (1.0 - RAILING_HEIGHT_FRACTION) / 2.0)
+	var high := points.slice(cut, points.size() - cut)
+	var shadow := PackedVector2Array()
+	for p in high:
+		shadow.append(p + Vector2(18, 28))
+	deck.add_child(_line(shadow, road_half_width * 2.0 + 16.0, null, Color(0, 0, 0, 0.28), false))
+	deck.add_child(_line(points, road_half_width * 2.0 + 12.0, null, OUTLINE_COLOUR, false))
+	deck.add_child(_line(points, road_half_width * 2.0, asphalt, Color.WHITE, false))
+	deck.add_child(_line(points, 12.0, _dash_texture(), DASH_COLOUR, false))
+	for side in [1.0, -1.0]:
+		var rail := _offset(high, side * (road_half_width + 4.0))
+		deck.add_child(_line(rail, 18.0, null, OUTLINE_COLOUR, false))
+		deck.add_child(_line(rail, 10.0, null, Color(0.93, 0.93, 0.95), false))
+	return deck
+
+
+## Solid railings along the high part of every bridge, for cars on the bridge only.
+func _build_railings() -> void:
+	if bridge_spans.is_empty():
+		return
+	var body := StaticBody2D.new()
+	body.name = "Railings"
+	body.collision_layer = Car.LAYER_RAILINGS
+	body.collision_mask = 0
+	add_child(body)
+	for span in bridge_spans:
+		var points := _span_points(span)
+		var cut := int(points.size() * (1.0 - RAILING_HEIGHT_FRACTION) / 2.0)
+		var high := points.slice(cut, points.size() - cut)
+		for side in [1.0, -1.0]:
+			var rail := _offset(high, side * (road_half_width + 4.0))
+			for i in rail.size() - 1:
+				var shape := CollisionShape2D.new()
+				var segment := SegmentShape2D.new()
+				segment.a = to_local(road.to_global(rail[i]))
+				segment.b = to_local(road.to_global(rail[i + 1]))
+				shape.shape = segment
+				body.add_child(shape)
 
 
 ## The racing line's points over one ice span, in Road coordinates.

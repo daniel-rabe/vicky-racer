@@ -8,9 +8,13 @@ extends RefCounted
 ## the game. An unreadable file is kept as .bak rather than silently overwritten.
 
 const DEFAULT_PATH := "user://vicky_racer.cfg"
-## 2 added [paint]. Version 1 files load as they are (no paint yet) and are written back as 2.
-const SCHEMA_VERSION := 2
-const READABLE_VERSIONS: Array[int] = [1, 2]
+## 2 added [paint]. 3: the tracks were rebuilt longer (with bridges), so best laps saved
+## before then are dropped — they were set on different tracks. Older files otherwise load
+## as they are and are written back as the current version.
+const SCHEMA_VERSION := 3
+const READABLE_VERSIONS: Array[int] = [1, 2, 3]
+## Below this version, saved best laps belong to the old, shorter tracks.
+const TRACKS_REBUILT_VERSION := 3
 const STARTER_SETUP := &"starter"
 
 var coins := 0
@@ -57,7 +61,8 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 			var colour := StringName(str(file.get_value("paint", id, "")))
 			if colour in Paint.COLOURS and colour != Paint.ORIGINAL:
 				profile.paint[StringName(id)] = colour
-	if file.has_section("best_laps"):
+	var version := int(file.get_value("profile", "schema_version", SCHEMA_VERSION))
+	if file.has_section("best_laps") and version >= TRACKS_REBUILT_VERSION:
 		for track in file.get_section_keys("best_laps"):
 			var seconds := float(file.get_value("best_laps", track, 0.0))
 			if seconds > 0.0:

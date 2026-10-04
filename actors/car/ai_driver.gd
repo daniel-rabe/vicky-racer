@@ -102,8 +102,8 @@ func _update_lane(delta: float) -> void:
 	var right := forward.orthogonal()
 	var blocked := false
 	for other: Car in get_tree().get_nodes_in_group(&"cars"):
-		if other == car:
-			continue
+		if other == car or other.level != car.level:
+			continue  # a car on the other level (over or under a bridge) is not in the way
 		var rel := other.global_position - car.global_position
 		var along := rel.dot(forward)
 		var side := rel.dot(right)
@@ -148,7 +148,7 @@ func _handle_stuck(speed: float, delta: float) -> bool:
 
 ## Put the car back on the racing line, facing along it.
 func _rescue() -> void:
-	var here := track.progress_at(car.global_position)
+	var here := track.progress_of(car)
 	car.global_position = _line_point(here, _offset)
 	car.rotation = _tangent(here).angle()
 	car.velocity = Vector2.ZERO

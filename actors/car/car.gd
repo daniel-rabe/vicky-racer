@@ -5,6 +5,16 @@ extends CharacterBody2D
 ## docs/DESIGN.md §4 — steering rotates the car directly, so it cannot spin out, and
 ## separate forward/sideways grip is what makes it drift.
 
+## Physics layers. The world (walls, props) is layer 1; cars on the ground and cars on a
+## bridge are on separate layers, so the two levels pass through each other where a road
+## crosses itself, and bridge railings stop only the cars up on the bridge.
+const LAYER_WORLD := 1
+const LAYER_CARS_GROUND := 2
+const LAYER_CARS_BRIDGE := 4
+const LAYER_RAILINGS := 8
+## Cars on a bridge draw above its deck (Track.DECK_Z).
+const BRIDGE_Z := 2
+
 ## A boost pad: for this long the car may go BOOST_SPEED_MULT over its top speed and gets
 ## BOOST_PUSH px/s² of extra acceleration. Fades out over the last third.
 const BOOST_SECONDS := 1.2
@@ -45,6 +55,8 @@ var catch_up_mult := 1.0
 
 ## Held still, ignoring its driver: during the countdown, and after the race.
 var frozen := false
+## 0 on the ground, 1 on a bridge. Set by the track through set_level().
+var level := 0
 
 ## The handling actually in use: base_config with the setup's multipliers applied.
 var config: CarConfig
@@ -63,6 +75,15 @@ func _ready() -> void:
 	if body_texture:
 		$Body.texture = body_texture
 	_resolve_config()
+	set_level(0)
+
+
+## Move between the ground and a bridge: drawing order and what the car can touch.
+func set_level(value: int) -> void:
+	level = value
+	z_index = BRIDGE_Z if value == 1 else 0
+	collision_layer = LAYER_CARS_BRIDGE if value == 1 else LAYER_CARS_GROUND
+	collision_mask = LAYER_WORLD | (LAYER_CARS_BRIDGE | LAYER_RAILINGS if value == 1 else LAYER_CARS_GROUND)
 
 
 func _resolve_config() -> void:

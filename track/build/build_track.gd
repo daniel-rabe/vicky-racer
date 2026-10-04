@@ -70,6 +70,10 @@ func _build(data: Dictionary, id: StringName, out_path: String) -> Error:
 	for span: Array in data.get("ice_spans", []):
 		spans.append(Vector2(span[0], span[1]))
 	_root.set("ice_spans", spans)
+	var bridges := PackedVector2Array()
+	for span: Array in data.get("bridge_spans", []):
+		bridges.append(Vector2(span[0], span[1]))
+	_root.set("bridge_spans", bridges)
 
 	_add(_ground(data, map_tiles, theme))
 	_add(_named(Node2D.new(), "Road"))

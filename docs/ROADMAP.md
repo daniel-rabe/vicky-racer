@@ -70,8 +70,10 @@ Built as planned: tracks as JSON specs, themes, Sunny Beach / Snowy Peak / Toy T
 on the road), boost pads, track select with unlocking by finishing. Details in
 [`DESIGN.md`](DESIGN.md) §7. Changes on the way:
 
-- **No figure-of-eight bridge**: a self-crossing line makes race progress ambiguous at the crossing.
-  Snowy Peak is twisty instead.
+- **Bridges after all** (asked for after the first build, with longer tracks): figure-of-eight
+  Meadow Loop, a mountain bridge on Snowy Peak, a flyover in Toy Town. The ambiguity at the
+  crossing is solved by searching each car's position locally (DESIGN.md §7.7). All tracks were
+  lengthened to ~22–31 s laps; save schema 3 drops best laps from the short tracks.
 - New surfaces **beach** (softer than a sand trap, for the easy track) and **snow** besides ice.
 - Snowman and toy house re-prompted to be truly top-down (described as seen from above).
 - Toy Town shares the meadow's ground tiles; only kerbs and props differ.

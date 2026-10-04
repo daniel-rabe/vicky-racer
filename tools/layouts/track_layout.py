@@ -11,6 +11,11 @@ order, where the finish goes, optionally the grid slots (otherwise placed behind
 patches (ellipses of the theme's patch surface: sand traps, ice ponds, dunes), props by kind,
 and, as fractions of a lap, ice on the road and boost pads. The theme (tools/layouts/
 themes.json) colours the diagram the way the track will look.
+
+Where the line crosses itself, one pass goes over a bridge: `bridges` names the upper pass
+by the fraction of the lap where it crosses ({"upper_at": 0.2, "length_tiles": 18}). The
+script finds every crossing, centres a bridge span on the chosen pass, and warns about a
+crossing with no bridge, or a gate, pad or ice patch on a bridge or right by a crossing.
 """
 import json
 import math
@@ -111,13 +116,18 @@ def at_fraction(pts, lengths, fraction):
     return min(range(len(pts)), key=lambda i: abs(lengths[i] - target))
 
 
-def min_clearance(pts, lengths):
+CROSSING_KEEP_OUT = 12.0  # tiles around a crossing that the clearance check ignores
+
+
+def min_clearance(pts, lengths, crossings=()):
     """The closest the line comes to itself between points at least two road widths apart
-    along it, in tiles: below road width + 1 the road would overlap or touch itself."""
+    along it, in tiles: below road width + 1 the road would overlap or touch itself.
+    Bridged crossings are meant to come close, so the area round each is left out."""
     step = 8
     lap = lengths[-1]
     best = math.inf
-    idx = list(range(0, len(pts), step))
+    idx = [i for i in range(0, len(pts), step)
+           if all(math.dist(pts[i], c["point"]) > CROSSING_KEEP_OUT for c in crossings)]
     for a in idx:
         for b in idx:
             along = abs(lengths[a] - lengths[b])
@@ -125,6 +135,32 @@ def min_clearance(pts, lengths):
                 continue
             best = min(best, math.dist(pts[a], pts[b]))
     return best
+
+
+def find_crossings(pts, lengths):
+    """Where the closed line crosses itself: the point, both passes (as lap fractions) and
+    the angle between them in degrees."""
+    n, lap = len(pts), lengths[-1]
+    found = []
+    for i in range(n):
+        a1, a2 = pts[i], pts[(i + 1) % n]
+        for j in range(i + 2, n):
+            if (j + 1) % n == i:
+                continue
+            b1, b2 = pts[j], pts[(j + 1) % n]
+            d = (a2[0] - a1[0]) * (b2[1] - b1[1]) - (a2[1] - a1[1]) * (b2[0] - b1[0])
+            if abs(d) < 1e-12:
+                continue
+            t = ((b1[0] - a1[0]) * (b2[1] - b1[1]) - (b1[1] - a1[1]) * (b2[0] - b1[0])) / d
+            u = ((b1[0] - a1[0]) * (a2[1] - a1[1]) - (b1[1] - a1[1]) * (a2[0] - a1[0])) / d
+            if 0 <= t <= 1 and 0 <= u <= 1:
+                point = (a1[0] + t * (a2[0] - a1[0]), a1[1] + t * (a2[1] - a1[1]))
+                ta, tb = tangent(pts, i), tangent(pts, j)
+                angle = math.degrees(math.acos(max(-1.0, min(1.0, abs(ta[0] * tb[0] + ta[1] * tb[1])))))
+                if any(math.dist(point, f["point"]) < 1.0 for f in found):
+                    continue  # the same crossing, found again on a neighbouring segment
+                found.append({"point": point, "passes": [lengths[i] / lap, lengths[j] / lap], "angle": angle})
+    return found
 
 
 def build(spec: dict) -> None:
@@ -141,9 +177,39 @@ def build(spec: dict) -> None:
     near = spec["finish_near"]
     finish_i = min(range(len(pts)), key=lambda i: math.dist(pts[i], near))
     finish = perpendicular_segment(pts[finish_i], tangent(pts, finish_i), half)
+    crossings = find_crossings(pts, lengths)
+    # Each bridge: a span of the lap centred on the pass it names, which goes over the other.
+    bridges = []
+    for b in spec.get("bridges", []):
+        best = min(((abs(f - b["upper_at"]), f, c) for c in crossings for f in c["passes"]), default=None,
+                   key=lambda x: x[0])
+        if best is None:
+            print(f"  WARNING {track_id}: a bridge is asked for but the line never crosses itself")
+            continue
+        span = b.get("length_tiles", 18.0) / lap_tiles
+        bridges.append({"start": (best[1] - span / 2) % 1.0, "length": span, "crossing": best[2]})
+    for c in crossings:
+        if not any(b["crossing"] is c for b in bridges):
+            print(f"  WARNING {track_id}: the road crosses itself at {tuple(round(v, 1) for v in c['point'])} with no bridge")
+    near_crossing = lambda i: any(math.dist(pts[i], c["point"]) < 6.0 for c in crossings)  # noqa: E731
+
+    def on_bridge(fraction):
+        return any((fraction - b["start"]) % 1.0 <= b["length"] for b in bridges)
+
+    # The checkpoint goes half a lap on, moved forward off any bridge or crossing.
     mid_target = (lengths[finish_i] + lap_tiles / 2) % lap_tiles
     check_i = min(range(len(pts)), key=lambda i: abs(lengths[i] - mid_target))
+    while near_crossing(check_i) or on_bridge(lengths[check_i] / lap_tiles):
+        check_i = (check_i + 4) % len(pts)
     checkpoint = perpendicular_segment(pts[check_i], tangent(pts, check_i), half)
+    if near_crossing(finish_i) or on_bridge(lengths[finish_i] / lap_tiles):
+        print(f"  WARNING {track_id}: the finish line is on a bridge or by a crossing")
+    for what, fractions in (("boost pad", spec.get("boost_pads", [])),
+                            ("ice patch", [x["at"] for x in spec.get("ice", [])])):
+        for f in fractions:
+            i = at_fraction(pts, lengths, f)
+            if near_crossing(i) or on_bridge(f):
+                print(f"  WARNING {track_id}: a {what} at {f} is on a bridge or by a crossing")
 
     if "grid_tiles" in spec:
         grid = [tuple(p) for p in spec["grid_tiles"]]
@@ -158,7 +224,7 @@ def build(spec: dict) -> None:
             grid.append((round(pts[i][0] - ty * side, 2), round(pts[i][1] + tx * side, 2)))
 
     kerb_runs = runs([curvature(pts, i) > 0.035 for i in range(len(pts))])
-    clearance = min_clearance(pts, lengths)
+    clearance = min_clearance(pts, lengths, crossings)
     colours_svg = theme["svg"]
 
     W, H = svg(map_tiles[0]), svg(map_tiles[1])
@@ -190,6 +256,22 @@ def build(spec: dict) -> None:
         sub = poly([pts[(a + k) % len(pts)] for k in range(n)])
         s.append(f'<path d="{sub}" fill="none" stroke="#C4E8F6" stroke-opacity="0.9" stroke-width="{svg(road) - 6}"/>')
     s.append(f'<path d="{road_path}" fill="none" stroke="#FFFFFF" stroke-opacity="0.75" stroke-width="2" stroke-dasharray="6 8"/>')
+    for b in bridges:
+        a = at_fraction(pts, lengths, b["start"])
+        n = int(b["length"] * len(pts))
+        deck = [pts[(a + k) % len(pts)] for k in range(n)]
+        middle = deck[n // 6: n - n // 6]
+        shadow = poly([(x + 0.5, y + 0.8) for x, y in middle])
+        s.append(f'<path d="{shadow}" fill="none" stroke="#000" stroke-opacity="0.3" stroke-width="{svg(road) + 10}"/>')
+        s.append(f'<path d="{poly(deck)}" fill="none" stroke="#1B1E23" stroke-width="{svg(road) + 8}"/>')
+        s.append(f'<path d="{poly(deck)}" fill="none" stroke="#5A6068" stroke-width="{svg(road) - 6}"/>')
+        for side in (1, -1):
+            rail = []
+            for k, (x, y) in enumerate(middle):
+                tx, ty = tangent(pts, (a + n // 6 + k) % len(pts))
+                rail.append((x - ty * side * (half + 0.15), y + tx * side * (half + 0.15)))
+            s.append(f'<path d="{poly(rail)}" fill="none" stroke="#F2F2F2" stroke-width="5"/>')
+        s.append(f'<path d="{poly(deck)}" fill="none" stroke="#FFFFFF" stroke-opacity="0.75" stroke-width="2" stroke-dasharray="6 8"/>')
     for frac in spec.get("boost_pads", []):
         i = at_fraction(pts, lengths, frac)
         ang = math.degrees(math.atan2(*reversed(tangent(pts, i))))
@@ -235,7 +317,8 @@ def build(spec: dict) -> None:
     lap_px = lap_tiles * TILE_PX
     info = [
         f"{spec['name'].upper()} · {theme['name']} · {map_tiles[0]}x{map_tiles[1]} tiles · road {road:g} tiles wide",
-        f"Lap {lap_tiles:.0f} tiles = {lap_px:,.0f} px · about {lap_px / AVG_SPEED_PX_S:.0f} s per lap · closest the road comes to itself: {clearance:.1f} tiles",
+        f"Lap {lap_tiles:.0f} tiles = {lap_px:,.0f} px · about {lap_px / AVG_SPEED_PX_S:.0f} s per lap · closest the road comes to itself: {clearance:.1f} tiles"
+        + "".join(f" · bridge crossing at {c['angle']:.0f}°" for c in crossings),
         "Dashed white = racing line. Pink = mid-lap checkpoint. Pale blue on the road = ice. Orange = boost pad.",
         "Kerbs wherever the bend is tight. Map edge is a wall. One faint square = one 128 px tile.",
     ]
@@ -263,11 +346,14 @@ def build(spec: dict) -> None:
         "props_tiles": spec.get("props", {}),
         "ice_spans": [[span["at"] % 1.0, span["length_tiles"] / lap_tiles] for span in spec.get("ice", [])],
         "boost_pads": spec.get("boost_pads", []),
+        "bridge_spans": [[b["start"], b["length"]] for b in bridges],
+        "crossings_px": [to_px(c["point"]) for c in crossings],
     }
     (OUT / f"{track_id}_points.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
     warn = "  ROAD OVERLAPS ITSELF" if clearance < road + 1.0 else ""
     print(f"{track_id}: lap {lap_tiles:.1f} tiles = {lap_px:,.0f} px (~{lap_px / AVG_SPEED_PX_S:.0f} s); "
-          f"{len(kerb_runs)} kerb runs; clearance {clearance:.1f} tiles{warn}")
+          f"{len(kerb_runs)} kerb runs; clearance {clearance:.1f} tiles{warn}; "
+          f"{len(crossings)} crossing(s){''.join(f' at {c["angle"]:.0f} deg' for c in crossings)}, {len(bridges)} bridge(s)")
 
 
 def main():

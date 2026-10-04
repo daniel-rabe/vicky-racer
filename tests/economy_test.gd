@@ -230,7 +230,17 @@ func _test_version_1_save_migrates() -> void:
 	m.repaint(&"kart")
 	var saved := ConfigFile.new()
 	saved.load(SAVE)
-	_check(int(saved.get_value("profile", "schema_version")) == SaveGame.SCHEMA_VERSION, "it is written back as version 2")
+	_check(int(saved.get_value("profile", "schema_version")) == SaveGame.SCHEMA_VERSION,
+		"it is written back as the current version")
+	_drop(m)
+	var v2 := ConfigFile.new()
+	v2.set_value("profile", "schema_version", 2)
+	v2.set_value("profile", "coins", 300)
+	v2.set_value("best_laps", "track_01", 15.2)
+	v2.save(SAVE)
+	m = _manager()
+	_check(m.profile.coins == 300 and m.profile.best_laps.is_empty(),
+		"a version 2 save keeps its coins but drops best laps set on the old, shorter tracks")
 	_drop(m)
 
 

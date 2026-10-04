@@ -96,7 +96,9 @@ func _report(start_progress: Dictionary) -> void:
 			print("  player rescues %d" % r["driver"].rescues)
 		else:
 			_check(laps.size() >= 2, "%s completed validated laps (%d)" % [name, laps.size()])
-			var ok_times := laps.all(func(t: float) -> bool: return t > 12.0 and t < 45.0)
+			# Sensible = an average speed between 250 and 2000 px/s, whatever the track's length.
+			var length: float = race.track.lap_length()
+			var ok_times := laps.all(func(t: float) -> bool: return t > length / 2000.0 and t < length / 250.0)
 			_check(ok_times, "%s lap times are sensible (%s)" % [name, laps.map(func(t: float) -> String: return "%.1f" % t)])
 			_check(r["driver"].rescues == 0, "%s never needed rescuing (%d)" % [name, r["driver"].rescues])
 	_check(_bad_orders == 0, "positions were always a clean 1-4 (%d bad updates)" % _bad_orders)

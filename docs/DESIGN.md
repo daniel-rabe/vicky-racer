@@ -323,26 +323,25 @@ write into those fields. The same car scene is used for all four racers.
 Four tracks, raced in this order; each opens when the one before it has been finished, in any
 place (§7.6).
 
-| # | Track | Theme | What it adds | Layout | Built |
-| --- | --- | --- | --- | --- | --- |
-| 1 | **Meadow Loop** | grass, sand traps, trees | the original circuit | [`track_01_layout.png`](mockups/track_01_layout.png) | [`screenshots/race.png`](screenshots/race.png) |
-| 2 | **Sunny Beach** | sand, dunes, palms, parasols, beach balls | a wide (3.5-tile) oval: the easy one | [`track_02_layout.png`](mockups/track_02_layout.png) | [`screenshots/track_beach.png`](screenshots/track_beach.png) |
-| 3 | **Snowy Peak** | snow, ice ponds, pine trees, snowmen | **ice on the road** at two bends, a hairpin | [`track_03_layout.png`](mockups/track_03_layout.png) | [`screenshots/track_snow.png`](screenshots/track_snow.png) |
-| 4 | **Toy Town** | lawns, sandpits, toy houses, traffic cones | city corners and three **boost pads** | [`track_04_layout.png`](mockups/track_04_layout.png) | [`screenshots/track_town.png`](screenshots/track_town.png) |
+| # | Track | Theme | What it adds | Lap (AI) | Layout | Built |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | **Meadow Loop** | grass, sand traps, trees | a **figure-of-eight over a bridge** | 22,600 px, ~24 s | [`track_01_layout.png`](mockups/track_01_layout.png) | [`screenshots/track_bridge.png`](screenshots/track_bridge.png) |
+| 2 | **Sunny Beach** | sand, dunes, palms, parasols, beach balls | a wide (3.5-tile) flowing loop: the easy one, no crossing | 20,000 px, ~22 s | [`track_02_layout.png`](mockups/track_02_layout.png) | [`screenshots/track_beach.png`](screenshots/track_beach.png) |
+| 3 | **Snowy Peak** | snow, ice ponds, pine trees, snowmen | a **mountain bridge** over its own hairpin loop, **ice on the road** at three bends | 28,000 px, ~31 s | [`track_03_layout.png`](mockups/track_03_layout.png) | [`screenshots/track_snow.png`](screenshots/track_snow.png) |
+| 4 | **Toy Town** | lawns, sandpits, toy houses, traffic cones | a **flyover** across the main street, city corners, three **boost pads** | 25,600 px, ~27 s | [`track_04_layout.png`](mockups/track_04_layout.png) | [`screenshots/track_town.png`](screenshots/track_town.png) |
 
-The roadmap's figure-of-eight bridge was dropped: a line that crosses itself would also make race
-progress (closest point on the line) ambiguous at the crossing, for little gain. Snowy Peak is the
-twisty one instead.
+Three laps take 65–95 s. The tracks were first built at about half this length (~15 s laps) and
+lengthened on request, with bridges where the road crosses itself (§7.7).
 
 ### 7.1 Track 01 — Meadow Loop
 
 ![Track 01 layout](mockups/track_01_layout.png)
 
-- **48 × 28 tiles** (6144 × 3584 px), lap ≈ **107 tiles / 13,600 px**, about **16 s** for the AI —
-  just under a minute for three laps, about right for a young child's attention. (Laps were ~20 s
-  until Phase 9 stopped car-to-car contact counting as a wall hit; the scrubbing had slowed the pack.)
-- Six corners: a sweeping T1, a hairpin at T2, the T3/T4 S-bend, the long T5 and T6 back onto the
-  start straight. Sand traps on the outside of T1 and T2, where mistakes happen.
+- **64 × 40 tiles** (8192 × 5120 px), a figure-of-eight, lap ≈ **176 tiles / 22,600 px**, about
+  **24 s** for the AI — a bit over a minute for three laps.
+- The start straight leads up over the bridge, down round the right-hand loop (T1–T3), back under
+  the bridge and round the left-hand loop (T4–T6) to the line. Sand traps sit in the corners, where
+  mistakes happen.
 - The circuit is defined **once**, in [`tools/layouts/tracks/track_01.json`](../tools/layouts/tracks/track_01.json)
   (§7.2). [`tools/layouts/track_layout.py`](../tools/layouts/track_layout.py) writes both this diagram and
   [`mockups/track_01_points.json`](mockups/track_01_points.json), which the game reads to build the
@@ -475,11 +474,36 @@ results screen re-races it, and every track's first finish pays its +100 bonus. 
 own opponents in its own cars ([`game/configs/tracks/`](../game/configs/tracks/)), always blue,
 yellow and green.
 
-The balance report runs per track (`--track`). A struggling child reaches the podium with every car
-on every track. Sunny Beach is all long straights, so there the top-speed cars (Banana, Formula,
-Dragon) win clean races by 4–5 s — on purpose the easy, fast track, and the autopilot never pays
-their slipperiness the way a child does. On Snowy Peak's ice and hairpin the field is within a
-second at clean pace whatever the car.
+The balance report runs per track (`--track`); the race test's "sensible lap" bound scales with
+the lap length. On the longer tracks a struggling child reaches the podium with every car on every
+track but one pairing: the slowest car driven slowest — the Ice-Cream Van at 0.7 pace — finishes
+4th on Meadow Loop, 7.6 s back (3rd elsewhere, up to 9 s back on Snowy Peak). Small pace gaps add
+up over longer laps; Easy difficulty is the answer for that child. The top-speed cars (Banana,
+Formula, Dragon) win clean races by 3–5 s; the autopilot never pays their slipperiness the way a
+child does.
+
+### 7.7 Bridges
+
+Where a track's line crosses itself, one pass goes over the other on a bridge. The spec names the
+upper pass (`"bridges": [{"upper_at": 0.13, "length_tiles": 20}]`, the lap fraction where it
+crosses); `track_layout.py` finds every crossing, centres the span on that pass, and warns about a
+crossing with no bridge or a finish line, checkpoint, boost pad or ice patch on or by one (the
+checkpoint moves itself forward off a bridge). It reports the crossing angle: 63–90° on the three
+bridges, so the levels clearly read as one road over another.
+
+| Problem | Answer |
+| --- | --- |
+| Race position at the crossing: the closest point on the line is ambiguous where two passes meet | `Track` measures each car by searching only a short window of the line (±12 baked points, 240 px) around where it was last frame, so a car keeps to its own pass. A full search runs only when a car is new or was moved (a rescue). Also cheaper: CPU per race frame fell from 249 to 208 µs |
+| Two levels | A car within a bridge span and on the road is **level 1**: drawn above the deck (`z_index` 2; the deck is 1), on its own physics layer. Cars on the two levels never collide; cars on the same level still bump |
+| Falling off | Solid **railings** along the high middle of each span, on a layer only level-1 cars collide with, so cars below drive under them. Skid marks laid on a bridge lie on its deck |
+| Looking like a bridge | The deck redraws the road above everything below it, with white railings and a shadow on the ground; the AI ignores cars on the other level when choosing its lane |
+
+[`tests/track_test.gd`](../tests/track_test.gd) drives a car over Meadow Loop's bridge (ground →
+bridge → ground, its progress never jumping to the other pass), and checks the two levels pass
+through each other, the same level still collides, and the railing stops only a bridge car.
+
+The longer tracks moved the save to **schema 3**: best laps from older saves belonged to the short
+tracks and are dropped; coins, cars and paint are kept.
 
 ## 8. AI and the race
 
