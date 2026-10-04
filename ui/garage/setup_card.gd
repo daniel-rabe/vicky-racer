@@ -9,6 +9,8 @@ signal chosen(setup: DriftSetup)
 const GREEN := Color(0.18, 0.769, 0.42)
 const RED := Color(0.902, 0.224, 0.275)
 const DIM := 0.55
+const NAME_SIZE := 30
+const NAME_SIZE_LONG := 22
 
 var setup: DriftSetup
 
@@ -25,10 +27,13 @@ func _ready() -> void:
 	pressed.connect(func() -> void: chosen.emit(setup))
 
 
-func show_setup(value: DriftSetup, owned: bool, equipped: bool, affordable: bool) -> void:
+## `art` is the card picture in the car's current paint (Paint.card).
+func show_setup(value: DriftSetup, art: Texture2D, owned: bool, equipped: bool, affordable: bool) -> void:
 	setup = value
-	_art.texture = setup.card_art
+	_art.texture = art
 	_name.text = setup.display_name.to_upper()
+	# Long names (MONSTER TRUCK, ICE-CREAM VAN) step down a size so they stay on the card.
+	_name.add_theme_font_size_override("font_size", NAME_SIZE if _name.text.length() <= 9 else NAME_SIZE_LONG)
 	_equipped.visible = equipped
 	_owned.visible = owned and not equipped
 	_price_row.visible = not owned
@@ -40,8 +45,9 @@ func show_setup(value: DriftSetup, owned: bool, equipped: bool, affordable: bool
 ## A short wobble when the player tries to buy something they cannot afford yet.
 func shake() -> void:
 	var tween := create_tween()
+	var home := _content.position.x  # end where it started, not at 0
 	for offset in [12.0, -10.0, 7.0, -4.0, 0.0]:
-		tween.tween_property(_content, "position:x", offset, 0.05)
+		tween.tween_property(_content, "position:x", home + offset, 0.05)
 
 
 ## A little pop when the setup has just been bought.

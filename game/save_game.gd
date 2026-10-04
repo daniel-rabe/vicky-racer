@@ -8,7 +8,9 @@ extends RefCounted
 ## the game. An unreadable file is kept as .bak rather than silently overwritten.
 
 const DEFAULT_PATH := "user://vicky_racer.cfg"
-const SCHEMA_VERSION := 1
+## 2 added [paint]. Version 1 files load as they are (no paint yet) and are written back as 2.
+const SCHEMA_VERSION := 2
+const READABLE_VERSIONS: Array[int] = [1, 2]
 const STARTER_SETUP := &"starter"
 
 var coins := 0
@@ -17,6 +19,8 @@ var equipped_setup: StringName = STARTER_SETUP
 ## track id -> best lap in seconds
 var best_laps := {}
 var completed_tracks: Array[StringName] = []
+## setup id -> paint colour (Paint.COLOURS); a car with no entry has its original paint.
+var paint := {}
 
 
 static func fresh(starting_coins := 0) -> SaveGame:
@@ -32,8 +36,7 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 	if file.load(path) != OK:
 		_keep_unreadable(path)
 		return fresh(starting_coins)
-	if int(file.get_value("profile", "schema_version", -1)) != SCHEMA_VERSION:
-		# Only one schema exists so far; a migration step goes here when a second does.
+	if int(file.get_value("profile", "schema_version", -1)) not in READABLE_VERSIONS:
 		_keep_unreadable(path)
 		return fresh(starting_coins)
 
@@ -45,6 +48,11 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 	var equipped := StringName(str(file.get_value("profile", "equipped_setup", STARTER_SETUP)))
 	profile.equipped_setup = equipped if equipped in profile.owned_setups else STARTER_SETUP
 	profile.completed_tracks = _string_names(file.get_value("profile", "completed_tracks", []))
+	if file.has_section("paint"):  # absent in version 1 files
+		for id in file.get_section_keys("paint"):
+			var colour := StringName(str(file.get_value("paint", id, "")))
+			if colour in Paint.COLOURS and colour != Paint.ORIGINAL:
+				profile.paint[StringName(id)] = colour
 	if file.has_section("best_laps"):
 		for track in file.get_section_keys("best_laps"):
 			var seconds := float(file.get_value("best_laps", track, 0.0))
@@ -62,6 +70,8 @@ func save_to(path := DEFAULT_PATH) -> Error:
 	file.set_value("profile", "completed_tracks", PackedStringArray(completed_tracks))
 	for track in best_laps:
 		file.set_value("best_laps", String(track), best_laps[track])
+	for id in paint:
+		file.set_value("paint", String(id), String(paint[id]))
 	return file.save(path)
 
 

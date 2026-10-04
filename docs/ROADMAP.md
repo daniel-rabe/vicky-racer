@@ -50,41 +50,17 @@ accelerate, difficulty) and `assist_test` (hands-off laps).
 
 ---
 
-## Phase 10 — More cars
+## Phase 10 — More cars ✅ done
 
-Today a *drift setup* is both how the car drives and what it looks like. Keep that — one choice is
-easier for a child than "car" plus "setup" — but call them **cars** in the garage and grow the
-roster, and let the opponents drive them too.
+Built as planned — six new cars, off-road ability, per-car skid/smoke colour, engine pitch and
+horn, the Police Car's siren lights, the paint shop, garage pages and opponents in roster cars.
+Details in [`DESIGN.md`](DESIGN.md) §4.2, §8.1, §8.3 and §9.3. Changes on the way:
 
-**Art gate:** a candidate sheet per new car (generated top-down, Kontext recolour for card art, as
-in Phase 3), plus a garage mockup showing paging between card pages.
-
-1. **Six new cars**, each a distinct trade so no purchase is wasted. Proposed:
-
-   | Car | Character | Price |
-   | --- | --- | --- |
-   | Monster Truck | Big, very grippy, slow — ploughs through grass and sand with almost no slowdown | 300 |
-   | Police Car | Balanced and quick; a siren light flashes when it drifts | 350 |
-   | Ice-Cream Van | Slow and heavy, plays a jingle on the horn | 200 |
-   | Formula | Highest top speed, needs braking, little grip on grass | 700 |
-   | Bubble Car | Tiny, darts into corners, slides on everything | 300 |
-   | Dragon | The top prize: fast, slidey, leaves fire-coloured skid marks | 1000 |
-
-2. **Surface multipliers per car** — `DriftSetup` gains `offroad_mult` (how much grass and sand
-   slow it), so the Monster Truck has a real reason to exist. Clamped like everything else.
-3. **Per-car effects** — `DriftSetup` gains optional `skid_colour`, `engine_pitch` and a `horn`
-   sound; skid marks and car audio read them.
-4. **Horn** — a new action (gamepad Y in race / H on keyboard). Pure fun, no gameplay effect.
-5. **Paint shop** — free colour choice per owned car from a palette of 6 (Kontext recolours made at
-   build time, like the opponents). Children love choosing a colour; it costs nothing to balance.
-6. **Garage paging** — 3 × 2 pages with shoulder buttons / Q E, a page dot indicator.
-7. **Opponents drive the roster** — `TrackConfig` lists a car per opponent; colours come from the
-   paint shop palette, so the player's car stays unique (the arrow marker stays regardless).
-8. **Economy** — owning everything goes from 1,450 to ~4,300 coins. Raise nothing; tournaments
-   (Phase 12) and track first-finish bonuses add income. Re-run the economy pacing table.
-
-**Done when:** `balance_report.py` covers all 12 cars at three paces and no car wins the clean-pace
-column by more than ~3 s; the race-setup test checks a new car's body, handling and skid colour.
+- **Opponents pace from the base car**, not their own: in Banana and Dragon they ran away from a
+  child in the Ice-Cream Van. Their car now sets handling and look, not difficulty.
+- **Formula and Dragon toned down** after the balance report (clean wins by 6.2 s and 4.2 s).
+- Two cars needed a second prompt (Monster Truck too like Grippy; Bubble Car in perspective).
+- The palette is original + blue, yellow, green, purple, pink; opponents wear blue / yellow / green.
 
 ---
 

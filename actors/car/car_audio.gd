@@ -9,6 +9,7 @@ extends Node2D
 const ENGINE := preload("res://art/sfx/engine_loop.wav")
 const SKID := preload("res://art/sfx/skid_loop.wav")
 const BUMP := preload("res://art/sfx/wall_bump.wav")
+const HORN := preload("res://art/sfx/horn.wav")
 ## Engine pitch at a standstill and at top speed.
 const PITCH_IDLE := 0.6
 const PITCH_TOP := 1.5
@@ -21,6 +22,7 @@ const HEARING_DISTANCE := 1800.0
 var _engine: AudioStreamPlayer2D
 var _skid: AudioStreamPlayer2D
 var _bump: AudioStreamPlayer2D
+var _horn: AudioStreamPlayer2D
 var _skid_level := 0.0
 
 @onready var car: Car = get_parent()
@@ -28,12 +30,14 @@ var _skid_level := 0.0
 
 func _enter_tree() -> void:
 	EventSystem.CAR_wall_hit.connect(_on_wall_hit)
+	EventSystem.CAR_horn.connect(_on_horn)
 
 
 func _ready() -> void:
 	_engine = _player(ENGINE, ENGINE_DB)
 	_skid = _player(SKID, SILENT_DB)
 	_bump = _player(BUMP, -4.0)
+	_horn = _player(HORN, -2.0)
 	if not SoundManager.audible():
 		set_physics_process(false)
 		return
@@ -45,7 +49,8 @@ func _physics_process(delta: float) -> void:
 	var fraction := clampf(car.velocity.length() / car.config.max_speed, 0.0, 1.0)
 	var throttle := maxf(car.throttle_input, 0.0)
 	# A little extra pitch under throttle, so pressing the pedal is heard straight away.
-	_engine.pitch_scale = lerpf(PITCH_IDLE, PITCH_TOP, fraction) + 0.08 * throttle
+	var pitch := car.setup.engine_pitch if car.setup else 1.0
+	_engine.pitch_scale = (lerpf(PITCH_IDLE, PITCH_TOP, fraction) + 0.08 * throttle) * pitch
 	_engine.volume_db = ENGINE_DB - 4.0 * (1.0 - maxf(fraction, throttle))
 	var target := 0.0
 	if car.is_drifting:
@@ -60,6 +65,13 @@ func _on_wall_hit(hit_car: Node, impact_speed: float) -> void:
 		_bump.volume_db = lerpf(-14.0, -3.0, clampf(impact_speed / 800.0, 0.0, 1.0))
 		_bump.pitch_scale = randf_range(0.9, 1.1)
 		_bump.play()
+
+
+func _on_horn(honking: Node) -> void:
+	if honking != car or not SoundManager.audible():
+		return
+	_horn.stream = car.setup.horn if car.setup and car.setup.horn else HORN
+	_horn.play()
 
 
 func _player(stream: AudioStream, volume_db: float) -> AudioStreamPlayer2D:

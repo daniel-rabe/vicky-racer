@@ -1,7 +1,8 @@
 class_name RacerSpawner
 extends Node
-## Puts the four cars on the grid: the player with their equipped setup, camera and
-## controls, and the opponents from the TrackConfig with AI drivers in staggered lanes.
+## Puts the four cars on the grid: the player in their equipped car and paint, with camera
+## and controls, and the opponents in the cars and paints from the TrackConfig, with AI
+## drivers in staggered lanes.
 ## Returns one Dictionary per racer, the shape RaceManager and the HUD work with:
 ## car, name, body (sprite path), colour, is_player, driver.
 
@@ -9,7 +10,6 @@ const CAR_SCENE := preload("res://actors/car/car.tscn")
 const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
 const PLAYER_INPUT := preload("res://actors/car/player_input.gd")
 const PLAYER_MARKER := preload("res://actors/car/player_marker.gd")
-const PLAYER_BODY := preload("res://art/cars/car_red.png")
 const PLAYER_COLOUR := Color(0.902, 0.224, 0.275)
 ## AI lanes, px either side of the racing line, so the pack spreads across the road.
 const LANES: Array[float] = [-70.0, 70.0, 0.0]
@@ -18,7 +18,7 @@ const LANES: Array[float] = [-70.0, 70.0, 0.0]
 ## `autopilot`: the player's car is driven by an AIDriver too (headless race tests).
 ## `difficulty` shifts every opponent's skill (DifficultyConfig.skill_offset).
 func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: Node,
-		autopilot := false, difficulty: DifficultyConfig = null) -> Array[Dictionary]:
+		autopilot := false, difficulty: DifficultyConfig = null, player_paint := Paint.ORIGINAL) -> Array[Dictionary]:
 	var skill_offset := difficulty.skill_offset if difficulty else 0.0
 	var grid := track.grid_transforms()
 	var racers: Array[Dictionary] = []
@@ -28,8 +28,8 @@ func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: 
 		var is_player := slot + 1 == config.player_slot
 		var racer := {"car": car, "is_player": is_player}
 		if is_player:
-			car.body_texture = PLAYER_BODY
-			car.setup = player_setup  # also swaps in the setup's own car body
+			car.setup = player_setup
+			car.body_texture = Paint.body(player_setup, player_paint)
 			racer.merge({"name": "YOU", "body": car.body_texture.resource_path, "colour": PLAYER_COLOUR})
 			if autopilot:
 				racer["driver"] = _ai(car, track, 1.0, 0.0)
@@ -45,12 +45,15 @@ func spawn(track: Track, config: TrackConfig, player_setup: DriftSetup, parent: 
 			marker.set_script(PLAYER_MARKER)
 			car.add_child(marker)
 		else:
-			var body: Texture2D = config.opponent_bodies[opponent]
+			var setup: DriftSetup = config.opponent_setups[opponent]
+			car.setup = setup
+			var body := Paint.body(setup, config.opponent_paints[opponent])
 			car.body_texture = body
 			racer.merge({"name": config.opponent_names[opponent], "body": body.resource_path,
 				"colour": config.opponent_colours[opponent]})
 			var skill := clampf(config.opponent_skills[opponent] + skill_offset, 0.0, 1.0)
 			racer["driver"] = _ai(car, track, skill, LANES[opponent % LANES.size()])
+			racer["driver"].pace_from_base = true
 			opponent += 1
 		car.name = racer["name"].capitalize()
 		car.frozen = true

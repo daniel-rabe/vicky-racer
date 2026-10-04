@@ -31,6 +31,7 @@ func _run_all() -> void:
 	await _test_reverse_is_capped()
 	await _test_wall_slides_not_stops()
 	await _test_grass_slows_gradually()
+	await _test_offroad_ability()
 	_test_setups_resolve_within_clamps()
 
 
@@ -166,6 +167,22 @@ func _test_grass_slows_gradually() -> void:
 	_check(after_a_moment > 0.85 * top, "no sudden stop on leaving the road (%d -> %d)" % [top, after_a_moment])
 	_check(settled <= 0.55 * car.config.max_speed + 5.0, "settles to the grass speed limit (%d)" % settled)
 	await _done(car)
+
+
+## The Monster Truck shrugs grass off; the Formula suffers more than an ordinary car.
+func _test_offroad_ability() -> void:
+	print("off-road ability")
+	var speeds := {}
+	for id in ["starter", "monster", "formula"]:
+		var car := _new_car(id)
+		car.surface_speed_mult = 0.55
+		car.surface_grip_mult = 0.7
+		await _drive(car, 5.0, 0.0, 1.0)
+		speeds[id] = car.velocity.length() / car.config.max_speed
+		await _done(car)
+	_check(speeds["monster"] > speeds["starter"] + 0.25, "Monster Truck keeps far more of its speed on grass (%.2f vs %.2f)" % [speeds["monster"], speeds["starter"]])
+	_check(speeds["formula"] < speeds["starter"] - 0.1, "Formula loses more than the Starter (%.2f)" % speeds["formula"])
+	_check(speeds["formula"] >= CarConfig.MIN_SURFACE_MULT - 0.01, "but never drops below the floor (%.2f)" % speeds["formula"])
 
 
 func _test_setups_resolve_within_clamps() -> void:

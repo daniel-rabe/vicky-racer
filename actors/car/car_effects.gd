@@ -20,6 +20,8 @@ const EMIT_FROM := Vector2(-40.0, 0.0)
 var _surface := &"asphalt"
 var _dust: GPUParticles2D
 var _smoke: GPUParticles2D
+var _siren: Node2D
+var _siren_time := 0.0
 
 @onready var car: Car = get_parent()
 
@@ -34,6 +36,7 @@ func _ready() -> void:
 	_dust = _emitter(puff, 32, 0.8, Vector2(0.6, 1.5), 80.0)
 	_smoke = _emitter(puff, 30, 0.9, Vector2(0.6, 1.4), 40.0)
 	_smoke.modulate = SMOKE_COLOUR
+	_siren = _siren_lights()
 
 
 func _on_surface_changed(changed: Node, surface: StringName) -> void:
@@ -43,13 +46,40 @@ func _on_surface_changed(changed: Node, surface: StringName) -> void:
 			_dust.modulate = DUST_COLOURS[surface]
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	var speed := car.velocity.length()
 	var fraction := clampf(speed / car.config.max_speed, 0.0, 1.0)
 	_dust.emitting = not car.frozen and DUST_COLOURS.has(_surface) and speed > DUST_MIN_SPEED
 	_dust.amount_ratio = 0.35 + 0.65 * fraction
 	_smoke.emitting = not car.frozen and car.is_drifting and _surface == &"asphalt"
+	if car.setup:
+		_smoke.modulate = car.setup.smoke_colour
+	# The Police Car's roof lights flash while it drifts.
+	_siren.visible = car.setup != null and car.setup.siren and car.is_drifting
+	if _siren.visible:
+		_siren_time += delta
+		var red_on := fmod(_siren_time, 0.3) < 0.15
+		_siren.get_child(0).modulate.a = 1.0 if red_on else 0.25
+		_siren.get_child(1).modulate.a = 0.25 if red_on else 1.0
 	_smoke.amount_ratio = clampf(car.lateral_speed / (car.config.drift_threshold * 2.5), 0.3, 1.0)
+
+
+## Two glowing discs on the roof, red and blue, flashed by _physics_process. This node draws
+## behind the car, so the lights get a z_index of their own to sit on top of it.
+func _siren_lights() -> Node2D:
+	var lights := Node2D.new()
+	lights.z_index = 1
+	lights.visible = false
+	add_child(lights)
+	var glow := _puff_texture()
+	for i in 2:
+		var light := Sprite2D.new()
+		light.texture = glow
+		light.scale = Vector2(0.55, 0.55)
+		light.position = Vector2(4.0, -14.0 if i == 0 else 14.0)
+		light.self_modulate = Color(1.0, 0.2, 0.2) if i == 0 else Color(0.25, 0.45, 1.0)
+		lights.add_child(light)
+	return lights
 
 
 func _emitter(texture: Texture2D, amount: int, lifetime: float, size: Vector2, spread_speed: float) -> GPUParticles2D:

@@ -1,12 +1,20 @@
 """Produces every game asset listed in asset_manifest.json, using the frozen pipeline.json.
 
     python tools/comfy/generate_assets.py candidates [--only tree,coin]
+    python tools/comfy/generate_assets.py variant-candidates [--only card_police]
     python tools/comfy/generate_assets.py pick tree 13
     python tools/comfy/generate_assets.py build [--only car_blue] [--force]
+    python tools/comfy/generate_assets.py paint-sheet
 
 `candidates` renders every candidate seed for sprites that have no seed yet and writes a
-review sheet to docs/mockups/candidates/<id>.png. `pick` pins the chosen seed in the
-manifest. `build` writes the final, game-sized PNGs into art/.
+review sheet to docs/mockups/candidates/<id>.png; `variant-candidates` does the same for
+Kontext variants (edits of another asset's master). `pick` pins the chosen seed in the
+manifest, for either kind. `build` writes the final, game-sized PNGs into art/.
+
+The manifest's `paints` section is the paint shop: every car in every palette colour, as a
+Kontext recolour of the car's master, written as a card (art/ui/cards/paint/) and a race body
+(art/cars/paint/). It expands into ordinary variants and copies (`expand`), so it builds like
+everything else; `paint-sheet` lays all of them out for review.
 
 Full-resolution masters (cut-out and raw) are kept in tools/comfy/masters/, outside
 Godot's import, because recolours and card art are made from them, not from the
@@ -40,6 +48,29 @@ def load_manifest() -> dict:
 
 def save_manifest(manifest: dict) -> None:
     MANIFEST_PATH.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def expand(manifest: dict) -> dict:
+    """The manifest with its `paints` section unrolled into variants and copies."""
+    paints = manifest.get("paints")
+    if not paints:
+        return manifest
+    variants, copies = list(manifest["variants"]), list(manifest["copies"])
+    for car, source in paints["cars"].items():
+        for colour, words in paints["palette"].items():
+            key = f"{car}_{colour}"
+            card_out = f"art/ui/cards/paint/{key}.png"
+            body_out = f"art/cars/paint/{key}.png"
+            reuse = paints.get("reuse", {}).get(key)
+            if reuse:  # an existing asset already is this car in this colour
+                copies.append({"id": f"paint_{key}", "source": reuse, "box": [312, 190], "out": card_out})
+                copies.append({"id": f"paint_{key}_body", "source": reuse, "box": [128, 72], "out": body_out})
+                continue
+            variants.append({"id": f"paint_{key}", "source": source, "box": [312, 190], "out": card_out,
+                             "seed": paints.get("seeds", {}).get(key, paints["seed"]),
+                             "instruction": paints["instruction"].format(colour=words)})
+            copies.append({"id": f"paint_{key}_body", "source": f"paint_{key}", "box": [128, 72], "out": body_out})
+    return {**manifest, "variants": variants, "copies": copies}
 
 
 def all_entries(manifest: dict) -> dict[str, dict]:
@@ -121,11 +152,53 @@ def cmd_candidates(only: list[str] | None) -> None:
         print(f"sheet: docs/mockups/candidates/{entry['id']}.png", flush=True)
 
 
+def cmd_variant_candidates(only: list[str] | None) -> None:
+    """Every candidate seed for variants without a seed, as one sheet per variant. Each cell
+    shows the cut-out turned to face +X, as it will on a card and in the race, so a variant
+    that came out pointing the wrong way is visible at a glance."""
+    manifest = expand(load_manifest())
+    entries = all_entries(manifest)
+    pending = [e for e in manifest["variants"] if e["seed"] is None and (not only or e["id"] in only)]
+    if not pending:
+        print("No variants without a seed" + (f" among {only}" if only else "") + ".")
+        return
+    client = ComfyClient()
+    client.check_alive()
+    CANDIDATES.mkdir(parents=True, exist_ok=True)
+    SHEETS.mkdir(parents=True, exist_ok=True)
+    uploads = {}
+    for entry in pending:
+        source = entry["source"]
+        if source not in uploads:
+            uploads[source] = client.upload_image((MASTERS / f"{source}_raw.png").read_bytes(), f"vr_src_{source}.png")
+        cells = []
+        for seed in manifest["candidate_seeds"]:
+            path = CANDIDATES / f"{entry['id']}_s{seed}.png"
+            if not path.exists():
+                images = client.run(recipe.variant_graph(uploads[source], entry["instruction"], seed, prefix="vr_variant"))
+                Image.open(io.BytesIO(images["save_cutout"][0])).convert("RGBA").save(path)
+                Image.open(io.BytesIO(images["save"][0])).convert("RGB").save(CANDIDATES / f"{entry['id']}_s{seed}_raw.png")
+                print(f"  {entry['id']} seed {seed}", flush=True)
+            cells.append((finalize(Image.open(path).convert("RGBA"), entry, entries), f"seed {seed} (facing +X)"))
+        sheet = pp.contact_sheet(cells, len(cells), tuple(entry["box"]), f"{entry['id'].upper()}: CANDIDATES", checker=True)
+        sheet.save(SHEETS / f"{entry['id']}.png")
+        print(f"sheet: docs/mockups/candidates/{entry['id']}.png", flush=True)
+
+
 def cmd_pick(asset_id: str, seed: int) -> None:
     manifest = load_manifest()
-    entry = next((e for e in manifest["sprites"] if e["id"] == asset_id), None)
+    if asset_id.startswith("paint_"):
+        # A paint re-roll: pinned in paints.seeds; delete the old master so build re-renders it.
+        key = asset_id[len("paint_"):]
+        manifest["paints"].setdefault("seeds", {})[key] = seed
+        save_manifest(manifest)
+        for suffix in ("", "_raw"):
+            (MASTERS / f"{asset_id}{suffix}.png").unlink(missing_ok=True)
+        print(f"{asset_id}: seed {seed} pinned; run build --only {asset_id},{asset_id}_body")
+        return
+    entry = next((e for e in manifest["sprites"] + manifest["variants"] if e["id"] == asset_id), None)
     if entry is None:
-        raise SystemExit(f"No sprite called {asset_id!r}")
+        raise SystemExit(f"No sprite or variant called {asset_id!r}")
     candidate = CANDIDATES / f"{asset_id}_s{seed}.png"
     if candidate.exists():
         # Reproducible recipe: the candidate already IS the master for this seed.
@@ -138,7 +211,7 @@ def cmd_pick(asset_id: str, seed: int) -> None:
 
 
 def cmd_build(only: list[str] | None, force: bool) -> None:
-    manifest = load_manifest()
+    manifest = expand(load_manifest())
     entries = all_entries(manifest)
     wanted = lambda e: not only or e["id"] in only  # noqa: E731
     MASTERS.mkdir(parents=True, exist_ok=True)
@@ -167,7 +240,7 @@ def cmd_build(only: list[str] | None, force: bool) -> None:
         write_art(finalize(Image.open(master), entry, entries), entry["out"])
 
     for entry in manifest["variants"]:
-        if not wanted(entry):
+        if not wanted(entry) or entry["seed"] is None:
             continue
         master = MASTERS / f"{entry['id']}.png"
         if force or not master.exists():
@@ -202,21 +275,42 @@ def cmd_build(only: list[str] | None, force: bool) -> None:
             write_art(pp.chequer(), entry["out"])
 
 
+def cmd_paint_sheet() -> None:
+    """Every car (rows) in every paint (columns), from the built cards, for review."""
+    paints = load_manifest()["paints"]
+    cells = []
+    for car in paints["cars"]:
+        for colour in paints["palette"]:
+            path = ROOT / f"art/ui/cards/paint/{car}_{colour}.png"
+            img = Image.open(path).convert("RGBA") if path.exists() else Image.new("RGBA", (312, 190))
+            cells.append((img, f"{car} {colour}"))
+    pp.contact_sheet(cells, len(paints["palette"]), (312, 190), "PAINT SHOP", checker=True) \
+        .save(SHEETS / "paint_shop.png")
+    print("sheet: docs/mockups/candidates/paint_shop.png")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
     c = sub.add_parser("candidates", help="render candidate seeds for unpicked sprites")
     c.add_argument("--only", help="comma-separated asset ids")
+    v = sub.add_parser("variant-candidates", help="render candidate seeds for unpicked variants")
+    v.add_argument("--only", help="comma-separated asset ids")
     p = sub.add_parser("pick", help="pin a candidate seed")
     p.add_argument("asset_id")
     p.add_argument("seed", type=int)
     b = sub.add_parser("build", help="write final art into art/")
     b.add_argument("--only", help="comma-separated asset ids")
     b.add_argument("--force", action="store_true", help="re-render masters even if they exist")
+    sub.add_parser("paint-sheet", help="review sheet of every car in every paint")
     args = parser.parse_args()
     only = args.only.split(",") if getattr(args, "only", None) else None
     if args.command == "candidates":
         cmd_candidates(only)
+    elif args.command == "variant-candidates":
+        cmd_variant_candidates(only)
+    elif args.command == "paint-sheet":
+        cmd_paint_sheet()
     elif args.command == "pick":
         cmd_pick(args.asset_id, args.seed)
     else:

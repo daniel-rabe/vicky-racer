@@ -20,6 +20,9 @@ func _ready() -> void:
 	_test_save_round_trip()
 	_test_unreadable_files_give_fresh_profile()
 	_test_two_last_places_afford_cheapest_setup()
+	_test_paint()
+	_test_version_1_save_migrates()
+	_test_every_car_loads()
 	_wipe()
 	if _failures.is_empty():
 		print("ALL ECONOMY TESTS PASSED")
@@ -186,4 +189,65 @@ func _test_two_last_places_afford_cheapest_setup() -> void:
 	_finish(4)
 	_finish(4)
 	_check(m.can_afford(&"grippy"), "two last places afford Grippy (%d coins)" % m.profile.coins)
+	_drop(m)
+
+
+func _test_paint() -> void:
+	print("paint shop")
+	_wipe()
+	var m := _manager()
+	m.repaint(&"grippy")
+	_check(not m.profile.paint.has(&"grippy"), "a car you do not own cannot be painted")
+	m.repaint(&"starter")
+	_check(m.profile.paint.get(&"starter") == &"blue", "painting cycles original -> blue")
+	for i in Paint.COLOURS.size() - 1:
+		m.repaint(&"starter")
+	_check(not m.profile.paint.has(&"starter"), "and round the palette back to the original")
+	m.repaint(&"starter")
+	m.repaint(&"starter")
+	_drop(m)
+	m = _manager()
+	_check(m.profile.paint.get(&"starter") == &"yellow", "paint survives a save and load (%s)" % m.profile.paint)
+	var starter: DriftSetup = load("res://game/configs/setups/starter.tres")
+	_check(Paint.body(starter, &"yellow") != starter.body, "a painted car has its own race body")
+	_check(Paint.body(starter, Paint.ORIGINAL) == starter.body, "the original paint is the car's own body")
+	_drop(m)
+
+
+func _test_version_1_save_migrates() -> void:
+	print("save version 1 -> 2")
+	_wipe()
+	var old := ConfigFile.new()
+	old.set_value("profile", "schema_version", 1)
+	old.set_value("profile", "coins", 480)
+	old.set_value("profile", "owned_setups", PackedStringArray(["starter", "kart"]))
+	old.set_value("profile", "equipped_setup", "kart")
+	old.save(SAVE)
+	var m := _manager()
+	_check(m.profile.coins == 480 and m.owns(&"kart") and m.profile.equipped_setup == &"kart",
+		"a version 1 save keeps its coins, cars and equipped car (%d coins)" % m.profile.coins)
+	_check(m.profile.paint.is_empty(), "with no paint yet")
+	m.repaint(&"kart")
+	var saved := ConfigFile.new()
+	saved.load(SAVE)
+	_check(int(saved.get_value("profile", "schema_version")) == SaveGame.SCHEMA_VERSION, "it is written back as version 2")
+	_drop(m)
+
+
+func _test_every_car_loads() -> void:
+	print("the roster")
+	_wipe()
+	var m := _manager()
+	_check(m.setups.size() == 12, "twelve cars in the garage (%d)" % m.setups.size())
+	for id in GarageManager.SETUP_ORDER:
+		var setup: DriftSetup = m.setups[id]
+		_check(setup != null and setup.id == id and setup.card_art != null and setup.body != null,
+			"%s loads with its card and body" % id)
+		for colour in Paint.COLOURS:
+			if Paint.body(setup, colour) == null or (colour != Paint.ORIGINAL and Paint.body(setup, colour) == setup.body):
+				_check(false, "%s has a %s paint job" % [id, colour])
+	var prices := GarageManager.SETUP_ORDER.map(func(id: StringName) -> int: return m.setups[id].price)
+	var sorted := prices.duplicate()
+	sorted.sort()
+	_check(prices == sorted, "the garage is in price order (%s)" % [prices])
 	_drop(m)

@@ -16,7 +16,8 @@ from pathlib import Path
 
 GODOT = r"G:\Godot\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe"
 ROOT = Path(__file__).resolve().parents[2]
-SETUPS = ["starter", "grippy", "slider", "rocket", "kart", "banana"]
+SETUPS = ["starter", "grippy", "icecream", "slider", "rocket", "kart",
+          "monster", "bubble", "police", "banana", "formula", "dragon"]
 RESULT = re.compile(r"results are in finishing order \(\[(.*)\]\)")
 ENTRY = re.compile(r'"(\w+) ([\d.]+)s"')
 

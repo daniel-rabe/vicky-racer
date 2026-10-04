@@ -13,6 +13,11 @@ extends Node
 
 ## Set by the RaceManager: < 1 eases off when far ahead of the player, > 1 pushes when behind.
 var rubber_band := 1.0
+## Pace from the base car's top speed rather than this car's own. Opponents do: which car
+## an opponent drives changes how it handles and looks, not how fast the race is, so a
+## Banana-driving opponent cannot run away from a child in the Ice-Cream Van. The player's
+## autopilot (balance tests) paces from its own car, so each car's speed still shows.
+var pace_from_base := false
 var track: Track
 ## How often this car had to be put back on the line; the race test expects 0.
 var rescues := 0
@@ -73,14 +78,15 @@ func _physics_process(delta: float) -> void:
 		bend = maxf(bend, absf(heading.angle_to(_tangent(fposmod(here + d, length)))))
 	# Corner speed depends on how quickly the car turns, not on its top speed: a sharp-
 	# steering setup (Kart) carries more speed through a bend, a lazy one (Rocket) lifts more.
-	var straight_speed := (0.80 + 0.15 * skill) * car.config.max_speed
+	var pace_speed := car.base_config.max_speed if pace_from_base else car.config.max_speed
+	var straight_speed := minf((0.80 + 0.15 * skill) * pace_speed, car.config.max_speed)
 	var turn_factor := car.config.max_steer_rate / car.base_config.max_steer_rate
 	var corner_speed := minf((0.45 + 0.15 * skill) * car.base_config.max_speed * turn_factor, straight_speed)
 	var bend_fraction := clampf(bend / SHARP_BEND, 0.0, 1.0)
 	var top := car.config.max_speed * maxf(rubber_band, 1.0)
 	car.catch_up_mult = maxf(rubber_band, 1.0)
 	var target_speed := clampf(lerpf(straight_speed, corner_speed, bend_fraction) * rubber_band,
-		0.3 * car.config.max_speed, top) * car.surface_speed_mult
+		0.3 * car.config.max_speed, top) * car.surface_speed()
 	if speed < target_speed - 30.0:
 		car.throttle_input = 1.0
 	elif speed > target_speed + 60.0:

@@ -13,6 +13,7 @@ const CONFIG := preload("res://game/configs/tracks/track_01.tres")
 var track: Track
 var racers: Array[Dictionary] = []
 var _player_setup: DriftSetup
+var _player_paint: StringName = Paint.ORIGINAL
 var _difficulty_id: StringName = &"normal"
 
 @onready var manager: RaceManager = $RaceManager
@@ -35,7 +36,7 @@ func _ready() -> void:
 	var difficulty := DifficultyConfig.named(_difficulty_id)
 	var args := OS.get_cmdline_user_args()
 	var autopilot := Array(args).filter(func(a: String) -> bool: return a.begins_with("--autopilot"))
-	racers = spawner.spawn(track, CONFIG, _player_setup, $Racers, not autopilot.is_empty(), difficulty)
+	racers = spawner.spawn(track, CONFIG, _player_setup, $Racers, not autopilot.is_empty(), difficulty, _player_paint)
 	for r in racers:
 		if r["is_player"]:
 			r["car"].get_node("ChaseCamera").set_world_bounds(track.world_rect())
@@ -52,6 +53,7 @@ func _on_state_changed(state: Dictionary) -> void:
 	for setup: DriftSetup in state["setups"]:
 		if setup.id == state["equipped"]:
 			_player_setup = setup
+	_player_paint = state.get("paint", {}).get(state["equipped"], Paint.ORIGINAL)
 
 
 func _show_overview() -> void:

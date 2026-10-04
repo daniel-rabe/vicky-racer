@@ -52,13 +52,15 @@ func _physics_process(_delta: float) -> void:
 	var accelerate := Input.get_action_strength("accelerate")
 	var brake := Input.get_action_strength("brake")
 	if auto_accelerate and brake < 0.1 and accelerate < 0.1:
-		var cruise := AUTO_GO_PACE * car.config.max_speed * car.surface_speed_mult
+		var cruise := AUTO_GO_PACE * car.config.max_speed * car.surface_speed()
 		accelerate = 1.0 if car.forward_speed() < cruise else 0.0
 	if steering_help and track and car.forward_speed() > 60.0:
 		steer = _helped(steer)
 	car.steer_input = steer
 	car.throttle_input = accelerate - brake
 	car.handbrake = Input.is_action_pressed("handbrake")
+	if Input.is_action_just_pressed("horn"):
+		EventSystem.CAR_horn.emit(car)
 
 
 func _helped(steer: float) -> float:

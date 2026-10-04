@@ -71,6 +71,57 @@
       "peak_db": -6.0,
       "out": "art/sfx/ui_click.wav",
       "seed": 103
+    },
+    {
+      "id": "horn",
+      "prompt": "two short cheerful beeps of a small toy car horn, beep beep, cartoon, clean sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.1,
+      "peak_db": -3.0,
+      "out": "art/sfx/horn.wav",
+      "seed": 104
+    },
+    {
+      "id": "horn_police",
+      "prompt": "one short friendly police siren whoop, a single rising and falling wail, toy police car, cartoon, clean sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.2,
+      "peak_db": -4.0,
+      "out": "art/sfx/horn_police.wav",
+      "seed": 102
+    },
+    {
+      "id": "horn_icecream",
+      "prompt": "short cheerful ice cream van jingle played on a tinkly music box chime, happy melody, 2 seconds",
+      "negative": "speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, sad",
+      "seconds": 3.0,
+      "kind": "oneshot",
+      "max_seconds": 2.2,
+      "peak_db": -4.0,
+      "out": "art/sfx/horn_icecream.wav",
+      "seed": 102
+    },
+    {
+      "id": "horn_monster",
+      "prompt": "one big deep truck air horn honk, short and loud, monster truck, cartoon, clean sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.0,
+      "peak_db": -3.0,
+      "out": "art/sfx/horn_monster.wav",
+      "seed": 101
+    },
+    {
+      "id": "horn_dragon",
+      "prompt": "one short cute cartoon baby dragon roar, a small playful growl with a puff of fire, friendly, sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.2,
+      "peak_db": -3.0,
+      "out": "art/sfx/horn_dragon.wav",
+      "seed": 101
     }
   ],
   "synth": [

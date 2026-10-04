@@ -29,6 +29,12 @@ extends Resource
 ## Sideways speed above which the car counts as drifting (skid marks, signals).
 @export var drift_threshold := 220.0
 
+@export_group("Off road")
+## How much grass and sand hold the car back: 1 = the surface slowdown and loss of grip in
+## track.gd SURFACES, 0 = drives off road as if it were asphalt, up to 1.5 = worse than
+## usual (the Formula). Never so bad that a surface stops a car (MIN_SURFACE_MULT).
+@export_range(0.0, 1.5) var offroad_penalty := 1.0
+
 @export_group("Walls")
 ## Fraction of speed lost on a solid wall hit; the slide along the wall is kept.
 @export_range(0.0, 1.0) var wall_speed_scrub := 0.15
@@ -38,6 +44,8 @@ extends Resource
 # Clamps from docs/DESIGN.md §4.2: no setup may make the car undrivable.
 const MIN_LATERAL_GRIP := 3.0
 const MAX_SPEED_CAP := 1500.0
+## However bad a car is off road, grass and sand keep at least this much speed and grip.
+const MIN_SURFACE_MULT := 0.25
 
 
 ## A copy of this config with a drift setup's multipliers applied and clamped.
@@ -50,4 +58,5 @@ func with_setup(setup: DriftSetup) -> CarConfig:
 	resolved.engine_power = engine_power * setup.engine_power_mult
 	resolved.max_speed = minf(max_speed * setup.max_speed_mult, MAX_SPEED_CAP)
 	resolved.max_steer_rate = max_steer_rate * setup.steer_rate_mult
+	resolved.offroad_penalty = clampf(offroad_penalty * setup.offroad_mult, 0.0, 1.5)
 	return resolved

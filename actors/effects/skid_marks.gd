@@ -32,7 +32,8 @@ func _on_drift_started(car: Node) -> void:
 	for wheel in REAR_WHEELS:
 		var line := Line2D.new()
 		line.width = WIDTH
-		line.default_color = COLOUR
+		# Each car can bring its own marks (the Dragon's are fiery); else the dark default.
+		line.default_color = car.setup.skid_colour if car is Car and car.setup else COLOUR
 		line.joint_mode = Line2D.LINE_JOINT_ROUND
 		line.begin_cap_mode = Line2D.LINE_CAP_ROUND
 		line.end_cap_mode = Line2D.LINE_CAP_ROUND

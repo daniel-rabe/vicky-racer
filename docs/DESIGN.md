@@ -56,6 +56,9 @@ balance pass) — and the document describes the game as it is. Mockups referenc
 | Back (menus) | Esc | B |
 | Race from garage | R | Y |
 | Pause (race) | Esc | Start |
+| Horn (race) | H | Y |
+| Paint the focused car (garage) | C | X |
+| Turn the garage page | Q / E | LB / RB |
 
 Escape and B also go back from the garage to the title. In a race, Escape pauses instead of
 leaving: one wrong button must never throw away a race (§10).
@@ -146,17 +149,38 @@ A `DriftSetup` is a `Resource` of **multipliers over** `CarConfig`, never replac
 they multiply a sane base and the results are clamped, no setup can produce nonsense physics, and
 none is a strict upgrade — each is a different trade.
 
-| Setup | Grip × | Handbrake grip × | Engine × | Top speed × | Steer × | Bars G / S / S | Price |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| **Starter** | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 0.7 / 0.4 / 0.5 | owned |
-| **Grippy** | 1.5 | 1.6 | 0.95 | 0.95 | 1.05 | 0.95 / 0.15 / 0.45 | 100 |
-| **Slider** | 0.55 | 0.6 | 1.0 | 1.0 | 1.15 | 0.3 / 0.9 / 0.5 | 250 |
-| **Rocket** | 0.9 | 1.0 | 1.25 | 1.2 | 0.8 | 0.55 / 0.45 / 0.9 | 250 |
-| **Kart** | 1.2 | 1.0 | 1.1 | 0.85 | 1.35 | 0.8 / 0.35 / 0.35 | 250 |
-| **Banana** | 0.45 | 0.5 | 1.3 | 1.25 | 1.0 | 0.2 / 1.0 / 1.0 | 600 |
+Twelve cars, in garage order (prices rise left to right, two pages of six):
 
-Resolved values are clamped — `lateral_grip` never below 3.0, `max_speed` never above 1500 px/s — so
-even Banana stays drivable.
+| Car | Grip × | Handbrake grip × | Engine × | Top speed × | Steer × | Off road × | Bars G / S / S | Price | Extras |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **Starter** | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 0.7 / 0.4 / 0.5 | owned | |
+| **Grippy** | 1.5 | 1.6 | 0.95 | 0.95 | 1.05 | 1.0 | 0.95 / 0.15 / 0.45 | 100 | |
+| **Ice-Cream Van** | 1.1 | 1.0 | 0.85 | 0.88 | 0.95 | 1.0 | 0.75 / 0.3 / 0.3 | 200 | horn plays a jingle |
+| **Slider** | 0.55 | 0.6 | 1.0 | 1.0 | 1.15 | 1.0 | 0.3 / 0.9 / 0.5 | 250 | |
+| **Rocket** | 0.9 | 1.0 | 1.25 | 1.2 | 0.8 | 1.0 | 0.55 / 0.45 / 0.9 | 250 | |
+| **Kart** | 1.2 | 1.0 | 1.1 | 0.85 | 1.35 | 1.0 | 0.8 / 0.35 / 0.35 | 250 | |
+| **Monster Truck** | 1.4 | 1.3 | 0.9 | 0.9 | 0.9 | **0.2** | 0.9 / 0.2 / 0.4 | 300 | deep engine, air horn; grass barely slows it |
+| **Bubble Car** | 0.6 | 0.7 | 1.15 | 0.92 | 1.4 | 1.0 | 0.35 / 0.85 / 0.4 | 300 | high-pitched engine |
+| **Police Car** | 1.05 | 0.8 | 1.1 | 1.08 | 1.05 | 1.0 | 0.7 / 0.5 / 0.65 | 350 | siren lights flash while drifting, siren horn |
+| **Banana** | 0.45 | 0.5 | 1.3 | 1.25 | 1.0 | 1.0 | 0.2 / 1.0 / 1.0 | 600 | |
+| **Formula** | 1.0 | 0.9 | 1.2 | 1.2 | 0.95 | **1.5** | 0.6 / 0.4 / 1.0 | 700 | fastest on straights; must brake, hates grass |
+| **Dragon** | 0.55 | 0.6 | 1.2 | 1.2 | 1.1 | 1.0 | 0.3 / 0.9 / 0.95 | 1000 | fire-coloured skid marks and smoke, roar horn |
+
+Resolved values are clamped — `lateral_grip` never below 3.0, `max_speed` never above 1500 px/s,
+and however bad a car is off road, grass and sand keep at least 25 % of its speed and grip — so
+even Banana stays drivable and the Formula never gets stuck.
+
+**Off road** (`offroad_mult`) scales how much grass and sand slow the car and loosen its grip: the
+Monster Truck keeps ~90 % of its speed on grass where the Starter keeps 55 %, the Formula ~43 %.
+Each car also brings its own **skid and smoke colour, engine pitch and horn** (`DriftSetup`'s
+"Look and sound" group); H / gamepad Y sounds the horn in a race — pure fun, no effect.
+
+The new cars are Kontext edits of the Starter car, like the Phase 5 setups, so all twelve share
+one silhouette scale and the frozen look; candidates and picks are in
+[`mockups/candidates/`](mockups/candidates/) (`card_monster.png` … `card_dragon.png`). Two needed a
+second prompt: the first Monster Truck was red with knobbly tyres, too close to Grippy (now purple
+with green flames), and the first Bubble Car came out in perspective (now a round car with a
+central dome).
 
 **A setup also changes how the car looks:** in the race the player drives the car from its garage
 card — knobbly tyres for Grippy, light-blue swirls for Slider, boosters for Rocket, the go-kart, the
@@ -300,8 +324,9 @@ write into those fields. The same car scene is used for all four racers.
 
 ![Track 01 layout](mockups/track_01_layout.png)
 
-- **48 × 28 tiles** (6144 × 3584 px), lap ≈ **107 tiles / 13,600 px**, about **19 s** at a 700 px/s
-  average — roughly a minute for three laps, about right for a young child's attention.
+- **48 × 28 tiles** (6144 × 3584 px), lap ≈ **107 tiles / 13,600 px**, about **16 s** for the AI —
+  just under a minute for three laps, about right for a young child's attention. (Laps were ~20 s
+  until Phase 9 stopped car-to-car contact counting as a wall hit; the scrubbing had slowed the pack.)
 - Six corners: a sweeping T1, a hairpin at T2, the T3/T4 S-bend, the long T5 and T6 back onto the
   start straight. Sand traps on the outside of T1 and T2, where mistakes happen.
 - The circuit is defined **once**, as control points in
@@ -404,6 +429,12 @@ inputs a player would:
    test expects no rescues in a normal race, and sees none.
 5. **Skill** — 0.85 / 0.70 / 0.55 for Blue / Yellow / Green on Track 01
    ([`game/configs/tracks/track_01.tres`](../game/configs/tracks/track_01.tres)).
+6. **Their cars** — opponents drive garage cars in their own colour: Blue a blue-painted Police Car,
+   Yellow the Banana, Green the Dragon — a preview of what the garage sells. An opponent's car sets
+   its handling, acceleration and look, but its **pace comes from the base car**
+   (`AIDriver.pace_from_base`), so difficulty does not depend on which car it wears: with pace from
+   its own car, a Banana-driving opponent left a child in the Ice-Cream Van 7 s behind. The player's
+   autopilot (balance tests) paces from its own car, so each car's speed still shows.
 
 ### 8.2 Race flow
 
@@ -469,7 +500,28 @@ because the autopilot ignored its sharper steering. Shipped:
 | Banana | 1st −3.0 s | 1st −0.5 s | 2nd +0.6 s |
 
 Clean driving wins narrowly on anything; a decent child fights for 2nd and 3rd; a struggling child
-reaches the podium. Setups are worth buying without trivialising the race. The autopilot never
+reaches the podium.
+
+With twelve cars and opponents in roster cars (Phase 10), Normal:
+
+| Car | 1.0 | 0.85 | 0.7 |
+| --- | --- | --- | --- |
+| Starter | 1st −0.6 s | 2nd +0.6 s | 3rd +1.6 s |
+| Grippy | 1st −0.4 s | 2nd +0.7 s | 3rd +1.8 s |
+| Ice-Cream Van | 2nd +0.4 s | 3rd +1.3 s | 3rd +2.5 s |
+| Slider | 1st −0.7 s | 2nd +0.5 s | 3rd +1.5 s |
+| Rocket | 1st −1.3 s | 2nd +0.1 s | 2nd +1.0 s |
+| Kart | 1st −0.5 s | 2nd +0.7 s | 3rd +1.5 s |
+| Monster Truck | 2nd +0.2 s | 2nd +1.1 s | 3rd +2.4 s |
+| Bubble Car | 1st −1.0 s | 2nd +0.5 s | 3rd +1.3 s |
+| Police Car | 1st −1.5 s | 2nd +0.1 s | 2nd +1.0 s |
+| Banana | 1st −2.6 s | 1st −0.4 s | 2nd +0.8 s |
+| Formula | 1st −2.4 s | 1st −0.2 s | 3rd +1.0 s |
+| Dragon | 1st −3.3 s | 1st −0.4 s | 2nd +0.7 s |
+
+The Formula first won clean races by 6.2 s and was cut back (top speed 1.3 → 1.2, steering
+1.1 → 0.95: fastest on straights, but it must brake for bends); the Dragon by 4.2 s (1.25 → 1.2).
+The slow, steady cars (Ice-Cream Van, Monster Truck) are the easy-to-drive end, never last. Setups are worth buying without trivialising the race. The autopilot never
 uses the handbrake, so the table cannot show what a slippery setup costs a child in control:
 Banana's margin is deliberately the largest because it is also the hardest car to keep on the road.
 
@@ -485,10 +537,13 @@ Banana's margin is deliberately the largest because it is also the hardest car t
 | 4th | 50 |
 | First time finishing a track | +100 once |
 
+Owning all twelve cars costs **4,300 coins**: at the ~65 coins a race a decent child earns, a new
+car every three to five races early on, and the Dragon as a long-term goal. The cups of Phase 12 add
+income on top.
+
 The Phase 8 balance pass left these numbers alone: with the retuned rubber-banding a decent child
 finishes 2nd or 3rd (60–75 coins), which keeps the pacing below. The floor is deliberately generous: a child finishing last every time still affords **Grippy**
-after two races and a 250-coin setup after about five. Winning just gets there faster. Owning
-everything costs 1,450 coins — roughly 15 races for a strong player, 25 for a struggling one. All of
+after two races and a 250-coin setup after about five. Winning just gets there faster. All of
 these numbers live in one `EconomyConfig` resource.
 
 ### 9.2 Save file
@@ -497,7 +552,7 @@ A `ConfigFile` at `user://vicky_racer.cfg`:
 
 ```ini
 [profile]
-schema_version=1
+schema_version=2
 coins=240
 owned_setups=PackedStringArray("starter", "slider")
 equipped_setup="slider"
@@ -507,7 +562,9 @@ completed_tracks=PackedStringArray("track_01")
 track_01=38.90
 ```
 
-`completed_tracks` records which tracks have paid their one-off first-finish bonus.
+`completed_tracks` records which tracks have paid their one-off first-finish bonus. Schema **2**
+(Phase 10) adds a `[paint]` section, car id = colour; version 1 files load as they are and are
+written back as version 2.
 
 Loading is defensive: a missing, unreadable or unknown-version file yields a fresh profile instead
 of an error, and an unreadable file is kept as `vicky_racer.cfg.bak` rather than overwritten.
@@ -522,6 +579,17 @@ Implemented in [`game/save_game.gd`](../game/save_game.gd) and
 [`tests/economy_test.gd`](../tests/economy_test.gd), which also proves the design promise that two
 last places afford Grippy.
 
+### 9.3 Paint shop
+
+Every owned car can be painted, free, as often as the child likes: X / C in the garage cycles the
+focused car through **original → blue → yellow → green → purple → pink**, and the card, the preview
+and the race car all change. The paint is saved per car. The 57 paint jobs (12 cars × 5 colours,
+less the three that already existed as the opponents' recoloured Starter cars) are Kontext
+recolours of each car's master, declared in one `paints` section of
+[`asset_manifest.json`](../tools/comfy/asset_manifest.json); `generate_assets.py paint-sheet` lays
+them all out ([`mockups/candidates/paint_shop.png`](mockups/candidates/paint_shop.png)).
+[`Paint`](../game/configs/paint.gd) maps a car and a colour to its card and race body.
+
 ## 10. Screens
 
 | Screen | Spec |
@@ -530,7 +598,7 @@ last places afford Grippy.
 | Pause | [`mockups/pause_settings_layout.png`](mockups/pause_settings_layout.png) — Esc / Start or the window losing focus pauses the whole tree. RESUME is focused, so pausing twice resumes; B resumes too; RESTART and GARAGE ask SURE? with NO focused. Built: [`screenshots/pause.png`](screenshots/pause.png) |
 | Settings | Same spec — SOUND, FULLSCREEN, AUTO GO, STEER HELP, OPPONENTS; one focusable row each, ← → change it. Over the title and over the pause menu. Built: [`screenshots/settings.png`](screenshots/settings.png) |
 | Race HUD | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown. Built: [`screenshots/race.png`](screenshots/race.png), [`screenshots/race_countdown.png`](screenshots/race_countdown.png). The countdown sits above screen centre rather than on it, so it never hides the player's own car |
-| Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, 3 × 2 setup cards, preview with Grip / Slide / Speed bars. Built: [`screenshots/garage.png`](screenshots/garage.png) |
+| Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, cards in pages of 3 × 2 (Q / E or the shoulder buttons, or moving off the edge of a page, turns it; `< 1 / 2 >` above the cards), preview with Grip / Slide / Speed bars and, for owned cars, paint swatches. Built: [`screenshots/garage.png`](screenshots/garage.png) |
 | Results | [`mockups/results_layout.png`](mockups/results_layout.png) — finishing order, payout count-up, Race Again. Built: [`screenshots/results.png`](screenshots/results.png) |
 
 Pink annotations on each spec give anchors, sizes and animation timings; they are meant to be

@@ -20,3 +20,12 @@ tools/comfy/masters/sfx/*
 !tools/comfy/masters/sfx/coin_104.flac
 !tools/comfy/masters/sfx/finish_fanfare_101.flac
 !tools/comfy/masters/sfx/ui_click_103.flac
+!tools/comfy/masters/sfx/horn_104.flac
+!tools/comfy/masters/sfx/horn_police_102.flac
+!tools/comfy/masters/sfx/horn_icecream_102.flac
+!tools/comfy/masters/sfx/horn_monster_101.flac
+!tools/comfy/masters/sfx/horn_dragon_101.flac
+
+# Paint-shop masters (81 MB): leaves nothing is built from, reproducible from the pinned seed
+# in asset_manifest.json's `paints` section. The built cards and bodies in art/ are committed.
+tools/comfy/masters/paint_*

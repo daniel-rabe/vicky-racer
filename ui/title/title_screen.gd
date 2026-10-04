@@ -6,7 +6,7 @@ extends Node2D
 const TRACK := preload("res://game/configs/tracks/track_01.tres")
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
-const RED := preload("res://art/cars/car_red.png")
+const RED := preload("res://game/configs/setups/starter.tres")
 const HINTS_KEYBOARD := "ENTER  CHOOSE"
 const HINTS_GAMEPAD := "A  CHOOSE"
 ## Skills and lanes for the four attract-mode cars, red first.
@@ -48,11 +48,14 @@ func _build_attract_mode() -> void:
 	_world.add_child(track)
 	_world.add_child(SkidMarks.new())
 	var grid := track.grid_transforms()
-	var bodies: Array[Texture2D] = [RED]
-	bodies.append_array(TRACK.opponent_bodies)
-	for i in mini(grid.size(), bodies.size()):
+	var setups: Array[DriftSetup] = [RED]
+	setups.append_array(TRACK.opponent_setups)
+	var paints: Array[StringName] = [Paint.ORIGINAL]
+	paints.append_array(TRACK.opponent_paints)
+	for i in mini(grid.size(), setups.size()):
 		var car: Car = CAR_SCENE.instantiate()
-		car.body_texture = bodies[i]
+		car.setup = setups[i]
+		car.body_texture = Paint.body(setups[i], paints[i])
 		car.transform = grid[i]
 		var audio := car.get_node("Audio")  # a quiet menu: no engines
 		car.remove_child(audio)

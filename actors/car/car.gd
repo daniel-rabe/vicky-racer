@@ -68,6 +68,16 @@ func forward_speed() -> float:
 	return velocity.dot(Vector2.RIGHT.rotated(rotation))
 
 
+## The surface's speed limit for this car: grass and sand slow an off-road car (Monster
+## Truck) less than a road car (CarConfig.offroad_penalty).
+func surface_speed() -> float:
+	return _offroad(surface_speed_mult)
+
+
+func _offroad(mult: float) -> float:
+	return maxf(1.0 - (1.0 - mult) * config.offroad_penalty, CarConfig.MIN_SURFACE_MULT)
+
+
 func _physics_process(delta: float) -> void:
 	if frozen:
 		velocity = Vector2.ZERO
@@ -106,12 +116,12 @@ func _apply_grip(forward: Vector2, delta: float) -> void:
 	# exact form of the per-frame damping, and can never overshoot into negative grip.
 	var forward_part := forward * velocity.dot(forward)
 	var sideways_part := velocity - forward_part
-	var grip := (config.handbrake_lateral_grip if handbrake else config.lateral_grip) * surface_grip_mult
+	var grip := (config.handbrake_lateral_grip if handbrake else config.lateral_grip) * _offroad(surface_grip_mult)
 	velocity = forward_part * exp(-config.forward_drag * delta) + sideways_part * exp(-grip * delta)
 
 
 func _limit_speed(speed_along: float, delta: float) -> void:
-	var limit := config.max_speed * surface_speed_mult * catch_up_mult if speed_along >= 0.0 		else config.max_reverse_speed
+	var limit := config.max_speed * surface_speed() * catch_up_mult if speed_along >= 0.0 		else config.max_reverse_speed
 	var speed := velocity.length()
 	if speed > limit:
 		velocity = velocity / speed * move_toward(speed, limit, OVERSPEED_DECEL * delta)

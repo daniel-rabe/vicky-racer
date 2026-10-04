@@ -170,6 +170,78 @@
       "out": "art/cars/setups/slider.png",
       "instruction": "Paint bold light-blue swirl decals on the bonnet, roof and sides of this car, like wind rushing past, and give it shiny slick tyres. Keep the red paint, the exact shape, the top-down view and the plain white background.",
       "_note": "A straight Slider car: the earlier card showed the car at a drift angle, which cannot be a driving sprite."
+    },
+    {
+      "id": "card_monster",
+      "source": "car_red",
+      "seed": 11,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/monster.png",
+      "instruction": "Turn this car into a big purple monster truck seen from directly above: a chunky raised purple body with bright green flame decals, sitting on four giant black knobbly off-road tyres that stick out far beyond the body at the sides. Keep its front (the windscreen and headlights) at the bottom of the picture exactly like the original car, the view from directly above and the plain white background.",
+      "_note": "Phase 10 car: Monster Truck. Purple with green flames: the first, red version looked like Grippy (red with knobbly tyres)."
+    },
+    {
+      "id": "card_police",
+      "source": "car_red",
+      "seed": 12,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/police.png",
+      "instruction": "Turn this car into a friendly cartoon police car seen from directly above: a white body with dark blue bonnet and boot, the word POLICE on the roof and a red and blue light bar across the roof. Keep its front (the windscreen and headlights) at the bottom of the picture exactly like the original car, the view from directly above and the plain white background.",
+      "_note": "Phase 10 car: Police Car."
+    },
+    {
+      "id": "card_icecream",
+      "source": "car_red",
+      "seed": 14,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/icecream.png",
+      "instruction": "Turn this car into a cute little ice-cream van seen from directly above: a short boxy pastel pink and mint green body with a giant ice-cream cone with a cherry on the roof. Keep its front (the windscreen and headlights) at the bottom of the picture exactly like the original car, the view from directly above and the plain white background.",
+      "_note": "Phase 10 car: Ice-Cream Van."
+    },
+    {
+      "id": "card_formula",
+      "source": "car_red",
+      "seed": 12,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/formula.png",
+      "instruction": "Turn this car into a sleek red formula racing car seen from directly above: a long narrow pointed body, an open cockpit with a driver in a white helmet, a wide front wing, a rear wing and four big exposed black wheels. Keep its front (the windscreen and headlights) at the bottom of the picture exactly like the original car, the view from directly above and the plain white background.",
+      "_note": "Phase 10 car: Formula."
+    },
+    {
+      "id": "card_bubble",
+      "source": "car_red",
+      "seed": 13,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/bubble.png",
+      "instruction": "Turn this car into a tiny round bubble car seen from directly above: a short, almost circular turquoise body, about as wide as it is long, with a big clear glass dome over the seats in the middle and four small wheels at the corners. Keep its front (the windscreen and headlights) at the bottom of the picture exactly like the original car, the view from directly above and the plain white background.",
+      "_note": "Phase 10 car: Bubble Car. Re-prompted: the first round came out in perspective or as the Starter car with a dome on its back."
+    },
+    {
+      "id": "card_dragon",
+      "source": "car_red",
+      "seed": 14,
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/dragon.png",
+      "instruction": "Turn this car into a friendly cartoon dragon car seen from directly above: a green scaly body with small purple wings folded along the sides, little spikes along the middle, a cute dragon head at the front and a curly tail at the back. Keep its front (the windscreen and headlights) at the bottom of the picture exactly like the original car, the view from directly above and the plain white background.",
+      "_note": "Phase 10 car: Dragon."
     }
   ],
   "copies": [
@@ -242,6 +314,66 @@
       ],
       "out": "art/cars/setups/banana.png",
       "_note": "In-race look of this setup: the same car as its garage card."
+    },
+    {
+      "id": "body_monster",
+      "source": "card_monster",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/monster.png",
+      "_note": "In-race look of this car: the same car as its garage card."
+    },
+    {
+      "id": "body_police",
+      "source": "card_police",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/police.png",
+      "_note": "In-race look of this car: the same car as its garage card."
+    },
+    {
+      "id": "body_icecream",
+      "source": "card_icecream",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/icecream.png",
+      "_note": "In-race look of this car: the same car as its garage card."
+    },
+    {
+      "id": "body_formula",
+      "source": "card_formula",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/formula.png",
+      "_note": "In-race look of this car: the same car as its garage card."
+    },
+    {
+      "id": "body_bubble",
+      "source": "card_bubble",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/bubble.png",
+      "_note": "In-race look of this car: the same car as its garage card."
+    },
+    {
+      "id": "body_dragon",
+      "source": "card_dragon",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/dragon.png",
+      "_note": "In-race look of this car: the same car as its garage card."
     }
   ],
   "procedural": [
@@ -270,5 +402,37 @@
       "kind": "chequer",
       "out": "art/tiles/finish_line.png"
     }
-  ]
+  ],
+  "paints": {
+    "_note": "Phase 10 paint shop: every car in five colours besides its own. Kontext recolours of each car's master; `reuse` points at an asset that already is that car in that colour (the opponents' recolours of the Starter car).",
+    "instruction": "Repaint the main body colour of this vehicle {colour}. Keep every other detail, decoration, wheel and window, the exact shape, the view from directly above and the plain white background exactly the same.",
+    "seed": 11,
+    "palette": {
+      "blue": "bright blue",
+      "yellow": "sunny yellow",
+      "green": "bright green",
+      "purple": "bright purple",
+      "pink": "bubblegum pink"
+    },
+    "cars": {
+      "starter": "car_red",
+      "grippy": "card_grippy",
+      "icecream": "card_icecream",
+      "slider": "body_slider",
+      "rocket": "card_rocket",
+      "kart": "card_kart",
+      "monster": "card_monster",
+      "bubble": "card_bubble",
+      "police": "card_police",
+      "banana": "card_banana",
+      "formula": "card_formula",
+      "dragon": "card_dragon"
+    },
+    "reuse": {
+      "starter_blue": "car_blue",
+      "starter_yellow": "car_yellow",
+      "starter_green": "car_green"
+    },
+    "seeds": {}
+  }
 }

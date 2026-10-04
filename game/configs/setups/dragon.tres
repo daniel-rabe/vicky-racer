@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="DriftSetup" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cards/dragon.png" id="2_card"]
+[ext_resource type="Texture2D" path="res://art/cars/setups/dragon.png" id="3_body"]
+[ext_resource type="AudioStream" path="res://art/sfx/horn_dragon.wav" id="4_horn"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"dragon"
+display_name = "Dragon"
+card_art = ExtResource("2_card")
+body = ExtResource("3_body")
+price = 1000
+lateral_grip_mult = 0.55
+handbrake_grip_mult = 0.6
+engine_power_mult = 1.2
+max_speed_mult = 1.2
+steer_rate_mult = 1.1
+offroad_mult = 1.0
+horn = ExtResource("4_horn")
+skid_colour = Color(0.95, 0.45, 0.1, 0.5)
+smoke_colour = Color(1, 0.55, 0.2, 1)
+engine_pitch = 0.85
+bar_grip = 0.3
+bar_slide = 0.9
+bar_speed = 0.95

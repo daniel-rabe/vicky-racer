@@ -22,6 +22,7 @@ func _ready() -> void:
 	await _test_skid_marks_and_smoke()
 	await _test_dust_on_grass()
 	await _test_wall_shake()
+	await _test_car_specific_effects()
 	if not _screenshot.is_empty():
 		await _take_screenshot()
 		# With a window the cars' engines are audible: free them and let audio mix once, or
@@ -163,6 +164,27 @@ func _test_wall_shake() -> void:
 	_check(rig.position.length() < 0.5, "another car's wall hit does not shake this camera")
 	other.queue_free()
 	await _done(car)
+
+
+## Cars bring their own effects: the Dragon's fiery marks and smoke, the Police Car's lights.
+func _test_car_specific_effects() -> void:
+	print("car-specific effects")
+	var dragon := _arena(ASPHALT)
+	dragon.setup = load("res://game/configs/setups/dragon.tres")
+	await _drive(dragon, 1.0, 0.0, 1.0)
+	await _drive(dragon, 0.6, 1.0, 1.0, true)
+	var marks := _marks(dragon)
+	_check(not marks.is_empty() and marks[0].default_color == dragon.setup.skid_colour, "the Dragon leaves fire-coloured skid marks")
+	_check(_emitter(dragon, 1).modulate == dragon.setup.smoke_colour, "and orange smoke")
+	await _done(dragon)
+	var police := _arena(ASPHALT)
+	police.setup = load("res://game/configs/setups/police.tres")
+	var lights: Node2D = police.get_node("Effects").get_child(2)
+	await _drive(police, 1.0, 0.0, 1.0)
+	_check(not lights.visible, "the Police Car's lights are off while it drives straight")
+	await _drive(police, 0.6, 1.0, 1.0, true)
+	_check(lights.visible, "and flash while it drifts")
+	await _done(police)
 
 
 ## A drift that runs off the road onto the grass: marks, smoke and dust in one picture.

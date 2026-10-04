@@ -12,7 +12,10 @@ extends Resource
 @export_group("Opponents")
 ## One entry per AI car, in the order they fill the free grid slots from the front.
 @export var opponent_names: PackedStringArray = ["BLUE", "YELLOW", "GREEN"]
-@export var opponent_bodies: Array[Texture2D] = []
+## The car each opponent drives (handling and look) and the paint it wears. The paint
+## matches its colour, so the minimap and results stay readable.
+@export var opponent_setups: Array[DriftSetup] = []
+@export var opponent_paints: Array[StringName] = []
 @export var opponent_colours: PackedColorArray = []
 ## 0-1 each; see AIDriver.skill.
 @export var opponent_skills: PackedFloat32Array = [0.85, 0.7, 0.55]

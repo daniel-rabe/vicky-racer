@@ -8,8 +8,9 @@ extends Node
 ## Every change is saved straight away.
 
 const SETUP_DIR := "res://game/configs/setups/"
-## Display order in the garage; prices rise left to right, top to bottom.
-const SETUP_ORDER: Array[StringName] = [&"starter", &"grippy", &"slider", &"rocket", &"kart", &"banana"]
+## Display order in the garage, six to a page; prices rise left to right, top to bottom.
+const SETUP_ORDER: Array[StringName] = [&"starter", &"grippy", &"icecream", &"slider", &"rocket", &"kart",
+	&"monster", &"bubble", &"police", &"banana", &"formula", &"dragon"]
 
 @export var economy: EconomyConfig
 @export var save_path := SaveGame.DEFAULT_PATH
@@ -24,6 +25,7 @@ func _enter_tree() -> void:
 	EventSystem.PRO_state_requested.connect(_publish_state)
 	EventSystem.PRO_buy_requested.connect(buy)
 	EventSystem.PRO_equip_requested.connect(equip)
+	EventSystem.PRO_paint_requested.connect(repaint)
 	EventSystem.RAC_race_finished.connect(_on_race_finished)
 
 
@@ -67,6 +69,19 @@ func equip(id: StringName) -> void:
 	_commit()
 
 
+## Paint an owned car the next colour in the palette (free, any number of times).
+func repaint(id: StringName) -> void:
+	if not owns(id):
+		return
+	var colour := Paint.next(profile.paint.get(id, Paint.ORIGINAL))
+	if colour == Paint.ORIGINAL:
+		profile.paint.erase(id)
+	else:
+		profile.paint[id] = colour
+	EventSystem.PRO_setup_painted.emit(id, colour)
+	_commit()
+
+
 func _on_race_finished(results: Array, track_id: StringName) -> void:
 	var player: Dictionary = {}
 	for entry: Dictionary in results:
@@ -103,6 +118,7 @@ func _publish_state() -> void:
 		"coins": profile.coins,
 		"owned": profile.owned_setups.duplicate(),
 		"equipped": profile.equipped_setup,
+		"paint": profile.paint.duplicate(),
 		"setups": SETUP_ORDER.map(func(id: StringName) -> DriftSetup: return setups[id]),
 		"best_laps": profile.best_laps.duplicate(),
 		"last_race": last_race,

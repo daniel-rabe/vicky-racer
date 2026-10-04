@@ -30,6 +30,7 @@ func _ready() -> void:
 	await _frames(5)
 	await _test_title_first()
 	await _test_settings_apply()
+	await _test_garage_pages_and_paint()
 	await _test_pause()
 	await _test_auto_accelerate_and_difficulty()
 	for path in [SAVE, SETTINGS]:
@@ -166,9 +167,46 @@ func _test_settings_apply() -> void:
 	_check(not panel.visible and title.get_node("%Menu").visible, "B / Escape closes the panel")
 
 
+func _test_garage_pages_and_paint() -> void:
+	print("garage pages and paint")
+	EventSystem.UI_screen_requested.emit(&"garage")
+	await _frames(5)
+	var garage := _screen()
+	await _shot("garage")
+	var focused := get_viewport().gui_get_focus_owner() as SetupCard
+	_check(focused != null and focused.setup.id == &"starter", "the equipped car has focus")
+	var visible_ids := func() -> Array:
+		return garage.get_node("%Cards").get_children().filter(func(c: Control) -> bool: return c.visible) 			.map(func(c: SetupCard) -> StringName: return c.setup.id)
+	_check(visible_ids.call().size() == 6 and &"dragon" not in visible_ids.call(), "page 1 shows six cars")
+	await _press(&"page_next")
+	_check(&"dragon" in visible_ids.call() and &"starter" not in visible_ids.call(), "E / RB turns to page 2")
+	_check((get_viewport().gui_get_focus_owner() as SetupCard).setup.id == &"monster", "focus lands in the same place")
+	await _shot("garage_page_2")
+	await _press(&"ui_left")
+	_check(&"kart" in visible_ids.call(), "moving left off page 2 goes back to page 1")
+	_check((get_viewport().gui_get_focus_owner() as SetupCard).setup.id == &"icecream",
+		"onto the right-hand card of the same (top) row")
+	await _press(&"ui_down")
+	await _press(&"paint")
+	var manager: GarageManager = _main.get_node("GarageManager")
+	_check(not manager.profile.paint.has(&"kart"), "a car you do not own cannot be painted")
+	garage.get_node("%Cards").get_child(0).grab_focus()
+	await _press(&"paint")
+	_check(manager.profile.paint.get(&"starter") == &"blue", "X / C paints the focused car (starter -> blue)")
+	var card: SetupCard = garage.get_node("%Cards").get_child(0)
+	var blue := Paint.card(manager.setups[&"starter"], &"blue")
+	_check(card.get_node("%Art").texture == blue and garage.get_node("%PreviewArt").texture == blue, "the card and the preview show the new paint")
+	await _shot("garage_paint")
+	for i in Paint.COLOURS.size() - 1:
+		manager.repaint(&"starter")
+	EventSystem.UI_screen_requested.emit(&"title")
+	await _frames(3)
+	EventSystem.UI_screen_requested.emit(&"race")  # the pause test starts from a race
+	await _frames(3)
+
+
 func _test_pause() -> void:
 	print("pause menu")
-	EventSystem.UI_screen_requested.emit(&"race")
 	await _frames(5)
 	var race := _screen()
 	var pause_menu: CanvasLayer = race.get_node("PauseMenu")
