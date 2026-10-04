@@ -12,11 +12,17 @@ const SETUP_DIR := "res://game/configs/setups/"
 const SETUP_ORDER: Array[StringName] = [&"starter", &"grippy", &"icecream", &"slider", &"rocket", &"kart",
 	&"monster", &"bubble", &"police", &"banana", &"formula", &"dragon"]
 
+## Track-select order. A track unlocks when the one before it has been finished — any place
+## counts, so a child is never stuck behind a race they cannot win (docs/DESIGN.md §7.6).
+const TRACK_ORDER: Array[StringName] = [&"track_01", &"track_02", &"track_03", &"track_04"]
+const TRACK_DIR := "res://game/configs/tracks/"
+
 @export var economy: EconomyConfig
 @export var save_path := SaveGame.DEFAULT_PATH
 
 var profile: SaveGame
 var setups: Dictionary = {}  # id -> DriftSetup
+var tracks: Dictionary = {}  # id -> TrackConfig
 ## What the results screen shows: results, coins breakdown, total awarded, new best lap.
 var last_race := {}
 
@@ -26,13 +32,18 @@ func _enter_tree() -> void:
 	EventSystem.PRO_buy_requested.connect(buy)
 	EventSystem.PRO_equip_requested.connect(equip)
 	EventSystem.PRO_paint_requested.connect(repaint)
+	EventSystem.PRO_track_select_requested.connect(select_track)
 	EventSystem.RAC_race_finished.connect(_on_race_finished)
 
 
 func _ready() -> void:
 	for id in SETUP_ORDER:
 		setups[id] = load(SETUP_DIR + String(id) + ".tres")
+	for id in TRACK_ORDER:
+		tracks[id] = load(TRACK_DIR + String(id) + ".tres")
 	profile = SaveGame.load_from(save_path, economy.starting_coins)
+	if not is_unlocked(profile.selected_track):
+		profile.selected_track = TRACK_ORDER[0]
 
 
 func owns(id: StringName) -> bool:
@@ -66,6 +77,26 @@ func equip(id: StringName) -> void:
 		return
 	profile.equipped_setup = id
 	EventSystem.PRO_setup_equipped.emit(id)
+	_commit()
+
+
+func is_unlocked(track_id: StringName) -> bool:
+	var i := TRACK_ORDER.find(track_id)
+	return i == 0 or (i > 0 and TRACK_ORDER[i - 1] in profile.completed_tracks)
+
+
+func selected_track() -> TrackConfig:
+	return tracks[profile.selected_track]
+
+
+## Choose the track for the next race; refused (PRO_track_locked) while it is locked.
+func select_track(track_id: StringName) -> void:
+	if not tracks.has(track_id):
+		return
+	if not is_unlocked(track_id):
+		EventSystem.PRO_track_locked.emit(track_id)
+		return
+	profile.selected_track = track_id
 	_commit()
 
 
@@ -119,6 +150,10 @@ func _publish_state() -> void:
 		"owned": profile.owned_setups.duplicate(),
 		"equipped": profile.equipped_setup,
 		"paint": profile.paint.duplicate(),
+		"selected_track": profile.selected_track,
+		"tracks": TRACK_ORDER.map(func(id: StringName) -> Dictionary:
+			return {"config": tracks[id], "unlocked": is_unlocked(id), "best_lap": profile.best_laps.get(id, 0.0),
+				"completed": id in profile.completed_tracks}),
 		"setups": SETUP_ORDER.map(func(id: StringName) -> DriftSetup: return setups[id]),
 		"best_laps": profile.best_laps.duplicate(),
 		"last_race": last_race,

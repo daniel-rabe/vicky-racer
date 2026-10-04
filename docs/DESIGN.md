@@ -318,9 +318,23 @@ rule while still surviving every screen swap. Changing screen always unpauses th
 nothing about who sets them. `player_input.gd` and `ai_driver.gd` are interchangeable children that
 write into those fields. The same car scene is used for all four racers.
 
-## 7. Track
+## 7. Tracks
 
-### 7.1 Track 01
+Four tracks, raced in this order; each opens when the one before it has been finished, in any
+place (§7.6).
+
+| # | Track | Theme | What it adds | Layout | Built |
+| --- | --- | --- | --- | --- | --- |
+| 1 | **Meadow Loop** | grass, sand traps, trees | the original circuit | [`track_01_layout.png`](mockups/track_01_layout.png) | [`screenshots/race.png`](screenshots/race.png) |
+| 2 | **Sunny Beach** | sand, dunes, palms, parasols, beach balls | a wide (3.5-tile) oval: the easy one | [`track_02_layout.png`](mockups/track_02_layout.png) | [`screenshots/track_beach.png`](screenshots/track_beach.png) |
+| 3 | **Snowy Peak** | snow, ice ponds, pine trees, snowmen | **ice on the road** at two bends, a hairpin | [`track_03_layout.png`](mockups/track_03_layout.png) | [`screenshots/track_snow.png`](screenshots/track_snow.png) |
+| 4 | **Toy Town** | lawns, sandpits, toy houses, traffic cones | city corners and three **boost pads** | [`track_04_layout.png`](mockups/track_04_layout.png) | [`screenshots/track_town.png`](screenshots/track_town.png) |
+
+The roadmap's figure-of-eight bridge was dropped: a line that crosses itself would also make race
+progress (closest point on the line) ambiguous at the crossing, for little gain. Snowy Peak is the
+twisty one instead.
+
+### 7.1 Track 01 — Meadow Loop
 
 ![Track 01 layout](mockups/track_01_layout.png)
 
@@ -329,10 +343,10 @@ write into those fields. The same car scene is used for all four racers.
   until Phase 9 stopped car-to-car contact counting as a wall hit; the scrubbing had slowed the pack.)
 - Six corners: a sweeping T1, a hairpin at T2, the T3/T4 S-bend, the long T5 and T6 back onto the
   start straight. Sand traps on the outside of T1 and T2, where mistakes happen.
-- The circuit is defined **once**, as control points in
-  [`tools/layouts/track_layout.py`](../tools/layouts/track_layout.py). That script writes both this
-  diagram and [`mockups/track_01_points.json`](mockups/track_01_points.json), which the game reads
-  to build the racing line — so the reviewed layout and the driven track cannot drift apart.
+- The circuit is defined **once**, in [`tools/layouts/tracks/track_01.json`](../tools/layouts/tracks/track_01.json)
+  (§7.2). [`tools/layouts/track_layout.py`](../tools/layouts/track_layout.py) writes both this diagram and
+  [`mockups/track_01_points.json`](mockups/track_01_points.json), which the game reads to build the
+  racing line — so the reviewed layout and the driven track cannot drift apart.
 
 ### 7.2 Building the track: spline road over a tile map
 
@@ -370,13 +384,21 @@ Inside a ground tile, sand is where the bilinear blend of its four corners excee
 are drawn with that rule and `Track.surface_at()` tests with it, so what you see is what you drive
 on. Neighbouring tiles share corners, so edges continue across tile borders without a seam.
 
-To change Track 01: edit `CONTROL_POINTS` and friends in `tools/layouts/track_layout.py`, run it,
-then rebuild the scene (this overwrites hand edits to `track_01.tscn`):
+**Every track is data.** A track is a JSON spec in [`tools/layouts/tracks/`](../tools/layouts/tracks/):
+map size, road width, control points, where the finish goes (the grid is placed behind it, along
+the road), patches of the theme's patch surface, props by kind, and — as fractions of a lap — ice
+on the road and boost pads. To change a track, or add one: edit or add its spec, then
 
 ```bash
-python tools/layouts/track_layout.py
+python tools/layouts/track_layout.py            # diagrams + points for every spec
+python tools/layouts/theme_art.py               # theme textures (only when themes change)
 Godot_v4.7.1-stable_win64_console.exe --path . --headless res://track/build/build_track.tscn
 ```
+
+`track_layout.py` also reports how close the road comes to itself and warns below a road width plus
+a tile. Migrating Track 01 to a spec reproduced its points file field for field; the rebuilt scene
+differs only by its theme and four grid-slot rotations of ~0.002 rad (the Phase 8 performance pass
+changed the curve's bake interval in the scene without a rebuild).
 
 Image generation makes none of this geometry — it is exactly what diffusion does worst. Generated
 art is limited to the cars, props and UI illustrations.
@@ -398,8 +420,18 @@ unaware of tracks.
 | Asphalt / kerb | 1.0 | 1.0 | Normal |
 | Grass | 0.55 | 0.7 | Slow and a bit loose — get back on |
 | Sand | 0.4 | 0.6 | Sticky and slow, but you drive out |
+| Beach | 0.6 | 0.65 | Sunny Beach's ground: softer than a sand trap, it is the easy track |
+| Snow | 0.6 | 0.55 | Snowy Peak's ground |
+| **Ice** | **1.0** | **0.35** | Full speed, almost no grip — drift heaven, never a stop. Ponds off the road, and spans *on* it |
 
-The map edge is a tyre wall: solid, but it slides you along it.
+On the road, a span of ice (`Track.ice_spans`, fractions of a lap) overrides asphalt; it is drawn
+as translucent sheet ice so the road still reads as road. Each car's off-road ability (§4.2)
+softens the off-road surfaces. The map edge is a wall of the theme's prop (tyres, beach balls,
+traffic cones): solid, but it slides you along it.
+
+**Boost pads** (Toy Town) are `Area2D`s across the road: driving over one gives 1.2 s of extra push
+(1,800 px/s²) and lets the car go 30 % past its top speed, fading over the last third, and emits
+`CAR_boosted` (a whoosh). The track test checks a boosted car passes its top speed.
 
 ### 7.4 Progress and laps
 
@@ -407,6 +439,47 @@ The map edge is a tyre wall: solid, but it slides you along it.
   curve.get_closest_offset(position)`. One number per car, sorted every frame for live positions.
 - **Lap validation** uses two `Area2D`s: the mid-lap checkpoint must be crossed before the
   start/finish line counts. This blocks reverse driving and cutting across the infield.
+
+### 7.5 Themes
+
+A theme ([`TrackTheme`](../game/configs/track_theme.gd), one `.tres` per theme in `game/configs/themes/`)
+is the look and the ground of a track: the ground tiles, which surface is everywhere off the road
+(`base_surface`) and which one the painted patches are (`patch_surface`), the road and kerb
+textures, the edge-wall prop, and the colour of its card. Its textures come from
+[`tools/layouts/theme_art.py`](../tools/layouts/theme_art.py) and
+[`themes.json`](../tools/layouts/themes.json): flat procedural fills (snow, ice and beach joined
+grass and sand in `pipeline.json`), the kerb strip in the theme's colours, and the 16-tile corner
+atlas of base and patch — the same corner rule as Track 01, so surfaces match what is drawn. Toy
+Town shares the meadow's tiles. Meadow's outputs are byte-identical to the originals.
+
+| Theme | Base / patch | Kerbs | Wall | Props (generated, picked from four) |
+| --- | --- | --- | --- | --- |
+| Meadow | grass / sand | red / cream | tyres | tree, tyre stack |
+| Sunny Beach | beach / grass dunes | blue / white | beach balls | palm tree, parasol, beach ball |
+| Snowy Peak | snow / ice | red / white | tyres | pine tree, snowman |
+| Toy Town | grass / sand | yellow / blue | traffic cones | toy house, traffic cone, tree |
+
+Two props needed a second prompt: "seen from directly above" still drew the snowman and the house
+from the front, like stickers standing up. Describing the shape from above instead ("a big round
+snowball seen from the top as a circle, a black top hat at the centre"; "the roof … no walls and no
+door visible") gave true top-down pictures that sit in the world like everything else.
+
+### 7.6 Track select and unlocking
+
+RACE! in the garage opens **PICK A TRACK** ([`screenshots/track_select.png`](screenshots/track_select.png)):
+four cards with the track's shape drawn from its racing line, its name, and the best lap, NEW! or —
+while locked — a padlock and "FINISH <the track before>". A track opens when the one before it has
+been finished **in any place**: a child is never stuck behind a race they cannot win. The choice is
+saved (`selected_track` in the profile; older saves start on the first track), RACE AGAIN on the
+results screen re-races it, and every track's first finish pays its +100 bonus. Each track has its
+own opponents in its own cars ([`game/configs/tracks/`](../game/configs/tracks/)), always blue,
+yellow and green.
+
+The balance report runs per track (`--track`). A struggling child reaches the podium with every car
+on every track. Sunny Beach is all long straights, so there the top-speed cars (Banana, Formula,
+Dragon) win clean races by 4–5 s — on purpose the easy, fast track, and the autopilot never pays
+their slipperiness the way a child does. On Snowy Peak's ice and hairpin the field is within a
+second at clean pace whatever the car.
 
 ## 8. AI and the race
 
@@ -599,6 +672,7 @@ them all out ([`mockups/candidates/paint_shop.png`](mockups/candidates/paint_sho
 | Settings | Same spec — SOUND, FULLSCREEN, AUTO GO, STEER HELP, OPPONENTS; one focusable row each, ← → change it. Over the title and over the pause menu. Built: [`screenshots/settings.png`](screenshots/settings.png) |
 | Race HUD | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown. Built: [`screenshots/race.png`](screenshots/race.png), [`screenshots/race_countdown.png`](screenshots/race_countdown.png). The countdown sits above screen centre rather than on it, so it never hides the player's own car |
 | Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, cards in pages of 3 × 2 (Q / E or the shoulder buttons, or moving off the edge of a page, turns it; `< 1 / 2 >` above the cards), preview with Grip / Slide / Speed bars and, for owned cars, paint swatches. Built: [`screenshots/garage.png`](screenshots/garage.png) |
+| Track select | Four cards (§7.6). ← → choose, A races, B back to the garage. Built: [`screenshots/track_select.png`](screenshots/track_select.png) |
 | Results | [`mockups/results_layout.png`](mockups/results_layout.png) — finishing order, payout count-up, Race Again. Built: [`screenshots/results.png`](screenshots/results.png) |
 
 Pink annotations on each spec give anchors, sizes and animation timings; they are meant to be

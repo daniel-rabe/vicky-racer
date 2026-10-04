@@ -5,6 +5,11 @@ extends CharacterBody2D
 ## docs/DESIGN.md §4 — steering rotates the car directly, so it cannot spin out, and
 ## separate forward/sideways grip is what makes it drift.
 
+## A boost pad: for this long the car may go BOOST_SPEED_MULT over its top speed and gets
+## BOOST_PUSH px/s² of extra acceleration. Fades out over the last third.
+const BOOST_SECONDS := 1.2
+const BOOST_SPEED_MULT := 1.3
+const BOOST_PUSH := 1800.0
 ## Below this forward speed, holding brake switches to reverse.
 const REVERSE_SWITCH_SPEED := 40.0
 ## How hard the car slows when it is over its speed limit (e.g. after driving onto grass
@@ -47,6 +52,7 @@ var is_drifting := false
 var lateral_speed := 0.0
 
 var _drift_time := 0.0
+var _boost_time := 0.0
 var _touching_wall := false
 
 
@@ -62,6 +68,19 @@ func _ready() -> void:
 func _resolve_config() -> void:
 	if base_config:
 		config = base_config.with_setup(setup)
+
+
+## Driven over a boost pad. Emits CAR_boosted (sound, effects).
+func boost() -> void:
+	if frozen:
+		return
+	_boost_time = BOOST_SECONDS
+	EventSystem.CAR_boosted.emit(self)
+
+
+## 0 normally, up to 1 during a boost.
+func boost_strength() -> float:
+	return clampf(_boost_time / (BOOST_SECONDS / 3.0), 0.0, 1.0)
 
 
 func forward_speed() -> float:
@@ -86,6 +105,9 @@ func _physics_process(delta: float) -> void:
 	_steer(speed_along, delta)
 	var forward := Vector2.RIGHT.rotated(rotation)
 	_apply_throttle(forward, speed_along, delta)
+	if _boost_time > 0.0:
+		velocity += forward * BOOST_PUSH * boost_strength() * delta
+		_boost_time -= delta
 	_apply_grip(forward, delta)
 	_limit_speed(speed_along, delta)
 	_move_and_handle_walls()
@@ -121,7 +143,10 @@ func _apply_grip(forward: Vector2, delta: float) -> void:
 
 
 func _limit_speed(speed_along: float, delta: float) -> void:
-	var limit := config.max_speed * surface_speed() * catch_up_mult if speed_along >= 0.0 		else config.max_reverse_speed
+	var boosted := lerpf(1.0, BOOST_SPEED_MULT, boost_strength())
+	var limit := config.max_speed * surface_speed() * catch_up_mult * boosted
+	if speed_along < 0.0:
+		limit = config.max_reverse_speed
 	var speed := velocity.length()
 	if speed > limit:
 		velocity = velocity / speed * move_toward(speed, limit, OVERSPEED_DECEL * delta)

@@ -10,6 +10,7 @@ const ENGINE := preload("res://art/sfx/engine_loop.wav")
 const SKID := preload("res://art/sfx/skid_loop.wav")
 const BUMP := preload("res://art/sfx/wall_bump.wav")
 const HORN := preload("res://art/sfx/horn.wav")
+const BOOST := preload("res://art/sfx/boost.wav")
 ## Engine pitch at a standstill and at top speed.
 const PITCH_IDLE := 0.6
 const PITCH_TOP := 1.5
@@ -31,6 +32,12 @@ var _skid_level := 0.0
 func _enter_tree() -> void:
 	EventSystem.CAR_wall_hit.connect(_on_wall_hit)
 	EventSystem.CAR_horn.connect(_on_horn)
+	EventSystem.CAR_boosted.connect(func(boosted: Node) -> void:
+		if boosted == car and SoundManager.audible():
+			_bump.stream = BOOST
+			_bump.volume_db = -4.0
+			_bump.pitch_scale = 1.0
+			_bump.play())
 
 
 func _ready() -> void:
@@ -62,6 +69,7 @@ func _physics_process(delta: float) -> void:
 
 func _on_wall_hit(hit_car: Node, impact_speed: float) -> void:
 	if hit_car == car and SoundManager.audible():
+		_bump.stream = BUMP
 		_bump.volume_db = lerpf(-14.0, -3.0, clampf(impact_speed / 800.0, 0.0, 1.0))
 		_bump.pitch_scale = randf_range(0.9, 1.1)
 		_bump.play()

@@ -18,6 +18,7 @@ signal CAR_drift_ended(car: Node, duration: float)
 signal CAR_surface_changed(car: Node, surface: StringName)
 signal CAR_wall_hit(car: Node, impact_speed: float)
 signal CAR_horn(car: Node)
+signal CAR_boosted(car: Node)
 
 # Progression. Screens never touch GarageManager directly: they emit a *_requested
 # signal and listen for PRO_state_changed, which carries the whole garage state.
@@ -26,6 +27,8 @@ signal PRO_state_changed(state: Dictionary)
 signal PRO_buy_requested(setup_id: StringName)
 signal PRO_equip_requested(setup_id: StringName)
 signal PRO_paint_requested(setup_id: StringName)
+signal PRO_track_select_requested(track_id: StringName)
+signal PRO_track_locked(track_id: StringName)
 signal PRO_coins_changed(total: int)
 signal PRO_coins_awarded(amount: int, breakdown: Dictionary)
 signal PRO_setup_purchased(setup_id: StringName)

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="TrackTheme" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/configs/track_theme.gd" id="1_script"]
+[ext_resource type="TileSet" path="res://track/themes/ground_snow.tres" id="2_tiles"]
+[ext_resource type="Texture2D" path="res://art/tiles/asphalt.png" id="3_asphalt"]
+[ext_resource type="Texture2D" path="res://art/tiles/snow/kerb.png" id="4_kerb"]
+[ext_resource type="Texture2D" path="res://art/props/tyre_stack.png" id="5_wall"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"snow"
+display_name = "Snowy Peak"
+ground_tiles = ExtResource("2_tiles")
+base_surface = &"snow"
+patch_surface = &"ice"
+asphalt = ExtResource("3_asphalt")
+kerb = ExtResource("4_kerb")
+wall_prop = ExtResource("5_wall")
+wall_spacing = 76.0
+card_colour = Color(0.85, 0.92, 0.97, 1)

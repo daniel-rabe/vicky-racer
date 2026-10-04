@@ -10,6 +10,7 @@
 [resource]
 script = ExtResource("1_script")
 track_id = &"track_01"
+display_name = "Meadow Loop"
 track_scene = ExtResource("2_track")
 laps = 3
 player_slot = 3

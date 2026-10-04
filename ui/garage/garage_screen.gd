@@ -128,7 +128,7 @@ func _flash(text: String) -> void:
 
 
 func _start_race() -> void:
-	EventSystem.UI_screen_requested.emit(&"race")
+	EventSystem.UI_screen_requested.emit(&"tracks")
 
 
 ## Show the controls for whichever device was used last.

@@ -2,14 +2,16 @@
 class_name Track
 extends Node2D
 ## One race track (docs/DESIGN.md §7). Two layers:
-##   - Ground: a TileMapLayer of grass and sand, painted by hand with the Grass/Sand terrain.
+##   - Ground: a TileMapLayer of the theme's base ground and patches (grass and sand traps,
+##     snow and ice ponds...), built from the layout by track/build/build_track.gd.
 ##   - Road: drawn from the RacingLine Path2D — asphalt, kerbs where the bend is tight,
 ##     lane dashes and the chequered line. Built in _ready and, in the editor, again whenever
 ##     the curve is edited, so the road always matches the line the AI drives.
 ##
 ## The track also owns surfaces: every physics frame it tells each car in the "cars" group
-## what it is driving on. On the road means within road_half_width (plus kerbs) of the line;
-## anywhere else, the ground tile decides.
+## what it is driving on. On the road means within road_half_width (plus kerbs) of the line
+## — asphalt, or ice where an ice span lies on the road; anywhere else, the ground tile
+## decides. Boost pads (BoostPads) give a car a short burst of speed.
 ##
 ## It also measures every car against the racing line once per frame, before anything else
 ## runs (process_physics_priority -2), so the race, the AI and steering help read
@@ -22,10 +24,16 @@ const SURFACES := {
 	&"asphalt": {"speed_mult": 1.0, "grip_mult": 1.0},
 	&"grass": {"speed_mult": 0.55, "grip_mult": 0.7},
 	&"sand": {"speed_mult": 0.4, "grip_mult": 0.6},
+	# Softer than a sand trap: the beach is everywhere off Sunny Beach's road, the easy track.
+	&"beach": {"speed_mult": 0.6, "grip_mult": 0.65},
+	&"snow": {"speed_mult": 0.6, "grip_mult": 0.55},
+	# Full speed, almost no grip: drift heaven, never a stop.
+	&"ice": {"speed_mult": 1.0, "grip_mult": 0.35},
 }
 const ASPHALT := preload("res://art/tiles/asphalt.png")
 const KERB := preload("res://art/tiles/kerb.png")
 const CHEQUER := preload("res://art/tiles/finish_line.png")
+const ROAD_ICE := preload("res://art/tiles/snow/road_ice.png")
 const OUTLINE_COLOUR := Color(0.106, 0.118, 0.137)
 const DASH_COLOUR := Color(0.925, 0.925, 0.882)
 const KERB_WIDTH := 38.0
@@ -36,6 +44,9 @@ const BL := 2
 const BR := 1
 
 @export var track_id := &"track"
+@export var theme: TrackTheme
+## Ice lying on the road: x = where it starts, y = how long it is, both as fractions of a lap.
+@export var ice_spans: PackedVector2Array = []
 @export var map_size := Vector2(6144, 3584)
 @export var road_half_width := 192.0
 ## A bend tighter than this (radians of turn per 100 px of road) gets kerbs.
@@ -65,6 +76,11 @@ func _ready() -> void:
 	$Checkpoint.body_entered.connect(func(body: Node2D) -> void:
 		if body is Car:
 			checkpoint_crossed.emit(body))
+	if has_node(^"BoostPads"):
+		for pad: Area2D in $BoostPads.get_children():
+			pad.body_entered.connect(func(body: Node2D) -> void:
+				if body is Car:
+					body.boost())
 
 
 func _physics_process(_delta: float) -> void:
@@ -104,21 +120,33 @@ func surface_at(global_pos: Vector2, distance := -1.0) -> StringName:
 	if distance < 0.0:
 		distance = distance_to_line(global_pos)
 	if distance <= road_half_width + KERB_WIDTH - 8.0:
-		return &"asphalt"
+		return &"ice" if _on_road_ice(global_pos) else &"asphalt"
+	var base := theme.base_surface if theme else &"grass"
+	var patch := theme.patch_surface if theme else &"sand"
 	var local := ground.to_local(global_pos)
 	var cell := ground.local_to_map(local)
 	var data := ground.get_cell_tile_data(cell)
 	if data == null:
-		return &"grass"
+		return base
 	var c: int = data.get_custom_data("sand_corners")
 	if c == 0:
-		return &"grass"
+		return base
 	# Same rule the tiles are drawn with: bilinear blend of the four corners, sand above 0.5.
 	var tile := Vector2(ground.tile_set.tile_size)
 	var uv := (local - ground.map_to_local(cell)) / tile + Vector2(0.5, 0.5)
 	var f := float(c & TL > 0) * (1.0 - uv.x) * (1.0 - uv.y) + float(c & TR > 0) * uv.x * (1.0 - uv.y) \
 		+ float(c & BL > 0) * (1.0 - uv.x) * uv.y + float(c & BR > 0) * uv.x * uv.y
-	return &"sand" if f > 0.5 else &"grass"
+	return patch if f > 0.5 else base
+
+
+func _on_road_ice(global_pos: Vector2) -> bool:
+	if ice_spans.is_empty():
+		return false
+	var at := progress_at(global_pos) / lap_length()
+	for span in ice_spans:
+		if fposmod(at - span.x, 1.0) <= span.y:
+			return true
+	return false
 
 
 func distance_to_line(global_pos: Vector2) -> float:
@@ -179,16 +207,31 @@ func _build_road() -> void:
 	var points := _sample_line(16.0)
 	if points.size() < 3:
 		return
+	var asphalt: Texture2D = theme.asphalt if theme and theme.asphalt else ASPHALT
+	var kerb: Texture2D = theme.kerb if theme and theme.kerb else KERB
 	_add_road(_line(points, road_half_width * 2.0 + 12.0, null, OUTLINE_COLOUR, true))
-	_add_road(_line(points, road_half_width * 2.0, ASPHALT, Color.WHITE, true))
+	_add_road(_line(points, road_half_width * 2.0, asphalt, Color.WHITE, true))
 	for run in _tight_runs(points):
 		for side in [1.0, -1.0]:
 			var edge := _offset(run, side * (road_half_width + KERB_WIDTH / 2.0 - 6.0))
 			if side < 0.0:
 				edge.reverse()  # keep the cream line on the road side
-			_add_road(_line(edge, KERB_WIDTH, KERB, Color.WHITE, false))
+			_add_road(_line(edge, KERB_WIDTH, kerb, Color.WHITE, false))
+	for span in ice_spans:
+		_add_road(_line(_span_points(span), road_half_width * 2.0 - 8.0, ROAD_ICE, Color.WHITE, false))
 	_add_road(_line(points, 12.0, _dash_texture(), DASH_COLOUR, true))
 	_add_road(_finish_line())
+
+
+## The racing line's points over one ice span, in Road coordinates.
+func _span_points(span: Vector2) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	var length := lap_length()
+	var steps := maxi(2, int(span.y * length / 16.0))
+	for i in steps + 1:
+		var offset := (span.x + span.y * i / steps) * length
+		out.append(road.to_local(line_point(offset)))
+	return out
 
 
 func _add_road(item: Node) -> void:

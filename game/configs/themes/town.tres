@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="TrackTheme" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/configs/track_theme.gd" id="1_script"]
+[ext_resource type="TileSet" path="res://track/ground_tiles.tres" id="2_tiles"]
+[ext_resource type="Texture2D" path="res://art/tiles/asphalt.png" id="3_asphalt"]
+[ext_resource type="Texture2D" path="res://art/tiles/town/kerb.png" id="4_kerb"]
+[ext_resource type="Texture2D" path="res://art/props/town/traffic_cone.png" id="5_wall"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"town"
+display_name = "Toy Town"
+ground_tiles = ExtResource("2_tiles")
+base_surface = &"grass"
+patch_surface = &"sand"
+asphalt = ExtResource("3_asphalt")
+kerb = ExtResource("4_kerb")
+wall_prop = ExtResource("5_wall")
+wall_spacing = 72.0
+card_colour = Color(0.4, 0.62, 0.95, 1)

@@ -29,3 +29,4 @@ tools/comfy/masters/sfx/*
 # Paint-shop masters (81 MB): leaves nothing is built from, reproducible from the pinned seed
 # in asset_manifest.json's `paints` section. The built cards and bodies in art/ are committed.
 tools/comfy/masters/paint_*
+!tools/comfy/masters/sfx/boost_103.flac

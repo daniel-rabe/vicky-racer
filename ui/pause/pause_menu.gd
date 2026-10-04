@@ -39,8 +39,14 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	# Alt-tabbing away (or a notification popping up) should not cost a race.
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and DisplayServer.get_name() != "headless":
+	var headless := DisplayServer.get_name() == "headless"
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and not headless and not _capturing():
 		pause()
+
+
+## Dev screenshot runs (main.gd --screenshot) often start without focus; they must not pause.
+static func _capturing() -> bool:
+	return Array(OS.get_cmdline_user_args()).any(func(a: String) -> bool: return a.begins_with("--screenshot"))
 
 
 func _unhandled_input(event: InputEvent) -> void:

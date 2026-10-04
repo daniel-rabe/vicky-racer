@@ -21,6 +21,9 @@ var best_laps := {}
 var completed_tracks: Array[StringName] = []
 ## setup id -> paint colour (Paint.COLOURS); a car with no entry has its original paint.
 var paint := {}
+## The track the next race is on (track select). Optional in the file: older saves
+## without it start on the first track.
+var selected_track: StringName = &"track_01"
 
 
 static func fresh(starting_coins := 0) -> SaveGame:
@@ -48,6 +51,7 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 	var equipped := StringName(str(file.get_value("profile", "equipped_setup", STARTER_SETUP)))
 	profile.equipped_setup = equipped if equipped in profile.owned_setups else STARTER_SETUP
 	profile.completed_tracks = _string_names(file.get_value("profile", "completed_tracks", []))
+	profile.selected_track = StringName(str(file.get_value("profile", "selected_track", "track_01")))
 	if file.has_section("paint"):  # absent in version 1 files
 		for id in file.get_section_keys("paint"):
 			var colour := StringName(str(file.get_value("paint", id, "")))
@@ -68,6 +72,7 @@ func save_to(path := DEFAULT_PATH) -> Error:
 	file.set_value("profile", "owned_setups", PackedStringArray(owned_setups))
 	file.set_value("profile", "equipped_setup", String(equipped_setup))
 	file.set_value("profile", "completed_tracks", PackedStringArray(completed_tracks))
+	file.set_value("profile", "selected_track", String(selected_track))
 	for track in best_laps:
 		file.set_value("best_laps", String(track), best_laps[track])
 	for id in paint:

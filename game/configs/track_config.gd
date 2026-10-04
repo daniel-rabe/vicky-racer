@@ -4,6 +4,7 @@ extends Resource
 ## Adding a track or changing difficulty is data, not code (docs/DESIGN.md §8).
 
 @export var track_id := &"track_01"
+@export var display_name := ""
 @export var track_scene: PackedScene
 @export var laps := 3
 ## Grid slot for the player, 1 = front. Starting third gives something to chase.

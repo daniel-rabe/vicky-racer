@@ -22,10 +22,10 @@ RESULT = re.compile(r"results are in finishing order \(\[(.*)\]\)")
 ENTRY = re.compile(r'"(\w+) ([\d.]+)s"')
 
 
-def race(setup: str, pace: float, difficulty: str = "normal") -> dict:
+def race(setup: str, pace: float, difficulty: str = "normal", track: str = "track_01") -> dict:
     out = subprocess.run(
         [GODOT, "--path", str(ROOT), "--headless", "--fixed-fps", "60", "res://tests/race_test.tscn",
-         "--", f"--autopilot={pace}", f"--setup={setup}", f"--difficulty={difficulty}"],
+         "--", f"--autopilot={pace}", f"--setup={setup}", f"--difficulty={difficulty}", f"--track={track}"],
         capture_output=True, text=True, timeout=600).stdout
     found = RESULT.search(out)
     if not found:
@@ -47,10 +47,11 @@ def main() -> None:
     parser.add_argument("--setups", nargs="+", default=SETUPS)
     parser.add_argument("--jobs", type=int, default=6)
     parser.add_argument("--difficulty", default="normal", choices=["easy", "normal", "fast"])
+    parser.add_argument("--track", default="track_01")
     args = parser.parse_args()
     jobs = [(s, p) for s in args.setups for p in args.paces]
     with ThreadPoolExecutor(args.jobs) as pool:
-        results = list(pool.map(lambda j: race(*j, args.difficulty), jobs))
+        results = list(pool.map(lambda j: race(*j, args.difficulty, args.track), jobs))
     print("| Setup | " + " | ".join(f"pace {p:g}" for p in args.paces) + " |")
     print("| --- |" + " --- |" * len(args.paces))
     for setup in args.setups:

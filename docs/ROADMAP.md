@@ -64,42 +64,17 @@ Details in [`DESIGN.md`](DESIGN.md) §4.2, §8.1, §8.3 and §9.3. Changes on th
 
 ---
 
-## Phase 11 — Track pipeline and three new tracks
+## Phase 11 — Track pipeline and three new tracks ✅ done
 
-Track 01 is defined once in [`tools/layouts/track_layout.py`](../tools/layouts/track_layout.py) and
-built by `track/build/`. Before adding tracks, make that one pipeline produce any track from a
-small data file, then use it for three new ones.
+Built as planned: tracks as JSON specs, themes, Sunny Beach / Snowy Peak / Toy Town, ice (ponds and
+on the road), boost pads, track select with unlocking by finishing. Details in
+[`DESIGN.md`](DESIGN.md) §7. Changes on the way:
 
-**Art gate:** for each track, a layout diagram (as [`mockups/track_01_layout.png`](mockups/track_01_layout.png))
-and a style frame for its theme generated with the frozen recipe; new ground fills and props
-through candidate sheets.
-
-1. **Layouts as data** — `tools/layouts/tracks/<id>.json`: control points, road width, grid slot,
-   checkpoint, surface regions, prop placements. One script builds the diagram, the points file and
-   the `.tscn` for any of them. Track 01 is migrated first and must come out identical (track test).
-2. **Themes** — a `TrackTheme` resource: ground fills, kerb colours, prop set, music (Phase 13),
-   ambient sound. Track 01 becomes the `meadow` theme.
-3. **Three new tracks**, each teaching something:
-
-   | Track | Theme | New thing | Shape |
-   | --- | --- | --- | --- |
-   | Sunny Beach | sand, palm trees, beach balls | wide road, lots of sand to slide in — easy, the first unlock | long sweeping oval |
-   | Snowy Peak | snow, pine trees, snowmen | **ice patches**: a new surface with very low grip but full speed — drift heaven | figure-of-eight with a bridge |
-   | Toy Town | streets, houses, traffic cones | tighter corners, **boost pads** that give a short speed burst | city blocks, 90° corners |
-
-4. **New surfaces** — `ice` (speed 1.0, grip 0.35) and `boost` (a pad, not a surface: an `Area2D`
-   that sets a short `boost_mult`, emitting `CAR_boosted`). Added to `Track.SURFACES` and the effects
-   (white sparkles on ice, a whoosh on boost).
-5. **Figure-of-eight crossing** — the bridge needs two draw layers and collision layers that swap
-   when a car passes the crossing; this is the hardest technical item in the roadmap and can be
-   swapped for a simpler shape if it fights back.
-6. **Track select** — a screen between garage and race: track cards with the minimap shape, best
-   lap and a lock. Tracks unlock by finishing the previous one (any position), never by winning.
-7. **AI** — check every track with `race_test` and `balance_report.py`; per-track opponent skills in
-   each `TrackConfig`.
-
-**Done when:** four tracks are raceable, each passes the race test with zero AI rescues, and the
-track test proves Track 01 rebuilds identically from its JSON.
+- **No figure-of-eight bridge**: a self-crossing line makes race progress ambiguous at the crossing.
+  Snowy Peak is twisty instead.
+- New surfaces **beach** (softer than a sand trap, for the easy track) and **snow** besides ice.
+- Snowman and toy house re-prompted to be truly top-down (described as seen from above).
+- Toy Town shares the meadow's ground tiles; only kerbs and props differ.
 
 ---
 

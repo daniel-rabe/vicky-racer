@@ -77,6 +77,90 @@
         128
       ],
       "out": "art/ui/coin.png"
+    },
+    {
+      "id": "palm_tree",
+      "subject": "a palm tree viewed from straight above, a star of long bright green fronds radiating from a small brown centre, flat lay",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        208,
+        208
+      ],
+      "out": "art/props/beach/palm_tree.png",
+      "_note": "Phase 11 theme prop."
+    },
+    {
+      "id": "parasol",
+      "subject": "a round beach umbrella seen from directly above, bright red and white striped segments meeting in the middle, flat lay",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        176,
+        176
+      ],
+      "out": "art/props/beach/parasol.png",
+      "_note": "Phase 11 theme prop."
+    },
+    {
+      "id": "beach_ball",
+      "subject": "a striped beach ball seen from directly above, red, white, blue and yellow segments, flat lay",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        72,
+        72
+      ],
+      "out": "art/props/beach/beach_ball.png",
+      "_note": "Phase 11 theme prop."
+    },
+    {
+      "id": "pine_tree",
+      "subject": "a snowy pine tree viewed from straight above, a round star of dark green branches dusted with white snow, flat lay",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        192,
+        192
+      ],
+      "out": "art/props/snow/pine_tree.png",
+      "_note": "Phase 11 theme prop."
+    },
+    {
+      "id": "snowman",
+      "subject": "a snowman viewed from straight above, flat lay: a big round white snowball seen from the top as a circle, with a smaller white circle in the middle, a black round top hat seen from above at the centre and a red scarf ring around it, no face",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        104,
+        104
+      ],
+      "out": "art/props/snow/snowman.png",
+      "_note": "Phase 11 theme prop. Re-prompted: asked for 'seen from directly above', the first round drew a front-view snowman."
+    },
+    {
+      "id": "toy_house",
+      "subject": "the roof of a small toy house viewed from straight above, flat lay: a red rectangle of roof tiles split down the middle by a ridge line into two halves, with a small square chimney, no walls and no door visible",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        224,
+        224
+      ],
+      "out": "art/props/town/toy_house.png",
+      "_note": "Phase 11 theme prop. Re-prompted as a roof: asked for 'seen from directly above', the first round drew the house from the front."
+    },
+    {
+      "id": "traffic_cone",
+      "subject": "an orange traffic cone seen from directly above, round with a white ring, flat lay",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        60,
+        60
+      ],
+      "out": "art/props/town/traffic_cone.png",
+      "_note": "Phase 11 theme prop."
     }
   ],
   "variants": [

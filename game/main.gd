@@ -16,6 +16,7 @@ extends Node
 const SCREENS := {
 	&"title": preload("res://ui/title/title_screen.tscn"),
 	&"garage": preload("res://ui/garage/garage_screen.tscn"),
+	&"tracks": preload("res://ui/track_select/track_select.tscn"),
 	&"race": preload("res://game/screens/race.tscn"),
 	# Dev: the open field for tuning handling (--screen=test_drive).
 	&"test_drive": preload("res://game/screens/test_drive.tscn"),

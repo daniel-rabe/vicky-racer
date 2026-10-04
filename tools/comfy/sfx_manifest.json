@@ -122,6 +122,16 @@
       "peak_db": -3.0,
       "out": "art/sfx/horn_dragon.wav",
       "seed": 101
+    },
+    {
+      "id": "boost",
+      "prompt": "one short bright whoosh of a toy car speeding up over a boost pad, rising swoosh with a little sparkle, cartoon, clean sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 0.9,
+      "peak_db": -4.0,
+      "out": "art/sfx/boost.wav",
+      "seed": 103
     }
   ],
   "synth": [

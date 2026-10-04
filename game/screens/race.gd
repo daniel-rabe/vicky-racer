@@ -8,8 +8,8 @@ extends Node2D
 ##                       pace < 1 makes it drive slower, to stand in for a struggling child
 ##   --overview    frame the whole track in one view, for checking the layout
 
-const CONFIG := preload("res://game/configs/tracks/track_01.tres")
-
+## The track and opponents of this race: the one picked on the track-select screen.
+var config: TrackConfig = preload("res://game/configs/tracks/track_01.tres")
 var track: Track
 var racers: Array[Dictionary] = []
 var _player_setup: DriftSetup
@@ -28,23 +28,23 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	track = CONFIG.track_scene.instantiate()
+	EventSystem.PRO_state_requested.emit()  # answered synchronously: sets config and _player_setup
+	track = config.track_scene.instantiate()
 	add_child(track)
 	move_child(track, 0)
-	EventSystem.PRO_state_requested.emit()  # answered synchronously: sets _player_setup
 	EventSystem.UI_settings_requested.emit()  # likewise: sets _difficulty_id
 	var difficulty := DifficultyConfig.named(_difficulty_id)
 	var args := OS.get_cmdline_user_args()
 	var autopilot := Array(args).filter(func(a: String) -> bool: return a.begins_with("--autopilot"))
-	racers = spawner.spawn(track, CONFIG, _player_setup, $Racers, not autopilot.is_empty(), difficulty, _player_paint)
+	racers = spawner.spawn(track, config, _player_setup, $Racers, not autopilot.is_empty(), difficulty, _player_paint)
 	for r in racers:
 		if r["is_player"]:
 			r["car"].get_node("ChaseCamera").set_world_bounds(track.world_rect())
 			if autopilot.size() > 0 and "=" in autopilot[0]:
 				r["driver"].rubber_band = float(autopilot[0].get_slice("=", 1))
-	hud.setup(track, racers, CONFIG.laps)
+	hud.setup(track, racers, config.laps)
 	manager.race_over.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"results"))
-	manager.start(track, CONFIG, racers, difficulty)
+	manager.start(track, config, racers, difficulty)
 	if "--overview" in args:
 		_show_overview()
 
@@ -54,6 +54,9 @@ func _on_state_changed(state: Dictionary) -> void:
 		if setup.id == state["equipped"]:
 			_player_setup = setup
 	_player_paint = state.get("paint", {}).get(state["equipped"], Paint.ORIGINAL)
+	for entry: Dictionary in state.get("tracks", []):
+		if entry["config"].track_id == state.get("selected_track"):
+			config = entry["config"]
 
 
 func _show_overview() -> void:

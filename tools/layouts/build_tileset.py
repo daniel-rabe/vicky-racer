@@ -27,7 +27,8 @@ def corners(c: int) -> tuple[int, int, int, int]:
     return tuple(int(bool(c & CORNER_BITS[k])) for k in ("tl", "tr", "bl", "br"))
 
 
-def render_tile(c: int, grass: np.ndarray, sand: np.ndarray) -> np.ndarray:
+def render_tile(c: int, grass: np.ndarray, sand: np.ndarray, rim=RIM) -> np.ndarray:
+    """One tile: `grass` is the base fill, `sand` the patch fill (any pair, per theme)."""
     tl, tr, bl, br = corners(c)
     v, u = (np.mgrid[0:TILE, 0:TILE].astype(np.float32) + 0.5) / TILE
     f = tl * (1 - u) * (1 - v) + tr * u * (1 - v) + bl * (1 - u) * v + br * u * v
@@ -39,14 +40,15 @@ def render_tile(c: int, grass: np.ndarray, sand: np.ndarray) -> np.ndarray:
     sand_w = np.clip(dist + 0.5, 0.0, 1.0)[..., None]                    # antialiased fill
     rim_w = np.clip(RIM_HALF_WIDTH + 0.5 - np.abs(dist), 0.0, 1.0)[..., None]
     base = grass * (1 - sand_w) + sand * sand_w
-    return base * (1 - rim_w) + np.array(RIM, np.float32) * rim_w
+    return base * (1 - rim_w) + np.array(rim, np.float32) * rim_w
 
 
-def tileset_tres() -> str:
+def tileset_tres(atlas: str = "art/tiles/ground_atlas.png", base_name: str = "Grass", patch_name: str = "Sand",
+                 base_colour: str = "Color(0.66, 0.75, 0.27, 1)", patch_colour: str = "Color(0.91, 0.8, 0.48, 1)") -> str:
     lines = [
         '[gd_resource type="TileSet" load_steps=3 format=3]',
         "",
-        '[ext_resource type="Texture2D" path="res://art/tiles/ground_atlas.png" id="1_atlas"]',
+        f'[ext_resource type="Texture2D" path="res://{atlas}" id="1_atlas"]',
         "",
         '[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ground"]',
         'texture = ExtResource("1_atlas")',
@@ -66,10 +68,10 @@ def tileset_tres() -> str:
         "[resource]",
         "tile_size = Vector2i(128, 128)",
         "terrain_set_0/mode = 1",
-        'terrain_set_0/terrain_0/name = "Grass"',
-        "terrain_set_0/terrain_0/color = Color(0.66, 0.75, 0.27, 1)",
-        'terrain_set_0/terrain_1/name = "Sand"',
-        "terrain_set_0/terrain_1/color = Color(0.91, 0.8, 0.48, 1)",
+        f'terrain_set_0/terrain_0/name = "{base_name}"',
+        f"terrain_set_0/terrain_0/color = {base_colour}",
+        f'terrain_set_0/terrain_1/name = "{patch_name}"',
+        f"terrain_set_0/terrain_1/color = {patch_colour}",
         'custom_data_layer_0/name = "sand_corners"',
         "custom_data_layer_0/type = 2",
         'sources/0 = SubResource("TileSetAtlasSource_ground")',
@@ -78,14 +80,20 @@ def tileset_tres() -> str:
     return "\n".join(lines)
 
 
-def main() -> None:
-    grass = np.asarray(Image.open(ROOT / "art/tiles/grass.png").convert("RGB"), np.float32)
-    sand = np.asarray(Image.open(ROOT / "art/tiles/sand.png").convert("RGB"), np.float32)
+def build_atlas(base_png: Path, patch_png: Path, atlas_out: Path, rim=RIM) -> None:
+    base = np.asarray(Image.open(base_png).convert("RGB"), np.float32)
+    patch = np.asarray(Image.open(patch_png).convert("RGB"), np.float32)
     atlas = np.zeros((4 * TILE, 4 * TILE, 3), np.float32)
     for c in range(16):
         x, y = c % 4, c // 4
-        atlas[y * TILE:(y + 1) * TILE, x * TILE:(x + 1) * TILE] = render_tile(c, grass, sand)
-    Image.fromarray(np.clip(atlas, 0, 255).astype(np.uint8)).save(ROOT / "art/tiles/ground_atlas.png")
+        atlas[y * TILE:(y + 1) * TILE, x * TILE:(x + 1) * TILE] = render_tile(c, base, patch, rim)
+    atlas_out.parent.mkdir(parents=True, exist_ok=True)
+    Image.fromarray(np.clip(atlas, 0, 255).astype(np.uint8)).save(atlas_out)
+
+
+def main() -> None:
+    """Track 01's meadow tiles. Every theme's tiles: tools/layouts/theme_art.py."""
+    build_atlas(ROOT / "art/tiles/grass.png", ROOT / "art/tiles/sand.png", ROOT / "art/tiles/ground_atlas.png")
     out = ROOT / "track" / "ground_tiles.tres"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(tileset_tres(), encoding="utf-8", newline="\n")

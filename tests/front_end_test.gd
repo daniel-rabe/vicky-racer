@@ -176,7 +176,8 @@ func _test_garage_pages_and_paint() -> void:
 	var focused := get_viewport().gui_get_focus_owner() as SetupCard
 	_check(focused != null and focused.setup.id == &"starter", "the equipped car has focus")
 	var visible_ids := func() -> Array:
-		return garage.get_node("%Cards").get_children().filter(func(c: Control) -> bool: return c.visible) 			.map(func(c: SetupCard) -> StringName: return c.setup.id)
+		var shown := garage.get_node("%Cards").get_children().filter(func(c: Control) -> bool: return c.visible)
+		return shown.map(func(c: SetupCard) -> StringName: return c.setup.id)
 	_check(visible_ids.call().size() == 6 and &"dragon" not in visible_ids.call(), "page 1 shows six cars")
 	await _press(&"page_next")
 	_check(&"dragon" in visible_ids.call() and &"starter" not in visible_ids.call(), "E / RB turns to page 2")
@@ -199,10 +200,36 @@ func _test_garage_pages_and_paint() -> void:
 	await _shot("garage_paint")
 	for i in Paint.COLOURS.size() - 1:
 		manager.repaint(&"starter")
-	EventSystem.UI_screen_requested.emit(&"title")
-	await _frames(3)
+	await _test_track_select(manager)
 	EventSystem.UI_screen_requested.emit(&"race")  # the pause test starts from a race
 	await _frames(3)
+
+
+func _test_track_select(manager: GarageManager) -> void:
+	print("track select")
+	await _press(&"race_start")
+	var screen := _screen()
+	_check(screen.name == "TrackSelect", "RACE! in the garage opens track select (%s)" % screen.name)
+	var cards: Array = screen.get_node("%Cards").get_children()
+	_check(cards.size() == 4, "four tracks")
+	_check(cards[0].unlocked and not cards[1].unlocked, "only the first is open on a new save")
+	await _shot("track_select")
+	cards[1].pressed.emit()
+	await _frames(2)
+	_check(_screen() == screen and manager.profile.selected_track == &"track_01",
+		"a locked track cannot be raced, and nothing changes")
+	manager.profile.completed_tracks.append(&"track_01")
+	EventSystem.UI_screen_requested.emit(&"tracks")
+	await _frames(3)
+	screen = _screen()
+	cards = screen.get_node("%Cards").get_children()
+	_check(cards[1].unlocked and not cards[2].unlocked, "finishing Meadow Loop opens Sunny Beach, in any place")
+	cards[1].pressed.emit()
+	await _frames(3)
+	_check(_screen().name == "Race" and _screen().config.track_id == &"track_02", "choosing it starts a race on it")
+	_check(manager.profile.selected_track == &"track_02", "and remembers the choice")
+	manager.profile.selected_track = &"track_01"
+	manager.profile.completed_tracks.clear()
 
 
 func _test_pause() -> void:

@@ -1,0 +1,104 @@
+{
+  "_about": "Track themes (docs/DESIGN.md §7.5). theme_art.py builds every texture listed here; the Godot side is game/configs/themes/<id>.tres. 'base' is the ground everywhere off the road, 'patch' the shapes painted on it (a sand trap, an ice pond); both name a fill in tools/comfy/pipeline.json ground and a surface in track.gd SURFACES.",
+  "meadow": {
+    "name": "Meadow",
+    "base": "grass",
+    "patch": "sand",
+    "kerb": {
+      "red": [
+        196,
+        47,
+        47
+      ],
+      "cream": [
+        231,
+        231,
+        171
+      ]
+    },
+    "kerb_out": "art/tiles/kerb.png",
+    "atlas_out": "art/tiles/ground_atlas.png",
+    "tileset_out": "track/ground_tiles.tres",
+    "svg": {
+      "ground": "#5DBB4A",
+      "patch": "#F2D27A",
+      "patch_rim": "#C9A24A"
+    }
+  },
+  "beach": {
+    "name": "Sunny Beach",
+    "base": "beach",
+    "patch": "grass",
+    "kerb": {
+      "red": [
+        58,
+        134,
+        255
+      ],
+      "cream": [
+        245,
+        245,
+        238
+      ]
+    },
+    "kerb_out": "art/tiles/beach/kerb.png",
+    "atlas_out": "art/tiles/beach/ground_atlas.png",
+    "tileset_out": "track/themes/ground_beach.tres",
+    "svg": {
+      "ground": "#EBD08A",
+      "patch": "#7CC24E",
+      "patch_rim": "#4E8F2E"
+    }
+  },
+  "snow": {
+    "name": "Snowy Peak",
+    "base": "snow",
+    "patch": "ice",
+    "kerb": {
+      "red": [
+        214,
+        40,
+        57
+      ],
+      "cream": [
+        250,
+        250,
+        250
+      ]
+    },
+    "kerb_out": "art/tiles/snow/kerb.png",
+    "atlas_out": "art/tiles/snow/ground_atlas.png",
+    "tileset_out": "track/themes/ground_snow.tres",
+    "svg": {
+      "ground": "#EEF3F8",
+      "patch": "#B8E2F2",
+      "patch_rim": "#7FBFD8"
+    }
+  },
+  "town": {
+    "name": "Toy Town",
+    "base": "grass",
+    "patch": "sand",
+    "kerb": {
+      "red": [
+        255,
+        196,
+        40
+      ],
+      "cream": [
+        58,
+        134,
+        255
+      ]
+    },
+    "kerb_out": "art/tiles/town/kerb.png",
+    "atlas_out": "art/tiles/ground_atlas.png",
+    "tileset_out": "track/ground_tiles.tres",
+    "svg": {
+      "ground": "#5DBB4A",
+      "patch": "#F2D27A",
+      "patch_rim": "#C9A24A"
+    },
+    "_note": "Same grass and sand as the meadow, so the same tiles; only the kerbs and props differ."
+  }
+}

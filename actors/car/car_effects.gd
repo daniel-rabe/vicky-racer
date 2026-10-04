@@ -10,6 +10,9 @@ extends Node2D
 const DUST_COLOURS := {
 	&"grass": Color(0.7, 0.58, 0.36),
 	&"sand": Color(0.87, 0.76, 0.5),
+	&"beach": Color(0.9, 0.8, 0.55),
+	&"snow": Color(0.97, 0.98, 1.0),
+	&"ice": Color(0.8, 0.93, 1.0),
 }
 const SMOKE_COLOUR := Color(0.93, 0.93, 0.91)
 ## Slower than this, px/s, and there is nothing to throw up.
