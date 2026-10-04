@@ -19,28 +19,28 @@ help: the moments a child needs an adult are the findings.
 | Pillar / feature | What to look for | Seen? Notes |
 | --- | --- | --- |
 | Getting started | Finds PLAY without help? Understands the garage, or just presses RACE!? | |
-| Controls | Which buttons does she actually use? Does she find the drift (Space / X)? | |
-| Stuck | Any moment she does not know what to do or cannot get going again (wall, grass, menu)? Where? | |
-| Readable | Does she know which car is hers (the arrow)? Does she read the position, or ignore it? | |
-| Forgiving | Ever upset — losing, crashing, a menu taking her somewhere unexpected? What happened just before? | |
-| Drift is the fun | Does she drift on purpose? Smile at the smoke and the squeal? | |
+| Controls | Which buttons does he actually use? Does he find the drift (Space / X)? | |
+| Stuck | Any moment he does not know what to do or cannot get going again (wall, grass, menu)? Where? | |
+| Readable | Does he know which car is his (the arrow)? Does he read the position, or ignore it? | |
+| Forgiving | Ever upset — losing, crashing, a menu taking him somewhere unexpected? What happened just before? | |
+| Drift is the fun | Does he drift on purpose? Smile at the smoke and the squeal? | |
 | Garage | Buys cars? Which first? Paints them? Understands "NEED MORE COINS"? | |
-| Stickers and shelf | Notices NEW STICKER!? Visits the trophy shelf on her own? | |
+| Stickers and shelf | Notices NEW STICKER!? Visits the trophy shelf on his own? | |
 | Cups | Starts a cup? Follows the standings between races? How does the podium land? | |
 | Two players | With a parent or sibling: does joining work without help? Who wins, and how does that feel? | |
-| Time trial | Interested at all? Does the gold ghost mean anything to her? | |
-| Music and sound | Too loud, annoying after a while, or loved? Any sound she imitates? | |
-| Laughs | What makes her laugh? (Keep these: they are what to make more of.) | |
-| Skips | What does she skip, press through, or never open? | |
-| Session length | How long before she wants to stop, and why? | |
+| Time trial | Interested at all? Does the gold ghost mean anything to him? | |
+| Music and sound | Too loud, annoying after a while, or loved? Any sound he imitates? | |
+| Laughs | What makes him laugh? (Keep these: they are what to make more of.) | |
+| Skips | What does he skip, press through, or never open? | |
+| Session length | How long before he wants to stop, and why? | |
 
 ## After
 
-- What did she say about it, in her words?
+- What did he say about it, in his words?
 - Three things to fix first:
   1.
   2.
   3.
-- Ideas she had (a car, a track, a colour, a sticker):
+- Ideas he had (a car, a track, a colour, a sticker):
 
 Turn the findings into a follow-up list in ROADMAP.md, as a new phase.
