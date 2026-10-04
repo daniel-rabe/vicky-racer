@@ -1,0 +1,81 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ui/cup/podium.gd" id="1_screen"]
+[ext_resource type="Theme" path="res://ui/theme/vicky_theme.tres" id="2_theme"]
+
+[node name="Podium" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_screen")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.078, 0.125, 0.18, 1)
+
+[node name="Stage" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="Headline" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 50.0
+offset_bottom = 140.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.824, 0.247, 1)
+theme_override_colors/font_outline_color = Color(0.055, 0.078, 0.11, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 60
+text = "YOU WON THE SUNSHINE CUP!"
+horizontal_alignment = 1
+
+[node name="Trophy" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1360.0
+offset_top = 260.0
+offset_right = 1760.0
+offset_bottom = 660.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Bonus" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1260.0
+offset_top = 680.0
+offset_right = 1860.0
+offset_bottom = 750.0
+theme_override_colors/font_color = Color(1, 0.824, 0.247, 1)
+theme_override_colors/font_outline_color = Color(0.055, 0.078, 0.11, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 44
+text = "+300 COINS"
+horizontal_alignment = 1
+
+[node name="Garage" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 92)
+layout_mode = 0
+offset_left = 1380.0
+offset_top = 900.0
+offset_right = 1740.0
+offset_bottom = 992.0
+theme_type_variation = &"RaceButton"
+text = "GARAGE"

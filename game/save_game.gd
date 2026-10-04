@@ -28,6 +28,11 @@ var paint := {}
 ## The track the next race is on (track select). Optional in the file: older saves
 ## without it start on the first track.
 var selected_track: StringName = &"track_01"
+## A cup in progress, as CupManager sent it ({} = none), so closing the game mid-cup loses
+## nothing; and the best trophy won per cup (cup id -> &"gold" / &"silver" / ...).
+## Both optional in the file.
+var cup_progress := {}
+var trophies := {}
 
 
 static func fresh(starting_coins := 0) -> SaveGame:
@@ -56,6 +61,13 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 	profile.equipped_setup = equipped if equipped in profile.owned_setups else STARTER_SETUP
 	profile.completed_tracks = _string_names(file.get_value("profile", "completed_tracks", []))
 	profile.selected_track = StringName(str(file.get_value("profile", "selected_track", "track_01")))
+	var progress: Variant = file.get_value("cup", "progress", {})
+	profile.cup_progress = progress if progress is Dictionary else {}
+	if file.has_section("trophies"):
+		for cup in file.get_section_keys("trophies"):
+			var trophy := StringName(str(file.get_value("trophies", cup, "")))
+			if trophy in [&"gold", &"silver", &"bronze", &"ribbon"]:
+				profile.trophies[StringName(cup)] = trophy
 	if file.has_section("paint"):  # absent in version 1 files
 		for id in file.get_section_keys("paint"):
 			var colour := StringName(str(file.get_value("paint", id, "")))
@@ -82,6 +94,10 @@ func save_to(path := DEFAULT_PATH) -> Error:
 		file.set_value("best_laps", String(track), best_laps[track])
 	for id in paint:
 		file.set_value("paint", String(id), String(paint[id]))
+	if not cup_progress.is_empty():
+		file.set_value("cup", "progress", cup_progress)
+	for cup in trophies:
+		file.set_value("trophies", String(cup), String(trophies[cup]))
 	return file.save(path)
 
 

@@ -25,6 +25,8 @@ var setups: Dictionary = {}  # id -> DriftSetup
 var tracks: Dictionary = {}  # id -> TrackConfig
 ## What the results screen shows: results, coins breakdown, total awarded, new best lap.
 var last_race := {}
+## The cup just finished, for the podium: cup id, trophy, bonus coins.
+var last_cup := {}
 
 
 func _enter_tree() -> void:
@@ -33,6 +35,10 @@ func _enter_tree() -> void:
 	EventSystem.PRO_equip_requested.connect(equip)
 	EventSystem.PRO_paint_requested.connect(repaint)
 	EventSystem.PRO_track_select_requested.connect(select_track)
+	EventSystem.CUP_progress_changed.connect(func(progress: Dictionary) -> void:
+		profile.cup_progress = progress
+		profile.save_to(save_path))
+	EventSystem.CUP_finished.connect(_on_cup_finished)
 	EventSystem.RAC_race_finished.connect(_on_race_finished)
 
 
@@ -113,6 +119,19 @@ func repaint(id: StringName) -> void:
 	_commit()
 
 
+## The end of a cup: the trophy's bonus coins, and the trophy kept if it beats the best.
+func _on_cup_finished(cup_id: StringName, _standings: Array, trophy: StringName) -> void:
+	var bonus := int(economy.cup_bonus.get(trophy, 0))
+	profile.coins += bonus
+	var best: StringName = profile.trophies.get(cup_id, &"")
+	if best == &"" or CupManager.TROPHY_RANK.find(trophy) < CupManager.TROPHY_RANK.find(best):
+		profile.trophies[cup_id] = trophy
+	profile.cup_progress = {}
+	last_cup = {"cup": cup_id, "trophy": trophy, "bonus": bonus}
+	EventSystem.PRO_coins_changed.emit(profile.coins)
+	_commit()
+
+
 func _on_race_finished(results: Array, track_id: StringName) -> void:
 	var player: Dictionary = {}
 	for entry: Dictionary in results:
@@ -151,6 +170,9 @@ func _publish_state() -> void:
 		"equipped": profile.equipped_setup,
 		"paint": profile.paint.duplicate(),
 		"selected_track": profile.selected_track,
+		"cup_progress": profile.cup_progress.duplicate(true),
+		"trophies": profile.trophies.duplicate(),
+		"last_cup": last_cup,
 		"tracks": TRACK_ORDER.map(func(id: StringName) -> Dictionary:
 			return {"config": tracks[id], "unlocked": is_unlocked(id), "best_lap": profile.best_laps.get(id, 0.0),
 				"completed": id in profile.completed_tracks}),

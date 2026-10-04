@@ -8,6 +8,9 @@ extends Resource
 @export var place_payouts: Array[int] = [100, 75, 60, 50]
 ## Paid once per track, the first time the player finishes it.
 @export var first_finish_bonus := 100
+## Paid at the end of a cup, by the trophy won (docs/DESIGN.md §12). Finishing at all earns
+## the ribbon's coins: nobody is ever told they lost.
+@export var cup_bonus := {&"gold": 300, &"silver": 200, &"bronze": 150, &"ribbon": 100}
 ## Coins in a brand-new save.
 @export var starting_coins := 0
 

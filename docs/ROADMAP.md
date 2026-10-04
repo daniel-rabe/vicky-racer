@@ -80,34 +80,16 @@ on the road), boost pads, track select with unlocking by finishing. Details in
 
 ---
 
-## Phase 12 — Tournament mode
+## Phase 12 — Tournament mode ✅ done
 
-A **cup** is a set of races in a row with points, standings and a trophy at the end.
+Built as planned (DESIGN.md §12): Sunshine and Snowflake Cups of three races, points 10/7/5/3,
+standings between races, a podium with confetti and a gold/silver/bronze trophy or ribbon, cup
+bonus coins, progress saved after every race with CONTINUE CUP on the title. Changes:
 
-**Art gate:** cup-select, standings and podium-ceremony layouts; three trophy illustrations
-(bronze / silver / gold) and a cup icon per cup, generated with the frozen recipe.
-
-1. **`CupConfig`** resource — name, icon, list of `TrackConfig`s, laps per race, opponent cars and
-   skills. Two cups to start: **Sunshine Cup** (Meadow, Beach, Toy Town) and **Snowflake Cup**
-   (Beach, Snowy Peak, Meadow reversed), the second unlocked by finishing the first.
-2. **Reverse tracks** — every track drivable backwards by flipping the racing line; doubles the
-   content for free. Lap validation already works in either direction (checkpoint then finish).
-3. **`CupManager`** in the main shell (next to `GarageManager`): current cup, race index, points
-   table, persisted between screens. Signals `CUP_started`, `CUP_race_finished(standings)`,
-   `CUP_finished(standings, trophy)`.
-4. **Points** — 10 / 7 / 5 / 3, all non-zero so a child always scores. Ties go to the better last
-   race.
-5. **Standings screen** between races: the four cars with points counting up, then NEXT RACE.
-6. **Podium ceremony** after the last race: the top three cars on a podium, confetti, fanfare,
-   then the trophy flies to the shelf (Phase 14). Third or better earns that cup's trophy colour;
-   finishing the cup at all earns a participation ribbon — *nobody is ever told they lost*.
-7. **Payout** — normal per-race coins plus a cup bonus (gold 300 / silver 200 / bronze 150 /
-   finished 100).
-8. **Saving mid-cup** — the cup state is saved after each race, so closing the game does not lose
-   a half-finished cup; the title screen offers CONTINUE CUP.
-
-**Done when:** a headless cup test runs a full cup on autopilot, checks points, standings order,
-the trophy awarded, the payout and the mid-cup save/resume.
+- **The next cup opens when the previous one is won** (1st overall) — the user's decision,
+  stricter than the proposal (finishing).
+- **No reverse tracks**: four tracks make two cups of three without them.
+- No save-schema bump: `[cup]` and `[trophies]` are optional sections.
 
 ---
 

@@ -15,6 +15,8 @@ const LANES: Array[float] = [0.0, -70.0, 70.0, 0.0]
 ## Shifts the view so the followed car runs left of the menu instead of behind it.
 const VIEW_OFFSET := Vector2(520, 40)
 
+var _cup := {}
+
 @onready var _world: Node2D = $World
 @onready var _play: Button = %Play
 @onready var _settings_button: Button = %Settings
@@ -23,6 +25,10 @@ const VIEW_OFFSET := Vector2(520, 40)
 @onready var _menu: Control = %Menu
 @onready var _logo: Control = %Logo
 @onready var _hints: Label = %Hints
+
+
+func _enter_tree() -> void:
+	EventSystem.CUP_state_changed.connect(func(state: Dictionary) -> void: _cup = state)
 
 
 func _ready() -> void:
@@ -38,9 +44,28 @@ func _ready() -> void:
 	_quit.pressed.connect(func() -> void:
 		get_tree().root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST))
 	_play.grab_focus()
+	_add_continue_cup()
 	var bob := create_tween().set_loops().set_trans(Tween.TRANS_SINE)
 	bob.tween_property(_logo, "position:y", _logo.position.y - 6.0, 1.0)
 	bob.tween_property(_logo, "position:y", _logo.position.y + 6.0, 1.0)
+
+
+## A cup left half-way (even with the game closed) can be picked up from the title.
+func _add_continue_cup() -> void:
+	EventSystem.CUP_state_requested.emit()
+	if _cup.is_empty() or _cup["phase"] not in [&"ready", &"results"]:
+		return
+	var button := Button.new()
+	button.name = "ContinueCup"
+	button.text = "CONTINUE CUP"
+	button.custom_minimum_size = Vector2(400, 110)
+	button.theme_type_variation = &"RaceButton"
+	button.add_theme_font_size_override("font_size", 36)
+	button.pressed.connect(func() -> void: EventSystem.CUP_continue_requested.emit())
+	_menu.add_child(button)
+	_menu.move_child(button, 0)
+	_menu.offset_top -= 70.0
+	button.grab_focus()
 
 
 func _build_attract_mode() -> void:

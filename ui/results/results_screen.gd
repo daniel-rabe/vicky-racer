@@ -20,9 +20,12 @@ const COIN := preload("res://art/sfx/coin.wav")
 @onready var _again: Button = %Again
 
 var _state := {}
+var _in_cup := false  # a cup race: the next stop is the standings, not another race
 
 
 func _enter_tree() -> void:
+	EventSystem.CUP_state_changed.connect(func(state: Dictionary) -> void:
+		_in_cup = state["phase"] in [&"results", &"done"])
 	EventSystem.PRO_state_changed.connect(func(state: Dictionary) -> void: _state = state)
 
 
@@ -31,7 +34,11 @@ func _ready() -> void:
 		button.disabled = true
 		button.focus_mode = Control.FOCUS_NONE
 	_garage.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"garage"))
-	_again.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"race"))
+	_again.pressed.connect(func() -> void:
+		EventSystem.UI_screen_requested.emit(&"standings" if _in_cup else &"race"))
+	EventSystem.CUP_state_requested.emit()
+	if _in_cup:
+		_again.text = "STANDINGS"
 	EventSystem.PRO_state_requested.emit()
 	var race: Dictionary = _state.get("last_race", {})
 	if race.is_empty():

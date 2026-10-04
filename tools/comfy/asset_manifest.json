@@ -161,6 +161,54 @@
       ],
       "out": "art/props/town/traffic_cone.png",
       "_note": "Phase 11 theme prop."
+    },
+    {
+      "id": "trophy_gold",
+      "subject": "a shiny gold trophy cup with two round handles on a short square base, front view, chunky toy-like children's game prize, simple rounded shapes",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        256,
+        256
+      ],
+      "out": "art/ui/cups/trophy_gold.png",
+      "_note": "Phase 12 cup art."
+    },
+    {
+      "id": "ribbon",
+      "subject": "a round blue prize rosette ribbon with two tails hanging down, a gold star in the middle, front view, children's game prize",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        256,
+        256
+      ],
+      "out": "art/ui/cups/ribbon.png",
+      "_note": "Phase 12 cup art."
+    },
+    {
+      "id": "cup_sun",
+      "subject": "a big smiling cartoon sun with round rays, cheerful yellow and orange, simple flat game icon",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        200,
+        200
+      ],
+      "out": "art/ui/cups/cup_sun.png",
+      "_note": "Phase 12 cup art."
+    },
+    {
+      "id": "cup_snow",
+      "subject": "a big friendly cartoon snowflake with six rounded arms, light blue and white, simple flat game icon",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        200,
+        200
+      ],
+      "out": "art/ui/cups/cup_snow.png",
+      "_note": "Phase 12 cup art."
     }
   ],
   "variants": [
@@ -326,6 +374,30 @@
       "out": "art/ui/cards/dragon.png",
       "instruction": "Turn this car into a friendly cartoon dragon car seen from directly above: a green scaly body with small purple wings folded along the sides, little spikes along the middle, a cute dragon head at the front and a curly tail at the back. Keep its front (the windscreen and headlights) at the bottom of the picture exactly like the original car, the view from directly above and the plain white background.",
       "_note": "Phase 10 car: Dragon."
+    },
+    {
+      "id": "trophy_silver",
+      "source": "trophy_gold",
+      "seed": 11,
+      "box": [
+        256,
+        256
+      ],
+      "out": "art/ui/cups/trophy_silver.png",
+      "instruction": "Change the trophy's gold metal to shiny polished silver. Keep the exact shape, the handles, the base, the view and the plain white background exactly the same.",
+      "_note": "Phase 12: recolour of the gold trophy, identical shape."
+    },
+    {
+      "id": "trophy_bronze",
+      "source": "trophy_gold",
+      "seed": 11,
+      "box": [
+        256,
+        256
+      ],
+      "out": "art/ui/cups/trophy_bronze.png",
+      "instruction": "Change the trophy's gold metal to warm shiny bronze. Keep the exact shape, the handles, the base, the view and the plain white background exactly the same.",
+      "_note": "Phase 12: recolour of the gold trophy, identical shape."
     }
   ],
   "copies": [

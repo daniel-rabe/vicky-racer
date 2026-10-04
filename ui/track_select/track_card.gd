@@ -5,8 +5,8 @@ extends Button
 
 signal chosen(config: TrackConfig)
 
-const SIZE := Vector2(400, 500)
-const SHAPE_RECT := Rect2(30, 30, 340, 260)
+const SIZE := Vector2(380, 400)
+const SHAPE_RECT := Rect2(24, 24, 332, 210)
 const DARK := Color(0.055, 0.078, 0.11)
 const YELLOW := Color(1, 0.824, 0.247)
 
@@ -28,7 +28,7 @@ func setup(track_config: TrackConfig, is_unlocked: bool, best_lap: float, comple
 	custom_minimum_size = SIZE
 	theme_type_variation = &"SettingsRow"
 	_read_track()
-	_name = _label(config.display_name.to_upper(), 30, Color.WHITE, Vector2(0, 320))
+	_name = _label(config.display_name.to_upper(), 30, Color.WHITE, Vector2(0, 250))
 	var info := "NEW!"
 	if not unlocked:
 		info = "LOCKED\nFINISH %s" % opened_by.to_upper()
@@ -36,7 +36,7 @@ func setup(track_config: TrackConfig, is_unlocked: bool, best_lap: float, comple
 		info = "BEST %s" % _format(best_lap)
 	elif completed:
 		info = ""
-	_info = _label(info, 22, YELLOW if unlocked else Color(0.75, 0.8, 0.86), Vector2(0, 380))
+	_info = _label(info, 22, YELLOW if unlocked else Color(0.75, 0.8, 0.86), Vector2(0, 304))
 	modulate = Color.WHITE if unlocked else Color(0.7, 0.7, 0.7)
 	pressed.connect(func() -> void: chosen.emit(config))
 

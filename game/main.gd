@@ -21,6 +21,8 @@ const SCREENS := {
 	# Dev: the open field for tuning handling (--screen=test_drive).
 	&"test_drive": preload("res://game/screens/test_drive.tscn"),
 	&"results": preload("res://ui/results/results_screen.tscn"),
+	&"standings": preload("res://ui/cup/standings.tscn"),
+	&"podium": preload("res://ui/cup/podium.tscn"),
 }
 const FIRST_SCREEN := &"title"
 

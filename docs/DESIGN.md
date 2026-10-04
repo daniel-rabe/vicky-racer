@@ -279,6 +279,7 @@ single autoload (`EventSystem`) and declares every cross-system signal. Managers
 | `RAC_` | Race | `countdown_tick(n)`, `race_started()`, `lap_completed(racer, lap, lap_time)`, `positions_updated(order)`, `race_finished(results, track_id)` |
 | `CAR_` | Car | `drift_started(car)`, `drift_ended(car, duration)`, `surface_changed(car, surface)`, `wall_hit(car, impact_speed)` |
 | `PRO_` | Progression | `state_requested()`, `state_changed(state)`, `buy_requested(id)`, `equip_requested(id)`, `coins_changed(total)`, `coins_awarded(amount, breakdown)`, `setup_purchased(id)`, `setup_equipped(id)`, `purchase_refused(id, reason)` |
+| `CUP_` | Cups | `state_requested()`, `state_changed(state)`, `start_requested(id)`, `continue_requested()`, `progress_changed(progress)`, `finished(id, standings, trophy)` |
 | `UI_` | Screens | `show_message(text, duration)`, `screen_requested(name)`, `settings_requested()`, `settings_changed(settings)`, `setting_change_requested(key, value)` |
 
 Screens never reach into managers. Following Vicky's Game's inventory pattern, a screen emits
@@ -696,7 +697,8 @@ them all out ([`mockups/candidates/paint_shop.png`](mockups/candidates/paint_sho
 | Settings | Same spec — SOUND, FULLSCREEN, AUTO GO, STEER HELP, OPPONENTS; one focusable row each, ← → change it. Over the title and over the pause menu. Built: [`screenshots/settings.png`](screenshots/settings.png) |
 | Race HUD | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown. Built: [`screenshots/race.png`](screenshots/race.png), [`screenshots/race_countdown.png`](screenshots/race_countdown.png). The countdown sits above screen centre rather than on it, so it never hides the player's own car |
 | Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, cards in pages of 3 × 2 (Q / E or the shoulder buttons, or moving off the edge of a page, turns it; `< 1 / 2 >` above the cards), preview with Grip / Slide / Speed bars and, for owned cars, paint swatches. Built: [`screenshots/garage.png`](screenshots/garage.png) |
-| Track select | Four cards (§7.6). ← → choose, A races, B back to the garage. Built: [`screenshots/track_select.png`](screenshots/track_select.png) |
+| Pick a race | Four track cards (§7.6) and two cup cards (§12). ← → ↑ ↓ choose, A races, B back to the garage. Built: [`screenshots/pick_a_race.png`](screenshots/pick_a_race.png) |
+| Standings, podium | §12 |
 | Results | [`mockups/results_layout.png`](mockups/results_layout.png) — finishing order, payout count-up, Race Again. Built: [`screenshots/results.png`](screenshots/results.png) |
 
 Pink annotations on each spec give anchors, sizes and animation timings; they are meant to be
@@ -798,7 +800,52 @@ python tools/comfy/generate_sfx.py pick coin 104              # pin a seed
 python tools/comfy/generate_sfx.py build                      # write art/sfx/*.wav
 ```
 
-## 12. Out of scope for v1
+## 12. Cups
+
+A **cup** is three races in a row with points, standings and a trophy at the end.
+
+| Cup | Races | Opens |
+| --- | --- | --- |
+| **Sunshine Cup** | Meadow Loop, Sunny Beach, Toy Town | from the start |
+| **Snowflake Cup** | Toy Town, Meadow Loop, Snowy Peak | when the Sunshine Cup has been **won** (1st overall) |
+
+- **Points** 10 / 7 / 5 / 3 per race, so everyone scores; a tie goes to whoever did better in the
+  last race.
+- **Flow:** PICK A RACE → a cup card → race → results (RACE AGAIN becomes STANDINGS) →
+  standings, the points just won counting up → NEXT RACE … → after the last race PODIUM!
+  ([`screenshots/cup_standings.png`](screenshots/cup_standings.png),
+  [`screenshots/cup_podium.png`](screenshots/cup_podium.png)).
+- **Podium:** the top three cars on a 2-1-3 podium, confetti, the fanfare, then the player's prize
+  flies in: **gold / silver / bronze** trophy for 1st–3rd overall, the **ribbon** for 4th — finishing
+  a cup is always celebrated, and always pays: **300 / 200 / 150 / 100** bonus coins
+  (`EconomyConfig.cup_bonus`) on top of the normal per-race payout.
+- **The next cup opens only on a win.** This is stricter than the tracks (which open on any
+  finish) — the user's call: the cups are the goal for a child who can already win races. Easy
+  difficulty (§8.3) is the route for a child who cannot yet. A trophy is never lost: a cup keeps
+  the best ever won.
+- **Leaving and resuming:** the progress is saved after every race, so leaving through the pause
+  menu, the standings' GARAGE button or closing the game keeps the cup. The cup card then says
+  CONTINUE — RACE 2 OF 3, and the title screen shows CONTINUE CUP. Starting a cup again from its
+  card starts it over. A race left half-way scores nothing and is raced again.
+
+| Piece | File |
+| --- | --- |
+| `CupConfig` — name, icon, tracks, points | [`game/configs/cup_config.gd`](../game/configs/cup_config.gd), `game/configs/cups/*.tres` |
+| `CupManager` — phases none → racing → results → … → done, points, standings, trophy; in the shell next to `GarageManager` | [`game/managers/cup_manager.gd`](../game/managers/cup_manager.gd) |
+| Standings, podium | [`ui/cup/`](../ui/cup/) |
+| Cup cards on PICK A RACE | [`ui/track_select/cup_card.gd`](../ui/track_select/cup_card.gd) |
+| Checks: points, ties, resume after closing the game, trophies, coins, opening on a win only, a single race not counting, and a whole cup through the real screens | [`tests/cup_test.gd`](../tests/cup_test.gd) |
+
+`CupManager` owns the cup's logic and `GarageManager` its saving: after each race the manager
+sends `CUP_progress_changed` (saved as `[cup] progress`), and at the end `CUP_finished` (cup,
+standings, trophy), on which `GarageManager` pays the bonus and records the trophy in
+`[trophies]`. Both sections are optional in the save, so the schema version did not change.
+
+The art — gold trophy, ribbon, sun and snowflake icons — was generated and picked from four
+candidates each; silver and bronze are Kontext recolours of the gold one, so all three trophies
+share one shape. Reverse tracks (in the roadmap) were left out: four tracks give two cups of three.
+
+## 13. Out of scope for v1
 
 More tracks, more cars, tournaments, music, split screen, time trial and ghosts are planned as
 Phases 9–17 in [`ROADMAP.md`](ROADMAP.md). Touch controls remain out of scope.

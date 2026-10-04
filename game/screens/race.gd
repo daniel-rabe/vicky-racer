@@ -14,6 +14,7 @@ var track: Track
 var racers: Array[Dictionary] = []
 var _player_setup: DriftSetup
 var _player_paint: StringName = Paint.ORIGINAL
+var _cup_track: TrackConfig
 var _difficulty_id: StringName = &"normal"
 
 @onready var manager: RaceManager = $RaceManager
@@ -23,12 +24,19 @@ var _difficulty_id: StringName = &"normal"
 
 func _enter_tree() -> void:
 	EventSystem.PRO_state_changed.connect(_on_state_changed)
+	# In a cup, the cup decides the track (CupManager answers synchronously).
+	EventSystem.CUP_state_changed.connect(func(state: Dictionary) -> void:
+		if state["phase"] == &"racing" and state["track"]:
+			_cup_track = state["track"])
 	EventSystem.UI_settings_changed.connect(func(settings: Dictionary) -> void:
 		_difficulty_id = settings.get("difficulty", &"normal"))
 
 
 func _ready() -> void:
 	EventSystem.PRO_state_requested.emit()  # answered synchronously: sets config and _player_setup
+	EventSystem.CUP_state_requested.emit()
+	if _cup_track:
+		config = _cup_track
 	track = config.track_scene.instantiate()
 	add_child(track)
 	move_child(track, 0)

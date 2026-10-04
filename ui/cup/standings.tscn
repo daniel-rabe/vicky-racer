@@ -1,0 +1,98 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ui/cup/standings.gd" id="1_screen"]
+[ext_resource type="Theme" path="res://ui/theme/vicky_theme.tres" id="2_theme"]
+
+[node name="Standings" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_screen")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.078, 0.125, 0.18, 1)
+
+[node name="Icon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 48.0
+offset_top = 36.0
+offset_right = 168.0
+offset_bottom = 156.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 192.0
+offset_top = 44.0
+offset_right = 1400.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 56
+text = "SUNSHINE CUP"
+
+[node name="Subtitle" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 196.0
+offset_top = 116.0
+offset_right = 1400.0
+offset_bottom = 160.0
+theme_override_colors/font_color = Color(0.624, 0.69, 0.769, 1)
+theme_override_font_sizes/font_size = 26
+text = "AFTER RACE 1 OF 3"
+
+[node name="Rows" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -550.0
+offset_top = 210.0
+offset_right = 550.0
+offset_bottom = 760.0
+grow_horizontal = 2
+theme_override_constants/separation = 20
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -420.0
+offset_top = -200.0
+offset_right = 420.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 48
+alignment = 1
+
+[node name="Garage" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 92)
+layout_mode = 2
+theme_type_variation = &"NavButton"
+text = "GARAGE"
+
+[node name="Next" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 92)
+layout_mode = 2
+theme_type_variation = &"RaceButton"
+theme_override_font_sizes/font_size = 32
+text = "NEXT RACE"

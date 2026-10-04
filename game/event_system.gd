@@ -36,6 +36,17 @@ signal PRO_setup_equipped(setup_id: StringName)
 signal PRO_setup_painted(setup_id: StringName, colour: StringName)
 signal PRO_purchase_refused(setup_id: StringName, reason: StringName)
 
+# Cups. Screens ask with CUP_state_requested and get the whole cup state back (as with
+# PRO_). CupManager owns the logic; GarageManager stores progress and pays the trophy.
+signal CUP_state_requested
+signal CUP_state_changed(state: Dictionary)
+signal CUP_start_requested(cup_id: StringName)
+signal CUP_continue_requested
+## progress: what must survive closing the game mid-cup ({} = no cup running).
+signal CUP_progress_changed(progress: Dictionary)
+## trophy: &"gold", &"silver", &"bronze" or &"ribbon".
+signal CUP_finished(cup_id: StringName, standings: Array, trophy: StringName)
+
 # Screens
 signal UI_show_message(text: String, duration: float)
 signal UI_screen_requested(screen_name: StringName)

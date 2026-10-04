@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CupConfig" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://game/configs/cup_config.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cups/cup_snow.png" id="2_icon"]
+[ext_resource type="Script" path="res://game/configs/track_config.gd" id="3_track"]
+[ext_resource type="Resource" path="res://game/configs/tracks/track_04.tres" id="4_track_04"]
+[ext_resource type="Resource" path="res://game/configs/tracks/track_01.tres" id="5_track_01"]
+[ext_resource type="Resource" path="res://game/configs/tracks/track_03.tres" id="6_track_03"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"snowflake"
+display_name = "Snowflake Cup"
+icon = ExtResource("2_icon")
+tracks = Array[ExtResource("3_track")]([ExtResource("4_track_04"), ExtResource("5_track_01"), ExtResource("6_track_03")])
+points = Array[int]([10, 7, 5, 3])
