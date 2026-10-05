@@ -38,7 +38,7 @@ tools/comfy/masters/paint_*
 tools/comfy/masters/music/
 docs/mockups/music/listen/
 
-# Release builds (Phase 17): export_presets.cfg writes the .exe here.
+# Release builds (Phase 17): export_presets.cfg writes the .exe and the web build here.
 build/
 
 # The sticker sound pick (Phase 14) is kept like the other picks.

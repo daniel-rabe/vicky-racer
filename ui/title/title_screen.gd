@@ -56,6 +56,8 @@ func _ready() -> void:
 	# Quit like closing the window does, so main.gd can let the sound stop cleanly first.
 	_quit.pressed.connect(func() -> void:
 		get_tree().root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST))
+	# In a browser there is nothing to quit to: quitting would only freeze the page.
+	_quit.visible = not OS.has_feature("web")
 	_play.grab_focus()
 	_add_continue_cup()
 	_add_version()

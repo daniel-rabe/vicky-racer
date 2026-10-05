@@ -1092,6 +1092,27 @@ Godot_console.exe --path . --headless --export-release "Windows" build/windows/V
 - **Playtest:** [`PLAYTEST.md`](PLAYTEST.md) — what to check before, what to watch for per
   pillar, and what to write down after.
 
+### 17.1 Web build
+
+The same game in a browser, for itch.io's "Run game" button: a second preset, **Web**, writes
+`index.html` and its files to `build/web/`. Zip the *contents* of that folder (index.html at the
+top of the zip), upload it on itch.io as "This file will be played in the browser", and set the
+viewport to 1280 × 720 with the fullscreen button on.
+
+```bash
+Godot_console.exe --path . --headless --export-release "Web" build/web/index.html
+```
+
+- **Needs** the Web export templates for 4.7.1 (not installed here yet: only the Windows ones).
+- **Renderer:** browsers have no Forward+, so the web build uses Compatibility
+  (`rendering/renderer/rendering_method.web`). The game is 2D, so the look should hold, but the
+  particles, lights and the shelf's silhouette shader are worth a look in the first web build.
+- **No threads** (`variant/thread_support=false`): runs on any host without the cross-origin
+  isolation headers itch.io only offers as an experiment. Audio then plays as Web Audio samples.
+- **Browser differences:** QUIT is hidden (there is nothing to quit to). The page always opens
+  windowed — browsers only go fullscreen after a click — and the window's size and place are not
+  remembered. Saves go to the browser's storage for that site, so they stay with that browser.
+
 ## 18. Out of scope for v1
 
 Ideas parked for later are listed in
