@@ -1,0 +1,57 @@
+# Export the game and push it to itch.io with butler.
+#
+# Runs on a version tag (git tag v1.0.1 && git push origin v1.0.1) or by hand from the Actions tab.
+# Needs the secret BUTLER_API_KEY (an itch.io API key, from itch.io > Settings > API keys) under
+# the repo's Settings > Secrets and variables > Actions.
+# The page is https://duneking.itch.io/vicky-racer (a repo variable ITCH_GAME can point elsewhere).
+name: Release to itch.io
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: 4.7.1
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot and export templates
+        run: |
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          curl -sSfL -o godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -sSfL -o templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -q godot.zip && mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
+          dir="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$dir" && unzip -q templates.tpz && mv templates/* "$dir/"
+          rm -rf godot.zip templates.tpz templates
+
+      - name: Install butler
+        run: |
+          curl -sSfL -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d "$HOME/butler" && chmod +x "$HOME/butler/butler"
+          echo "$HOME/butler" >> "$GITHUB_PATH"
+          rm butler.zip
+
+      - name: Import assets
+        run: godot --headless --import
+
+      - name: Export
+        run: |
+          mkdir -p build/web build/windows
+          godot --headless --export-release "Web" build/web/index.html
+          godot --headless --export-release "Windows" build/windows/VickyRacer.exe
+          test -f build/web/index.pck && test -f build/windows/VickyRacer.exe
+
+      - name: Push to itch.io
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_GAME: ${{ vars.ITCH_GAME || 'duneking/vicky-racer' }}
+        run: |
+          version=$(sed -n 's/^config\/version="\(.*\)"/\1/p' project.godot)
+          butler push build/web "$ITCH_GAME:web" --userversion "$version"
+          butler push build/windows "$ITCH_GAME:windows" --userversion "$version"
