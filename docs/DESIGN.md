@@ -1508,3 +1508,147 @@ the roster in the same way as car opponents (§8).
   rather than turned, or it would sail upside down. The splash and the ramp take-off were cut
   from the approved wake and wave recordings (`derive_sfx.py`): Stable Audio's one-shot water
   sounded like wind.
+
+---
+
+## 21. Free Drive: the island
+
+*Gate A (design and mockups) approved 2026-10-06. Art (Gate B) and code (Gate C) to come.*
+
+The town (§19) becomes an island. The ring of trees at its edge gives way to grass with
+palms, a sandy beach, and the ocean all round. A **harbour** on the south coast swaps the
+car for the boat equipped in the Boat Dock (§20), so the child can sail round the island and
+then drive back into town.
+
+![The island](mockups/island/01_island_overview.png)
+
+| Picture | What it shows |
+| --- | --- |
+| [`01_island_overview.png`](mockups/island/01_island_overview.png) | The whole island from far out: the game's own photo of the town (`--overview`), with the coast, the sea and everything at sea painted round it |
+| [`02_harbour_closeup.png`](mockups/island/02_harbour_closeup.png) | The harbour at game scale (zoom 1.0). The ring road is the game's own photo; the rest is painted in world pixels |
+| [`03_swap_views.png`](mockups/island/03_swap_views.png) | What the screen shows at the land pad and at the mooring |
+
+All three are drawn by [`tools/layouts/island_probe.py`](../tools/layouts/island_probe.py).
+It photographs the running game and places every piece in world pixels. The positions in this
+section are the ones the code will use.
+
+### 21.1 The layout
+
+The streets do not move. Only what lies outside the ring road changes.
+
+| Band | Distance out from today's world edge | Surface |
+| --- | --- | --- |
+| Grass, with palms along its outer edge | up to about −70 px (inside the old edge) | grass |
+| Beach: dry sand, then a strip of wet sand | −70 to +250 px, ± 150 px of gentle bays and points | sand |
+| Shallows: pale lagoon water, with a line of foam at the sand | +250 to about +670 px | shallows |
+| The open sea | out to **+2,750 px** | deep water |
+| The outer limit: red buoys and clumps of rock, with darker sea beyond | +2,750 px | a wall |
+
+- The island has rounded corners (radius 1,300 px). The waterline wobbles along the coast,
+  except at the harbour, where the quay wall is straight.
+- The world grows from 9,920 × 8,320 to about **15,400 × 13,800 px**. `TownLayout.world_size()`
+  stays the island's size. A new `TownLayout.SEA` (2,750) gives the sea around it.
+- The beach has parasols and beach balls (Phase 20 art). Palms stand where the grass meets
+  the sand, in place of the old ring of round trees.
+
+### 21.2 The harbour
+
+The harbour is on the south coast, between the third and fourth avenues (world x 4,250–5,750).
+Its parts, from top to bottom:
+
+| Piece | Where (world px) | What it is |
+| --- | --- | --- |
+| **Harbour road** | x 5,250–5,510, from the ring road to the quay | A short dead-end road with a lane each way. It is not on the traffic's map, so traffic never turns into it |
+| **Harbour building** | 4,380–4,940 × 7,700–8,140, front facing down onto the quay | The harbour master's boathouse: a navy roof with a round lookout and a flag, cream boards, two big boathouse doors, a lifebuoy on the wall. It is a named place (`HARBOUR`) like the shops, so its sign pops up |
+| **Quay** | 4,250–5,750 × 8,150–8,650 | Stone paving with a dark edge and bollards along the water; crates and a coil of rope |
+| **Land pad** | 4,470–4,850 × 8,165–8,460 | A blue pad with a white boat on it, in front of the building's doors |
+| **Pier** | 4,560–4,760, out to y 9,100 | Wooden planks, with posts down both sides. It is solid for boats; cars cannot reach it, because the quay edge is a wall |
+| **Mooring** | 4,500–4,820 × 9,100–9,380, at the end of the pier | Water inside a ring of floating white and yellow buoys, with a car drawn on the water |
+| **Slipway** | 5,480–5,680, down into the water | Scenery: concrete running into the sea |
+| **Boats tied up** | beside the pier and the quay | The tugboat, the rubber duck, the swan and a sailboat, as props |
+
+### 21.3 Swapping
+
+Each pad shows what you will become, not what you are: the land pad has a **boat** on it,
+and the mooring has a **car**.
+
+1. The player's car drives onto the land pad. Steering in is needed, as at the car wash. The
+   car must be going slower than 300 px/s, so a child racing across the quay is not swapped
+   by accident.
+2. The ship's bell rings and the screen fades to white for 0.35 s.
+3. The car is left parked on the pad as a prop, in its paint.
+4. The equipped boat appears in the mooring, in its paint, pointing out to sea (down the
+   screen). The camera follows it, and the fade lifts.
+5. Sailing back into the mooring does the same in reverse. The boat is left tied up in the
+   mooring, and the car appears on the land pad, facing up the harbour road.
+
+A pad that was just used does nothing until the vehicle has left it, so nobody swaps
+straight back. While sailing, the HUD shows a little boat, and the pause menu's GARAGE opens
+the Boat Dock.
+
+### 21.4 Who can go where
+
+The coast has **two edges on the same waterline**:
+
+- a sea edge, which stops cars at the wet sand;
+- a land edge, which stops boats in the shallows.
+
+So cars can drive on the beach, and boats can sail right up to it. The quay and the pier are
+walls for boats. The town's pond stays car water, as it is now; a boat can never reach it.
+
+### 21.5 Things to do at sea
+
+| Thing | Where | What happens |
+| --- | --- | --- |
+| **Coin trails** | Arcs of 7–9 coins round the coast, through the slalom and over the ramps | Each coin is worth 2. It is banked at once and comes back 40 s later, as in town |
+| **Lighthouse** | On a rocky islet to the north-east | Its beam sweeps slowly round. Sailing round its islet counts as a place (`LIGHTHOUSE`) |
+| **Two ramp islets** | East and west | A ramp in the water in front of a sandy islet with a palm. Jump the islet and collect the coins in the air (Phase 20's ramp and airborne) |
+| **Buoy slalom** | Along the north shore | Ten buoys, alternately left and right, with a coin in each gate |
+| **Shipwreck** | North-west | The Phase 20 wreck on a sandbar, with a treasure chest. Reaching it counts as a place (`SHIPWRECK`) |
+| **Dolphins** | West | A pod of three. They leap in arcs, with a splash, beside a boat sailing near them |
+| **Seagulls** | Over the harbour and the lighthouse | They circle. A horn makes them flap away, like the town's birds |
+| **Two sailboats** | One loops round the whole island, the other round the east islet | They follow fixed loops at a gentle speed. They are bumpers: a boat that meets one bounces off softly |
+
+The places at sea count towards the all-places bonus, which grows from 11 to 14 places (the
+harbour, the lighthouse and the shipwreck).
+
+### 21.6 Art and sound needed (Gate B)
+
+- **Harbour building:** a Kontext edit of the block sketch
+  ([`harbour_sketch.png`](mockups/island/harbour_sketch.png)), as for every other building (§19.2).
+- **Ground:** the wet-sand strip and a darker open-sea fill, as flat fills in `pipeline.json`
+  beside `beach`, `lagoon_water` and `lagoon_deep`.
+- **Sprites (frozen recipe):** a lighthouse seen from above, a sailboat, a dolphin, a seagull,
+  wooden pier planks and a mooring post.
+- **Reused as they are (Phase 20 art):** rocks, ramps, palms, parasols, beach balls, the
+  shipwreck and the treasure chest.
+- **Sound:** a ship's bell for the swap. The first candidate is the pirate ship's bell from
+  Phase 20. The sea uses Phase 20's wave ambience, mixed in while sailing.
+
+### 21.7 Under the hood (Gate C)
+
+- **`town.gd`:**
+  - `_build_edge` becomes `_build_coast`: palms, beach, waterline, shallows, sea, the outer
+    limit and the two coast edges.
+  - `surface_at` answers sand, shallows and deep water.
+- **Collision layers:** `Car` gets `LAYER_SEA_EDGE` and `LAYER_LAND_EDGE`. Cars collide with
+  the first, and boats with the second.
+- **The harbour** is built through the `_building` path (a named place), with two swap pads
+  modelled on the car wash's pad. A new event, `CAR_vehicle_swap_requested`, asks the screen to
+  swap.
+- **`game/screens/town.gd`:**
+  - It spawns either a car or a boat, from `GarageManager`'s equipped setup and paint.
+  - On a swap, it parks the old vehicle as a prop, moves `PlayerInput`, the camera and the
+    marker across to the new one, and fades.
+- **What stays in town:** the sky, the traffic and the walkers. Sea life (dolphins, gulls and
+  sailboats) are simple loop followers, not traffic AI.
+- **Minimap and perf:**
+  - The minimap shows the coast and the harbour.
+  - The world is bigger, so the perf probe is run again.
+  - The sea is drawn as a few large polygons, not as tiles.
+- **Tests:** `tests/town_test.gd` gains checks for:
+  - the coast surfaces;
+  - a car stopped at the waterline, and a boat stopped at the beach;
+  - both swaps, with the right boat and paint;
+  - sea coins;
+  - the camera following each swap.
