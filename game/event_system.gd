@@ -25,6 +25,8 @@ signal CAR_surface_changed(car: Node, surface: StringName)
 signal CAR_wall_hit(car: Node, impact_speed: float)
 signal CAR_horn(car: Node)
 signal CAR_boosted(car: Node)
+## Driven through the car wash in Free Drive: foam, then the car sparkles for a while.
+signal CAR_washed(car: Node)
 
 # Progression. Screens never touch GarageManager directly: they emit a *_requested
 # signal and listen for PRO_state_changed, which carries the whole garage state.

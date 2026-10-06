@@ -3,8 +3,11 @@ extends Node2D
 ## (from CAR_surface_changed), white tyre smoke when it drifts on the road. Particles are
 ## left behind in the world rather than dragged along with the car, and draw beneath it.
 ##
-## The puff texture is built here (a soft-edged disc), so the effect needs no art file and
-## stays in the flat picture-book look of the rest of the game.
+## Out of Free Drive's car wash (CAR_washed) the car is covered in foam for a moment, then
+## sparkles — little stars twinkling all over it — for SPARKLE_SECONDS, fading at the end.
+##
+## The puff and star textures are built here, so the effects need no art file and stay in
+## the flat picture-book look of the rest of the game.
 
 ## Grass throws up earth rather than green, which would vanish against the grass itself.
 const DUST_COLOURS := {
@@ -26,18 +29,29 @@ const SMOKE_COLOUR := Color(0.93, 0.93, 0.91)
 const DUST_MIN_SPEED := 120.0
 ## Behind the rear axle in the car's own frame.
 const EMIT_FROM := Vector2(-40.0, 0.0)
+## How long a washed car sparkles, and over how much of the end it fades away, s.
+const SPARKLE_SECONDS := 25.0
+const SPARKLE_FADE := 6.0
+const FOAM_COLOUR := Color(1.0, 1.0, 1.0)
 
 var _surface := &"asphalt"
 var _dust: GPUParticles2D
 var _smoke: GPUParticles2D
 var _siren: Node2D
 var _siren_time := 0.0
+var _foam: GPUParticles2D
+var _sparkle: GPUParticles2D
+## Seconds of sparkle left; 0 = not sparkling.
+var sparkle_time := 0.0
 
 @onready var car: Car = get_parent()
 
 
 func _enter_tree() -> void:
 	EventSystem.CAR_surface_changed.connect(_on_surface_changed)
+	EventSystem.CAR_washed.connect(func(washed: Node) -> void:
+		if washed == car:
+			wash())
 
 
 func _ready() -> void:
@@ -47,6 +61,21 @@ func _ready() -> void:
 	_smoke = _emitter(puff, 30, 0.9, Vector2(0.6, 1.4), 40.0)
 	_smoke.modulate = SMOKE_COLOUR
 	_siren = _siren_lights()
+	_foam = _foam_burst(puff)
+	_sparkle = _sparkles()
+
+
+## Foam all over, then sparkles. Washing a car that is still sparkling starts it afresh.
+func wash() -> void:
+	_foam.restart()
+	sparkle_time = SPARKLE_SECONDS
+	_sparkle.emitting = true
+	# Out of the foam, the paint gleams: a bright flash on the body that settles back.
+	var body: CanvasItem = car.get_node(^"Body")
+	var shine := create_tween()
+	shine.tween_interval(0.9)
+	shine.tween_property(body, "self_modulate", Color(1.6, 1.6, 1.6), 0.15)
+	shine.tween_property(body, "self_modulate", Color.WHITE, 0.6).set_trans(Tween.TRANS_SINE)
 
 
 func _on_surface_changed(changed: Node, surface: StringName) -> void:
@@ -72,6 +101,87 @@ func _physics_process(delta: float) -> void:
 		_siren.get_child(0).modulate.a = 1.0 if red_on else 0.25
 		_siren.get_child(1).modulate.a = 0.25 if red_on else 1.0
 	_smoke.amount_ratio = clampf(car.lateral_speed / (car.config.drift_threshold * 2.5), 0.3, 1.0)
+	if sparkle_time > 0.0:
+		sparkle_time = maxf(sparkle_time - delta, 0.0)
+		_sparkle.amount_ratio = clampf(sparkle_time / SPARKLE_FADE, 0.15, 1.0)
+		_sparkle.emitting = sparkle_time > 0.0
+
+
+## A burst of foam bubbles round the whole car, left behind where it was washed.
+func _foam_burst(puff: Texture2D) -> GPUParticles2D:
+	var material := ParticleProcessMaterial.new()
+	material.direction = Vector3(1.0, 0.0, 0.0)
+	material.spread = 180.0
+	material.initial_velocity_min = 20.0
+	material.initial_velocity_max = 90.0
+	material.gravity = Vector3.ZERO
+	material.damping_min = 30.0
+	material.damping_max = 50.0
+	material.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	material.emission_box_extents = Vector3(60.0, 34.0, 0.0)
+	material.scale_min = 0.35
+	material.scale_max = 0.9
+	var fade := Gradient.new()
+	fade.set_color(0, Color(1, 1, 1, 0.95))
+	fade.add_point(0.7, Color(0.92, 0.97, 1.0, 0.85))
+	fade.set_color(fade.get_point_count() - 1, Color(0.85, 0.95, 1.0, 0.0))
+	var ramp := GradientTexture1D.new()
+	ramp.gradient = fade
+	material.color_ramp = ramp
+	var foam := GPUParticles2D.new()
+	foam.name = "Foam"
+	foam.process_material = material
+	foam.texture = puff
+	foam.amount = 60
+	foam.lifetime = 1.6
+	foam.one_shot = true
+	foam.explosiveness = 0.85
+	foam.local_coords = false
+	foam.z_index = 2  # this node draws behind the car; the foam covers it
+	foam.modulate = FOAM_COLOUR
+	foam.emitting = false
+	add_child(foam)
+	return foam
+
+
+## Little four-pointed stars that pop up all over the car, grow, twinkle and shrink. They
+## ride with the car (local coordinates) and draw on top of it.
+func _sparkles() -> GPUParticles2D:
+	var material := ParticleProcessMaterial.new()
+	material.gravity = Vector3.ZERO
+	material.initial_velocity_min = 0.0
+	material.initial_velocity_max = 6.0
+	material.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	material.emission_box_extents = Vector3(62.0, 36.0, 0.0)  # over the body and just past it
+	material.angle_min = -20.0
+	material.angle_max = 20.0
+	material.angular_velocity_min = -90.0
+	material.angular_velocity_max = 90.0
+	material.scale_min = 0.8
+	material.scale_max = 1.5
+	var pulse := Curve.new()
+	pulse.add_point(Vector2(0.0, 0.0))
+	pulse.add_point(Vector2(0.35, 1.0))
+	pulse.add_point(Vector2(1.0, 0.0))
+	material.scale_curve = _curve_texture(pulse)
+	var tint := Gradient.new()
+	tint.set_color(0, Color(1.0, 1.0, 1.0, 1.0))
+	tint.set_color(1, Color(1.0, 0.92, 0.55, 1.0))
+	var ramp := GradientTexture1D.new()
+	ramp.gradient = tint
+	material.color_initial_ramp = ramp  # each star white to pale gold
+	var sparkle := GPUParticles2D.new()
+	sparkle.name = "Sparkle"
+	sparkle.process_material = material
+	sparkle.texture = _star_texture()
+	sparkle.amount = 18
+	sparkle.lifetime = 0.8
+	sparkle.randomness = 0.5
+	sparkle.local_coords = true
+	sparkle.z_index = 2
+	sparkle.emitting = false
+	add_child(sparkle)
+	return sparkle
 
 
 ## Two glowing discs on the roof, red and blue, flashed by _physics_process. This node draws
@@ -135,6 +245,23 @@ static func _curve_texture(curve: Curve) -> CurveTexture:
 	var texture := CurveTexture.new()
 	texture.curve = curve
 	return texture
+
+
+## A four-pointed star with a soft glow: two thin rays crossing over a bright core.
+static func _star_texture() -> ImageTexture:
+	var size := 40
+	var image := Image.create(size, size, false, Image.FORMAT_RGBA8)
+	var c := (size - 1) / 2.0
+	for y in size:
+		for x in size:
+			var dx := absf(x - c) / c
+			var dy := absf(y - c) / c
+			# Rays thin out towards their tips; the core is a soft round glow.
+			var ray := maxf(clampf(1.0 - dx - 6.0 * dy, 0.0, 1.0), clampf(1.0 - dy - 6.0 * dx, 0.0, 1.0))
+			var core := clampf(1.0 - Vector2(dx, dy).length() * 2.2, 0.0, 1.0)
+			var a := clampf(maxf(ray * 1.6, core * 1.4), 0.0, 1.0)
+			image.set_pixel(x, y, Color(1, 1, 1, a))
+	return ImageTexture.create_from_image(image)
 
 
 static func _puff_texture() -> GradientTexture2D:

@@ -11,6 +11,9 @@ const SKID := preload("res://art/sfx/skid_loop.wav")
 const BUMP := preload("res://art/sfx/wall_bump.wav")
 const HORN := preload("res://art/sfx/horn.wav")
 const BOOST := preload("res://art/sfx/boost.wav")
+## Free Drive's car wash: the spray and brushes, then a twinkle as the car comes out shiny.
+const WASH := "res://art/sfx/car_wash.wav"
+const SPARKLE := "res://art/sfx/sparkle.wav"
 ## Engine pitch at a standstill and at top speed.
 const PITCH_IDLE := 0.6
 const PITCH_TOP := 1.5
@@ -24,6 +27,7 @@ var _engine: AudioStreamPlayer2D
 var _skid: AudioStreamPlayer2D
 var _bump: AudioStreamPlayer2D
 var _horn: AudioStreamPlayer2D
+var _wash: AudioStreamPlayer2D
 var _skid_level := 0.0
 ## Added to the engine's volume. Free Drive's traffic runs quieter (-12 dB) than a racer, so
 ## a street full of cars hums instead of roaring.
@@ -35,6 +39,7 @@ var engine_offset_db := 0.0
 func _enter_tree() -> void:
 	EventSystem.CAR_wall_hit.connect(_on_wall_hit)
 	EventSystem.CAR_horn.connect(_on_horn)
+	EventSystem.CAR_washed.connect(_on_washed)
 	EventSystem.CAR_boosted.connect(func(boosted: Node) -> void:
 		if boosted == car and SoundManager.audible():
 			_bump.stream = BOOST
@@ -48,6 +53,7 @@ func _ready() -> void:
 	_skid = _player(SKID, SILENT_DB)
 	_bump = _player(BUMP, -4.0)
 	_horn = _player(HORN, -2.0)
+	_wash = _player(null, -3.0)
 	if not SoundManager.audible():
 		set_physics_process(false)
 		return
@@ -83,6 +89,18 @@ func _on_horn(honking: Node) -> void:
 		return
 	_horn.stream = car.setup.horn if car.setup and car.setup.horn else HORN
 	_horn.play()
+
+
+func _on_washed(washed: Node) -> void:
+	if washed != car or not SoundManager.audible():
+		return
+	if ResourceLoader.exists(WASH):
+		_wash.stream = load(WASH)
+		_wash.play()
+		await _wash.finished
+	if ResourceLoader.exists(SPARKLE) and is_inside_tree():
+		_wash.stream = load(SPARKLE)
+		_wash.play()
 
 
 func _player(stream: AudioStream, volume_db: float) -> AudioStreamPlayer2D:

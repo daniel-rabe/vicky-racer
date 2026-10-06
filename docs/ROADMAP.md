@@ -278,6 +278,9 @@ An open-world mode beside the races (DESIGN.md §19): **TOWN** on the title scre
   through.
 - New generated art: 14 buildings, 4 vehicles, 4 animals, park props, a balloon; new sounds:
   quack, woof, meow, town ambience. `tests/town_test.gd`.
+- **The car wash** (asked for after the first build): driving onto the wet blue pad in front of
+  it washes the car — foam, soap bubbles, a spray-and-brushes sound — and the car comes out
+  gleaming and **sparkles** with twinkling stars for 25 seconds.
 
 ---
 
@@ -285,12 +288,6 @@ An open-world mode beside the races (DESIGN.md §19): **TOWN** on the title scre
 
 Not planned, but worth keeping in mind:
 
-- **Car wash you can drive through (Free Drive)** — requested 2026-10-06. Make the town's car
-  wash interactable: driving into it washes the car, and afterwards the car **sparkles for a
-  while** (glints and stars on the body that fade out over some seconds). Today the car wash is
-  only a named place: pulling up at its door shows its sign and soap bubbles on the HUD
-  (`TownHUD.bubbles()`, triggered in `game/screens/town.gd` `_on_place_reached`); nothing
-  happens to the car itself.
 
 - **Track editor for the child** — place pieces on a grid and race on it. Delightful but large.
 - **Weather** — rain on any track (puddles = low-grip patches, wipers on the HUD).

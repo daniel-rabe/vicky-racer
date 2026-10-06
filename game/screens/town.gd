@@ -4,7 +4,8 @@ extends Node2D
 ## buses, vans and cars drive about keeping to their lanes; dogs and cats walk the
 ## pavements and duck families cross at the zebras; balloons and birds pass overhead.
 ## Coins lie about the streets to pick up (banked straight away), and pulling up at a shop
-## door shows its sign. Visiting every kind of place once pays a bonus.
+## door shows its sign. Visiting every kind of place once pays a bonus. Driving onto the car
+## wash's pad washes the car: foam and soap bubbles, then it sparkles for a while.
 ##
 ## Escape / Start pauses (RESUME / SETTINGS / GARAGE).
 ##
@@ -14,6 +15,7 @@ extends Node2D
 ##   --traffic-report  print, every 10 s, how much of the traffic is moving (jams, deadlocks)
 ##   --start=x,y   start the player there instead (screenshots of one corner of town)
 ##   --start=duck  start the player by the first duck family's crossing
+##   --start=wash  start the player on the car wash's pad (it is washed at once)
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
@@ -64,6 +66,9 @@ var _rng := RandomNumberGenerator.new()
 
 func _enter_tree() -> void:
 	EventSystem.PRO_state_changed.connect(_on_state_changed)
+	EventSystem.CAR_washed.connect(func(car: Node) -> void:
+		if car == player:
+			hud.bubbles())
 
 
 func _on_state_changed(state: Dictionary) -> void:
@@ -315,15 +320,14 @@ func _on_coin_collected(coin: TownCoin) -> void:
 			coin.reappear(_coin_spot()))
 
 
-func _on_place_reached(place_id: String, display_name: String, picture: Texture2D) -> void:
+func _on_place_reached(_place_id: String, display_name: String, picture: Texture2D) -> void:
 	var first := not visited.has(display_name)
 	visited[display_name] = true
 	hud.show_place(display_name, picture, visited.size(), first)
 	if first and visited.size() == TownLayout.PLACE_NAMES.size():
 		EventSystem.PRO_coins_found.emit(ALL_PLACES_BONUS)
 		hud.show_banner("YOU VISITED EVERY PLACE!  +%d" % ALL_PLACES_BONUS)
-	if place_id == "car_wash":
-		hud.bubbles()
+
 
 
 ## Things in the sky: hot-air balloons drifting over, and now and then a flock of birds.
@@ -358,6 +362,9 @@ func _dev_start(where: String) -> void:
 	if where == "duck":
 		var duck: Walker = _walkers.get_children().filter(func(w: Walker) -> bool: return w.followers > 0)[0]
 		at = duck.route[0].lerp(duck.route[1], 0.5) + Vector2(-260, 120)
+	elif where == "wash":
+		at = town.wash_pad.get_center() + Vector2(0, 40)
+		player.rotation = -PI / 2.0  # facing the car wash
 	else:
 		at = Vector2(float(where.get_slice(",", 0)), float(where.get_slice(",", 1)))
 	player.global_position = at

@@ -189,6 +189,29 @@
       "out": "art/sfx/town_ambience.wav",
       "seed": 103,
       "_note": "Free Drive: birdsong under the town, looped quietly. Picked from the spectrogram: a steady breeze with birdsong spread evenly."
+    },
+    {
+      "id": "car_wash",
+      "prompt": "a car wash: water spraying from jets and big soft spinning brushes swishing, foamy bubbles, short, cheerful, close up, clean sound effect",
+      "seconds": 3.0,
+      "kind": "oneshot",
+      "max_seconds": 1.8,
+      "peak_db": -5.0,
+      "out": "art/sfx/car_wash.wav",
+      "seed": 103,
+      "_note": "Free Drive: driving through the car wash (DESIGN.md §19.7)."
+    },
+    {
+      "id": "sparkle",
+      "prompt": "a magical sparkle twinkle, bright little glittering chime, shiny, like a star twinkling in a cartoon, clean sound effect",
+      "negative": "speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, sad",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.4,
+      "peak_db": -6.0,
+      "out": "art/sfx/sparkle.wav",
+      "seed": 103,
+      "_note": "Free Drive: the car comes out of the car wash sparkling."
     }
   ],
   "synth": [

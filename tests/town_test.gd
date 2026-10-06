@@ -6,7 +6,7 @@ extends Node
 ##   - surfaces: road and pavement asphalt, lawns grass, the pond water;
 ##   - a minute of traffic with no jam: nobody stands still for long, nobody leaves the
 ##     streets, nobody is stuck in a building, nobody drives over a duck;
-##   - coins pay out, and pulling up at a shop shows it.
+##   - coins pay out, pulling up at a shop shows it, and the car wash's pad makes the car sparkle.
 ##   Godot_console.exe --path . --headless --fixed-fps 60 res://tests/town_test.tscn
 ## Exit code 0 = all passed.
 
@@ -28,6 +28,7 @@ var _wrong_lane := {}  # car -> seconds in the oncoming lane (not overtaking)
 var _longest_wrong := 0.0
 var _coins_found := 0
 var _places: Array[String] = []
+var _washed: Array[Node] = []
 var _done := false
 
 
@@ -39,6 +40,7 @@ func _enter_tree() -> void:
 		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/starter.tres")],
 			"equipped": &"starter", "coins": 0, "paint": {}}))
 	EventSystem.PRO_coins_found.connect(func(amount: int) -> void: _coins_found += amount)
+	EventSystem.CAR_washed.connect(func(car: Node) -> void: _washed.append(car))
 
 
 func _ready() -> void:
@@ -172,6 +174,20 @@ func _finish() -> void:
 		await get_tree().physics_frame
 	check.call(paid == screen.COIN_VALUE, "driving through a coin pays %d (paid %d)" % [screen.COIN_VALUE, paid])
 	check.call(place["id"] in _places, "pulling up at the %s shows it (%s)" % [place["name"], _places])
+
+	# The car wash: onto its pad, washed once, then sparkling, the sparkle running down.
+	var effects: Node = player.get_node(^"Effects")
+	check.call(effects.sparkle_time == 0.0, "the car does not sparkle before the car wash")
+	player.global_position = town.wash_pad.get_center()
+	player.reset_physics_interpolation()
+	for i in 10:
+		await get_tree().physics_frame
+	check.call(_washed == [player], "driving onto the car wash's pad washes the car (washed: %s)" % [_washed])
+	var left: float = effects.sparkle_time
+	check.call(left > 0.0 and left < effects.SPARKLE_SECONDS and effects.get_node(^"Sparkle").emitting,
+		"and it sparkles, running down (%.2f s left)" % left)
+	var lane_car: Car = screen.traffic[0]
+	check.call(lane_car.get_node(^"Effects").sparkle_time == 0.0, "traffic is not washed")
 
 	if failures.is_empty():
 		print("ALL TOWN TESTS PASSED")

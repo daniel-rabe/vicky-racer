@@ -39,6 +39,10 @@ const TREE_TRUNK := 34.0
 const TREE_SPACING := 190.0
 ## A building's solid footprint is its picture less this much all round, px.
 const WALL_INSET := 14.0
+const WASH_COLOUR := Color(0.55, 0.82, 0.96, 0.9)
+## How far the car wash's pad reaches into the road past the pavement, px: the near lane's
+## cars pass clear of it, a car steering in drives onto it.
+const WASH_PAD_INTO_ROAD := 30.0
 
 var junctions := {}  # Vector2i -> Vector2, world position
 var links := {}      # Vector2i -> Array[Vector2i], junctions joined by a road
@@ -49,6 +53,8 @@ var ponds: Array[Vector3] = []  # x, y, radius
 var footprints: Array[Rect2] = []
 ## Every named place: {id, name, door (Vector2), picture}.
 var places: Array[Dictionary] = []
+## The car wash's pad, where a car is washed (Rect2() if the town has none).
+var wash_pad := Rect2()
 
 var _reserved := {}    # Vector2i -> the car crossing that junction
 var _surface_of := {}  # car -> surface id
@@ -319,6 +325,57 @@ func _building(id: String, picture: Texture2D, rect: Rect2, on_street: bool) -> 
 		area.body_entered.connect(func(body: Node2D) -> void:
 			if body is Car and body.has_node(^"PlayerInput"):
 				place_reached.emit(id, TownLayout.PLACE_NAMES[id], picture))
+	if on_street and id == "car_wash":
+		_wash_pad(solid, rect)
+
+
+## The car wash's pad: a wet blue strip with soap bubbles and arrows pointing in, from the
+## building's front across the pavement and a little way into the road. Driving the player's
+## car onto it washes the car (CAR_washed): foam, then it sparkles. Steering in is needed —
+## a car keeping to its lane passes by.
+func _wash_pad(solid: Rect2, rect: Rect2) -> void:
+	var width := solid.size.x * 0.7
+	var top := rect.end.y - 14.0
+	var bottom := rect.end.y + 10.0 + TownLayout.SIDEWALK + WASH_PAD_INTO_ROAD
+	var pad := Rect2(solid.get_center().x - width / 2.0, top, width, bottom - top)
+	wash_pad = pad
+	_ground.add_child(_flat(_rect_points(pad, 26.0), WASH_COLOUR))
+	for i in 18:
+		var bubble := Polygon2D.new()
+		var at := Vector2(_rng.randf_range(pad.position.x + 20.0, pad.end.x - 20.0),
+			_rng.randf_range(pad.position.y + 20.0, pad.end.y - 20.0))
+		var r := _rng.randf_range(6.0, 15.0)
+		var ring := PackedVector2Array()
+		for k in 12:
+			ring.append(at + Vector2.from_angle(TAU * k / 12.0) * r)
+		bubble.polygon = ring
+		bubble.color = Color(1, 1, 1, 0.75)
+		_ground.add_child(bubble)
+	for side in [-1.0, 1.0]:
+		var arrow := Line2D.new()
+		var x: float = pad.get_center().x + side * width * 0.22
+		var tip := pad.position.y + pad.size.y * 0.35
+		arrow.points = PackedVector2Array([Vector2(x - 26.0, tip + 30.0), Vector2(x, tip), Vector2(x + 26.0, tip + 30.0)])
+		arrow.width = 12.0
+		arrow.default_color = Color(1, 1, 1, 0.9)
+		arrow.joint_mode = Line2D.LINE_JOINT_ROUND
+		arrow.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		arrow.end_cap_mode = Line2D.LINE_CAP_ROUND
+		_ground.add_child(arrow)
+	var area := Area2D.new()
+	area.name = "WashPad"
+	area.position = pad.get_center()
+	area.collision_layer = 0
+	area.collision_mask = Car.LAYER_CARS_GROUND
+	var shape := CollisionShape2D.new()
+	var box := RectangleShape2D.new()
+	box.size = pad.size
+	shape.shape = box
+	area.add_child(shape)
+	_things.add_child(area)
+	area.body_entered.connect(func(body: Node2D) -> void:
+		if body is Car and body.has_node(^"PlayerInput"):
+			EventSystem.CAR_washed.emit(body))
 
 
 ## The big park: a fountain in the middle, the pond and the playground either side, flower

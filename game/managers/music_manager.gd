@@ -132,7 +132,11 @@ func _fade(player: AudioStreamPlayer, to: float, seconds: float) -> void:
 	if player == null:
 		return
 	var tween := create_tween()
-	tween.tween_method(func(v: float) -> void: player.set_meta(&"fade", v), player.get_meta(&"fade"), to, seconds)
+	# A fade-in still running when a fade-out frees the player (quitting in the first second)
+	# must not touch it any more.
+	tween.tween_method(func(v: float) -> void:
+		if is_instance_valid(player):
+			player.set_meta(&"fade", v), player.get_meta(&"fade"), to, seconds)
 	if to <= 0.0:
 		tween.tween_callback(func() -> void:
 			_players.erase(player)

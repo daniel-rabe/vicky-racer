@@ -1254,7 +1254,8 @@ and keeps to the right-hand lane except when overtaking.
   thing to save up for.
 - **Shops**: pulling up at a shop door pops up its sign — the building's picture and name, and
   how many kinds of place have been visited (*NEW PLACE! 4 / 11*). Visiting all eleven in one
-  drive pays a bonus of 50 coins. The car wash fills the screen with soap bubbles.
+  drive pays a bonus of 50 coins.
+- **The car wash** (§19.7): drive onto its pad and the car is washed and sparkles.
 - The **pond** is water you can drive through, slowly, with a splash.
 
 Pause has RESUME, SETTINGS and GARAGE; there is nothing to restart.
@@ -1281,3 +1282,25 @@ ducks, like a car waiting for them).
 Roads and pavements are asphalt, lawns and the grass round the town are grass, and the ponds are
 **water** (speed × 0.45, grip × 0.5 — a new surface in `Track.SURFACES`, light spray instead of
 dust).
+
+### 19.7 The car wash
+
+In front of the car wash a wet blue pad with soap bubbles and two arrows pointing in reaches
+from the building across the pavement and 30 px into the road — so a car keeping to its lane
+passes it, and a child steering in drives onto it. The player's car on the pad emits
+`CAR_washed` (traffic is never washed). Then, all from the car's own effects and sounds:
+
+| When | What |
+| --- | --- |
+| At once | a burst of white foam all over the car (left behind where it was washed); soap bubbles float up the screen; the **car wash** sound — spray and swishing brushes |
+| 0.9 s | the paint gleams: a bright flash on the body that settles back |
+| Then | the **sparkle** chime, and four-pointed stars (drawn in code, white to pale gold) pop up all over the car, grow, twinkle and shrink — riding with it — for **25 s**, thinning out over the last 6 |
+
+Washing again while still sparkling starts the 25 s afresh. Both sounds are Stable Audio picks
+from spectrograms: `car_wash` 103 (fades out naturally, 1.75 s), `sparkle` 103 (1.0 s). The town
+test drives the player onto the pad and checks the car is washed once and sparkles, and that
+traffic is not.
+
+Found while checking it: quitting within the first second of a screen (dev screenshots) left
+MusicManager's fade-in tween calling into a music player the fade-out had already freed; the
+tween now checks the player is still there.
