@@ -287,6 +287,30 @@
       "waves": 5,
       "speckle_density": 0.0015,
       "speckle_shift": 26
+    },
+    "wet_sand": {
+      "base": [
+        206,
+        178,
+        112
+      ],
+      "variation": 0.04,
+      "waves": 5,
+      "speckle_density": 0.003,
+      "speckle_shift": 10,
+      "_note": "Phase 21: the strip of wet sand at the island's waterline."
+    },
+    "open_sea": {
+      "base": [
+        22,
+        98,
+        160
+      ],
+      "variation": 0.035,
+      "waves": 5,
+      "speckle_density": 0.0,
+      "speckle_shift": 10,
+      "_note": "Phase 21: the sea beyond the island's outer limit."
     }
   },
   "selection": {

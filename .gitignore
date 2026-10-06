@@ -126,3 +126,13 @@ tools/comfy/masters/water_*
 !tools/comfy/masters/sfx/horn_steamer_103.flac
 # The boat sounds' listening page (MP3 previews, rebuilt by tools/comfy/listen_boats.py).
 docs/mockups/sfx/listen_boats/
+
+# Phase 21 island. Masters are leaves, reproducible from the pinned seeds in asset_manifest.json.
+tools/comfy/masters/harbour.png
+tools/comfy/masters/harbour_raw.png
+tools/comfy/masters/island_*
+!tools/comfy/masters/sfx/harbour_swap_106.flac
+!tools/comfy/masters/sfx/seagull_107.flac
+!tools/comfy/masters/sfx/dolphin_105.flac
+# The island sounds' listening page (MP3 previews, rebuilt by tools/comfy/listen_island.py).
+docs/mockups/sfx/listen_island/

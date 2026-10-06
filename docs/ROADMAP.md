@@ -329,7 +329,7 @@ are shared with the cars.
   - `tests/boat_test.gd`, plus the whole suite to prove the cars are unchanged.
   - A balance pass.
 
-## Phase 21 — The island: harbour and ocean in Free Drive 🚧 Gate A
+## Phase 21 — The island: harbour and ocean in Free Drive 🚧 Gate C
 
 The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats and water).
 
@@ -343,6 +343,9 @@ The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats a
 - **Gate A: design and mockups** (approved 2026-10-06): DESIGN §21, and
   `docs/mockups/island/`, drawn by `tools/layouts/island_probe.py` from photos of the running
   game: the island overview, the harbour at game scale, and the two swap views.
+- **Gate B: art and sound** (approved 2026-10-06): the harbour building (a Kontext edit of
+  its block sketch), lighthouse, sailboat, dolphin, seagull and mooring post; wet sand, sea,
+  open sea and pier planks; the swap bell, a seagull and a dolphin. DESIGN §21.6.
 
 ---
 

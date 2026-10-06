@@ -368,6 +368,45 @@
       "out": "art/sfx/horn_steamer.wav",
       "seed": 103,
       "_note": "Phase 20 boats (DESIGN.md §20.6)."
+    },
+    {
+      "id": "harbour_swap",
+      "prompt": "a cheerful harbour bell rung three times quickly, ding ding ding, bright clear brass tone with a short ring-out, close up, clean sound effect",
+      "seconds": 3.0,
+      "kind": "oneshot",
+      "max_seconds": 1.6,
+      "peak_db": -3.0,
+      "out": "art/sfx/harbour_swap.wav",
+      "seed": 106,
+      "candidates": 8,
+      "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, church bells, gong, explosion",
+      "_note": "Phase 21 (DESIGN.md §21.3): the car <-> boat swap at the harbour. The alternative is reusing horn_pirate (the ship's bell)."
+    },
+    {
+      "id": "seagull",
+      "prompt": "a single seagull calling twice, a bright high cry of a gull by the sea, close up, no waves, no wind, clean sound effect",
+      "seconds": 3.0,
+      "kind": "oneshot",
+      "max_seconds": 1.4,
+      "peak_db": -5.0,
+      "out": "art/sfx/seagull.wav",
+      "seed": 107,
+      "candidates": 8,
+      "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, many birds, flock, crowd of birds, waves, wind",
+      "_note": "Phase 21 (DESIGN.md §21.5): a gull flapping away from a horn."
+    },
+    {
+      "id": "dolphin",
+      "prompt": "a friendly dolphin chattering, a short series of playful high clicks and squeaky whistles, close up, clean sound effect",
+      "seconds": 3.0,
+      "kind": "oneshot",
+      "max_seconds": 1.4,
+      "peak_db": -5.0,
+      "out": "art/sfx/dolphin.wav",
+      "seed": 105,
+      "candidates": 8,
+      "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, waves, wind, bird",
+      "_note": "Phase 21 (DESIGN.md §21.5): a dolphin leaping beside the boat."
     }
   ],
   "synth": [

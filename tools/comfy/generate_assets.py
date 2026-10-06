@@ -160,7 +160,7 @@ def cmd_candidates(only: list[str] | None) -> None:
     SHEETS.mkdir(parents=True, exist_ok=True)
     for entry in pending:
         big, small = [], []
-        for seed in manifest["candidate_seeds"]:
+        for seed in entry.get("candidate_seeds", manifest["candidate_seeds"]):
             cut_path = CANDIDATES / f"{entry['id']}_s{seed}.png"
             if cut_path.exists():
                 cut = Image.open(cut_path).convert("RGBA")
@@ -214,7 +214,7 @@ def cmd_variant_candidates(only: list[str] | None) -> None:
         if source not in uploads:
             uploads[source] = client.upload_image((MASTERS / f"{source}_raw.png").read_bytes(), f"vr_src_{source}.png")
         cells = []
-        for seed in manifest["candidate_seeds"]:
+        for seed in entry.get("candidate_seeds", manifest["candidate_seeds"]):
             path = CANDIDATES / f"{entry['id']}_s{seed}.png"
             if not path.exists():
                 images = client.run(recipe.variant_graph(uploads[source], entry["instruction"], seed, prefix="vr_variant"))

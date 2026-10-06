@@ -1260,6 +1260,116 @@
       "out": "art/props/water/cocktail_umbrella_2.png",
       "sheet_ground": "pond_water",
       "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 2 looks the user kept (2026-10-06); the course builder mixes them."
+    },
+    {
+      "id": "harbour",
+      "subject": "harbour master's boathouse",
+      "details": "navy blue roof seen from above with a big golden anchor, a coil of white rope and a little blue and white flag on top, the front wall below of cream wooden boards with two big blue boathouse doors, a red and white lifebuoy hanging on the wall, a small brass ship's bell beside the doors",
+      "seed": 22,
+      "facing": null,
+      "box": [
+        580,
+        450
+      ],
+      "out": "art/town/buildings/harbour.png",
+      "sketch": {
+        "width": 0.8,
+        "roof": 0.3,
+        "wall": 0.26,
+        "roof_colour": [
+          40,
+          80,
+          150
+        ],
+        "wall_colour": [
+          236,
+          222,
+          190
+        ],
+        "front": "garages",
+        "count": 2,
+        "door_colour": [
+          70,
+          130,
+          190
+        ]
+      },
+      "_note": "Phase 21 island (DESIGN.md §21). Kontext edit of a block sketch, like every town building. Round 1 (seeds 11-14, a round lookout tower asked for) all came out three-quarter; round 2 asks for roof-top details only, as the fire station did.",
+      "candidate_seeds": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    },
+    {
+      "id": "island_lighthouse",
+      "subject": "the top of a lighthouse seen from straight above as a flat lay map icon, no side view: a round red cone roof with a little golden ball in the middle, a ring-shaped white gallery walkway with a thin railing around it, red and white rings around that, sitting on a round grey rocky base",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        360,
+        360
+      ],
+      "sheet_ground": "lagoon_deep",
+      "out": "art/town/island/lighthouse.png",
+      "_note": "Phase 21 island (DESIGN.md §21)."
+    },
+    {
+      "id": "island_sailboat",
+      "subject": "a small toy sailboat seen from straight above as a flat lay map icon, only its deck and sail visible, no side view: a pointed white hull with a wooden deck, a big white sail with red stripes lying flat out to one side along its wooden boom, pointing straight up",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        200,
+        200
+      ],
+      "sheet_ground": "lagoon_deep",
+      "out": "art/town/island/sailboat.png",
+      "_note": "Phase 21 island (DESIGN.md §21). Ambient boat on a fixed loop. FLUX draws it side-on (front-on for the gull) whatever is asked; kept like that as a picture-book view, never rotated, mirrored for direction."
+    },
+    {
+      "id": "island_dolphin",
+      "subject": "a friendly grey dolphin swimming seen from straight above, flat lay: its smooth streamlined grey back with a small curved dorsal fin, two little side flippers and a tail fluke, a pale belly edge, pointing straight up, perfectly symmetrical",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        180,
+        180
+      ],
+      "sheet_ground": "lagoon_deep",
+      "out": "art/town/island/dolphin.png",
+      "_note": "Phase 21 island (DESIGN.md §21). FLUX draws it side-on (front-on for the gull) whatever is asked; kept like that as a picture-book view, never rotated, mirrored for direction."
+    },
+    {
+      "id": "island_seagull",
+      "subject": "a white seagull flying seen from directly above, wings spread wide with grey backs and black wing tips, a small yellow beak, head pointing straight up, flat lay",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        96,
+        96
+      ],
+      "sheet_ground": "lagoon_deep",
+      "out": "art/town/island/seagull.png",
+      "_note": "Phase 21 island (DESIGN.md §21). FLUX draws it side-on (front-on for the gull) whatever is asked; kept like that as a picture-book view, never rotated, mirrored for direction."
+    },
+    {
+      "id": "island_mooring_post",
+      "subject": "a round wooden mooring post seen from straight above, flat lay: the round top of a thick brown wooden pole with a coil of thick rope wound round it",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        56,
+        56
+      ],
+      "sheet_ground": "lagoon_deep",
+      "out": "art/town/island/mooring_post.png",
+      "_note": "Phase 21 island (DESIGN.md §21). Along the pier and the quay."
     }
   ],
   "variants": [
@@ -1698,6 +1808,21 @@
       "id": "finish_line",
       "kind": "chequer",
       "out": "art/tiles/finish_line.png"
+    },
+    {
+      "id": "ground_wet_sand",
+      "fill": "wet_sand",
+      "out": "art/town/island/wet_sand.png"
+    },
+    {
+      "id": "ground_sea",
+      "fill": "lagoon_deep",
+      "out": "art/town/island/sea.png"
+    },
+    {
+      "id": "ground_open_sea",
+      "fill": "open_sea",
+      "out": "art/town/island/open_sea.png"
     }
   ],
   "paints": {

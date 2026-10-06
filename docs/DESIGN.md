@@ -1513,7 +1513,7 @@ the roster in the same way as car opponents (§8).
 
 ## 21. Free Drive: the island
 
-*Gate A (design and mockups) approved 2026-10-06. Art (Gate B) and code (Gate C) to come.*
+*Gate A (design and mockups) and Gate B (art and sound) approved 2026-10-06. Code (Gate C) to come.*
 
 The town (§19) becomes an island. The ring of trees at its edge gives way to grass with
 palms, a sandy beach, and the ocean all round. A **harbour** on the south coast swaps the
@@ -1612,18 +1612,34 @@ walls for boats. The town's pond stays car water, as it is now; a boat can never
 The places at sea count towards the all-places bonus, which grows from 11 to 14 places (the
 harbour, the lighthouse and the shipwreck).
 
-### 21.6 Art and sound needed (Gate B)
+### 21.6 Art and sound (Gate B)
 
-- **Harbour building:** a Kontext edit of the block sketch
-  ([`harbour_sketch.png`](mockups/island/harbour_sketch.png)), as for every other building (§19.2).
-- **Ground:** the wet-sand strip and a darker open-sea fill, as flat fills in `pipeline.json`
-  beside `beach`, `lagoon_water` and `lagoon_deep`.
-- **Sprites (frozen recipe):** a lighthouse seen from above, a sailboat, a dolphin, a seagull,
-  wooden pier planks and a mooring post.
+![The island art](mockups/island/04_art_picks.png)
+
+| Art | Pick | Note |
+| --- | --- | --- |
+| Harbour building | 22 | A Kontext edit of the block sketch ([`harbour_sketch.png`](mockups/island/harbour_sketch.png)), as for every building (§19.2). Round 1 asked for a round lookout tower on the roof, and all four came out at an angle. Round 2 asked only for things lying on the roof (an anchor, a coil of rope, a flag), as the fire station did, and seeds 20–22 kept the street view |
+| Lighthouse | 13 | Red-roofed, on a grassy rock with steps |
+| Sailboat | 14 | Red-striped and white sails |
+| Dolphin | 13 | Mid-leap |
+| Seagull | 12 | Wings up, dark tips |
+| Mooring post | 13 | A coil of rope round a wooden top, seen from above |
+
+- **Side-on, like the balloon.** FLUX drew the lighthouse, sailboat and dolphin from the side,
+  and the gull from the front, however they were asked for. They are kept that way, as a
+  picture-book map draws them (the building fronts and the hot-air balloon already are). In
+  the game they are **never rotated**: a sailboat or a dolphin is mirrored to face the way it
+  goes, a dolphin tilts along its leap, and a gull hovers and flaps.
+- **Ground:** wet sand, sea and open sea are flat fills in `pipeline.json` (`wet_sand`,
+  `lagoon_deep`, `open_sea`), built to `art/town/island/`. The pier's planks are drawn in
+  [`town_art.py`](../tools/layouts/town_art.py).
 - **Reused as they are (Phase 20 art):** rocks, ramps, palms, parasols, beach balls, the
   shipwreck and the treasure chest.
-- **Sound:** a ship's bell for the swap. The first candidate is the pirate ship's bell from
-  Phase 20. The sea uses Phase 20's wave ambience, mixed in while sailing.
+- **Sound** (Stable Audio, the §11.2 recipe; Claude's picks, from the spectrograms, at the
+  user's word): **harbour_swap** 106, three quick dings of a harbour bell; **seagull** 107,
+  one clear cry; **dolphin** 105, whistles and clicks. The listening page is made by
+  `tools/comfy/listen_island.py`. The sea uses Phase 20's wave ambience, mixed in while
+  sailing.
 
 ### 21.7 Under the hood (Gate C)
 

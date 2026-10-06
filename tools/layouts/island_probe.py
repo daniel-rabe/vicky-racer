@@ -14,9 +14,9 @@ Writes, in docs/mockups/island/:
   02_harbour_closeup.png  the harbour at game scale, from the ring road to the mooring
   03_swap_views.png       what the player sees: the car on the land pad, the boat at the mooring
 
-The harbour building is a flat block sketch (postprocess.building_sketch, the §19.2 recipe it
-will be made from); the lighthouse, sailboats, dolphins and seagulls are placeholders until
-their art is generated (Gate B). Ground, boats, cars, rocks, palms and parasols are real art.
+Everything is the game's art (Gate B, art/town/island/ and the harbour building). Until a
+piece is built, a drawn placeholder stands in for it; the harbour's block sketch, the picture
+Kontext is given (§19.2), is saved beside the mockups.
 """
 import json
 import math
@@ -210,6 +210,12 @@ def limit_outline():
 
 # --- placeholders (Gate B makes the real art) --------------------------------------------
 
+def art_or(path, placeholder):
+    """The built art at `path` (under art/), or the drawn placeholder while there is none."""
+    full = ART / path
+    return Image.open(full).convert("RGBA") if full.exists() else placeholder()
+
+
 def lighthouse_img(size=360):
     im = Image.new("RGBA", (size, size))
     d = ImageDraw.Draw(im)
@@ -293,15 +299,15 @@ def harbour_sketch():
 # --- the pieces --------------------------------------------------------------------------
 
 def paint_ground(v: View, town_photo=None, photo_rect=None, photo_k=None, photo_origin=None, photo_crop=None):
-    sea = sea_tile(SEA_DEEP)
-    v.fill_poly(limit_outline(), v.tiled("deep", sea))
+    v.img.paste(v.tiled("open", Image.open(ART / "town" / "island" / "open_sea.png")), (0, 0))
+    v.fill_poly(limit_outline(), v.tiled("deep", Image.open(ART / "town" / "island" / "sea.png")))
     v.fill_poly(outline(SHALLOWS), v.tiled("shallows", fill_tile("lagoon_water")), soft=v.s(120))
     v.fill_poly(outline(SHALLOWS * 0.45), v.tiled("shallows", None), soft=v.s(60))
     # Foam where the waves meet the sand.
     foam = Image.new("L", v.img.size, 0)
     ImageDraw.Draw(foam).line(v.pts(outline(18) + outline(18)[:1]), fill=230, width=max(2, round(v.s(26))))
     v.fill_mask(foam.filter(ImageFilter.GaussianBlur(max(1, v.s(6)))), FOAM)
-    v.fill_poly(outline(0), v.tiled("wet", Image.new("RGB", (8, 8), (206, 178, 112))))
+    v.fill_poly(outline(0), v.tiled("wet", Image.open(ART / "town" / "island" / "wet_sand.png")))
     v.fill_poly(outline(-WET), v.tiled("beach", fill_tile("beach")), soft=v.s(30))
     v.fill_poly(outline(-BEACH), v.tiled("grass", Image.open(ART / "tiles" / "grass.png")), soft=v.s(40))
 
@@ -375,19 +381,23 @@ def paint_harbour(v: View, sketch: Image.Image):
     # The pier: planks across, posts down either side.
     p = PIER
     v.shadow(((p[0] + p[2]) / 2 + 14, (p[1] + p[3]) / 2 + 14), (p[2] - p[0]) / 2, (p[3] - p[1]) / 2, 50)
-    d.rectangle(v.box(p), fill=(186, 130, 78), outline=(110, 70, 36), width=max(1, round(v.s(5))))
-    y = p[1] + 34
-    while y < p[3]:
-        d.line([v.p(p[0], y), v.p(p[2], y)], fill=(130, 86, 46), width=max(1, round(v.s(4))))
-        y += 34
+    planks = ART / "town" / "island" / "planks.png"
+    if planks.exists():
+        v.fill_poly([(p[0], p[1]), (p[2], p[1]), (p[2], p[3]), (p[0], p[3])], v.tiled("planks", Image.open(planks)), soft=0)
+    else:
+        d.rectangle(v.box(p), fill=(186, 130, 78), outline=(110, 70, 36), width=max(1, round(v.s(5))))
     y = p[1] + 60
     while y < p[3] + 40:
         for x in (p[0] - 6, p[2] + 6):
-            d.ellipse(v.box((x - 20, y - 20, x + 20, y + 20)), fill=(116, 76, 40), outline=(70, 44, 20))
+            post = ART / "town" / "island" / "mooring_post.png"
+            if post.exists():
+                v.sprite(post, (x, y), 56)
+            else:
+                d.ellipse(v.box((x - 20, y - 20, x + 20, y + 20)), fill=(116, 76, 40), outline=(70, 44, 20))
         y += 150
     # The harbour building, front down onto the quay.
     b = BUILDING
-    v.sprite(sketch, ((b[0] + b[2]) / 2, (b[1] + b[3]) / 2), max(b[2] - b[0], b[3] - b[1]))
+    v.sprite(art_or("town/buildings/harbour.png", lambda: sketch), ((b[0] + b[2]) / 2, (b[1] + b[3]) / 2), max(b[2] - b[0], b[3] - b[1]))
     # The land pad: driving the car on swaps it for the boat.
     pad(v, LAND_PAD, (60, 150, 220), "boat")
     # The mooring: sailing the boat in swaps it back for the car.
@@ -417,7 +427,7 @@ def paint_harbour(v: View, sketch: Image.Image):
     v.sprite(ART / "boats" / "tugboat.png", (p[0] - 110, 8880), 150, math.pi / 2)
     v.sprite(ART / "boats" / "duck.png", (p[2] + 100, 8820), 120, math.pi / 2)
     v.sprite(ART / "boats" / "swan.png", (4120, 8780), 120, math.pi * 0.62)
-    v.sprite(sailboat_img((60, 120, 220)), (5840, 8840), 180, math.pi / 2)
+    v.sprite(art_or("town/island/sailboat.png", sailboat_img), (5840, 8800), 200)
 
 
 def pad(v: View, r, colour, kind):
@@ -495,7 +505,7 @@ def paint_sea(v: View, rng: random.Random):
     v.img.alpha_composite(beam.filter(ImageFilter.GaussianBlur(max(1, v.s(30)))))
     islet(v, lh, 420, rng, palms=0)
     v.shadow((lh[0] + 30, lh[1] + 40), 190, 190, 70)
-    v.sprite(lighthouse_img(), lh, 360)
+    v.sprite(art_or("town/island/lighthouse.png", lighthouse_img), (lh[0], lh[1] - 80), 420)
     # Islets with a ramp: line up, jump the sandbar, collect the coins in the air.
     for at, heading in (((WORLD_W + 1350, 4700), -math.pi / 2), ((-1450, 2300), math.pi / 2)):
         islet(v, at, 260, rng, palms=1, rocks=False)
@@ -525,10 +535,10 @@ def paint_sea(v: View, rng: random.Random):
         ImageDraw.Draw(ring).ellipse((x - v.s(110), y - v.s(46), x + v.s(110), y + v.s(46)), outline=(255, 255, 255, 160),
                                      width=max(1, round(v.s(8))))
         v.img.alpha_composite(ring)
-        v.sprite(dolphin_img(), (dx, dy), 180, -0.35 + k * 0.15)
+        v.sprite(art_or("town/island/dolphin.png", dolphin_img), (dx, dy), 200, -0.35 + k * 0.15)
     for at in ((4300, WORLD_H + 900), (4900, WORLD_H + 1250), (5600, WORLD_H + 1000), (WORLD_W + 900, -700),
                (WORLD_W + 1600, -1500)):
-        v.sprite(gull_img(), at, 110, rng.uniform(-0.6, 0.6))
+        v.sprite(art_or("town/island/seagull.png", gull_img), at, 110)
     # Two sailboats on fixed loops: one round the whole island, one round the east islet.
     loop = outline(1250, wobble=0.3)
     dots = Image.new("RGBA", v.img.size)
@@ -542,8 +552,12 @@ def paint_sea(v: View, rng: random.Random):
         dd.ellipse((x - v.s(12), y - v.s(12), x + v.s(12), y + v.s(12)), fill=(255, 255, 255, 110))
     v.img.alpha_composite(dots)
     i = len(loop) // 5
-    v.sprite(sailboat_img(), loop[i], 230, math.atan2(loop[i + 1][1] - loop[i][1], loop[i + 1][0] - loop[i][0]))
-    v.sprite(sailboat_img((250, 200, 40)), small[40], 230, math.atan2(small[41][1] - small[40][1], small[41][0] - small[40][0]))
+    # Side-on, never turned: mirrored when sailing left.
+    for at, nxt in ((loop[i], loop[i + 1]), (small[40], small[41])):
+        boat = art_or("town/island/sailboat.png", sailboat_img)
+        if nxt[0] < at[0]:
+            boat = boat.transpose(Image.FLIP_LEFT_RIGHT)
+        v.sprite(boat, at, 260)
 
 
 def label(v: View, text, at, size=16, anchor="la"):
@@ -644,8 +658,8 @@ def closeup(photos, sketch):
     paint_harbour(v, sketch)
     for at in ((4120, 9350), (5800, 9500)):
         v.sprite(ART / "props" / "water" / "rock.png", at, 130, rng.uniform(0, 6))
-    v.sprite(gull_img(), (5300, 9050), 110, 0.3)
-    v.sprite(gull_img(), (4200, 8450), 100, -0.4)
+    v.sprite(art_or("town/island/seagull.png", gull_img), (5300, 9050), 110)
+    v.sprite(art_or("town/island/seagull.png", gull_img), (4200, 8450), 100)
     coin_trail(v, arc((5000, 9550), (5850, 9250), 120, 6))
     # The car heading down the harbour road, the boat leaving the mooring.
     v.sprite(ART / "cars" / "car_red.png", (DRIVE_X - 60, 7980), 128, math.pi / 2)
@@ -653,7 +667,7 @@ def closeup(photos, sketch):
     wake_behind(v, boat_at, math.pi / 2, 260, 50)
     v.sprite(ART / "boats" / "speedboat.png", boat_at, 128, math.pi / 2)
     notes = [
-        ("1 HARBOUR (block sketch)", ((BUILDING[0] + BUILDING[2]) / 2, BUILDING[1] - 30), "md"),
+        ("1 HARBOUR", ((BUILDING[0] + BUILDING[2]) / 2, BUILDING[1] - 30), "md"),
         ("2 LAND PAD: drive on = swap to boat", ((LAND_PAD[0] + LAND_PAD[2]) / 2, LAND_PAD[3] + 30), "ma"),
         ("3 PIER", (PIER[2] + 60, 8980), "la"),
         ("4 MOORING: sail in = swap to car", (MOORING[2] + 60, MOORING[1] + 60), "la"),

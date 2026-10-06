@@ -21,6 +21,10 @@ OUT = ROOT / "art" / "town"
 PAVEMENT = (222, 214, 200)
 JOINT = (198, 189, 174)
 SLAB = 64
+PLANK = (186, 132, 82)
+PLANK_GAP = (112, 74, 40)
+NAIL = (90, 84, 78)
+BOARD = 32
 
 
 def pavement() -> Image.Image:
@@ -44,6 +48,20 @@ def zebra(along: int = 96, across: int = 296, bar: int = 26, gap: int = 22) -> I
     return img
 
 
+def planks() -> Image.Image:
+    """The pier's boards (§21.2): warm wood in 32 px boards running across the pier, a dark gap
+    between them and a nail at each end, so the 128 px tile wraps."""
+    tile = pp.flat_fill(128, PLANK, variation=0.05, waves=6, speckle_density=0.002, speckle_shift=12, seed=21)
+    draw = ImageDraw.Draw(tile)
+    for k in range(0, 128, BOARD):
+        draw.rectangle((0, k, 127, k + 2), fill=PLANK_GAP)
+        shift = (k // BOARD) * 37 % 128  # boards end at different places
+        draw.rectangle((shift, k, shift + 2, k + BOARD - 1), fill=PLANK_GAP)
+        for x in (shift + 10, (shift + 118) % 128):
+            draw.ellipse((x - 2, k + BOARD // 2 - 2, x + 2, k + BOARD // 2 + 2), fill=NAIL)
+    return tile
+
+
 def button_icon() -> Image.Image:
     shop = Image.open(OUT / "buildings" / "candy_shop.png").convert("RGBA")
     shop.thumbnail((96, 96), Image.LANCZOS)
@@ -56,8 +74,10 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     pavement().save(OUT / "pavement.png")
     zebra().save(OUT / "zebra.png")
+    (OUT / "island").mkdir(exist_ok=True)
+    planks().save(OUT / "island" / "planks.png")
     button_icon().save(ROOT / "art" / "ui" / "town_button.png")
-    print("wrote art/town/pavement.png, art/town/zebra.png, art/ui/town_button.png")
+    print("wrote art/town/pavement.png, art/town/zebra.png, art/town/island/planks.png, art/ui/town_button.png")
 
 
 if __name__ == "__main__":
