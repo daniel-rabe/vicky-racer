@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=15 format=3]
+[gd_resource type="Theme" load_steps=16 format=3]
 
 [ext_resource type="FontFile" path="res://ui/fonts/PublicPixel.ttf" id="1_font"]
 
@@ -73,10 +73,26 @@ border_width_top = 8
 border_width_right = 8
 border_width_bottom = 8
 border_color = Color(1, 0.824, 0.247, 1)
-corner_radius_top_left = 30
-corner_radius_top_right = 30
-corner_radius_bottom_right = 30
-corner_radius_bottom_left = 30
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="focus_round"]
+draw_center = false
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(1, 0.824, 0.247, 1)
+corner_radius_top_left = 44
+corner_radius_top_right = 44
+corner_radius_bottom_right = 44
+corner_radius_bottom_left = 44
 expand_margin_left = 4.0
 expand_margin_top = 4.0
 expand_margin_right = 4.0
@@ -190,6 +206,7 @@ HudPanel/styles/panel = SubResource("hud_panel")
 Label/colors/font_color = Color(1, 1, 1, 1)
 NavButton/base_type = &"Button"
 NavButton/font_sizes/font_size = 34
+NavButton/styles/focus = SubResource("focus_round")
 NavButton/styles/hover = SubResource("nav_hover")
 NavButton/styles/normal = SubResource("nav_normal")
 NavButton/styles/pressed = SubResource("nav_normal")
@@ -203,6 +220,7 @@ SettingsRow/styles/normal = SubResource("row_normal")
 SettingsRow/styles/pressed = SubResource("row_normal")
 RaceButton/base_type = &"Button"
 RaceButton/font_sizes/font_size = 40
+RaceButton/styles/focus = SubResource("focus_round")
 RaceButton/styles/hover = SubResource("race_hover")
 RaceButton/styles/normal = SubResource("race_normal")
 RaceButton/styles/pressed = SubResource("race_normal")
