@@ -35,6 +35,15 @@ const SURFACES := {
 	&"snow": {"speed_mult": 0.6, "grip_mult": 0.55},
 	# Full speed, almost no grip: drift heaven, never a stop.
 	&"ice": {"speed_mult": 1.0, "grip_mult": 0.35},
+	# Jungle Run: lush ground like grass, and sticky mud puddles.
+	&"jungle": {"speed_mult": 0.55, "grip_mult": 0.7},
+	&"mud": {"speed_mult": 0.4, "grip_mult": 0.55},
+	# Candy Lane: soft icing like the beach, and gooey chocolate.
+	&"candy": {"speed_mult": 0.6, "grip_mult": 0.65},
+	&"chocolate": {"speed_mult": 0.45, "grip_mult": 0.6},
+	# Moon Base: light moon dust slides about; the craters are deeper dust.
+	&"moondust": {"speed_mult": 0.6, "grip_mult": 0.45},
+	&"crater": {"speed_mult": 0.45, "grip_mult": 0.45},
 }
 const ASPHALT := preload("res://art/tiles/asphalt.png")
 const KERB := preload("res://art/tiles/kerb.png")

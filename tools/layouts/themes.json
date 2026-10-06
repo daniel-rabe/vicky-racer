@@ -1,5 +1,5 @@
 {
-  "_about": "Track themes (docs/DESIGN.md §7.5). theme_art.py builds every texture listed here; the Godot side is game/configs/themes/<id>.tres. 'base' is the ground everywhere off the road, 'patch' the shapes painted on it (a sand trap, an ice pond); both name a fill in tools/comfy/pipeline.json ground and a surface in track.gd SURFACES.",
+  "_about": "Track themes (docs/DESIGN.md \u00a77.5). theme_art.py builds every texture listed here; the Godot side is game/configs/themes/<id>.tres. 'base' is the ground everywhere off the road, 'patch' the shapes painted on it (a sand trap, an ice pond); both name a fill in tools/comfy/pipeline.json ground and a surface in track.gd SURFACES.",
   "meadow": {
     "name": "Meadow",
     "base": "grass",
@@ -100,5 +100,80 @@
       "patch_rim": "#C9A24A"
     },
     "_note": "Same grass and sand as the meadow, so the same tiles; only the kerbs and props differ."
+  },
+  "jungle": {
+    "name": "Jungle Run",
+    "base": "jungle",
+    "patch": "mud",
+    "kerb": {
+      "red": [
+        242,
+        120,
+        40
+      ],
+      "cream": [
+        255,
+        226,
+        120
+      ]
+    },
+    "kerb_out": "art/tiles/jungle/kerb.png",
+    "atlas_out": "art/tiles/jungle/ground_atlas.png",
+    "tileset_out": "track/themes/ground_jungle.tres",
+    "svg": {
+      "ground": "#4FA03C",
+      "patch": "#8A5A32",
+      "patch_rim": "#5E3A1E"
+    }
+  },
+  "candy": {
+    "name": "Candy Lane",
+    "base": "candy",
+    "patch": "chocolate",
+    "kerb": {
+      "red": [
+        62,
+        201,
+        167
+      ],
+      "cream": [
+        255,
+        255,
+        255
+      ]
+    },
+    "kerb_out": "art/tiles/candy/kerb.png",
+    "atlas_out": "art/tiles/candy/ground_atlas.png",
+    "tileset_out": "track/themes/ground_candy.tres",
+    "svg": {
+      "ground": "#F6BED6",
+      "patch": "#80503A",
+      "patch_rim": "#5C3420"
+    }
+  },
+  "moon": {
+    "name": "Moon Base",
+    "base": "moondust",
+    "patch": "crater",
+    "kerb": {
+      "red": [
+        52,
+        56,
+        66
+      ],
+      "cream": [
+        255,
+        200,
+        40
+      ]
+    },
+    "kerb_out": "art/tiles/moon/kerb.png",
+    "atlas_out": "art/tiles/moon/ground_atlas.png",
+    "tileset_out": "track/themes/ground_moon.tres",
+    "svg": {
+      "ground": "#D6D2E2",
+      "patch": "#AAA2C4",
+      "patch_rim": "#837AA2"
+    }
   }
 }

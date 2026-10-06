@@ -13,6 +13,12 @@ const DUST_COLOURS := {
 	&"beach": Color(0.9, 0.8, 0.55),
 	&"snow": Color(0.97, 0.98, 1.0),
 	&"ice": Color(0.8, 0.93, 1.0),
+	&"jungle": Color(0.55, 0.42, 0.26),
+	&"mud": Color(0.45, 0.3, 0.18),
+	&"candy": Color(1.0, 0.85, 0.92),
+	&"chocolate": Color(0.42, 0.26, 0.17),
+	&"moondust": Color(0.88, 0.86, 0.94),
+	&"crater": Color(0.74, 0.7, 0.84),
 }
 const SMOKE_COLOUR := Color(0.93, 0.93, 0.91)
 ## Slower than this, px/s, and there is nothing to throw up.

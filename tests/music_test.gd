@@ -10,7 +10,7 @@ extends Node
 const MAIN := preload("res://game/main.tscn")
 const SAVE := "user://music_test.cfg"
 const SETTINGS := "user://music_test_settings.cfg"
-const THEMES := ["meadow", "beach", "snow", "town"]
+const THEMES := ["meadow", "beach", "snow", "town", "jungle", "candy", "moon"]
 
 var _failures: PackedStringArray = []
 

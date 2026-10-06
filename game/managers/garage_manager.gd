@@ -14,7 +14,8 @@ const SETUP_ORDER: Array[StringName] = [&"starter", &"grippy", &"icecream", &"sl
 
 ## Track-select order. A track unlocks when the one before it has been finished — any place
 ## counts, so a child is never stuck behind a race they cannot win (docs/DESIGN.md §7.6).
-const TRACK_ORDER: Array[StringName] = [&"track_01", &"track_02", &"track_03", &"track_04"]
+const TRACK_ORDER: Array[StringName] = [&"track_01", &"track_02", &"track_03", &"track_04", &"track_05", &"track_06",
+	&"track_07"]
 const TRACK_DIR := "res://game/configs/tracks/"
 
 @export var economy: EconomyConfig

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TrackConfig" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://game/configs/track_config.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://track/tracks/track_05.tscn" id="2_track"]
+[ext_resource type="Resource" path="res://game/configs/setups/grippy.tres" id="3_a"]
+[ext_resource type="Resource" path="res://game/configs/setups/slider.tres" id="4_b"]
+[ext_resource type="Resource" path="res://game/configs/setups/monster.tres" id="5_c"]
+[ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="6_setup"]
+
+[resource]
+script = ExtResource("1_script")
+track_id = &"track_05"
+display_name = "Jungle Run"
+track_scene = ExtResource("2_track")
+laps = 3
+player_slot = 3
+opponent_names = PackedStringArray("BLUE", "YELLOW", "GREEN")
+opponent_setups = Array[ExtResource("6_setup")]([ExtResource("3_a"), ExtResource("4_b"), ExtResource("5_c")])
+opponent_paints = Array[StringName]([&"blue", &"yellow", &"green"])
+opponent_colours = Array[Color]([Color(0.227, 0.525, 1, 1), Color(1, 0.824, 0.247, 1), Color(0.18, 0.769, 0.42, 1)])
+opponent_skills = PackedFloat32Array(0.85, 0.7, 0.55)

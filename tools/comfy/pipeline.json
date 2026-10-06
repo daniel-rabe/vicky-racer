@@ -122,6 +122,72 @@
       "waves": 5,
       "speckle_density": 0.004,
       "speckle_shift": 10
+    },
+    "jungle": {
+      "base": [
+        76,
+        152,
+        60
+      ],
+      "variation": 0.05,
+      "waves": 6,
+      "speckle_density": 0.002,
+      "speckle_shift": 14
+    },
+    "mud": {
+      "base": [
+        138,
+        94,
+        58
+      ],
+      "variation": 0.06,
+      "waves": 5,
+      "speckle_density": 0.004,
+      "speckle_shift": 12
+    },
+    "candy": {
+      "base": [
+        246,
+        192,
+        216
+      ],
+      "variation": 0.03,
+      "waves": 5,
+      "speckle_density": 0.004,
+      "speckle_shift": 18
+    },
+    "chocolate": {
+      "base": [
+        128,
+        80,
+        54
+      ],
+      "variation": 0.04,
+      "waves": 4,
+      "speckle_density": 0.002,
+      "speckle_shift": 10
+    },
+    "moondust": {
+      "base": [
+        214,
+        210,
+        226
+      ],
+      "variation": 0.035,
+      "waves": 6,
+      "speckle_density": 0.0015,
+      "speckle_shift": 8
+    },
+    "crater": {
+      "base": [
+        170,
+        162,
+        196
+      ],
+      "variation": 0.05,
+      "waves": 4,
+      "speckle_density": 0.003,
+      "speckle_shift": 14
     }
   },
   "selection": {

@@ -39,6 +39,11 @@ PROP_STYLE = {  # kind -> (svg radius, fill, stroke)
     "beach_ball": (7, "#3A86FF", "#FFD23F"), "pine_tree": (16, "#1F6B45", "#FFFFFF"),
     "snowman": (10, "#FFFFFF", "#22252A"), "toy_house": (22, "#C0392B", "#5A1E16"),
     "traffic_cone": (6, "#FF7A1A", "#FFFFFF"),
+    "jungle_tree": (20, "#2F7D32", "#1B4D1E"), "jungle_flower": (11, "#FF5FA2", "#FFD23F"),
+    "boulder": (10, "#8C8F96", "#5B5E66"), "lollipop": (10, "#FF4F8B", "#FFFFFF"),
+    "donut": (11, "#F7A8C8", "#B07040"), "cupcake": (11, "#FFF3F8", "#E05A9A"),
+    "gumdrop": (7, "#7BD88F", "#3E9E57"), "rocket": (15, "#F2F2F2", "#E63946"),
+    "satellite_dish": (14, "#E6E8EE", "#6C7080"), "moon_rock": (10, "#9A94AE", "#625C78"),
 }
 
 

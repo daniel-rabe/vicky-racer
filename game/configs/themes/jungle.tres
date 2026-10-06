@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TrackTheme" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://game/configs/track_theme.gd" id="1_script"]
+[ext_resource type="TileSet" path="res://track/themes/ground_jungle.tres" id="2_tiles"]
+[ext_resource type="Texture2D" path="res://art/tiles/asphalt.png" id="3_asphalt"]
+[ext_resource type="Texture2D" path="res://art/tiles/jungle/kerb.png" id="4_kerb"]
+[ext_resource type="Texture2D" path="res://art/props/jungle/boulder.png" id="5_wall"]
+[ext_resource type="Resource" path="res://game/configs/music/race_jungle.tres" id="6_music"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"jungle"
+display_name = "Jungle Run"
+ground_tiles = ExtResource("2_tiles")
+base_surface = &"jungle"
+patch_surface = &"mud"
+asphalt = ExtResource("3_asphalt")
+kerb = ExtResource("4_kerb")
+wall_prop = ExtResource("5_wall")
+wall_spacing = 86.0
+card_colour = Color(0.31, 0.63, 0.24, 1)
+music = ExtResource("6_music")

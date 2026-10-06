@@ -133,6 +133,13 @@ func _test_trophies_and_unlocking() -> void:
 		"a worse result never takes away the gold, or the open cup")
 	_managers()
 	_check(_cups.is_unlocked(&"snowflake"), "the open cup survives a save and load")
+	_check(not _cups.is_unlocked(&"starlight"), "the Starlight Cup waits for a Snowflake win")
+	_cups.start(&"snowflake")
+	for i in 3:
+		_finish(["YOU", "BLUE", "YELLOW", "GREEN"], _cups.current_track().track_id)
+		_cups.continue_cup()
+	_check(_cups.is_unlocked(&"starlight"), "winning the Snowflake Cup opens the Starlight Cup")
+	EventSystem.UI_screen_requested.emit(&"garage")
 
 
 func _test_ties_and_single_races() -> void:

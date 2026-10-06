@@ -12,7 +12,7 @@ const TRACK_SCRIPT := preload("res://track/track.gd")
 const GROUND_TILES := preload("res://track/ground_tiles.tres")
 const TYRES := preload("res://art/props/tyre_stack.png")
 const BOOST_PAD := preload("res://art/tiles/boost_pad.png")
-const ALL_TRACKS := "track_01,track_02,track_03,track_04"
+const ALL_TRACKS := "track_01,track_02,track_03,track_04,track_05,track_06,track_07"
 ## Prop kind (as in the layout) -> texture and collision radius. Radii are smaller than the
 ## pictures: clipping a palm frond or a parasol's edge should not stop a car.
 const PROPS := {
@@ -25,6 +25,16 @@ const PROPS := {
 	"snowman": ["res://art/props/snow/snowman.png", 40.0],
 	"toy_house": ["res://art/props/town/toy_house.png", 92.0],
 	"traffic_cone": ["res://art/props/town/traffic_cone.png", 22.0],
+	"jungle_tree": ["res://art/props/jungle/jungle_tree.png", 60.0],
+	"jungle_flower": ["res://art/props/jungle/jungle_flower.png", 30.0],
+	"boulder": ["res://art/props/jungle/boulder.png", 38.0],
+	"lollipop": ["res://art/props/candy/lollipop.png", 44.0],
+	"donut": ["res://art/props/candy/donut.png", 48.0],
+	"cupcake": ["res://art/props/candy/cupcake.png", 44.0],
+	"gumdrop": ["res://art/props/candy/gumdrop.png", 30.0],
+	"rocket": ["res://art/props/moon/rocket.png", 46.0],
+	"satellite_dish": ["res://art/props/moon/satellite_dish.png", 54.0],
+	"moon_rock": ["res://art/props/moon/moon_rock.png", 36.0],
 }
 const BOOST_PAD_SIZE := Vector2(150, 210)
 const WALL_THICKNESS := 64.0
