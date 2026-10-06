@@ -330,6 +330,570 @@
       ],
       "out": "art/ui/shelf/background.png",
       "_note": "Phase 14: the trophy shelf screen's background."
+    },
+    {
+      "id": "candy_shop",
+      "subject": "candy shop",
+      "details": "pink roof seen from above with rounded clay roof tiles and a giant swirl lollipop lying on the roof, the front wall below with a pink and white striped awning over shop windows full of colourful sweets and jars, a round wooden door",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        480,
+        430
+      ],
+      "out": "art/town/buildings/candy_shop.png",
+      "sketch": {
+        "width": 0.62,
+        "roof": 0.32,
+        "wall": 0.24,
+        "roof_colour": [
+          240,
+          140,
+          175
+        ],
+        "wall_colour": [
+          250,
+          225,
+          150
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "ice_cream_shop",
+      "subject": "ice cream parlour",
+      "details": "mint green roof seen from above with a giant ice cream cone with three scoops (strawberry, vanilla, chocolate) lying on the roof, the front wall below with a mint and white striped awning, a wide serving window showing tubs of ice cream, a little door",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        480,
+        430
+      ],
+      "out": "art/town/buildings/ice_cream_shop.png",
+      "sketch": {
+        "width": 0.62,
+        "roof": 0.32,
+        "wall": 0.24,
+        "roof_colour": [
+          150,
+          220,
+          200
+        ],
+        "wall_colour": [
+          255,
+          245,
+          235
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "toy_shop",
+      "subject": "toy shop",
+      "details": "blue roof seen from above with a giant smiling teddy bear sitting on the roof seen from above, the red front wall below with a yellow awning, shop windows full of toys, balls, blocks and a toy train, a yellow door",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        480,
+        430
+      ],
+      "out": "art/town/buildings/toy_shop.png",
+      "sketch": {
+        "width": 0.62,
+        "roof": 0.32,
+        "wall": 0.24,
+        "roof_colour": [
+          90,
+          140,
+          220
+        ],
+        "wall_colour": [
+          235,
+          90,
+          80
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "bakery",
+      "subject": "bakery",
+      "details": "warm brown roof seen from above with a giant pink frosted donut with sprinkles lying on the roof, the cream front wall below with a brown and white striped awning, windows full of bread loaves, cakes and croissants, a wooden door",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        480,
+        430
+      ],
+      "out": "art/town/buildings/bakery.png",
+      "sketch": {
+        "width": 0.62,
+        "roof": 0.32,
+        "wall": 0.24,
+        "roof_colour": [
+          190,
+          120,
+          80
+        ],
+        "wall_colour": [
+          255,
+          235,
+          200
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "pet_shop",
+      "subject": "pet shop",
+      "details": "green roof seen from above with a giant dog bone lying on the roof, the orange front wall below with a green awning, windows with puppies, kittens and a goldfish bowl, a round door with a paw print",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        480,
+        430
+      ],
+      "out": "art/town/buildings/pet_shop.png",
+      "sketch": {
+        "width": 0.62,
+        "roof": 0.32,
+        "wall": 0.24,
+        "roof_colour": [
+          130,
+          200,
+          90
+        ],
+        "wall_colour": [
+          255,
+          190,
+          110
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "pizza_place",
+      "subject": "pizza restaurant",
+      "details": "red roof seen from above with a giant round pizza with cheese and pepperoni lying on the roof, the front wall below with a green, white and red striped awning, windows with little tables, a brick pizza oven glowing, a wooden door",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        480,
+        430
+      ],
+      "out": "art/town/buildings/pizza_place.png",
+      "sketch": {
+        "width": 0.62,
+        "roof": 0.32,
+        "wall": 0.24,
+        "roof_colour": [
+          220,
+          70,
+          60
+        ],
+        "wall_colour": [
+          250,
+          240,
+          215
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "flower_shop",
+      "subject": "flower shop",
+      "details": "sunny yellow roof seen from above covered in a giant ring of colourful flowers, the white front wall below with a purple awning, buckets of tulips and sunflowers in front of the windows, a green door",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        480,
+        430
+      ],
+      "out": "art/town/buildings/flower_shop.png",
+      "sketch": {
+        "width": 0.62,
+        "roof": 0.32,
+        "wall": 0.24,
+        "roof_colour": [
+          250,
+          200,
+          90
+        ],
+        "wall_colour": [
+          255,
+          250,
+          240
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "fire_station",
+      "subject": "fire station",
+      "details": "red roof seen from above with a big shiny golden bell, a red siren light and a coiled yellow fire hose on top, the front wall below with three big red garage doors, a little red fire engine peeking out of the middle door, a silver ladder hanging on the wall, a golden star badge above the doors",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        640,
+        450
+      ],
+      "out": "art/town/buildings/fire_station.png",
+      "sketch": {
+        "width": 0.86,
+        "roof": 0.3,
+        "wall": 0.24,
+        "roof_colour": [
+          215,
+          60,
+          55
+        ],
+        "wall_colour": [
+          240,
+          225,
+          205
+        ],
+        "front": "garages",
+        "count": 3,
+        "door_colour": [
+          200,
+          50,
+          50
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings). Re-rolled: the first details gave plain red sheds that did not read as a fire station."
+    },
+    {
+      "id": "police_station",
+      "subject": "police station",
+      "details": "dark blue roof seen from above with a blue siren light on top, the white front wall below with a blue stripe, a big gold star badge over the double door, two windows each side",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        640,
+        450
+      ],
+      "out": "art/town/buildings/police_station.png",
+      "sketch": {
+        "width": 0.86,
+        "roof": 0.3,
+        "wall": 0.24,
+        "roof_colour": [
+          70,
+          110,
+          190
+        ],
+        "wall_colour": [
+          235,
+          235,
+          240
+        ],
+        "front": "door"
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "school",
+      "subject": "school",
+      "details": "orange roof seen from above with a little bell tower and a round clock on top, the front wall below with rows of windows with crayon drawings in them, a big double door, a flag",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        640,
+        450
+      ],
+      "out": "art/town/buildings/school.png",
+      "sketch": {
+        "width": 0.86,
+        "roof": 0.3,
+        "wall": 0.24,
+        "roof_colour": [
+          230,
+          150,
+          70
+        ],
+        "wall_colour": [
+          250,
+          220,
+          170
+        ],
+        "front": "door"
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "car_wash",
+      "subject": "car wash",
+      "details": "light blue roof seen from above with giant soap bubbles on top, the front wall below with two wide open drive-through bays with big round spinning brushes in red and blue, bubbles and foam",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        640,
+        450
+      ],
+      "out": "art/town/buildings/car_wash.png",
+      "sketch": {
+        "width": 0.86,
+        "roof": 0.3,
+        "wall": 0.24,
+        "roof_colour": [
+          80,
+          190,
+          230
+        ],
+        "wall_colour": [
+          250,
+          250,
+          255
+        ],
+        "front": "garages",
+        "count": 2,
+        "door_colour": [
+          120,
+          170,
+          200
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "house_red",
+      "subject": "family house",
+      "details": "red tiled roof seen from above with a chimney, the cream front wall below with two windows with flower boxes and a blue front door",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        370,
+        370
+      ],
+      "out": "art/town/buildings/house_red.png",
+      "sketch": {
+        "width": 0.52,
+        "roof": 0.34,
+        "wall": 0.22,
+        "roof_colour": [
+          210,
+          80,
+          70
+        ],
+        "wall_colour": [
+          255,
+          240,
+          210
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "house_blue",
+      "subject": "family house",
+      "details": "blue tiled roof seen from above with a round attic window, the yellow front wall below with two windows with shutters and a red front door",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        370,
+        370
+      ],
+      "out": "art/town/buildings/house_blue.png",
+      "sketch": {
+        "width": 0.52,
+        "roof": 0.34,
+        "wall": 0.22,
+        "roof_colour": [
+          90,
+          130,
+          200
+        ],
+        "wall_colour": [
+          255,
+          225,
+          170
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "house_green",
+      "subject": "family cottage",
+      "details": "green tiled roof seen from above with a chimney and a little bird house, the pink front wall below with round windows and a white front door",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        370,
+        370
+      ],
+      "out": "art/town/buildings/house_green.png",
+      "sketch": {
+        "width": 0.52,
+        "roof": 0.34,
+        "wall": 0.22,
+        "roof_colour": [
+          110,
+          170,
+          90
+        ],
+        "wall_colour": [
+          240,
+          200,
+          220
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings)."
+    },
+    {
+      "id": "fountain",
+      "subject": "a round stone park fountain viewed from straight above, flat lay: a circular basin of bright blue water ringed by pale stone, a small round bowl in the centre with water splashing out",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        280,
+        280
+      ],
+      "out": "art/town/props/fountain.png",
+      "_note": "Free Drive town."
+    },
+    {
+      "id": "playground",
+      "subject": "a children's playground viewed from straight above, flat lay: a rectangle of yellow sand with a red slide, a yellow climbing frame and a blue swing set all seen from the top",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        320,
+        240
+      ],
+      "out": "art/town/props/playground.png",
+      "_note": "Free Drive town."
+    },
+    {
+      "id": "bench",
+      "subject": "a wooden park bench viewed from straight above, flat lay: three brown wooden slats side by side with dark green metal ends",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        120,
+        60
+      ],
+      "out": "art/town/props/bench.png",
+      "_note": "Free Drive town."
+    },
+    {
+      "id": "flower_bed",
+      "subject": "a round flower bed viewed from straight above, flat lay: a circle of dark soil packed with red, yellow, pink and purple flowers",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        110,
+        110
+      ],
+      "out": "art/town/props/flower_bed.png",
+      "_note": "Free Drive town."
+    },
+    {
+      "id": "bus",
+      "subject": "a chunky yellow toy school bus seen from directly above, pointing straight up, perfectly symmetrical, a long white roof with roof vents",
+      "seed": 13,
+      "facing": "down",
+      "box": [
+        208,
+        84
+      ],
+      "out": "art/town/vehicles/bus.png",
+      "_note": "Free Drive town. Faces DOWN: windscreen and headlights at the bottom of the picture."
+    },
+    {
+      "id": "fire_engine",
+      "subject": "a chunky red toy fire engine seen from directly above, pointing straight up, perfectly symmetrical, a silver ladder along the roof and blue lights on the cab",
+      "seed": 11,
+      "facing": "down",
+      "box": [
+        184,
+        84
+      ],
+      "out": "art/town/vehicles/fire_engine.png",
+      "_note": "Free Drive town. Faces DOWN: windscreen and headlights at the bottom of the picture."
+    },
+    {
+      "id": "delivery_van",
+      "subject": "a chunky light blue toy delivery van seen from directly above, pointing straight up, perfectly symmetrical, a white roof",
+      "seed": 11,
+      "facing": "down",
+      "box": [
+        150,
+        80
+      ],
+      "out": "art/town/vehicles/delivery_van.png",
+      "_note": "Free Drive town. Faces DOWN: the windscreen (with a face) and the bumper at the bottom."
+    },
+    {
+      "id": "garbage_truck",
+      "subject": "a chunky green toy garbage truck seen from straight above as a flat lay, only its roof visible: a long ribbed green rectangular container, a small green cab roof with an orange light at the top end, four black wheels peeking out at the sides, pointing straight up, perfectly symmetrical",
+      "seed": 12,
+      "facing": "right",
+      "box": [
+        184,
+        84
+      ],
+      "out": "art/town/vehicles/garbage_truck.png",
+      "_note": "Free Drive town. Re-prompted: the first prompt gave four side views. Seed 12 is the one seen from above: cab and orange lights at the RIGHT end."
+    },
+    {
+      "id": "duck",
+      "subject": "a white duck seen from straight above as a flat lay: a plump oval white body with folded wings and a short tail, a small round white head with an orange beak at the top end, pointing straight up, perfectly symmetrical, no face visible",
+      "seed": 12,
+      "facing": "up",
+      "box": [
+        72,
+        72
+      ],
+      "out": "art/town/animals/duck.png",
+      "_note": "Free Drive town. Re-prompted: the first prompt gave four side views. Still drawn front-on mostly; seed 12 is nearest to above (head at the top, tail at the bottom)."
+    },
+    {
+      "id": "dog",
+      "subject": "a cute small brown puppy seen from directly above, flat lay, walking, head pointing straight up, floppy ears, tail at the bottom",
+      "seed": 11,
+      "facing": "down",
+      "box": [
+        76,
+        76
+      ],
+      "out": "art/town/animals/dog.png",
+      "_note": "Free Drive town. Faces DOWN: head at the bottom, tail at the top."
+    },
+    {
+      "id": "cat",
+      "subject": "a cute ginger cat seen from directly above, flat lay, walking, head pointing straight up, striped back, tail at the bottom",
+      "seed": 12,
+      "facing": "up",
+      "box": [
+        68,
+        68
+      ],
+      "out": "art/town/animals/cat.png",
+      "_note": "Free Drive town. Seen from above and behind: head at the top (faces UP)."
+    },
+    {
+      "id": "bird",
+      "subject": "a little blue bird flying seen from directly above, wings spread wide, head pointing straight up, flat lay",
+      "seed": 12,
+      "facing": "up",
+      "box": [
+        72,
+        72
+      ],
+      "out": "art/town/animals/bird.png",
+      "_note": "Free Drive town. Seen from above and behind, wings spread: head at the top (faces UP)."
+    },
+    {
+      "id": "balloon",
+      "subject": "a hot air balloon seen from directly above, flat lay: a big round balloon with bright rainbow stripe segments meeting in the middle",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        220,
+        220
+      ],
+      "out": "art/town/props/balloon.png",
+      "_note": "Free Drive town. Drawn from the side whatever the prompt; kept like that on purpose: high in the sky, the classic balloon shape reads better than a striped circle, and it matches the buildings' street view."
     }
   ],
   "variants": [

@@ -44,6 +44,8 @@ const SURFACES := {
 	# Moon Base: light moon dust slides about; the craters are deeper dust.
 	&"moondust": {"speed_mult": 0.6, "grip_mult": 0.45},
 	&"crater": {"speed_mult": 0.45, "grip_mult": 0.45},
+	# Free Drive's pond (town/town.gd): wade through slowly, with a splash.
+	&"water": {"speed_mult": 0.45, "grip_mult": 0.5},
 }
 const ASPHALT := preload("res://art/tiles/asphalt.png")
 const KERB := preload("res://art/tiles/kerb.png")

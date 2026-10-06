@@ -221,3 +221,50 @@ def cover(img: Image.Image, box: tuple[int, int]) -> Image.Image:
     resized = img.convert("RGB").resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
     left, top = (resized.width - box[0]) // 2, (resized.height - box[1]) // 2
     return resized.crop((left, top, left + box[0], top + box[1]))
+
+
+def building_sketch(sketch: dict, size: int = 1536) -> Image.Image:
+    """A flat block drawing of a town building in the game's street view: the roof seen from
+    above on top, the front wall facing straight down below it, nothing at an angle.
+
+    FLUX draws every building isometric however it is asked; Kontext keeps the layout of an
+    image it edits, so it is given this drawing and only adds the detail (generate_assets.py).
+    `sketch`: width, roof and wall as fractions of `size`; roof_colour and wall_colour; the
+    front: "door" (a door between windows), "garages" (n big doors) or "open" (a counter).
+    """
+    img = Image.new("RGB", (size, size), (250, 250, 248))
+    d = ImageDraw.Draw(img)
+    w, roof_h, wall_h = (round(sketch[k] * size) for k in ("width", "roof", "wall"))
+    roof, wall = tuple(sketch["roof_colour"]), tuple(sketch["wall_colour"])
+    x0 = (size - w) // 2
+    x1 = x0 + w
+    top = (size - roof_h - wall_h) // 2
+    eave = top + roof_h
+    bottom = eave + wall_h
+    dark = tuple(int(c * 0.8) for c in roof)
+    d.rounded_rectangle((x0 + 30, top + 60, x1 + 40, bottom + 30), 60, fill=(228, 228, 225))  # shadow
+    d.rounded_rectangle((x0, top, x1, eave + 20), 70, fill=roof)
+    d.rounded_rectangle((x0 + 30, eave - 20, x1 - 30, bottom), 30, fill=wall)
+    d.rounded_rectangle((x0 - 10, eave - 30, x1 + 10, eave + 40), 36, fill=dark)  # eaves
+    inner = (x0 + 70, x1 - 70)
+    floor = bottom - 10
+    front = sketch.get("front", "door")
+    glass, wood = (170, 210, 235), (120, 80, 60)
+    if front == "garages":
+        n = sketch.get("count", 2)
+        gap = 40
+        each = (inner[1] - inner[0] - gap * (n - 1)) / n
+        for i in range(n):
+            gx = inner[0] + i * (each + gap)
+            d.rounded_rectangle((gx, eave + 90, gx + each, floor), 24, fill=tuple(sketch.get("door_colour", (200, 200, 205))))
+    elif front == "open":
+        d.rounded_rectangle((inner[0], eave + 90, inner[1], floor - 90), 24, fill=glass)
+        d.rounded_rectangle((inner[0] - 10, floor - 100, inner[1] + 10, floor), 20, fill=dark)
+    else:
+        door_w = min(220, w // 5)
+        cx = (x0 + x1) // 2
+        d.rounded_rectangle((cx - door_w // 2, max(eave + 100, floor - 260), cx + door_w // 2, floor), 40, fill=wood)
+        win_h = min(170, (floor - eave) - 160)
+        for wx in (inner[0], inner[1] - 220):
+            d.rounded_rectangle((wx, eave + 100, wx + 220, eave + 100 + win_h), 24, fill=glass)
+    return img

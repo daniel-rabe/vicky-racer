@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/screens/town.gd" id="1_town"]
+[ext_resource type="Script" path="res://actors/effects/skid_marks.gd" id="2_skids"]
+[ext_resource type="Script" path="res://ui/town/town_hud.gd" id="3_hud"]
+[ext_resource type="PackedScene" path="res://ui/pause/pause_menu.tscn" id="4_pause"]
+
+[node name="Town" type="Node2D"]
+script = ExtResource("1_town")
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="SkidMarks" type="Node2D" parent="World"]
+script = ExtResource("2_skids")
+
+[node name="Coins" type="Node2D" parent="World"]
+
+[node name="Walkers" type="Node2D" parent="World"]
+
+[node name="Cars" type="Node2D" parent="World"]
+
+[node name="Sky" type="Node2D" parent="World"]
+
+[node name="TownHUD" type="CanvasLayer" parent="."]
+script = ExtResource("3_hud")
+
+[node name="PauseMenu" parent="." instance=ExtResource("4_pause")]
+can_restart = false

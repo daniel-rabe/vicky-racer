@@ -56,3 +56,9 @@ def background_graph(scene: str, seed: int, size: tuple[int, int], uploaded_refe
     prompt = f"{scene}, {PIPELINE['prompt']['style']}"
     return wf.flux_txt2img(prompt, seed, size[0], size[1], settings=flux_settings(),
                            style=style_ref(uploaded_reference), prefix=prefix)
+
+
+def building_graph(uploaded_sketch: str, subject: str, details: str, seed: int, prefix: str = "vr_building") -> dict:
+    """A town building: Kontext turns the uploaded block sketch into the clay look, keeping its layout."""
+    instruction = PIPELINE["buildings"]["instruction_template"].format(subject=subject, details=details)
+    return variant_graph(uploaded_sketch, instruction, seed, prefix=prefix)

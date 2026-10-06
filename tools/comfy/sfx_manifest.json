@@ -144,6 +144,51 @@
       "out": "art/sfx/sticker.wav",
       "seed": 103,
       "_note": "Phase 14: a new sticker pops onto the screen."
+    },
+    {
+      "id": "quack",
+      "prompt": "a single cute duck quack, one short clear quack of a farmyard duck, close up, clean sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "peak_db": -4.0,
+      "out": "art/sfx/quack.wav",
+      "seed": 101,
+      "max_seconds": 1.2,
+      "_note": "Free Drive: an animal's voice (actors/town/walker.gd). Picked from the spectrogram."
+    },
+    {
+      "id": "woof",
+      "prompt": "a single happy small puppy bark, one short friendly woof, close up, clean sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "peak_db": -4.0,
+      "out": "art/sfx/woof.wav",
+      "seed": 103,
+      "max_seconds": 0.6,
+      "_note": "Free Drive: an animal's voice (actors/town/walker.gd). Picked from the spectrogram."
+    },
+    {
+      "id": "meow",
+      "prompt": "a single short cute kitten meow, friendly, close up, clean sound effect",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "peak_db": -4.0,
+      "out": "art/sfx/meow.wav",
+      "seed": 103,
+      "max_seconds": 1.2,
+      "_note": "Free Drive: an animal's voice (actors/town/walker.gd). Picked from the spectrogram."
+    },
+    {
+      "id": "town_ambience",
+      "prompt": "gentle sunny morning in a quiet small town park, soft birdsong and chirping sparrows, light breeze in the trees, calm, continuous, no cars, no people, field recording",
+      "negative": "music, melody, speech, voice, talking, singing, crowd, traffic, engine, distortion, clipping, low quality, muffled",
+      "seconds": 12.0,
+      "kind": "loop",
+      "loop_seconds": 8.0,
+      "peak_db": -8.0,
+      "out": "art/sfx/town_ambience.wav",
+      "seed": 103,
+      "_note": "Free Drive: birdsong under the town, looped quietly. Picked from the spectrogram: a steady breeze with birdsong spread evenly."
     }
   ],
   "synth": [

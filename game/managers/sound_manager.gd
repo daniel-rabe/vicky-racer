@@ -21,6 +21,7 @@ func _enter_tree() -> void:
 	EventSystem.RAC_time_trial_finished.connect(func(_id: StringName, _car: StringName, _laps: Array, _ghost: GhostLap) -> void:
 		play(FANFARE, -2.0))
 	EventSystem.PRO_setup_purchased.connect(func(_id: StringName) -> void: play(COIN))
+	EventSystem.PRO_coins_found.connect(func(_amount: int) -> void: play(COIN, -6.0))
 
 
 func _ready() -> void:

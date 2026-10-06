@@ -47,6 +47,10 @@ func _enter_tree() -> void:
 			profile.stickers.append(id)
 			_commit())
 	EventSystem.RAC_race_finished.connect(_on_race_finished)
+	EventSystem.PRO_coins_found.connect(func(amount: int) -> void:
+		profile.coins += amount
+		EventSystem.PRO_coins_changed.emit(profile.coins)
+		_commit())
 	EventSystem.RAC_time_trial_finished.connect(_on_time_trial_finished)
 	EventSystem.PRO_race_mode_requested.connect(func(mode: StringName) -> void:
 		if mode in [&"race", &"time_trial"]:

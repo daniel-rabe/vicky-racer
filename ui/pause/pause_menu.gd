@@ -7,6 +7,9 @@ extends CanvasLayer
 ## pressing pause twice just resumes; B / Escape resumes too; RESTART and GARAGE ask
 ## "SURE?" with NO focused.
 
+## Free Drive has nothing to restart: its menu has no RESTART.
+@export var can_restart := true
+
 @onready var _menu: Control = %Menu
 @onready var _resume: Button = %Resume
 @onready var _restart: Button = %Restart
@@ -24,6 +27,7 @@ var _asked_from: Button  # focus returns here when SURE? is answered NO
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
+	_restart.visible = can_restart
 	_resume.pressed.connect(resume)
 	_restart.pressed.connect(_ask.bind(_leave_to.bind(&"race"), _restart))
 	_garage.pressed.connect(_ask.bind(_leave_to.bind(&"garage"), _garage))

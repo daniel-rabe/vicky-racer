@@ -25,6 +25,9 @@ var _skid: AudioStreamPlayer2D
 var _bump: AudioStreamPlayer2D
 var _horn: AudioStreamPlayer2D
 var _skid_level := 0.0
+## Added to the engine's volume. Free Drive's traffic runs quieter (-12 dB) than a racer, so
+## a street full of cars hums instead of roaring.
+var engine_offset_db := 0.0
 
 @onready var car: Car = get_parent()
 
@@ -58,7 +61,7 @@ func _physics_process(delta: float) -> void:
 	# A little extra pitch under throttle, so pressing the pedal is heard straight away.
 	var pitch := car.setup.engine_pitch if car.setup else 1.0
 	_engine.pitch_scale = (lerpf(PITCH_IDLE, PITCH_TOP, fraction) + 0.08 * throttle) * pitch
-	_engine.volume_db = ENGINE_DB - 4.0 * (1.0 - maxf(fraction, throttle))
+	_engine.volume_db = ENGINE_DB + engine_offset_db - 4.0 * (1.0 - maxf(fraction, throttle))
 	var target := 0.0
 	if car.is_drifting:
 		target = clampf(car.lateral_speed / (car.config.drift_threshold * 2.0), 0.4, 1.0)

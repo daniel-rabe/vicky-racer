@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://ui/title/title_screen.gd" id="1_title"]
 [ext_resource type="Theme" path="res://ui/theme/vicky_theme.tres" id="2_theme"]
 [ext_resource type="PackedScene" path="res://ui/settings/settings_panel.tscn" id="3_settings"]
 [ext_resource type="Texture2D" path="res://art/ui/cups/trophy_gold.png" id="4_trophy"]
+[ext_resource type="Texture2D" path="res://art/ui/town_button.png" id="5_town"]
 
 [node name="TitleScreen" type="Node2D"]
 script = ExtResource("1_title")
@@ -80,11 +81,11 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
-offset_top = 520.0
+offset_top = 476.0
 offset_right = 200.0
-offset_bottom = 930.0
+offset_bottom = 970.0
 grow_horizontal = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 
 [node name="Play" type="Button" parent="UI/Root/Menu"]
 unique_name_in_owner = true
@@ -93,6 +94,16 @@ layout_mode = 2
 theme_type_variation = &"RaceButton"
 theme_override_font_sizes/font_size = 48
 text = "PLAY"
+
+[node name="Town" type="Button" parent="UI/Root/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+theme_type_variation = &"NavButton"
+theme_override_constants/icon_max_width = 90
+text = "TOWN"
+icon = ExtResource("5_town")
+expand_icon = true
 
 [node name="TwoPlayers" type="Button" parent="UI/Root/Menu"]
 unique_name_in_owner = true
@@ -123,9 +134,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = 270.0
-offset_top = 500.0
+offset_top = 456.0
 offset_right = 420.0
-offset_bottom = 650.0
+offset_bottom = 606.0
 grow_horizontal = 2
 theme_type_variation = &"NavButton"
 icon = ExtResource("4_trophy")

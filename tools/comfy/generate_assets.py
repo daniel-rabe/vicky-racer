@@ -89,7 +89,15 @@ def facing_of(entry: dict, entries: dict) -> str | None:
 
 
 def render_sprite(client: ComfyClient, ref: str, entry: dict, seed: int) -> tuple[Image.Image, Image.Image]:
-    """(cut-out, raw) for a sprite. A background (`size` set) has no cut-out: both are the picture."""
+    """(cut-out, raw) for a sprite. A background (`size` set) has no cut-out: both are the picture.
+    A building (`sketch` set) is Kontext's edit of its block sketch (pipeline.json `buildings`)."""
+    if "sketch" in entry:
+        buf = io.BytesIO()
+        pp.building_sketch(entry["sketch"]).save(buf, "PNG")
+        uploaded = client.upload_image(buf.getvalue(), f"vr_sketch_{entry['id']}.png")
+        images = client.run(recipe.building_graph(uploaded, entry["subject"], entry["details"], seed))
+        return (Image.open(io.BytesIO(images["save_cutout"][0])).convert("RGBA"),
+                Image.open(io.BytesIO(images["save"][0])).convert("RGB"))
     if "size" in entry:
         images = client.run(recipe.background_graph(entry["subject"], seed, tuple(entry["size"]), ref))
         raw = Image.open(io.BytesIO(images["save"][0])).convert("RGB")
@@ -108,7 +116,9 @@ def finalize(master: Image.Image, entry: dict, entries: dict) -> Image.Image:
     for step in entry.get("post", []):
         master = POST_STEPS[step](master)
     turned = master.rotate(TO_PLUS_X[facing_of(entry, entries)], expand=True)
-    return pp.fit_sprite(turned, tuple(entry["box"]))
+    fitted = pp.fit_sprite(turned, tuple(entry["box"]))
+    # A building is placed by its picture's edges (its front on the pavement): no margin.
+    return fitted.crop(fitted.getchannel("A").getbbox()) if "sketch" in entry else fitted
 
 
 def write_art(img: Image.Image, rel: str) -> None:

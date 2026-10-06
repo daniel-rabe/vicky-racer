@@ -259,9 +259,38 @@ Three tracks, each in a theme of its own, and a third cup (DESIGN.md §7, §7.3,
 
 ---
 
+## Phase 19 — Free Drive: the town ✅ done
+
+An open-world mode beside the races (DESIGN.md §19): **TOWN** on the title screen.
+
+- A town of 5 × 4 blocks on a street grid with zebra crossings, a two-block park with a fountain,
+  a pond and a playground, another pond and playground, and a ring of trees round the edge.
+- **Fourteen buildings**, all facing the viewer like a picture-book map: candy shop, ice cream
+  parlour, toy shop, bakery, pet shop, pizza place, flower shop, fire station, police station,
+  school, car wash and three family houses — generated as Kontext edits of flat block sketches,
+  because FLUX alone only draws buildings isometric.
+- **A living town:** 24 vehicles (every car in the garage plus buses, vans, a fire engine and a
+  garbage truck) keep to the right-hand lane, take turns at junctions, stop for ducks, toot at a
+  child parked in their way and then drive round them; dogs and cats walk the pavements, duck
+  families cross at the zebras, balloons, birds and cloud shadows pass overhead, birdsong.
+- **Things to do:** coins in the streets (banked at once), shop signs when pulling up at a
+  door, a bonus for visiting every kind of place, bubbles at the car wash, a pond to splash
+  through.
+- New generated art: 14 buildings, 4 vehicles, 4 animals, park props, a balloon; new sounds:
+  quack, woof, meow, town ambience. `tests/town_test.gd`.
+
+---
+
 ## Ideas parked
 
 Not planned, but worth keeping in mind:
+
+- **Car wash you can drive through (Free Drive)** — requested 2026-10-06. Make the town's car
+  wash interactable: driving into it washes the car, and afterwards the car **sparkles for a
+  while** (glints and stars on the body that fade out over some seconds). Today the car wash is
+  only a named place: pulling up at its door shows its sign and soap bubbles on the HUD
+  (`TownHUD.bubbles()`, triggered in `game/screens/town.gd` `_on_place_reached`); nothing
+  happens to the car itself.
 
 - **Track editor for the child** — place pieces on a grid and race on it. Delightful but large.
 - **Weather** — rain on any track (puddles = low-grip patches, wipers on the HUD).

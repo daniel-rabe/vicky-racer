@@ -42,3 +42,66 @@ docs/mockups/music/listen/
 build/
 
 # The sticker sound pick (Phase 14) is kept like the other picks.
+
+# Free Drive sound picks.
+!tools/comfy/masters/sfx/quack_101.flac
+!tools/comfy/masters/sfx/woof_103.flac
+!tools/comfy/masters/sfx/meow_103.flac
+!tools/comfy/masters/sfx/town_ambience_103.flac
+
+# Free Drive's town masters (55 MB): leaves nothing is built from, reproducible from the pinned
+# seeds in asset_manifest.json. The built pictures in art/town/ are committed.
+tools/comfy/masters/candy_shop.png
+tools/comfy/masters/candy_shop_raw.png
+tools/comfy/masters/ice_cream_shop.png
+tools/comfy/masters/ice_cream_shop_raw.png
+tools/comfy/masters/toy_shop.png
+tools/comfy/masters/toy_shop_raw.png
+tools/comfy/masters/bakery.png
+tools/comfy/masters/bakery_raw.png
+tools/comfy/masters/pet_shop.png
+tools/comfy/masters/pet_shop_raw.png
+tools/comfy/masters/pizza_place.png
+tools/comfy/masters/pizza_place_raw.png
+tools/comfy/masters/flower_shop.png
+tools/comfy/masters/flower_shop_raw.png
+tools/comfy/masters/fire_station.png
+tools/comfy/masters/fire_station_raw.png
+tools/comfy/masters/police_station.png
+tools/comfy/masters/police_station_raw.png
+tools/comfy/masters/school.png
+tools/comfy/masters/school_raw.png
+tools/comfy/masters/car_wash.png
+tools/comfy/masters/car_wash_raw.png
+tools/comfy/masters/house_red.png
+tools/comfy/masters/house_red_raw.png
+tools/comfy/masters/house_blue.png
+tools/comfy/masters/house_blue_raw.png
+tools/comfy/masters/house_green.png
+tools/comfy/masters/house_green_raw.png
+tools/comfy/masters/fountain.png
+tools/comfy/masters/fountain_raw.png
+tools/comfy/masters/playground.png
+tools/comfy/masters/playground_raw.png
+tools/comfy/masters/bench.png
+tools/comfy/masters/bench_raw.png
+tools/comfy/masters/flower_bed.png
+tools/comfy/masters/flower_bed_raw.png
+tools/comfy/masters/bus.png
+tools/comfy/masters/bus_raw.png
+tools/comfy/masters/fire_engine.png
+tools/comfy/masters/fire_engine_raw.png
+tools/comfy/masters/delivery_van.png
+tools/comfy/masters/delivery_van_raw.png
+tools/comfy/masters/garbage_truck.png
+tools/comfy/masters/garbage_truck_raw.png
+tools/comfy/masters/duck.png
+tools/comfy/masters/duck_raw.png
+tools/comfy/masters/dog.png
+tools/comfy/masters/dog_raw.png
+tools/comfy/masters/cat.png
+tools/comfy/masters/cat_raw.png
+tools/comfy/masters/bird.png
+tools/comfy/masters/bird_raw.png
+tools/comfy/masters/balloon.png
+tools/comfy/masters/balloon_raw.png

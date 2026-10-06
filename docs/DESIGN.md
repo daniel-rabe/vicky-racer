@@ -1130,3 +1130,137 @@ Godot_console.exe --path . --headless --export-release "Windows" build/windows/V
 
 Ideas parked for later are listed in
 [`ROADMAP.md`](ROADMAP.md). Touch controls remain out of scope.
+
+## 19. Free Drive: the town
+
+**TOWN** on the title screen opens Free Drive: no race, no laps, no timer, nobody to beat. The
+child drives their own car (the one equipped in the garage, in its paint) round a little town
+— and the town gets on with its day around them.
+
+![The town](screenshots/town_overview.png)
+
+![Driving in town](screenshots/town_street.png)
+
+| Piece | What it is | File |
+| --- | --- | --- |
+| Layout | A grid of 5 × 4 blocks between two-lane streets, as data: which road is left out (the park is two blocks wide), and what stands in each block | [`town/town_layout.gd`](../town/town_layout.gd) |
+| Town | Builds grass, pavements, streets, zebra crossings, buildings, the park, trees and the edge in `_ready`; sets surfaces; the traffic's map | [`town/town.gd`](../town/town.gd) |
+| Screen | The player's car, traffic, animals, coins, sky; shop signs and the all-places bonus | [`game/screens/town.gd`](../game/screens/town.gd) |
+| Traffic | A driver child for the same `car.tscn` every racer uses | [`actors/traffic/traffic_driver.gd`](../actors/traffic/traffic_driver.gd) |
+| Animals | Dogs, cats, duck families | [`actors/town/walker.gd`](../actors/town/walker.gd) |
+| Sky | Cloud shadows, hot-air balloons, flocks of birds | [`actors/town/town_sky.gd`](../actors/town/town_sky.gd) |
+| HUD | Coins, the town map, the shop sign | [`ui/town/`](../ui/town/) |
+| Checks | Network, lanes, buildings, surfaces, a minute of traffic, coins and shops | [`tests/town_test.gd`](../tests/town_test.gd) |
+
+### 19.1 The street view
+
+Every building faces down the screen: its roof seen from above, its front wall below it, like a
+picture-book town map. The camera never rotates (§5), so a front that faces down always faces
+the viewer. Shops stand along the **bottom** edge of their block, door onto the pavement of the
+road below; houses also stand along the top edge, facing their front gardens. A building's
+picture is its solid wall (less a 14 px inset), so cars bump along shop fronts as along a track
+wall.
+
+| Kind | Buildings |
+| --- | --- |
+| Shops (with a sign) | candy shop, ice cream parlour, toy shop, bakery, pet shop, pizza place, flower shop |
+| Town (with a sign) | fire station, police station, school, car wash |
+| Houses | red, blue and green family houses |
+
+### 19.2 Buildings: a sketch for Kontext
+
+FLUX-dev draws a building **isometric**, however it is asked — "top-down RPG view", "orthographic
+front view, no side walls", "flat lay" all came back at 45°
+([`mockups/town/probes/01_view_search.png`](mockups/town/probes/01_view_search.png)), which cannot
+stand on a top-down street grid. Image-to-image from a drawing in the right view was either
+still flat (denoise 0.75) or isometric again (0.88). **FLUX Kontext** keeps the layout of the
+image it edits, so each building is drawn first as a flat block sketch in the street view
+(`postprocess.building_sketch`: roof colour, wall colour, width, the front — a door between
+windows, garage doors, or an open counter) and Kontext turns it into the clay look, adding what
+the manifest's `details` asks for: a giant lollipop on the candy shop's roof, a teddy bear on the
+toy shop, a donut on the bakery, a bone on the pet shop. The manifest's buildings are ordinary
+sprites with a `sketch` and `details`, so `candidates` / `pick` / `build` work as for
+everything else; built pictures are trimmed to their edges, because a building is placed by
+them. Kontext keeps the view but not always the sketch's width (the police station came out
+narrower); that is fine, the row is spread from the built widths.
+
+The first fire station details gave plain red sheds; asking for a bell, a coiled hose, a ladder
+on the wall and "a little red fire engine peeking out of the middle door" made it read at once.
+Review sheets of every round are in [`mockups/town/probes/`](mockups/town/probes/).
+
+The town's other art is ordinary txt2img sprites (the frozen recipe, four seeds each):
+
+| Art | Pick | Note |
+| --- | --- | --- |
+| Fountain, playground, bench, flower bed | 12, 12, 12, 11 | true top-down at the first try |
+| Bus, fire engine, delivery van | 13, 11, 11 | all face **down** (windscreen and lights at the bottom), not the "up" asked for; the van has a face |
+| Garbage truck | 12 | the first prompt gave four side views; re-asked as "only its roof visible", seed 12 is seen from above, cab to the **right** |
+| Dog, cat, bird | 11, 12, 12 | most seeds drew animals standing, facing the camera; the picks are the ones seen from above (dog faces down, cat and bird up) |
+| Duck | 12 | side views twice; seed 12 of the second prompt is nearest to above |
+| Hot-air balloon | 11 | always drawn from the side. Kept: high in the sky the classic shape reads better than a striped circle, and it matches the buildings' street view |
+
+Sounds (Stable Audio, the §11.2 recipe, picked from spectrograms): **quack** 101, **woof** 103,
+**meow** 103 and **town ambience** 103, a breeze with birdsong looped quietly under the town.
+
+### 19.3 Streets and traffic
+
+Streets are a junction graph. Each road has a lane each way, driven on the **right**, 80 px from
+the centre line. `Town.lane_points(a, b)` is the line from the edge of junction *a* to the
+edge of *b*; `turn_points(a, b, c)` the line through *b*: straight on, or a curve between the
+two lanes (a quadratic through the point where they meet — tight to the right, wide to the left).
+
+A `TrafficDriver` steers at a point ahead on its line, as the AI racer does, and picks a road at
+random at every junction (never back the way it came). Before it drives into a junction it
+**reserves** it, and waits at the line until it may — one vehicle in a junction at a time, so
+nothing ever crosses another's path. It slows for what is ahead in its lane: a vehicle, the
+player, a duck. Held up by the player it toots after 2 s and every 4 s after; if the player has
+**stopped in its lane** for 3 s, it pulls out round them when the other lane is clear for 1,300 px
+and the junction is far enough off to get back in. Town driving is calm: 300–430 px/s against a
+racer's 1,100, under 200 round corners. Traffic cars get tighter low-speed steering and more grip
+(`steer_speed_ref` 150, `lateral_grip` 14) so they turn on the spot of a town corner and never
+drift, and their engines run 12 dB quieter (`CarAudio.engine_offset_db`).
+
+Two bugs found by the town test: a vehicle stopping for a junction braked *into reverse* below
+40 px/s (the car's own reverse rule) and crept back and forth; and one creeping up to the line
+could drop the last point of its lane, forget it was waiting and drive off the map. Stopping now
+brakes to a standstill and lets drag hold it, and the lane's end is kept apart from the points
+still to drive.
+
+| On the streets | How many |
+| --- | --- |
+| Cars, every car in every paint, at random | 18 |
+| Buses, delivery vans, a fire engine, a garbage truck (bigger collision boxes) | 6 |
+| Dogs and cats walking round a block on the pavement | 8 |
+| Mother ducks with three ducklings, to and fro across a zebra crossing | 4 |
+| Hot-air balloons, cloud shadows; a flock of five birds every 14–28 s | 3, 5 |
+
+Animals have no bodies: a car coming fast makes one hop aside (and call out — quack, woof,
+meow), and a horn tooted near one makes it jump. A duck family waits at the kerb until nothing
+is driving near the crossing (cars standing still are waiting for them, so they go), then
+crosses with the ducklings in a line behind, and rests on the grass on the far side. Traffic
+stops for every duck and duckling, and does not drive into a junction while its way out is a
+crossing with ducks on it — waiting there would block the junction for everyone.
+
+The duck rules came from the town test: a duck rested on the pavement with her ducklings still
+in the road behind her (traffic stood 17 s), and a truck that had already turned into a junction
+waited for ducks inside it. The test now also checks that traffic never drives over an animal
+and keeps to the right-hand lane except when overtaking.
+
+### 19.4 Things to do
+
+- **Coins** lie about the streets (36 at a time, 2 each). Driving through one banks it at once
+  (`PRO_coins_found`, saved straight away) with the coin chime; it comes back somewhere else 40 s
+  later. A minute of driving earns about what a race does, and the garage's cars are still the
+  thing to save up for.
+- **Shops**: pulling up at a shop door pops up its sign — the building's picture and name, and
+  how many kinds of place have been visited (*NEW PLACE! 4 / 11*). Visiting all eleven in one
+  drive pays a bonus of 50 coins. The car wash fills the screen with soap bubbles.
+- The **pond** is water you can drive through, slowly, with a splash.
+
+Pause has RESUME, SETTINGS and GARAGE; there is nothing to restart.
+
+### 19.5 Surfaces
+
+Roads and pavements are asphalt, lawns and the grass round the town are grass, and the ponds are
+**water** (speed × 0.45, grip × 0.5 — a new surface in `Track.SURFACES`, light spray instead of
+dust).

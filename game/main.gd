@@ -22,6 +22,8 @@ const SCREENS := {
 	&"garage": preload("res://ui/garage/garage_screen.tscn"),
 	&"tracks": preload("res://ui/track_select/track_select.tscn"),
 	&"race": preload("res://game/screens/race.tscn"),
+	# Free Drive: the open town (docs/DESIGN.md §19).
+	&"town": preload("res://game/screens/town.tscn"),
 	# Dev: the open field for tuning handling (--screen=test_drive).
 	&"test_drive": preload("res://game/screens/test_drive.tscn"),
 	&"results": preload("res://ui/results/results_screen.tscn"),

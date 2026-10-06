@@ -39,6 +39,8 @@ signal PRO_race_mode_requested(mode: StringName)
 signal PRO_track_locked(track_id: StringName)
 signal PRO_coins_changed(total: int)
 signal PRO_coins_awarded(amount: int, breakdown: Dictionary)
+## Coins picked up in Free Drive's town (docs/DESIGN.md §19): GarageManager banks them at once.
+signal PRO_coins_found(amount: int)
 signal PRO_setup_purchased(setup_id: StringName)
 signal PRO_setup_equipped(setup_id: StringName)
 signal PRO_setup_painted(setup_id: StringName, colour: StringName)
