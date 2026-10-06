@@ -214,7 +214,7 @@ func _test_track_select(manager: GarageManager) -> void:
 	var screen := _screen()
 	_check(screen.name == "TrackSelect", "RACE! in the garage opens track select (%s)" % screen.name)
 	var cards: Array = screen.get_node("%Cards").get_children()
-	_check(cards.size() == 4, "four tracks")
+	_check(cards.size() == GarageManager.TRACK_ORDER.size(), "every track has a card (%d)" % cards.size())
 	_check(cards[0].unlocked and not cards[1].unlocked, "only the first is open on a new save")
 	await _shot("track_select")
 	cards[1].pressed.emit()

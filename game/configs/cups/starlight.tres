@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CupConfig" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://game/configs/cup_config.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cups/cup_star.png" id="2_icon"]
+[ext_resource type="Script" path="res://game/configs/track_config.gd" id="3_track"]
+[ext_resource type="Resource" path="res://game/configs/tracks/track_05.tres" id="4_track_05"]
+[ext_resource type="Resource" path="res://game/configs/tracks/track_06.tres" id="5_track_06"]
+[ext_resource type="Resource" path="res://game/configs/tracks/track_07.tres" id="6_track_07"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"starlight"
+display_name = "Starlight Cup"
+icon = ExtResource("2_icon")
+tracks = Array[ExtResource("3_track")]([ExtResource("4_track_05"), ExtResource("5_track_06"), ExtResource("6_track_07")])
+points = Array[int]([10, 7, 5, 3])

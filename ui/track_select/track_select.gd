@@ -1,5 +1,5 @@
 extends Control
-## Pick a race, between the garage and a race (docs/DESIGN.md §10): four track cards (the
+## Pick a race, between the garage and a race (docs/DESIGN.md §10): a row of track cards (the
 ## last track raced focused) and, below, the cups (§12). A cup opens when the one before it
 ## has been won; the cup in progress offers CONTINUE. A locked card shakes and says which track to finish first. Choosing
 ## a track goes through EventSystem (PRO_track_select_requested), then straight to the race.
@@ -68,6 +68,15 @@ func _on_state_changed(state: Dictionary) -> void:
 	var selected: TrackCard = _cards.get(state.get("selected_track"))
 	if selected:
 		selected.grab_focus()
+		_scroll_into_view(selected)
+
+
+## The row scrolls with the focus, but not before it has been laid out once: the card focused
+## on opening (the last track raced) may be off to the right.
+func _scroll_into_view(card: Control) -> void:
+	await get_tree().process_frame
+	if is_instance_valid(card):
+		($CardsScroll as ScrollContainer).ensure_control_visible(card)
 
 
 func _on_chosen(config: TrackConfig) -> void:

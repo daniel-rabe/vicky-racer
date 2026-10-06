@@ -69,6 +69,39 @@
       "seed": 103
     },
     {
+      "id": "race_jungle",
+      "use": "Jungle Run",
+      "prompt": "bouncy tropical jungle adventure racing music for a children's cartoon video game, marimba, kalimba, bongos, congas, shaker, plucked bass, major key, energetic and playful, instrumental, 120 BPM",
+      "seconds": 64.0,
+      "bpm": 120,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_jungle.ogg",
+      "_note": "No seed picked yet: the game ships the synthesised version from synth_music.py until one is."
+    },
+    {
+      "id": "race_candy",
+      "use": "Candy Lane",
+      "prompt": "sweet bubbly candy land racing music for a children's cartoon video game, music box, glockenspiel, toy organ, hand claps, bouncy bass, major key, happy and sugary, instrumental, 132 BPM",
+      "seconds": 64.0,
+      "bpm": 132,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_candy.ogg",
+      "_note": "No seed picked yet: the game ships the synthesised version from synth_music.py until one is."
+    },
+    {
+      "id": "race_moon",
+      "use": "Moon Base",
+      "prompt": "bright space adventure racing music for a children's cartoon video game, sparkling synth arpeggios, square wave lead, soft synth strings, electronic drums, major key, wondrous and energetic, instrumental, 124 BPM",
+      "seconds": 64.0,
+      "bpm": 124,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_moon.ogg",
+      "_note": "No seed picked yet: the game ships the synthesised version from synth_music.py until one is."
+    },
+    {
       "id": "podium",
       "use": "cup podium",
       "prompt": "triumphant joyful celebration music for a children's video game award ceremony, brass fanfare, timpani, glockenspiel, marching snare drum, major key, proud and happy, instrumental, 112 BPM",

@@ -28,6 +28,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 15 | Two players, split screen | Racing with a parent or sibling on the same sofa | L |
 | 16 | Time trial and ghosts | Something to come back to once the cups are won | M |
 | 17 | Release build | A real Windows build that starts from a desktop icon | S |
+| 18 | Three more tracks in new themes | More places to race once the two cups are won | M |
 
 ---
 
@@ -228,6 +229,33 @@ this machine; the other-machine check is the first item of the playtest. Changes
 
 **Done when:** the exported `.exe` runs from a clean folder on another machine, with no ComfyUI
 and no editor installed.
+
+---
+
+## Phase 18 — Three more tracks in new themes ✅ done
+
+Three tracks, each in a theme of its own, and a third cup (DESIGN.md §7, §7.3, §7.5, §12, §13):
+
+| Track | Theme | Ground / patches | What it adds |
+| --- | --- | --- | --- |
+| **Jungle Run** | jungle | jungle / mud | the twistiest track: S-bends, a hairpin and a loop over a log bridge |
+| **Candy Lane** | candy | pink icing / chocolate | a heart-shaped circuit with a boost pad on each long diagonal |
+| **Moon Base** | moon | moon dust (low grip) / craters | a loop-the-loop over a bridge, two boost pads |
+
+- **The Starlight Cup** (Jungle Run, Candy Lane, Moon Base) opens when the Snowflake Cup is won.
+- **Six new surfaces**, all data in `Track.SURFACES`: jungle and mud, candy and chocolate, moon dust
+  and craters. Moon dust grips least of any ground (0.45), so Moon Base slides wide off the road.
+- **PICK A RACE scrolls**: seven cards and three cups no longer fit across the screen, so both rows
+  scroll sideways with the focus and the last track raced is scrolled into view.
+- **Made without ComfyUI.** The props, wall props and the star cup icon are drawn by
+  `tools/layouts/prop_art.py` in the clay look, and the three race pieces are synthesised by
+  `tools/comfy/synth_music.py`. Both can be swapped for generated versions file for file; the
+  music prompts are already in the manifest, unseeded.
+- Developer ghosts recorded for the three tracks; EXPLORER now needs all seven tracks finished
+  (a sticker already earned is kept).
+- Balance: a struggling child (0.7 pace) reaches the podium on every new track in the Starter
+  car; in the Ice-Cream Van they finish 3rd on Jungle Run and Moon Base and 4th, 2.2 s back, on
+  Candy Lane.
 
 ---
 

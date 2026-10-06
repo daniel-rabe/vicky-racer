@@ -23,7 +23,8 @@ import build_tileset as bt  # noqa: E402
 
 THEMES = json.loads((HERE / "themes.json").read_text(encoding="utf-8"))
 GROUND = json.loads((ROOT / "tools" / "comfy" / "pipeline.json").read_text(encoding="utf-8"))["ground"]
-RIMS = {"sand": (201, 162, 74), "grass": (78, 143, 46), "ice": (127, 191, 216)}
+RIMS = {"sand": (201, 162, 74), "grass": (78, 143, 46), "ice": (127, 191, 216), "mud": (94, 58, 30),
+        "chocolate": (92, 52, 32), "crater": (131, 122, 162)}
 
 
 def fill_path(name: str) -> Path:

@@ -322,8 +322,8 @@ write into those fields. The same car scene is used for all four racers.
 
 ## 7. Tracks
 
-Four tracks, raced in this order; each opens when the one before it has been finished, in any
-place (§7.6).
+Seven tracks in seven themes, raced in this order; each opens when the one before it has been
+finished, in any place (§7.6).
 
 | # | Track | Theme | What it adds | Lap (AI) | Layout | Built |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -331,6 +331,9 @@ place (§7.6).
 | 2 | **Sunny Beach** | sand, dunes, palms, parasols, beach balls | a wide (3.5-tile) flowing loop: the easy one, no crossing | 20,000 px, ~22 s | [`track_02_layout.png`](mockups/track_02_layout.png) | [`screenshots/track_beach.png`](screenshots/track_beach.png) |
 | 3 | **Snowy Peak** | snow, ice ponds, pine trees, snowmen | a **mountain bridge** over its own hairpin loop, **ice on the road** at three bends | 28,000 px, ~31 s | [`track_03_layout.png`](mockups/track_03_layout.png) | [`screenshots/track_snow.png`](screenshots/track_snow.png) |
 | 4 | **Toy Town** | lawns, sandpits, toy houses, traffic cones | a **flyover** across the main street, city corners, three **boost pads** | 25,600 px, ~27 s | [`track_04_layout.png`](mockups/track_04_layout.png) | [`screenshots/track_town.png`](screenshots/track_town.png) |
+| 5 | **Jungle Run** | jungle, mud puddles, jungle trees, flowers, boulders | the twistiest: S-bends, a hairpin, a loop over a **log bridge** across its own back straight | 25,100 px, ~28 s | [`track_05_layout.png`](mockups/track_05_layout.png) | [`screenshots/track_jungle.png`](screenshots/track_jungle.png) |
+| 6 | **Candy Lane** | pink icing, chocolate puddles, lollipops, donuts, cupcakes, gumdrops | a **heart**: two long diagonals with a **boost pad** each, the dip and the tip | 20,400 px, ~22 s | [`track_06_layout.png`](mockups/track_06_layout.png) | [`screenshots/track_candy.png`](screenshots/track_candy.png) |
+| 7 | **Moon Base** | moon dust (low grip), craters, rockets, dish aerials, moon rocks | a **loop-the-loop** over a bridge, two **boost pads**, slippery ground off the road | 26,500 px, ~28 s | [`track_07_layout.png`](mockups/track_07_layout.png) | [`screenshots/track_moon.png`](screenshots/track_moon.png) |
 
 Three laps take 65–95 s. The tracks were first built at about half this length (~15 s laps) and
 lengthened on request, with bridges where the road crosses itself (§7.7).
@@ -393,6 +396,7 @@ on the road and boost pads. To change a track, or add one: edit or add its spec,
 ```bash
 python tools/layouts/track_layout.py            # diagrams + points for every spec
 python tools/layouts/theme_art.py               # theme textures (only when themes change)
+python tools/layouts/prop_art.py                # drawn props: Jungle, Candy, Moon (only when they change)
 Godot_v4.7.1-stable_win64_console.exe --path . --headless res://track/build/build_track.tscn
 ```
 
@@ -424,6 +428,12 @@ unaware of tracks.
 | Beach | 0.6 | 0.65 | Sunny Beach's ground: softer than a sand trap, it is the easy track |
 | Snow | 0.6 | 0.55 | Snowy Peak's ground |
 | **Ice** | **1.0** | **0.35** | Full speed, almost no grip — drift heaven, never a stop. Ponds off the road, and spans *on* it |
+| Jungle | 0.55 | 0.7 | Jungle Run's ground: like grass |
+| Mud | 0.4 | 0.55 | Jungle Run's puddles: a sand trap that also slides |
+| Candy | 0.6 | 0.65 | Candy Lane's icing: soft, like the beach |
+| Chocolate | 0.45 | 0.6 | Candy Lane's puddles: gooey |
+| Moon dust | 0.6 | 0.45 | Moon Base's ground: floaty, the car slides wide |
+| Crater | 0.45 | 0.45 | Moon Base's craters: deeper dust |
 
 On the road, a span of ice (`Track.ice_spans`, fractions of a lap) overrides asphalt; it is drawn
 as translucent sheet ice so the road still reads as road. Each car's off-road ability (§4.2)
@@ -459,6 +469,16 @@ Town shares the meadow's tiles. Meadow's outputs are byte-identical to the origi
 | Sunny Beach | beach / grass dunes | blue / white | beach balls | palm tree, parasol, beach ball |
 | Snowy Peak | snow / ice | red / white | tyres | pine tree, snowman |
 | Toy Town | grass / sand | yellow / blue | traffic cones | toy house, traffic cone, tree |
+| Jungle Run | jungle / mud | orange / yellow | boulders | jungle tree, flower, boulder (drawn by script) |
+| Candy Lane | candy / chocolate | mint / white | gumdrops | lollipop, donut, cupcake, gumdrop (drawn by script) |
+| Moon Base | moon dust / crater | charcoal / yellow | moon rocks | rocket, dish aerial, moon rock (drawn by script) |
+
+The last three themes' props ([`mockups/props_jungle_candy_moon.png`](mockups/props_jungle_candy_moon.png))
+were not generated: ComfyUI was not to hand when they were added. [`tools/layouts/prop_art.py`](../tools/layouts/prop_art.py)
+draws each one as a stack of flat shapes, gives every shape a pillowy height from its own blurred
+outline and lights the height field from the top left, which gets close to the generated props'
+soft clay look; the Starlight Cup's star icon is drawn the same way. Seeded, so a rebuild is
+byte-identical. Their FLUX versions can replace them file for file.
 
 Two props needed a second prompt: "seen from directly above" still drew the snowman and the house
 from the front, like stickers standing up. Describing the shape from above instead ("a big round
@@ -468,7 +488,7 @@ door visible") gave true top-down pictures that sit in the world like everything
 ### 7.6 Track select and unlocking
 
 RACE! in the garage opens **PICK A TRACK** ([`screenshots/track_select.png`](screenshots/track_select.png)):
-four cards with the track's shape drawn from its racing line, its name, and the best lap, NEW! or —
+a scrolling row of cards (the focused one kept in view) with the track's shape drawn from its racing line, its name, and the best lap, NEW! or —
 while locked — a padlock and "FINISH <the track before>". A track opens when the one before it has
 been finished **in any place**: a child is never stuck behind a race they cannot win. The choice is
 saved (`selected_track` in the profile; older saves start on the first track), RACE AGAIN on the
@@ -698,7 +718,7 @@ them all out ([`mockups/candidates/paint_shop.png`](mockups/candidates/paint_sho
 | Settings | Same spec — SOUND, MUSIC, FULLSCREEN, AUTO GO, STEER HELP, OPPONENTS; one focusable row each, ← → change it. Over the title and over the pause menu. Built: [`screenshots/settings.png`](screenshots/settings.png) |
 | Race HUD | [`mockups/hud_layout.png`](mockups/hud_layout.png) — position, lap, timers, speed bar, minimap, countdown. Built: [`screenshots/race.png`](screenshots/race.png), [`screenshots/race_countdown.png`](screenshots/race_countdown.png). The countdown sits above screen centre rather than on it, so it never hides the player's own car |
 | Garage | [`mockups/garage_layout.png`](mockups/garage_layout.png) — balance, cards in pages of 3 × 2 (Q / E or the shoulder buttons, or moving off the edge of a page, turns it; `< 1 / 2 >` above the cards), preview with Grip / Slide / Speed bars and, for owned cars, paint swatches. Built: [`screenshots/garage.png`](screenshots/garage.png) |
-| Pick a race | RACE / TIME TRIAL switch (§16), four track cards (§7.6) and two cup cards (§12). ← → ↑ ↓ choose, A races, B back to the garage. Built: [`screenshots/pick_a_race.png`](screenshots/pick_a_race.png) |
+| Pick a race | RACE / TIME TRIAL switch (§16), a row of track cards (§7.6) and a row of cup cards (§12), each scrolling sideways with the focus. ← → ↑ ↓ choose, A races, B back to the garage. Built: [`screenshots/pick_a_race.png`](screenshots/pick_a_race.png) |
 | Standings, podium | §12 |
 | Two players | §15 — 2 PLAYERS on the title: the join screen, then PICK A RACE and a split-screen race. Built: [`screenshots/join.png`](screenshots/join.png), [`screenshots/split_screen.png`](screenshots/split_screen.png) |
 | Trophy shelf | §14 — the trophy button right of PLAY on the title. Built: [`screenshots/shelf.png`](screenshots/shelf.png) |
@@ -811,6 +831,7 @@ A **cup** is three races in a row with points, standings and a trophy at the end
 | --- | --- | --- |
 | **Sunshine Cup** | Meadow Loop, Sunny Beach, Toy Town | from the start |
 | **Snowflake Cup** | Toy Town, Meadow Loop, Snowy Peak | when the Sunshine Cup has been **won** (1st overall) |
+| **Starlight Cup** | Jungle Run, Candy Lane, Moon Base | when the Snowflake Cup has been **won** |
 
 - **Points** 10 / 7 / 5 / 3 per race, so everyone scores; a tie goes to whoever did better in the
   last race.
@@ -846,7 +867,8 @@ standings, trophy), on which `GarageManager` pays the bonus and records the trop
 
 The art — gold trophy, ribbon, sun and snowflake icons — was generated and picked from four
 candidates each; silver and bronze are Kontext recolours of the gold one, so all three trophies
-share one shape. Reverse tracks (in the roadmap) were left out: four tracks give two cups of three.
+share one shape. Reverse tracks (in the roadmap) were left out: four tracks gave two cups of three,
+and the three themes added later (§7) make the third, the Starlight Cup, with a drawn star icon (§7.5).
 
 ## 13. Music
 
@@ -862,6 +884,9 @@ Ogg Vorbis (about 6 MB in all).
 | `race_beach` — steel drums, surf guitar, calypso | Sunny Beach | 126 BPM, 16 bars |
 | `race_town` — toy piano, marimba | Toy Town | 136 BPM, 16 bars |
 | `race_snow` — sleigh bells, celesta, pizzicato | Snowy Peak | 128 BPM, 16 bars |
+| `race_jungle` — marimba, kalimba, bongos *(synthesised)* | Jungle Run | 120 BPM, 16 bars |
+| `race_candy` — music box, glockenspiel, toy organ *(synthesised)* | Candy Lane | 132 BPM, 16 bars |
+| `race_moon` — synth arpeggios, square lead, lydian *(synthesised)* | Moon Base | 124 BPM, 16 bars |
 | `standings` — a 3-second marimba sting, then `menu` | cup standings | once |
 | `podium` — brass fanfare, timpani | cup podium (replaces the finish fanfare there) | 112 BPM, 8 bars after a 2-bar fanfare |
 
@@ -882,6 +907,15 @@ across the seam as played must be no larger than the music's own 95th-percentile
 to frame; `build` refuses a piece that fails. Every pick passes (0.24–0.87). Candidates are also
 scored on tempo held, how well the loop matches and clipped samples; the scores and spectrograms
 are on the sheets in [`mockups/music/`](mockups/music/).
+
+**Synthesised, for the three later themes.** `race_jungle`, `race_candy` and `race_moon` were added
+without ComfyUI to hand, so [`tools/comfy/synth_music.py`](../tools/comfy/synth_music.py) writes
+them note by note: a four-chord progression, a bass line, drums and a lead built from the chords'
+notes as a 4-bar phrase repeated A A' B A'', on small synthesised instruments (marimba, music box,
+square lead and so on), levelled like the generated pieces. The 16 bars are rendered with what
+rings past the end wrapped round to the start, so each loop is seamless from 0 s. They are
+simpler than the generated pieces; their Stable Audio prompts are already in the manifest without
+a seed (so `build` skips them), and `candidates`, `pick` and `build` replace them like any piece.
 
 **Picked by ear.** `generate_music.py listen` writes MP3 previews of every candidate — lead-in, one
 loop, then the jump back and 8 more seconds so the seam can be heard — and a page to compare them.

@@ -179,12 +179,14 @@ func _test_first_win_and_coins() -> void:
 
 func _test_every_track_and_all_cars() -> void:
 	print("every track, every car")
+	var rest := GarageManager.TRACK_ORDER.slice(2)  # track_01 and track_02 are finished above
+	for id: StringName in rest.slice(0, rest.size() - 1):
+		EventSystem.RAC_race_started.emit()
+		_finish(3, id)
+	_check(_count(&"every_track") == 0, "every track but one: not yet")
 	EventSystem.RAC_race_started.emit()
-	_finish(3, &"track_03")
-	_check(_count(&"every_track") == 0, "three tracks of four: not yet")
-	EventSystem.RAC_race_started.emit()
-	_finish(3, &"track_04")
-	_check(_count(&"every_track") == 1, "the fourth track earns EXPLORER")
+	_finish(3, rest[-1])
+	_check(_count(&"every_track") == 1, "the last track earns EXPLORER")
 	_garage.profile.coins = 100000
 	var ids := GarageManager.SETUP_ORDER.filter(func(id: StringName) -> bool: return not _garage.owns(id))
 	for id: StringName in ids.slice(0, ids.size() - 1):
