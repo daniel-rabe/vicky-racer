@@ -285,6 +285,17 @@ An open-world mode beside the races (DESIGN.md §19): **TOWN** on the title scre
   it washes the car — foam, soap bubbles, a spray-and-brushes sound — and the car comes out
   gleaming and **sparkles** with twinkling stars for 25 seconds.
 
+## Phase 20 — Animated cars 🚧 in progress
+
+Plan: [CAR_ANIMATION_PLAN.md](CAR_ANIMATION_PLAN.md).
+
+- **20a, rolling wheels ✅ done:** tread slides over the tyres already drawn into every body
+  (a shader, no new art), backwards in reverse, rear wheels locked on the handbrake, smeared at
+  top speed, ghosts included. Tyre positions for all 70 bodies found by
+  `tools/comfy/wheel_rects.py`; the Bubble Car's tyres hardly show, so it has none.
+- 20b, steering front wheels — optional, only if 20a is not enough.
+- Extras — body lean when drifting, a squash on wall hits, flickering rocket flames.
+
 ---
 
 ## Phase 20 — Boats: racing on water ✅ done

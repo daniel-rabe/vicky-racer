@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://actors/car/car.gd" id="1_car"]
 [ext_resource type="Resource" path="res://game/configs/cars/base_car.tres" id="2_base"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://art/cars/car_red.png" id="4_body"]
 [ext_resource type="Script" path="res://actors/car/car_effects.gd" id="5_effects"]
 [ext_resource type="Script" path="res://actors/car/car_audio.gd" id="6_audio"]
+[ext_resource type="Script" path="res://actors/car/rolling_tread.gd" id="7_tread"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(110, 60)
@@ -27,3 +28,6 @@ script = ExtResource("5_effects")
 
 [node name="Audio" type="Node2D" parent="."]
 script = ExtResource("6_audio")
+
+[node name="Tread" type="Node" parent="."]
+script = ExtResource("7_tread")

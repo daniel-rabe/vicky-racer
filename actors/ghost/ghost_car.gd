@@ -7,7 +7,8 @@ extends Sprite2D
 ##
 ## Placed in _physics_process, so physics interpolation smooths it like a real car. Drawn at
 ## the car's own layer (above a bridge deck while on it) but before the cars in the tree, so a
-## real car always covers it.
+## real car always covers it. Its wheels roll like a real car's (RollingTread), at the speed
+## between samples.
 
 const FADE_SECONDS := 0.4
 
@@ -23,10 +24,15 @@ var tint := Color(1, 1, 1, 0.45)
 var tick := 0
 var running := false
 
+var _tread: RollingTread
+
 
 func _ready() -> void:
 	modulate = tint
 	visible = false
+	_tread = RollingTread.new()
+	_tread.sprite = self
+	add_child(_tread)
 
 
 func start() -> void:
@@ -40,7 +46,7 @@ func start() -> void:
 	reset_physics_interpolation()
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if not running:
 		return
 	tick += 1
@@ -48,7 +54,10 @@ func _physics_process(_delta: float) -> void:
 		running = false
 		create_tween().tween_property(self, "modulate:a", 0.0, FADE_SECONDS)
 		return
+	var before := global_position
 	_place()
+	var moved := (global_position - before).dot(Vector2.RIGHT.rotated(global_rotation))
+	_tread.advance(moved, moved / delta)
 
 
 func _place() -> void:
