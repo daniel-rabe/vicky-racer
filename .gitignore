@@ -136,3 +136,4 @@ tools/comfy/masters/island_*
 !tools/comfy/masters/sfx/dolphin_105.flac
 # The island sounds' listening page (MP3 previews, rebuilt by tools/comfy/listen_island.py).
 docs/mockups/sfx/listen_island/
+.vscode/settings.json
