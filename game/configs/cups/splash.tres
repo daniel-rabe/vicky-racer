@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CupConfig" load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://game/configs/cup_config.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://art/ui/cards/boats/duck.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://art/ui/cups/cup_splash.png" id="2_icon"]
 [ext_resource type="Script" path="res://game/configs/track_config.gd" id="3_track"]
 [ext_resource type="Resource" path="res://game/configs/tracks/boat_01.tres" id="4_boat_01"]
 [ext_resource type="Resource" path="res://game/configs/tracks/boat_02.tres" id="5_boat_02"]
