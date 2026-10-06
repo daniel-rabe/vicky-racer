@@ -1103,6 +1103,13 @@ Godot_console.exe --path . --headless --export-release "Windows" build/windows/V
   approved assets, nothing newly generated: the icon is the red car racing up a road on a grass
   tile ([`art/ui/release/icon.png`](../art/ui/release/icon.png), `.ico` from 16 to 256 px); the boot
   splash is VICKY RACER in the title's font and colours over the car, shown at least 1.2 s.
+- **Linux and macOS** are built only by the release workflow
+  ([`.github/workflows/release.yml`](../.github/workflows/release.yml)), which has the full template
+  set: Linux x86-64 (`VickyRacer.x86_64`, pack embedded) and a universal macOS `VickyRacer.app`
+  (Intel and Apple silicon, so `import_etc2_astc` is on), pushed to itch.io as the `linux` and
+  `mac` channels next to `web` and `windows`. The Mac app is ad-hoc signed, not notarised (that
+  needs a paid Apple developer account): on first launch macOS refuses it, and the player opens it
+  from System Settings > Privacy & Security > Open Anyway.
 - **Boot polish:** the window is titled *Vicky Racer*. The project's internal name stays
   `VickyRacer`, because it names the save folder (`%APPDATA%/Godot/app_userdata/VickyRacer`) and
   renaming it would lose every save. Fullscreen was already remembered; now the window's size

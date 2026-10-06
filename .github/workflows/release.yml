@@ -42,10 +42,13 @@ jobs:
 
       - name: Export
         run: |
-          mkdir -p build/web build/windows
+          mkdir -p build/web build/windows build/linux build/macos
           godot --headless --export-release "Web" build/web/index.html
           godot --headless --export-release "Windows" build/windows/VickyRacer.exe
+          godot --headless --export-release "Linux" build/linux/VickyRacer.x86_64
+          godot --headless --export-release "macOS" build/macos/VickyRacer.zip
           test -f build/web/index.pck && test -f build/windows/VickyRacer.exe
+          test -x build/linux/VickyRacer.x86_64 && test -f build/macos/VickyRacer.zip
 
       - name: Push to itch.io
         env:
@@ -55,3 +58,6 @@ jobs:
           version=$(sed -n 's/^config\/version="\(.*\)"/\1/p' project.godot)
           butler push build/web "$ITCH_GAME:web" --userversion "$version"
           butler push build/windows "$ITCH_GAME:windows" --userversion "$version"
+          butler push build/linux "$ITCH_GAME:linux" --userversion "$version"
+          # butler unpacks the zip, so players get VickyRacer.app rather than a zip in a zip.
+          butler push build/macos/VickyRacer.zip "$ITCH_GAME:mac" --userversion "$version"
