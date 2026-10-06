@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="TrackTheme" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://game/configs/track_theme.gd" id="1_script"]
+[ext_resource type="TileSet" path="res://track/themes/ground_lagoon.tres" id="2_tiles"]
+[ext_resource type="Texture2D" path="res://art/tiles/water/lagoon/channel.png" id="3_channel"]
+[ext_resource type="Texture2D" path="res://art/tiles/water/lagoon/buoys.png" id="4_buoys"]
+[ext_resource type="Texture2D" path="res://art/props/beach/palm_tree.png" id="5_wall"]
+[ext_resource type="Resource" path="res://game/configs/music/race_lagoon.tres" id="6_music"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"lagoon"
+display_name = "Pirate Cove"
+ground_tiles = ExtResource("2_tiles")
+base_surface = &"lagoon_water"
+patch_surface = &"sandbank"
+asphalt = ExtResource("3_channel")
+kerb = ExtResource("4_buoys")
+wall_prop = ExtResource("5_wall")
+wall_spacing = 150.0
+card_colour = Color(0.16, 0.61, 0.8, 1)
+music = ExtResource("6_music")
+water = true
+road_surface = &"deep_water"

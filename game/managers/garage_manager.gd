@@ -6,6 +6,11 @@ extends Node
 ## Screens talk to it only through EventSystem: PRO_state_requested / PRO_buy_requested /
 ## PRO_equip_requested in, PRO_state_changed (the whole state) and feedback signals out.
 ## Every change is saved straight away.
+##
+## Cars and boats (docs/DESIGN.md §20): one wallet, one list of what is owned, but each kind
+## has its own roster, equipped vehicle, tracks and selected track. vehicle_kind (CARS or BOATS
+## on the title) says which the screens are showing: the state's setups, tracks, equipped and
+## selected_track are that kind's, so the garage, PICK A RACE and the race need not know.
 
 const SETUP_DIR := "res://game/configs/setups/"
 ## Display order in the garage, six to a page; prices rise left to right, top to bottom.
@@ -17,6 +22,11 @@ const SETUP_ORDER: Array[StringName] = [&"starter", &"grippy", &"icecream", &"sl
 const TRACK_ORDER: Array[StringName] = [&"track_01", &"track_02", &"track_03", &"track_04", &"track_05", &"track_06",
 	&"track_07"]
 const TRACK_DIR := "res://game/configs/tracks/"
+const BOAT_DIR := "res://game/configs/boats/"
+## The Boat Dock's order, and the boat courses'. The first course is open from the start.
+const BOAT_SETUP_ORDER: Array[StringName] = [&"speedboat", &"jetski", &"duck", &"swan", &"hovercraft", &"tugboat",
+	&"pirate", &"banana_boat", &"steamer"]
+const BOAT_TRACK_ORDER: Array[StringName] = [&"boat_01", &"boat_02", &"boat_03", &"boat_04"]
 
 @export var economy: EconomyConfig
 @export var save_path := SaveGame.DEFAULT_PATH
@@ -30,6 +40,8 @@ var last_race := {}
 var last_cup := {}
 ## &"race" or &"time_trial", for the next race (PICK A RACE's switch). Not saved.
 var race_mode: StringName = &"race"
+## &"car" or &"boat": which the screens are showing (the title's CARS / BOATS). Not saved.
+var vehicle_kind: StringName = &"car"
 
 
 func _enter_tree() -> void:
@@ -52,6 +64,10 @@ func _enter_tree() -> void:
 		EventSystem.PRO_coins_changed.emit(profile.coins)
 		_commit())
 	EventSystem.RAC_time_trial_finished.connect(_on_time_trial_finished)
+	EventSystem.PRO_vehicle_kind_requested.connect(func(kind: StringName) -> void:
+		if kind in [&"car", &"boat"] and kind != vehicle_kind:
+			vehicle_kind = kind
+			_publish_state())
 	EventSystem.PRO_race_mode_requested.connect(func(mode: StringName) -> void:
 		if mode in [&"race", &"time_trial"]:
 			race_mode = mode
@@ -61,11 +77,15 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	for id in SETUP_ORDER:
 		setups[id] = load(SETUP_DIR + String(id) + ".tres")
-	for id in TRACK_ORDER:
+	for id in BOAT_SETUP_ORDER:
+		setups[id] = load(BOAT_DIR + String(id) + ".tres")
+	for id in TRACK_ORDER + BOAT_TRACK_ORDER:
 		tracks[id] = load(TRACK_DIR + String(id) + ".tres")
 	profile = SaveGame.load_from(save_path, economy.starting_coins)
 	if not is_unlocked(profile.selected_track):
 		profile.selected_track = TRACK_ORDER[0]
+	if not is_unlocked(profile.selected_course):
+		profile.selected_course = BOAT_TRACK_ORDER[0]
 
 
 func owns(id: StringName) -> bool:
@@ -76,8 +96,21 @@ func can_afford(id: StringName) -> bool:
 	return profile.coins >= setups[id].price
 
 
-func equipped_setup() -> DriftSetup:
-	return setups[profile.equipped_setup]
+## The equipped car, or boat (`kind`; default: the kind on show).
+func equipped_setup(kind := &"") -> DriftSetup:
+	return setups[_equipped_id(kind if kind != &"" else vehicle_kind)]
+
+
+func _equipped_id(kind: StringName) -> StringName:
+	return profile.equipped_boat if kind == &"boat" else profile.equipped_setup
+
+
+func _setup_order(kind: StringName) -> Array[StringName]:
+	return BOAT_SETUP_ORDER if kind == &"boat" else SETUP_ORDER
+
+
+func _track_order(kind: StringName) -> Array[StringName]:
+	return BOAT_TRACK_ORDER if kind == &"boat" else TRACK_ORDER
 
 
 func buy(id: StringName) -> void:
@@ -97,18 +130,26 @@ func buy(id: StringName) -> void:
 func equip(id: StringName) -> void:
 	if not owns(id):
 		return
-	profile.equipped_setup = id
+	if setups[id].kind == &"boat":
+		profile.equipped_boat = id
+	else:
+		profile.equipped_setup = id
 	EventSystem.PRO_setup_equipped.emit(id)
 	_commit()
 
 
 func is_unlocked(track_id: StringName) -> bool:
-	var i := TRACK_ORDER.find(track_id)
-	return i == 0 or (i > 0 and TRACK_ORDER[i - 1] in profile.completed_tracks)
+	var order := BOAT_TRACK_ORDER if track_id in BOAT_TRACK_ORDER else TRACK_ORDER
+	var i := order.find(track_id)
+	return i == 0 or (i > 0 and order[i - 1] in profile.completed_tracks)
 
 
 func selected_track() -> TrackConfig:
-	return tracks[profile.selected_track]
+	return tracks[_selected_id(vehicle_kind)]
+
+
+func _selected_id(kind: StringName) -> StringName:
+	return profile.selected_course if kind == &"boat" else profile.selected_track
 
 
 ## Choose the track for the next race; refused (PRO_track_locked) while it is locked.
@@ -118,7 +159,10 @@ func select_track(track_id: StringName) -> void:
 	if not is_unlocked(track_id):
 		EventSystem.PRO_track_locked.emit(track_id)
 		return
-	profile.selected_track = track_id
+	if track_id in BOAT_TRACK_ORDER:
+		profile.selected_course = track_id
+	else:
+		profile.selected_track = track_id
 	_commit()
 
 
@@ -220,21 +264,32 @@ func _commit() -> void:
 	_publish_state()
 
 
+func _track_entries(kind: StringName) -> Array:
+	return _track_order(kind).map(func(id: StringName) -> Dictionary:
+		return {"config": tracks[id], "unlocked": is_unlocked(id), "best_lap": profile.best_laps.get(id, 0.0),
+			"completed": id in profile.completed_tracks})
+
+
 func _publish_state() -> void:
+	var kind := vehicle_kind
 	EventSystem.PRO_state_changed.emit({
 		"coins": profile.coins,
 		"owned": profile.owned_setups.duplicate(),
-		"equipped": profile.equipped_setup,
+		"vehicle_kind": kind,
+		"equipped": _equipped_id(kind),
+		"equipped_car": profile.equipped_setup,
+		"equipped_boat": profile.equipped_boat,
 		"paint": profile.paint.duplicate(),
-		"selected_track": profile.selected_track,
+		"selected_track": _selected_id(kind),
 		"cup_progress": profile.cup_progress.duplicate(true),
 		"trophies": profile.trophies.duplicate(),
 		"stickers": profile.stickers.duplicate(),
 		"last_cup": last_cup,
-		"tracks": TRACK_ORDER.map(func(id: StringName) -> Dictionary:
-			return {"config": tracks[id], "unlocked": is_unlocked(id), "best_lap": profile.best_laps.get(id, 0.0),
-				"completed": id in profile.completed_tracks}),
-		"setups": SETUP_ORDER.map(func(id: StringName) -> DriftSetup: return setups[id]),
+		"tracks": _track_entries(kind),
+		"setups": _setup_order(kind).map(func(id: StringName) -> DriftSetup: return setups[id]),
+		# The cars' own lists whatever is on show (stickers: every car, every track).
+		"car_tracks": _track_entries(&"car"),
+		"car_setups": SETUP_ORDER.map(func(id: StringName) -> DriftSetup: return setups[id]),
 		"best_laps": profile.best_laps.duplicate(),
 		"last_race": last_race,
 		"race_mode": race_mode,

@@ -18,6 +18,7 @@ extends Node2D
 ##   --overview    frame the whole track in one view, for checking the layout
 
 const HUD_SCENE := preload("res://ui/hud/race_hud.tscn")
+const WAVES := preload("res://art/sfx/wave_ambience.wav")
 const THEME := preload("res://ui/theme/vicky_theme.tres")
 const DEVELOPER_GHOSTS := "res://game/configs/ghosts/%s.res"
 const OWN_GHOST_TINT := Color(1, 1, 1, 0.45)
@@ -79,7 +80,10 @@ func _ready() -> void:
 	world.add_child(track)
 	world.move_child(track, 0)
 	if track.theme:
-		EventSystem.UI_music_requested.emit(track.theme.music)
+		var takes := track.theme.music_takes
+		EventSystem.UI_music_requested.emit(takes.pick_random() if not takes.is_empty() else track.theme.music)
+		if track.theme.water:
+			_add_waves()
 	EventSystem.UI_settings_requested.emit()  # likewise: sets _difficulty_id
 	var difficulty := DifficultyConfig.named(_difficulty_id)
 	var args := OS.get_cmdline_user_args()
@@ -171,6 +175,20 @@ func _on_race_over() -> void:
 		EventSystem.RAC_time_trial_finished.emit(config.track_id, _player_setup.id, player["lap_times"],
 			recorder.best)
 	EventSystem.UI_screen_requested.emit(&"results")
+
+
+## A boat course (docs/DESIGN.md §20.6): small waves lapping, quietly, under the race.
+func _add_waves() -> void:
+	if not SoundManager.audible():
+		return
+	var player := AudioStreamPlayer.new()
+	player.name = "Waves"
+	player.stream = WAVES
+	player.bus = &"SFX"
+	player.volume_db = -16.0
+	add_child(player)
+	player.finished.connect(player.play)
+	player.play()
 
 
 ## Who drives: the player in their equipped car, or both players of a two-player game in

@@ -72,6 +72,8 @@ func _action(action: StringName) -> StringName:
 
 func _helped(steer: float) -> float:
 	var pos := car.global_position
+	if track.branch_of(car) >= 0:
+		return steer  # on an alternative path (docs/DESIGN.md §20.3): help would pull it back
 	var here := track.progress_of(car)
 	var limit := track.road_half_width - EDGE_MARGIN
 	var lane := clampf(track.side_of_line(pos, here), -limit, limit)

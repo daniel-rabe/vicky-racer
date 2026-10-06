@@ -3,8 +3,9 @@ extends Control
 ## device by pressing its button: A on a gamepad, SPACE for the left half of the keyboard
 ## (W A S D), ENTER for the right half (the arrow keys). The first to press is player 1.
 ## A joined player picks a car from the ones the garage owns with their own left and right;
-## O or Y switches the AI opponents on and off; once both are in, either one's join button
-## again goes on to PICK A RACE. B / Escape goes back to the title, which ends the game.
+## O or Y switches the AI opponents on and off, V or X switches between racing cars and boats
+## (docs/DESIGN.md §20.5); once both are in, either one's join button again goes on to PICK A
+## RACE. B / Escape goes back to the title, which ends the game.
 ##
 ## The screen reads raw events rather than the ui_ actions: which device pressed matters here.
 
@@ -26,15 +27,17 @@ var _stick_latched := {}  # pad id -> true while the stick is held over
 
 
 func _enter_tree() -> void:
-	EventSystem.PRO_state_changed.connect(func(state: Dictionary) -> void: _garage = state)
+	EventSystem.PRO_state_changed.connect(func(state: Dictionary) -> void:
+		_garage = state
+		_owned.clear()
+		for setup: DriftSetup in state.get("setups", []):
+			if setup.id in state.get("owned", []):
+				_owned.append(setup))
 	EventSystem.PLY_state_changed.connect(_on_party_changed)
 
 
 func _ready() -> void:
 	EventSystem.PRO_state_requested.emit()
-	for setup: DriftSetup in _garage.get("setups", []):
-		if setup.id in _garage.get("owned", []):
-			_owned.append(setup)
 	var background := ColorRect.new()
 	background.color = BACKGROUND
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -79,7 +82,9 @@ func _refresh() -> void:
 	var players := _players()
 	for i in 2:
 		_fill_card(_cards[i], i, players[i] if i < players.size() else {})
-	_opponents.text = "OPPONENTS:  %s     ( O / Y )" % ("ON" if _party.get("opponents", true) else "OFF")
+	_opponents.text = "%s     ( V / X )          OPPONENTS:  %s     ( O / Y )" % [
+		"BOATS" if _garage.get("vehicle_kind", &"car") == &"boat" else "CARS",
+		"ON" if _party.get("opponents", true) else "OFF"]
 	_hints.text = "BOTH IN?  PRESS YOUR BUTTON AGAIN TO RACE!     ESC / B  BACK" if players.size() == 2 \
 		else "GAMEPAD: A     KEYBOARD: SPACE (W A S D)  OR  ENTER (ARROWS)     ESC / B  BACK"
 
@@ -156,7 +161,24 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		EventSystem.PLY_opponents_requested.emit(not _party.get("opponents", true))
 		return
+	if (event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_V) \
+			or (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_X):
+		get_viewport().set_input_as_handled()
+		_switch_kind()
+		return
 	_pick_car(event)
+
+
+## Cars or boats: every player who has joined moves into the matching vehicle of the other kind
+## (the equipped one for player 1, the next one owned for player 2), so nobody drives a car
+## on the water.
+func _switch_kind() -> void:
+	var kind := &"car" if _garage.get("vehicle_kind", &"car") == &"boat" else &"boat"
+	EventSystem.PRO_vehicle_kind_requested.emit(kind)  # answered at once: _garage and _owned follow
+	var players := _players()
+	for index in players.size():
+		EventSystem.PLY_car_requested.emit(index, _default_car(players.slice(0, index)))
+	_refresh()
 
 
 ## The device whose join button this event is, or {}.

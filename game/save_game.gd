@@ -11,15 +11,23 @@ const DEFAULT_PATH := "user://vicky_racer.cfg"
 ## 2 added [paint]. 3: the tracks were rebuilt longer (with bridges), so best laps saved
 ## before then are dropped — they were set on different tracks. Older files otherwise load
 ## as they are and are written back as the current version.
-const SCHEMA_VERSION := 3
-const READABLE_VERSIONS: Array[int] = [1, 2, 3]
+## 4 added the boats (docs/DESIGN.md §20): the equipped boat and the selected boat course;
+## older files load with the Speedboat owned and the first course selected.
+const SCHEMA_VERSION := 4
+const READABLE_VERSIONS: Array[int] = [1, 2, 3, 4]
 ## Below this version, saved best laps belong to the old, shorter tracks.
 const TRACKS_REBUILT_VERSION := 3
 const STARTER_SETUP := &"starter"
+const STARTER_BOAT := &"speedboat"
+const FIRST_COURSE := &"boat_01"
 
 var coins := 0
-var owned_setups: Array[StringName] = [STARTER_SETUP]
+## Cars and boats both: their ids never clash (the boat is &"banana_boat", the car &"banana").
+var owned_setups: Array[StringName] = [STARTER_SETUP, STARTER_BOAT]
 var equipped_setup: StringName = STARTER_SETUP
+var equipped_boat: StringName = STARTER_BOAT
+## The boat course the next boat race is on.
+var selected_course: StringName = FIRST_COURSE
 ## track id -> best lap in seconds
 var best_laps := {}
 var completed_tracks: Array[StringName] = []
@@ -63,8 +71,13 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 	profile.owned_setups = _string_names(file.get_value("profile", "owned_setups", []))
 	if STARTER_SETUP not in profile.owned_setups:
 		profile.owned_setups.push_front(STARTER_SETUP)
+	if STARTER_BOAT not in profile.owned_setups:
+		profile.owned_setups.append(STARTER_BOAT)
 	var equipped := StringName(str(file.get_value("profile", "equipped_setup", STARTER_SETUP)))
 	profile.equipped_setup = equipped if equipped in profile.owned_setups else STARTER_SETUP
+	var boat := StringName(str(file.get_value("profile", "equipped_boat", STARTER_BOAT)))
+	profile.equipped_boat = boat if boat in profile.owned_setups else STARTER_BOAT
+	profile.selected_course = StringName(str(file.get_value("profile", "selected_course", FIRST_COURSE)))
 	profile.completed_tracks = _string_names(file.get_value("profile", "completed_tracks", []))
 	profile.selected_track = StringName(str(file.get_value("profile", "selected_track", "track_01")))
 	var progress: Variant = file.get_value("cup", "progress", {})
@@ -102,6 +115,8 @@ func save_to(path := DEFAULT_PATH) -> Error:
 	file.set_value("profile", "equipped_setup", String(equipped_setup))
 	file.set_value("profile", "completed_tracks", PackedStringArray(completed_tracks))
 	file.set_value("profile", "selected_track", String(selected_track))
+	file.set_value("profile", "equipped_boat", String(equipped_boat))
+	file.set_value("profile", "selected_course", String(selected_course))
 	for track in best_laps:
 		file.set_value("best_laps", String(track), best_laps[track])
 	for id in paint:

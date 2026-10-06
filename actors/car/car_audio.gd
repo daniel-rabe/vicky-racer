@@ -49,8 +49,8 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	_engine = _player(ENGINE, ENGINE_DB)
-	_skid = _player(SKID, SILENT_DB)
+	_engine = _player(_engine_stream(), ENGINE_DB)
+	_skid = _player(_skid_stream(), SILENT_DB)
 	_bump = _player(BUMP, -4.0)
 	_horn = _player(HORN, -2.0)
 	_wash = _player(null, -3.0)
@@ -78,7 +78,7 @@ func _physics_process(delta: float) -> void:
 
 func _on_wall_hit(hit_car: Node, impact_speed: float) -> void:
 	if hit_car == car and SoundManager.audible():
-		_bump.stream = BUMP
+		_bump.stream = _bump_stream()
 		_bump.volume_db = lerpf(-14.0, -3.0, clampf(impact_speed / 800.0, 0.0, 1.0))
 		_bump.pitch_scale = randf_range(0.9, 1.1)
 		_bump.play()
@@ -101,6 +101,20 @@ func _on_washed(washed: Node) -> void:
 	if ResourceLoader.exists(SPARKLE) and is_inside_tree():
 		_wash.stream = load(SPARKLE)
 		_wash.play()
+
+
+## The setup's own engine (a boat's motor, jet or fan), or the toy car engine.
+func _engine_stream() -> AudioStream:
+	return car.setup.engine_sound if car.setup and car.setup.engine_sound else ENGINE
+
+
+## What plays while sliding, and on a bump. A boat (BoatAudio) has water for both.
+func _skid_stream() -> AudioStream:
+	return SKID
+
+
+func _bump_stream() -> AudioStream:
+	return BUMP
 
 
 func _player(stream: AudioStream, volume_db: float) -> AudioStreamPlayer2D:

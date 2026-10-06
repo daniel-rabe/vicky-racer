@@ -8,6 +8,9 @@ const TRACK := preload("res://game/configs/tracks/track_01.tres")
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
 const RED := preload("res://game/configs/setups/starter.tres")
+const CARS_PICTURE := preload("res://art/cars/car_red.png")
+const BOATS_PICTURE := preload("res://art/boats/speedboat.png")
+const BOATS_COLOUR := Color(0.12, 0.64, 0.78)
 const HINTS_KEYBOARD := "ENTER  CHOOSE"
 const HINTS_GAMEPAD := "A  CHOOSE"
 ## Skills and lanes for the four attract-mode cars, red first.
@@ -37,16 +40,26 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_build_attract_mode()
-	_play.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"garage"))
+	# PLAY is two picture buttons (docs/DESIGN.md §20.5): CARS, and BOATS beside it.
+	var boats := _split_play()
+	_play.pressed.connect(func() -> void:
+		EventSystem.PRO_vehicle_kind_requested.emit(&"car")
+		EventSystem.UI_screen_requested.emit(&"garage"))
+	boats.pressed.connect(func() -> void:
+		EventSystem.PRO_vehicle_kind_requested.emit(&"boat")
+		EventSystem.UI_screen_requested.emit(&"garage"))
 	_shelf.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"shelf"))
 	# Free Drive: no race, just the town to drive round (docs/DESIGN.md §19).
 	_town.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"town"))
 	_two_players.pressed.connect(func() -> void:
 		EventSystem.PLY_two_player_requested.emit()
 		EventSystem.UI_screen_requested.emit(&"join"))
-	# The shelf button stands beside the menu: right of PLAY goes to it, left comes back.
-	_play.focus_neighbor_right = _play.get_path_to(_shelf)
-	_shelf.focus_neighbor_left = _shelf.get_path_to(_play)
+	# The shelf button stands beside the menu: right of BOATS goes to it, left comes back.
+	_play.focus_neighbor_right = _play.get_path_to(boats)
+	boats.focus_neighbor_left = boats.get_path_to(_play)
+	boats.focus_neighbor_right = boats.get_path_to(_shelf)
+	boats.focus_neighbor_bottom = boats.get_path_to(_town)
+	_shelf.focus_neighbor_left = _shelf.get_path_to(boats)
 	_shelf.focus_neighbor_bottom = _shelf.get_path_to(_town)
 	_settings_button.pressed.connect(func() -> void:
 		_menu.visible = false
@@ -67,6 +80,43 @@ func _ready() -> void:
 	var bob := create_tween().set_loops().set_trans(Tween.TRANS_SINE)
 	bob.tween_property(_logo, "position:y", _logo.position.y - 6.0, 1.0)
 	bob.tween_property(_logo, "position:y", _logo.position.y + 6.0, 1.0)
+
+
+## PLAY becomes CARS, and BOATS stands beside it in the same row: two picture buttons half
+## PLAY's width, each with its vehicle above the word. Returns BOATS.
+func _split_play() -> Button:
+	var row := HBoxContainer.new()
+	row.name = "PlayRow"
+	row.add_theme_constant_override("separation", 12)
+	_menu.add_child(row)
+	_menu.move_child(row, _play.get_index())
+	_play.reparent(row)
+	var boats := Button.new()
+	boats.name = "Boats"
+	row.add_child(boats)
+	var pictures := {_play: CARS_PICTURE, boats: BOATS_PICTURE}
+	for button: Button in pictures:
+		button.text = "CARS" if button == _play else "BOATS"
+		button.custom_minimum_size = Vector2(194, 124)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.theme_type_variation = &"RaceButton"
+		button.add_theme_font_size_override("font_size", 30)
+		button.icon = pictures[button]
+		button.expand_icon = true
+		button.add_theme_constant_override("icon_max_width", 96)
+		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	boats.add_theme_stylebox_override("normal", _tinted(_play.get_theme_stylebox("normal"), BOATS_COLOUR))
+	boats.add_theme_stylebox_override("hover", _tinted(_play.get_theme_stylebox("hover"), BOATS_COLOUR.lightened(0.1)))
+	return boats
+
+
+static func _tinted(box: StyleBox, colour: Color) -> StyleBox:
+	if not box is StyleBoxFlat:
+		return box
+	var copy: StyleBoxFlat = box.duplicate()
+	copy.bg_color = colour
+	return copy
 
 
 ## The version, small in the corner, so a parent can tell which build is installed.

@@ -12,9 +12,13 @@ const LINE_WIDTH := 8.0
 const DOT_RADIUS := 10.0
 const PLAYER_DOT_RADIUS := 13.0
 const LINE_POINTS := 200
+const BRANCH_COLOUR := Color(1, 1, 1, 0.6)
 
 var _line: PackedVector2Array = []   # racing line, world coordinates
 var _map_line: PackedVector2Array = []  # the same, in this control's coordinates, closed
+## A boat course's alternative paths (docs/DESIGN.md §20.3), world and map coordinates.
+var _branches: Array[PackedVector2Array] = []
+var _map_branches: Array[PackedVector2Array] = []
 ## Opponents first and the player last, so the player's dot is drawn on top.
 var _draw_order: Array[Dictionary] = []
 var _bounds := Rect2()
@@ -30,9 +34,13 @@ func setup(track: Track, racers: Array[Dictionary]) -> void:
 	_line.clear()
 	for i in LINE_POINTS:
 		_line.append(track.racing_line.to_global(curve.sample_baked(length * i / LINE_POINTS)))
+	_branches.assign(track.branch_lines)
 	_bounds = Rect2(_line[0], Vector2.ZERO)
 	for p in _line:
 		_bounds = _bounds.expand(p)
+	for branch in _branches:
+		for p in branch:
+			_bounds = _bounds.expand(p)
 	_fit()
 
 
@@ -56,6 +64,12 @@ func _fit() -> void:
 	for i in _line.size():
 		_map_line[i] = _to_map(_line[i])
 	_map_line[_line.size()] = _map_line[0]
+	_map_branches.clear()
+	for branch in _branches:
+		var mapped := PackedVector2Array()
+		for p in branch:
+			mapped.append(_to_map(p))
+		_map_branches.append(mapped)
 
 
 func _to_map(world: Vector2) -> Vector2:
@@ -65,6 +79,8 @@ func _to_map(world: Vector2) -> Vector2:
 func _draw() -> void:
 	if _map_line.is_empty():
 		return
+	for branch in _map_branches:  # thinner, under the main line
+		draw_polyline(branch, BRANCH_COLOUR, LINE_WIDTH * 0.6, true)
 	draw_polyline(_map_line, Color.WHITE, LINE_WIDTH, true)
 	for r in _draw_order:
 		var at := _to_map(r["car"].global_position)

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="DriftSetup" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cards/boats/duck.png" id="2_card"]
+[ext_resource type="Texture2D" path="res://art/boats/duck.png" id="3_body"]
+[ext_resource type="AudioStream" path="res://art/sfx/quack.wav" id="4_horn"]
+[ext_resource type="AudioStream" path="res://art/sfx/motor_loop.wav" id="5_engine"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"duck"
+kind = &"boat"
+display_name = "Rubber Duck"
+card_art = ExtResource("2_card")
+body = ExtResource("3_body")
+price = 150
+lateral_grip_mult = 1.5
+handbrake_grip_mult = 1.3
+engine_power_mult = 0.95
+max_speed_mult = 0.92
+steer_rate_mult = 1.05
+skid_colour = Color(0, 0, 0, 0)
+engine_pitch = 1.15
+horn = ExtResource("4_horn")
+engine_sound = ExtResource("5_engine")
+ignores_land = false
+bar_grip = 0.85
+bar_slide = 0.25
+bar_speed = 0.4

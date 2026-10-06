@@ -100,10 +100,10 @@ func _on_garage_state(state: Dictionary) -> void:
 	for id: StringName in state.get("stickers", []):
 		if id not in earned:
 			earned.append(id)
-	var setups: Array = state.get("setups", [])
+	var setups: Array = state.get("car_setups", state.get("setups", []))
 	var owned: Array = state.get("owned", [])
 	if not setups.is_empty() and setups.all(func(s: DriftSetup) -> bool: return s.id in owned):
 		earn(&"all_cars")
-	var tracks: Array = state.get("tracks", [])
+	var tracks: Array = state.get("car_tracks", state.get("tracks", []))
 	if not tracks.is_empty() and tracks.all(func(t: Dictionary) -> bool: return t["completed"]):
 		earn(&"every_track")

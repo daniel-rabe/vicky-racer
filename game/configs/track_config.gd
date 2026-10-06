@@ -6,6 +6,9 @@ extends Resource
 @export var track_id := &"track_01"
 @export var display_name := ""
 @export var track_scene: PackedScene
+## &"car" or &"boat" (docs/DESIGN.md §20), and the scene every racer is made from; null = the car.
+@export var vehicle_kind := &"car"
+@export var vehicle_scene: PackedScene
 @export var laps := 3
 ## Grid slot for the player, 1 = front. Starting third gives something to chase.
 @export var player_slot := 3

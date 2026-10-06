@@ -29,6 +29,9 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 16 | Time trial and ghosts | Something to come back to once the cups are won | M |
 | 17 | Release build | A real Windows build that starts from a desktop icon | S |
 | 18 | Three more tracks in new themes | More places to race once the two cups are won | M |
+| 19 | Free Drive: the town | Somewhere to just drive, with nobody to beat | L |
+| 20 | Boats: racing on water | A second racing game with its own boats, courses and cup | L |
+| 21 | The island: harbour and ocean in Free Drive | Take the boat out from the town, round the island | M |
 
 ---
 
@@ -281,6 +284,51 @@ An open-world mode beside the races (DESIGN.md §19): **TOWN** on the title scre
 - **The car wash** (asked for after the first build): driving onto the wet blue pad in front of
   it washes the car — foam, soap bubbles, a spray-and-brushes sound — and the car comes out
   gleaming and **sparkles** with twinkling stars for 25 seconds.
+
+---
+
+## Phase 20 — Boats: racing on water ✅ done
+
+A second racing game beside the cars (DESIGN.md §20), asked for on 2026-10-06. It has boats
+of different kinds, water courses, its own Boat Dock, and the Splash Cup. Coins and stickers
+are shared with the cars.
+
+- **Gate A: design and mockups.**
+  - DESIGN §20.
+  - Four course layouts, `boat_01`–`boat_04`, drawn by `track_layout.py` from water themes.
+    They are about 1.5× the car tracks, each with two alternative paths (branches).
+  - The water look probe and theme sheet: `water_probe.py`.
+  - The Boat Dock and title layouts.
+  - Everything is in `docs/mockups/boat/` and `docs/mockups/boat_0N_layout.png`.
+- **Gate B: art.**
+  - Nine boat sprites and their paint jobs, using the frozen recipe.
+  - Water theme tiles, buoys and the channel texture.
+  - Props: ramp, logs, rocks, reeds, lily pads, shipwreck, lemon slices, bridges.
+  - Motor, splash, wave and horn sounds.
+  - Two music pieces.
+- **Gate C: code** (built 2026-10-06; DESIGN.md §20.7–20.8). All boat courses raced headless
+  with every kind of boat, and the whole suite passes.
+  - `Boat extends Car`.
+  - `vehicle_scene` on `TrackConfig`.
+  - Water surfaces, currents, ramps and logs in the track builder and `Track`.
+  - The Boat Dock as a mode of the garage screen.
+  - CARS / BOATS on the title.
+  - The Splash Cup.
+  - Save schema 4.
+  - `tests/boat_test.gd`, plus the whole suite to prove the cars are unchanged.
+  - A balance pass.
+
+## Phase 21 — The island: harbour and ocean in Free Drive (planned)
+
+The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats and water).
+
+- The ring of trees at the town's edge gives way to a beach, a shoreline and an ocean all round.
+- A **harbour** building on the coast has a pier. Driving onto its pad swaps the car for the
+  boat equipped in the Boat Dock. Sailing back to the mooring swaps back.
+- At sea: coin trails, a lighthouse, islets with a ramp, buoys, dolphins and seagulls, and
+  sailboats.
+- The shoreline stops cars at the water and boats at the land.
+- It goes through the same three gates, with DESIGN §21 written at Gate A.
 
 ---
 

@@ -1304,3 +1304,206 @@ traffic is not.
 Found while checking it: quitting within the first second of a screen (dev screenshots) left
 MusicManager's fade-in tween calling into a music player the fade-out had already freed; the
 tween now checks the player is still there.
+
+---
+
+## 20. Boats: racing on water
+
+*Built (Phase 20). Designed and approved through the three gates: mockups, then art, then code.*
+
+**BOATS** on the title screen is a second racing game beside the cars. It has its own boats in
+its own **Boat Dock**, four water courses and the **Splash Cup**, and works with 2 PLAYERS
+and time trial. Coins are shared, so a race on water pays into the same wallet as one on
+the road, and the shelf collects stickers from both.
+
+![Jungle River](screenshots/boat_river.png)
+
+| Piece | What it is | File |
+| --- | --- | --- |
+| Boat | `class_name Boat extends Car`: the car's driver contract, surfaces, boost, levels and signals, with its own glide, bounce, bobbing, currents and jumps | [`actors/boat/boat.gd`](../actors/boat/boat.gd) |
+| Boat scene | Same node layout as `car.tscn`, a capsule hull, a shadow for jumps | [`actors/boat/boat.tscn`](../actors/boat/boat.tscn) |
+| Wake and sound | Foam V, churn, spray, splash ring; motor, wake, bump, whoosh and splash | [`boat_effects.gd`](../actors/boat/boat_effects.gd), [`boat_audio.gd`](../actors/boat/boat_audio.gd) |
+| Roster | Nine `DriftSetup`s with `kind = &"boat"`, on `base_boat.tres` | [`game/configs/boats/`](../game/configs/boats/) |
+| Courses | Spec, then points, then scene, exactly as for tracks (§7.2), with a water theme; `Track` measures branches and pushes currents | [`tools/layouts/tracks/boat_0N.json`](../tools/layouts/tracks/), [`track/track.gd`](../track/track.gd) |
+| Logs | Floating logs drifting to and fro across the channel | [`actors/water/drifting_log.gd`](../actors/water/drifting_log.gd) |
+| Look probe | The water at race scale, and the four water themes | [`tools/layouts/water_probe.py`](../tools/layouts/water_probe.py) |
+| Checks | A boat is a Car; glide; banks and the hovercraft; currents; ramps; branch progress; the garage's two kinds; v3 saves; paints. Full races: `race_test -- --track=boat_0N --setup=<boat>` | [`tests/boat_test.gd`](../tests/boat_test.gd) |
+
+### 20.1 How a boat handles
+
+A boat uses the same velocity model as a car (§4). Different numbers make it feel like water.
+These are the starting values, to be tuned in the balance pass:
+
+| | Car | Boat | Why |
+| --- | --- | --- | --- |
+| `forward_drag` | 0.6 | 0.35 | Let go of the throttle and a boat glides on |
+| `lateral_grip` | 9.0 | 4.0 | Turns carry the boat wide, like a long gentle drift |
+| `engine_power` | 1400 | 1150 | Pulls away a little softer |
+| `max_speed` | 1100 | 1050 | About the same, because the channel is wider |
+| `wall_speed_scrub` | 0.15 | 0.08 | Shores, buoys and other boats **bounce** you off softly instead of stopping you |
+
+- **Never a spin-out.** Steering still fades in with speed, as in §4. The minimum grip clamp
+  (`MIN_LATERAL_GRIP`) still applies, so no boat can be made undrivable.
+- **Bobbing.** The sprite rocks a few degrees and dips gently, faster at speed. This is purely
+  visual; the collision shape never moves.
+
+### 20.2 Water, banks, currents, ramps
+
+A boat course is a race track whose **road is a channel of deep water** (§7.2). The theme
+says so with `road_surface`. Everything off the channel is **shallows**, and the theme's patches
+are **banks**:
+
+| Surface | Speed | Grip | Where |
+| --- | --- | --- | --- |
+| deep water | 1.0 | 1.0 | the channel, the darker water with the pale lip |
+| shallows | 0.6 | 0.8 | everywhere off the channel; each theme has its own colour, but all handle the same |
+| bank (sand, mud, icing) | 0.35 | 0.6 | the theme's patches: islands, sandbanks, the shortcut on Pirate Cove |
+
+- **Hovercraft** (`ignores_land`) skim the shallows and banks at full speed. That is their
+  trick: on Pirate Cove they can take the sandbank shortcut.
+- **Currents** are spans of the lap, given like ice spans (`current_spans`: start, length,
+  strength). Inside one, every boat is pushed along the racing line at up to 260 px/s, which
+  makes a river's straight feel fast. They are drawn as white chevrons on the water.
+- **Ramps** are wooden wedges in the channel that reuse the boost-pad machinery. Hitting one
+  gives a small boost and **airborne** for about 0.6 s:
+  - the sprite grows by up to 25 % and a shadow drops below it;
+  - boats in the air pass over other boats and ignore surfaces;
+  - landing throws up a splash and a sound.
+
+  Steering stays live in the air, so a jump never takes control away.
+- **Fizz pads** on Lemonade Lake are boost pads (§7.3) in lemonade colours.
+- **Obstacles are bumpers, never crashes.**
+  - Buoys mark the tight bends, where cars have kerbs.
+  - Rocks stand in the shallows.
+  - Logs drift slowly to and fro across the channel along a short path.
+
+  All of them bounce a boat away gently (`wall_speed_scrub` 0.08).
+- **Bridges** over a river are scenery: drawn above the boats, with a shadow, never solid.
+- The **shore** at the map edge is the wall (§7.2), lined with the theme's wall prop (reeds,
+  palms, candy).
+
+### 20.3 The courses
+
+Four courses make the **Splash Cup**. The first boat cup is open from the start. Inside the
+boat cups, the rule from §12 holds: the next cup opens when the previous one is **won**.
+
+The courses are about **1.5× the size of the car tracks** (84×54 to 108×58 tiles, against
+64×40), with a 4.5–5 tile channel. Every course has **two alternative paths**:
+
+| Course | Map | Main channel | Alternative paths | Lap |
+| --- | --- | --- | --- | --- |
+| **Duck Pond** (pond: green shore, reeds, lily pads; sandbanks) | 84×54 | the easy one: a wide kidney loop round an island with a duck house, one ramp | **Reed Run**: a narrow reedy channel over the top instead of the dip (37 tiles for 40). **Duck Island**: round the far side of an islet on a gentle current (29 for 23) | ~28 s |
+| **Jungle River** (river; mud banks) | 108×58 | two currents, drifting logs on the side, two bridges overhead | **Rapids**: a narrow fast-current run along the top, with two logs drifting across it (45 for 48). **Hidden Lagoon**: a calm wide loop below the middle hump (46 for 51) | ~38 s |
+| **Pirate Cove** (lagoon; sandbanks) | 92×62 | a long winding cove, a ramp, and a sandbank shortcut across a hairpin (hovercraft only) | **Shipwreck Passage**: through the wreck island on a current, with a ramp in the middle (46 for 37). **Smuggler's Gap**: a tight gap between rocks that skips the top hairpin (14 for 38), the daring one | ~47 s |
+| **Lemonade Lake** (lemonade; pink icing banks) | 96×60 | one ramp, three fizz pads, lemon slices and ice cubes | **Fizzy Falls**: across the top with two ramps, skipping the V (35 for 41). **Straw Slide**: along the right edge on a current (34 for 31) | ~35 s |
+
+Lap times are estimates at the AI's average car speed. Races are 3 laps, apart from Pirate Cove
+(2 laps, about 1½ minutes), so no race runs much over two minutes.
+
+**How the alternative paths work.**
+- A branch is in the course spec as `branches`: where it leaves and rejoins the racing line
+  (`from_near` / `to_near`), its own control points, its width, and optionally a current and ramps.
+- `track_layout.py` draws it, measures it against the stretch it bypasses, and keeps the finish
+  and the checkpoint off any stretch a branch skips. It warns if a branch comes too close to
+  the main channel.
+- In the game, a boat on a branch has its progress mapped onto the bypassed stretch of lap, in
+  proportion to how far along the branch it is. Laps, positions, the minimap, gates and
+  rubber-banding need nothing new.
+- AI boats choose a branch now and then, more often the higher their skill, so the child sees
+  rivals take the other way. Smuggler's Gap is only for the most skilled AI.
+- **Each path is a trade, not a free win:**
+  - shorter paths are narrower, or have rocks and logs;
+  - longer paths carry a current or a ramp;
+  - Smuggler's Gap is the one real shortcut, threaded between rocks.
+
+![Duck Pond](mockups/boat_01_layout.png)
+![Jungle River](mockups/boat_02_layout.png)
+![Pirate Cove](mockups/boat_03_layout.png)
+![Lemonade Lake](mockups/boat_04_layout.png)
+
+![The four water themes](mockups/boat/02_water_themes.png)
+
+The water is made in the same way as every other ground (§7.5), as flat procedural fills in
+`pipeline.json` `ground`: `pond_water`, `pond_deep`, `sandbank`, `river_water`, `river_deep`,
+`lagoon_water`, `lagoon_deep`, `lemonade` and `lemonade_deep`. The water fills have no
+speckles; speckles read as gravel on water. A theme with `"water": true` in `themes.json`
+names its channel fill as `road`, and its kerb colours become the buoys.
+
+### 20.4 The boats
+
+The roster is nine boats (the bathtub was dropped). The bars in the dock are GRIP, **GLIDE** (in place of SLIDE)
+and SPEED. Prices sit beside the cars' (100–1000):
+
+| Boat | Kind | Character | Price |
+| --- | --- | --- | --- |
+| **Speedboat** | speedboat | the all-rounder, the starter boat | free |
+| **Jet Ski** | jet ski | small and nimble, turns sharpest, light, bounces furthest | 100 |
+| **Rubber Duck** | fun | grippy and steady, the easiest boat, quacks for a horn | 150 |
+| **Swan Pedalo** | fun | slow to pull away, very grippy, honks | 250 |
+| **Hovercraft** | hovercraft | slidey, full speed over shallows and banks | 300 |
+| **Tugboat** | fun | heavy, pushes other boats aside, toots | 300 |
+| **Pirate Ship** | fun | big and steady, fast on the straights, "boom" horn | 400 |
+| **Banana Boat** | fun | long and fast, glides wide | 500 |
+| **Paddle Steamer** | fun | the top boat: fastest, wheels churning, chuff-chuff | 600 |
+
+Each boat is a FLUX sprite made with the frozen recipe (§11.1), 4 candidates and one pick.
+Each gets six paint jobs as Kontext recolours, as in the paint shop (§9.3). Opponents pick from
+the roster in the same way as car opponents (§8).
+
+### 20.5 Screens
+
+![Boat Dock](mockups/boat/03_boat_dock_layout.png)
+
+- **Title:** PLAY splits into two picture buttons, **CARS** and **BOATS**, so the menu keeps
+  its height. CARS is focused first, as PLAY was. 2 PLAYERS asks "cars or boats" on the join
+  screen. ![Title](mockups/boat/04_title_boats.png)
+- **Pick a race:** the same screen. It shows the boat courses and boat cups when BOATS was
+  chosen.
+- **Boat Dock:** the garage screen (§9) in water colours, with the boat roster, GLIDE and SAIL!.
+- **HUD, results, podium, pause:** unchanged.
+
+### 20.6 Effects and sound
+
+- **Wake:** a V of foam spreading behind every boat, plus a churned strip right behind the
+  motor. It is longer at speed, and drawn on the water under the boats as the skid marks are.
+- **Spray** comes off the outside of a turn when gliding wide. It replaces the drift smoke.
+- **Splash** on landing a jump and on bumping a bank.
+- **Sounds** use Stable Audio with the §11.2 recipe, picked from spectrograms:
+  - motor loops for speedboat, jet ski and hovercraft, pitched by speed;
+  - splash and ramp whoosh;
+  - gentle wave ambience under the race;
+  - horns for the fun boats.
+- **Music:** two new pieces, river and lagoon. Duck Pond and Lemonade Lake reuse the meadow
+  and candy pieces.
+
+### 20.7 Under the hood
+
+- `DriftSetup` gains `kind` (`car` / `boat`) and `ignores_land`. A boat's config is
+  `base_boat.tres` with the setup's multipliers applied (`CarConfig.with_setup`).
+- `TrackConfig` gains `vehicle_scene`. `RacerSpawner` spawns that scene, not a fixed car scene.
+- `TrackTheme` gains `road_surface`. `Track.surface_at` reads it, and also reads
+  `current_spans`, ramps and logs from the points JSON.
+- `GarageManager` keeps owned, equipped and paint state per kind, with one coin balance.
+- The save goes to schema 4 (`owned_boats`, `equipped_boat`, `boat_paint`) and migrates from 3.
+- Because `Boat` **is a** `Car`, the race, HUD, minimap, ghosts, split screen and AI drive it
+  unchanged.
+
+### 20.8 What building it taught
+
+- **A current moves the water, not the boat.** Pushing the boat along the current did little to a
+  boat lying across it: its sideways grip ate the push. Grip and drag now work on the boat's
+  motion *through the water* (velocity less the current), so any boat is carried along.
+- **Progress on a branch is a blend.** Near its ends a branch runs beside the racing line, which
+  measures a racer well; in the middle only the branch's own measure (in proportion to the
+  stretch it skips) makes sense. The weight eases over 700 px of each end, the line's search is
+  anchored at the nearer junction (Smuggler's Gap passes between two stretches of the line, and
+  the search hopped between them), a racer keeps to a branch it is on except at its ends, and
+  progress glides at most 60 px a frame. The race test's "progress never jumped" caught all of it.
+- **The AI on a branch** follows the branch's line and lets go of it 120 px before its end; the
+  first build held on past the end and circled the junction.
+- Art lessons (Gate B): FLUX drew the tugboat, pirate ship and paddle steamer side-on; re-prompting
+  with only what is seen from above fixed two; the pirate ship stayed three-quarter whatever was
+  tried (Kontext from the speedboat, Kontext from a flat sketch), and the picked one is mirrored
+  rather than turned, or it would sail upside down. The splash and the ramp take-off were cut
+  from the approved wake and wave recordings (`derive_sfx.py`): Stable Audio's one-shot water
+  sounded like wind.

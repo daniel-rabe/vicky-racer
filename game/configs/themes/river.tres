@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="TrackTheme" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://game/configs/track_theme.gd" id="1_script"]
+[ext_resource type="TileSet" path="res://track/themes/ground_river.tres" id="2_tiles"]
+[ext_resource type="Texture2D" path="res://art/tiles/water/river/channel.png" id="3_channel"]
+[ext_resource type="Texture2D" path="res://art/tiles/water/river/buoys.png" id="4_buoys"]
+[ext_resource type="Texture2D" path="res://art/props/water/reeds.png" id="5_wall"]
+[ext_resource type="Resource" path="res://game/configs/music/race_river.tres" id="6_music"]
+[ext_resource type="Resource" path="res://game/configs/music/race_river_2.tres" id="7_music"]
+[ext_resource type="Resource" path="res://game/configs/music/race_river_3.tres" id="8_music"]
+[ext_resource type="Script" path="res://game/configs/music_piece.gd" id="9_piece"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"river"
+display_name = "Jungle River"
+ground_tiles = ExtResource("2_tiles")
+base_surface = &"river_water"
+patch_surface = &"mud"
+asphalt = ExtResource("3_channel")
+kerb = ExtResource("4_buoys")
+wall_prop = ExtResource("5_wall")
+wall_spacing = 96.0
+card_colour = Color(0.21, 0.48, 0.53, 1)
+music = ExtResource("6_music")
+water = true
+road_surface = &"deep_water"
+music_takes = Array[ExtResource("9_piece")]([ExtResource("6_music"), ExtResource("7_music"), ExtResource("8_music")])

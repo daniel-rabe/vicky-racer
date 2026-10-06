@@ -12,6 +12,8 @@ const LAYER_WORLD := 1
 const LAYER_CARS_GROUND := 2
 const LAYER_CARS_BRIDGE := 4
 const LAYER_RAILINGS := 8
+## A boat in the air off a ramp (Boat): only the gates see it, so it sails over the others.
+const LAYER_AIRBORNE := 16
 ## Cars on a bridge draw above its deck (Track.DECK_Z).
 const BRIDGE_Z := 2
 

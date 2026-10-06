@@ -21,3 +21,12 @@ extends Resource
 @export var card_colour := Color(0.36, 0.73, 0.29)
 ## Played during the race (docs/DESIGN.md §13).
 @export var music: MusicPiece
+
+@export_group("Water (boat courses)")
+## A boat course (docs/DESIGN.md §20): `asphalt` is the channel's deep water and `kerb` its
+## buoys; the channel gets a pale lip instead of the road's dark outline, and no lane dashes.
+@export var water := false
+## What a racer in the channel drives on: asphalt for a road, deep_water for a channel.
+@export var road_surface := &"asphalt"
+## More than one take of the race music: one is picked at random each race.
+@export var music_takes: Array[MusicPiece] = []

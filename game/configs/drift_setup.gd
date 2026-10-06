@@ -5,6 +5,8 @@ extends Resource
 ## (docs/DESIGN.md §4.2).
 
 @export var id: StringName
+## &"car" or &"boat" (docs/DESIGN.md §20): which garage sells it and which races it drives in.
+@export var kind := &"car"
 @export var display_name := ""
 @export var card_art: Texture2D
 ## What the player's car looks like with this setup equipped (128 x 72, facing +X).
@@ -31,6 +33,10 @@ extends Resource
 @export var horn: AudioStream
 ## Red and blue lights flash on the roof while drifting (the Police Car).
 @export var siren := false
+## The engine loop; null = the toy car engine. Boats have motors, a jet and a fan.
+@export var engine_sound: AudioStream
+## A hovercraft rides over shallows and banks at full speed (Boat).
+@export var ignores_land := false
 
 @export_group("Garage bars")
 ## Authored, not computed: they describe how the setup *feels*, 0–1.

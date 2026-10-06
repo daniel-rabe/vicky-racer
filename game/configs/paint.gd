@@ -18,14 +18,16 @@ const SWATCHES := {
 }
 
 
-## The car's race body in this paint (128 x 72, facing +X).
+## The car's race body in this paint (128 x 72, facing +X). Boats keep theirs in art/boats/paint/.
 static func body(setup: DriftSetup, colour: StringName) -> Texture2D:
-	return _painted("res://art/cars/paint/%s_%s.png", setup, colour, setup.body)
+	var pattern := "res://art/boats/paint/%s_%s.png" if setup.kind == &"boat" else "res://art/cars/paint/%s_%s.png"
+	return _painted(pattern, setup, colour, setup.body)
 
 
 ## The car's garage card art in this paint.
 static func card(setup: DriftSetup, colour: StringName) -> Texture2D:
-	return _painted("res://art/ui/cards/paint/%s_%s.png", setup, colour, setup.card_art)
+	var pattern := "res://art/ui/cards/boats/paint/%s_%s.png" if setup.kind == &"boat" else "res://art/ui/cards/paint/%s_%s.png"
+	return _painted(pattern, setup, colour, setup.card_art)
 
 
 ## The colour after `colour` in the cycle, wrapping round to the original.

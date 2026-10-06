@@ -5,6 +5,9 @@ extends Control
 ## moving left or right off the edge of one. X / C paints the focused car the next colour.
 ## Everything goes through EventSystem: it asks GarageManager for the state and sends
 ## buy / equip / paint requests; it never touches the manager itself.
+##
+## With BOATS chosen on the title it is the Boat Dock (docs/DESIGN.md §20.5): the same screen
+## in water colours, the boats instead of the cars, GLIDE for SLIDE and SAIL! for RACE!.
 
 const CARD_SCENE := preload("res://ui/garage/setup_card.tscn")
 const MESSAGE_SECONDS := 2.2
@@ -14,6 +17,7 @@ const PAGE_SIZE := 6
 const COLUMNS := 3
 const SWATCH := 44
 const YELLOW := Color(1, 0.824, 0.247)
+const DOCK_BACKGROUND := Color(0.063, 0.165, 0.227)
 
 var _state := {}
 var _cards := {}  # setup id -> SetupCard
@@ -60,6 +64,11 @@ func _ready() -> void:
 
 func _on_state_changed(state: Dictionary) -> void:
 	_state = state
+	if state.get("vehicle_kind", &"car") == &"boat":
+		$Title.text = "BOAT DOCK"
+		$Background.color = DOCK_BACKGROUND
+		%SlideLabel.text = "GLIDE"
+		_race.text = "SAIL!"
 	_count_coins_to(state["coins"])
 	var paint: Dictionary = state.get("paint", {})
 	for setup: DriftSetup in state["setups"]:

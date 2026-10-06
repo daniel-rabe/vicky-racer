@@ -28,6 +28,8 @@ func _enter_tree() -> void:
 
 
 func _on_drift_started(car: Node) -> void:
+	if car is Boat:
+		return  # water keeps no marks: a boat's wake is its own (BoatEffects)
 	var lines: Array[Line2D] = []
 	for wheel in REAR_WHEELS:
 		var line := Line2D.new()

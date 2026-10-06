@@ -72,10 +72,12 @@ func _enter_tree() -> void:
 
 
 func _on_state_changed(state: Dictionary) -> void:
-	for setup: DriftSetup in state["setups"]:
-		if setup.id == state["equipped"]:
+	# Free Drive is driven in the equipped car, whichever kind the garage is showing.
+	var equipped: StringName = state.get("equipped_car", state["equipped"])
+	for setup: DriftSetup in state.get("car_setups", state["setups"]):
+		if setup.id == equipped:
 			_setup = setup
-	_paint = state.get("paint", {}).get(state["equipped"], Paint.ORIGINAL)
+	_paint = state.get("paint", {}).get(equipped, Paint.ORIGINAL)
 	if hud and is_node_ready():
 		hud.show_coins(state["coins"])
 

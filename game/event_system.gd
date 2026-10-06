@@ -27,6 +27,9 @@ signal CAR_horn(car: Node)
 signal CAR_boosted(car: Node)
 ## Driven through the car wash in Free Drive: foam, then the car sparkles for a while.
 signal CAR_washed(car: Node)
+## A boat flew off a ramp, and came down again (docs/DESIGN.md §20.2): whoosh, then splash.
+signal CAR_jumped(car: Node)
+signal CAR_landed(car: Node)
 
 # Progression. Screens never touch GarageManager directly: they emit a *_requested
 # signal and listen for PRO_state_changed, which carries the whole garage state.
@@ -38,6 +41,8 @@ signal PRO_paint_requested(setup_id: StringName)
 signal PRO_track_select_requested(track_id: StringName)
 ## &"race" or &"time_trial": what the next race on the selected track is (PICK A RACE's switch).
 signal PRO_race_mode_requested(mode: StringName)
+## &"car" or &"boat": which the garage, PICK A RACE and the race show (the title's CARS / BOATS).
+signal PRO_vehicle_kind_requested(kind: StringName)
 signal PRO_track_locked(track_id: StringName)
 signal PRO_coins_changed(total: int)
 signal PRO_coins_awarded(amount: int, breakdown: Dictionary)

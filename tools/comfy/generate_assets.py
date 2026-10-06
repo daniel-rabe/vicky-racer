@@ -38,7 +38,7 @@ MASTERS = HERE / "masters"
 CANDIDATES = MASTERS / "candidates"
 SHEETS = ROOT / "docs" / "mockups" / "candidates"
 # Rotation (PIL degrees, counter-clockwise) that turns a sprite's facing into +X.
-TO_PLUS_X = {"up": -90, "down": 90, "left": 180, "right": 0, None: 0}
+TO_PLUS_X = {"up": -90, "down": 90, "left": 180, "right": 0, "up_right": -45, None: 0}
 GRASS = tuple(recipe.PIPELINE["ground"]["grass"]["base"])
 
 
@@ -51,25 +51,29 @@ def save_manifest(manifest: dict) -> None:
 
 
 def expand(manifest: dict) -> dict:
-    """The manifest with its `paints` section unrolled into variants and copies."""
+    """The manifest with its `paints` section unrolled into variants and copies: every car,
+    and every boat (DESIGN.md §20.4, into folders of their own), in every palette colour."""
     paints = manifest.get("paints")
     if not paints:
         return manifest
     variants, copies = list(manifest["variants"]), list(manifest["copies"])
-    for car, source in paints["cars"].items():
-        for colour, words in paints["palette"].items():
-            key = f"{car}_{colour}"
-            card_out = f"art/ui/cards/paint/{key}.png"
-            body_out = f"art/cars/paint/{key}.png"
-            reuse = paints.get("reuse", {}).get(key)
-            if reuse:  # an existing asset already is this car in this colour
-                copies.append({"id": f"paint_{key}", "source": reuse, "box": [312, 190], "out": card_out})
-                copies.append({"id": f"paint_{key}_body", "source": reuse, "box": [128, 72], "out": body_out})
-                continue
-            variants.append({"id": f"paint_{key}", "source": source, "box": [312, 190], "out": card_out,
-                             "seed": paints.get("seeds", {}).get(key, paints["seed"]),
-                             "instruction": paints["instruction"].format(colour=words)})
-            copies.append({"id": f"paint_{key}_body", "source": f"paint_{key}", "box": [128, 72], "out": body_out})
+    groups = (("cars", "art/ui/cards/paint", "art/cars/paint"),
+              ("boats", "art/ui/cards/boats/paint", "art/boats/paint"))
+    for group, card_dir, body_dir in groups:
+        for vehicle, source in paints.get(group, {}).items():
+            for colour, words in paints["palette"].items():
+                key = f"{vehicle}_{colour}"
+                card_out = f"{card_dir}/{key}.png"
+                body_out = f"{body_dir}/{key}.png"
+                reuse = paints.get("reuse", {}).get(key)
+                if reuse:  # an existing asset already is this vehicle in this colour
+                    copies.append({"id": f"paint_{key}", "source": reuse, "box": [312, 190], "out": card_out})
+                    copies.append({"id": f"paint_{key}_body", "source": reuse, "box": [128, 72], "out": body_out})
+                    continue
+                variants.append({"id": f"paint_{key}", "source": source, "box": [312, 190], "out": card_out,
+                                 "seed": paints.get("seeds", {}).get(key, paints["seed"]),
+                                 "instruction": paints["instruction"].format(colour=words)})
+                copies.append({"id": f"paint_{key}_body", "source": f"paint_{key}", "box": [128, 72], "out": body_out})
     return {**manifest, "variants": variants, "copies": copies}
 
 
@@ -86,6 +90,16 @@ def facing_of(entry: dict, entries: dict) -> str | None:
     while "facing" not in entry and "source" in entry:
         entry = entries[entry["source"]]
     return entry.get("facing")
+
+
+def post_of(entry: dict, entries: dict) -> list[str]:
+    """Post steps; a variant or copy of a mirrored asset is mirrored too, so it faces the same way.
+    Its own steps (a sticker border) come after the inherited ones."""
+    steps = list(entry.get("post", []))
+    while "source" in entry:
+        entry = entries[entry["source"]]
+        steps = [s for s in entry.get("post", []) if s == "mirror"] + steps
+    return steps
 
 
 def render_sprite(client: ComfyClient, ref: str, entry: dict, seed: int) -> tuple[Image.Image, Image.Image]:
@@ -107,13 +121,15 @@ def render_sprite(client: ComfyClient, ref: str, entry: dict, seed: int) -> tupl
             Image.open(io.BytesIO(images["save"][0])).convert("RGB"))
 
 
-POST_STEPS = {"punch_hole": pp.punch_center_hole, "sticker": pp.sticker_border}
+# "mirror" flips left-right: a three-quarter view (the pirate ship) turned 180 degrees would hang upside down.
+POST_STEPS = {"punch_hole": pp.punch_center_hole, "sticker": pp.sticker_border,
+              "mirror": lambda img: img.transpose(Image.Transpose.FLIP_LEFT_RIGHT)}
 
 
 def finalize(master: Image.Image, entry: dict, entries: dict) -> Image.Image:
     if "size" in entry:
         return pp.cover(master, tuple(entry["box"]))
-    for step in entry.get("post", []):
+    for step in post_of(entry, entries):
         master = POST_STEPS[step](master)
     turned = master.rotate(TO_PLUS_X[facing_of(entry, entries)], expand=True)
     fitted = pp.fit_sprite(turned, tuple(entry["box"]))
@@ -157,7 +173,8 @@ def cmd_candidates(only: list[str] | None) -> None:
             if "size" in entry:
                 continue
             # Shown at final size on grass, scaled 2x so it is inspectable.
-            tile = Image.new("RGB", (max(entry["box"]) + 32,) * 2, GRASS)
+            ground = tuple(recipe.PIPELINE["ground"][entry.get("sheet_ground", "grass")]["base"])
+            tile = Image.new("RGB", (max(entry["box"]) + 32,) * 2, ground)
             sprite = finalize(cut, entry, entries)
             tile.paste(sprite, ((tile.width - sprite.width) // 2, (tile.height - sprite.height) // 2), sprite)
             small.append((tile.resize((tile.width * 2, tile.height * 2), Image.NEAREST), f"seed {seed} in game, 2x"))
@@ -168,7 +185,8 @@ def cmd_candidates(only: list[str] | None) -> None:
             continue
         top = pp.contact_sheet(big, len(big), (256, 256), f"{entry['id'].upper()}: CANDIDATES", checker=True)
         side = max(256, small[0][0].width)
-        bottom = pp.contact_sheet(small, len(small), (side, side), "AT GAME SIZE ON GRASS (2x)")
+        where = "WATER" if "sheet_ground" in entry else "GRASS"
+        bottom = pp.contact_sheet(small, len(small), (side, side), f"AT GAME SIZE ON {where} (2x)")
         sheet = Image.new("RGB", (max(top.width, bottom.width), top.height + bottom.height), (40, 44, 52))
         sheet.paste(top, (0, 0))
         sheet.paste(bottom, (0, top.height))

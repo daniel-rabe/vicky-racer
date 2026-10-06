@@ -78,7 +78,9 @@ func _test_fresh_profile() -> void:
 	_wipe()
 	var m := _manager()
 	_check(m.profile.coins == 0, "starts with 0 coins")
-	_check(m.owns(&"starter") and m.profile.owned_setups.size() == 1, "owns only Starter")
+	# The Starter car, and the Speedboat for racing on water (docs/DESIGN.md §20).
+	_check(m.owns(&"starter") and m.owns(&"speedboat") and m.profile.owned_setups.size() == 2,
+		"owns only the Starter car and the Speedboat")
 	_check(m.profile.equipped_setup == &"starter", "Starter equipped")
 	_drop(m)
 
@@ -140,7 +142,7 @@ func _test_save_round_trip() -> void:
 	var again := _manager()
 	var p := again.profile
 	_check(p.coins == 150, "coins survive a reload (%d)" % p.coins)
-	_check(p.owned_setups == ([&"starter", &"rocket"] as Array[StringName]), "owned setups survive (%s)" % [p.owned_setups])
+	_check(p.owned_setups == ([&"starter", &"speedboat", &"rocket"] as Array[StringName]), "owned setups survive (%s)" % [p.owned_setups])
 	_check(p.equipped_setup == &"rocket", "equipped setup survives")
 	_check(TRACK in p.completed_tracks and is_equal_approx(p.best_laps[TRACK], 37.25), "completed tracks and best laps survive")
 	_drop(again)
@@ -248,7 +250,8 @@ func _test_every_car_loads() -> void:
 	print("the roster")
 	_wipe()
 	var m := _manager()
-	_check(m.setups.size() == 12, "twelve cars in the garage (%d)" % m.setups.size())
+	var cars := m.setups.values().filter(func(s: DriftSetup) -> bool: return s.kind == &"car")
+	_check(cars.size() == 12, "twelve cars in the garage (%d)" % cars.size())
 	for id in GarageManager.SETUP_ORDER:
 		var setup: DriftSetup = m.setups[id]
 		_check(setup != null and setup.id == id and setup.card_art != null and setup.body != null,

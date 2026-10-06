@@ -21,6 +21,8 @@ var _mode: StringName = &"race"
 var _trials := {}
 var _tabs := {}  # mode -> Button
 var _gamepad := false
+## &"car" or &"boat": the cups shown are this kind's (docs/DESIGN.md §20).
+var _kind := &"car"
 
 @onready var _row: HBoxContainer = %Cards
 @onready var _cups_row: HBoxContainer = %Cups
@@ -52,6 +54,7 @@ func _ready() -> void:
 
 func _on_state_changed(state: Dictionary) -> void:
 	_trials = state.get("trials", {})
+	_kind = state.get("vehicle_kind", &"car")
 	if not _two_player:
 		_mode = state.get("race_mode", &"race")
 	if not _cards.is_empty():
@@ -89,7 +92,8 @@ func _on_chosen(config: TrackConfig) -> void:
 
 
 func _build_cups() -> void:
-	var entries: Array = _cup["cups"]
+	var entries: Array = _cup["cups"].filter(func(entry: Dictionary) -> bool:
+		return entry["config"].vehicle_kind == _kind)
 	for i in entries.size():
 		var entry: Dictionary = entries[i]
 		var cup: CupConfig = entry["config"]

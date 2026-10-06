@@ -211,6 +211,18 @@
       "_note": "Phase 12 cup art."
     },
     {
+      "id": "cup_splash",
+      "subject": "a big smiling cartoon water splash with round blue droplets flying up, cheerful bright blue and white, simple flat game icon",
+      "seed": null,
+      "facing": null,
+      "box": [
+        200,
+        200
+      ],
+      "out": "art/ui/cups/cup_splash.png",
+      "_note": "Phase 20: the Splash Cup (boat courses)."
+    },
+    {
       "id": "sticker_drift",
       "subject": "a cute little red toy race car skidding sideways in a drift with big round puffs of white smoke behind its back wheels, side view, cheerful children's sticker",
       "seed": 13,
@@ -894,6 +906,360 @@
       ],
       "out": "art/town/props/balloon.png",
       "_note": "Free Drive town. Drawn from the side whatever the prompt; kept like that on purpose: high in the sky, the classic balloon shape reads better than a striped circle, and it matches the buildings' street view."
+    },
+    {
+      "id": "boat_speedboat",
+      "subject": "a chunky toy speedboat seen from directly above, flat lay: a pointed white hull with a bright red deck, a small curved windscreen in front of two seats, a grey outboard motor at the back, pointing straight up, perfectly symmetrical",
+      "seed": 11,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/boats/speedboat.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat (DESIGN.md §20.4). Picked by the user 2026-10-06. Faces UP: bow at the top, outboard motor at the bottom."
+    },
+    {
+      "id": "boat_jetski",
+      "subject": "a chunky toy jet ski seen from directly above, flat lay: a small rounded bright yellow body with a long black seat along the middle and handlebars near the pointed front, pointing straight up, perfectly symmetrical",
+      "seed": 11,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/boats/jetski.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat (DESIGN.md §20.4). Picked by the user 2026-10-06. Faces UP: pointed nose and handlebars at the top."
+    },
+    {
+      "id": "boat_hovercraft",
+      "subject": "a chunky toy hovercraft seen from directly above, flat lay: a fat black rubber skirt all round a bright green cabin roof with round windows, a big round fan cage at the back, pointing straight up, perfectly symmetrical",
+      "seed": 12,
+      "facing": "down",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/boats/hovercraft.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat (DESIGN.md §20.4). Picked by the user 2026-10-06. Faces DOWN: the green fan housing is the BACK, at the top; the cabin faces down."
+    },
+    {
+      "id": "boat_duck",
+      "subject": "a giant yellow rubber duck boat seen from directly above, flat lay: its round yellow back and little tail, the duck's round head with an orange beak at the front, a small seat on its back, pointing straight up, perfectly symmetrical",
+      "seed": 11,
+      "facing": "down",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/boats/duck.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat (DESIGN.md §20.4). Picked by the user 2026-10-06. Faces DOWN: the duck's head and beak at the bottom."
+    },
+    {
+      "id": "boat_swan",
+      "subject": "a swan pedal boat seen from directly above, flat lay: a white boat shaped like a swan with folded white wings along both sides, its curved neck and head with an orange beak at the front, a pink two-seat bench in the middle, pointing straight up, perfectly symmetrical",
+      "seed": 14,
+      "facing": "down",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/boats/swan.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat (DESIGN.md §20.4). Picked by the user 2026-10-06. Faces DOWN: the swan's head and beak at the bottom."
+    },
+    {
+      "id": "boat_tugboat",
+      "subject": "a chunky toy tugboat seen from straight above as a flat lay map icon, only its deck and roof visible, no side view: an oval red deck ringed all round with black rubber tyre bumpers, a square white cabin roof in the middle and a round yellow funnel opening behind it, pointing straight up, perfectly symmetrical",
+      "seed": 11,
+      "facing": "down",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/boats/tugboat.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat (DESIGN.md §20.4). Picked by the user 2026-10-06 (second prompt; round 1 drew side views, kept in masters/candidates/rejected/). Faces DOWN: the cabin's window looks DOWN; the yellow funnel is at the back, the top."
+    },
+    {
+      "id": "boat_pirate",
+      "subject": "a chunky toy pirate boat seen from straight above as a flat lay map icon, only its deck visible, no side view, no sail up: a pointed oval brown wooden deck inside a golden hull rim, a white sail rolled up flat along a yard across the middle, a big white skull and crossbones painted on the black front deck, a small treasure chest and a ship's wheel at the back, little black cannons along both sides, pointing straight up, perfectly symmetrical",
+      "seed": 14,
+      "facing": "right",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/boats/pirate.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat (DESIGN.md §20.4). Picked by the user 2026-10-06 ('furled 14'). Every prompt drew pirate ships side-on or three-quarter; Kontext edits of the speedboat and of a flat top-down sketch did too. This pick is a three-quarter view, chosen for its look. Faces LEFT as drawn (bow with the skull flag on the left); post 'mirror' flips it to face RIGHT the right way up, because turning a three-quarter view 180 degrees hangs it upside down. Earlier rounds in masters/candidates/rejected/.",
+      "post": [
+        "mirror"
+      ]
+    },
+    {
+      "id": "boat_banana",
+      "subject": "an inflatable banana boat seen from directly above, flat lay: a long bright yellow inflatable tube with a green pointed tip at the front, three seats with handles along its back, pointing straight up, perfectly symmetrical",
+      "seed": 11,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/boats/banana_boat.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat (DESIGN.md §20.4). Picked by the user 2026-10-06. Faces UP: the green pointed tip is the nose, at the top; the brown stem is the back."
+    },
+    {
+      "id": "boat_steamer",
+      "subject": "a chunky toy paddle steamer seen from straight above as a flat lay map icon, only its roofs visible, no side view: a long white deck with rounded ends, a red paddle wheel housing sticking out on each side, a cabin roof with two round black funnel openings ringed in gold, pointing straight up, perfectly symmetrical",
+      "seed": 13,
+      "facing": "right",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/boats/steamer.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat (DESIGN.md §20.4). Picked by the user 2026-10-06 (second prompt; round 1 drew side views, kept in masters/candidates/rejected/). Faces RIGHT: drawn lying sideways; the little window on the cabin's right end is the front."
+    },
+    {
+      "id": "water_reeds",
+      "subject": "a round clump of tall green reeds and bulrushes viewed from straight above, flat lay: a tuft of thin green blades fanning out from the centre with a few brown cattail heads",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        128,
+        128
+      ],
+      "out": "art/props/water/reeds.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2)."
+    },
+    {
+      "id": "water_lily_pad",
+      "subject": "a round flat green lily pad viewed from straight above, flat lay, with a small wedge-shaped notch and one pink water lily flower on it",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        96,
+        96
+      ],
+      "out": "art/props/water/lily_pad.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2)."
+    },
+    {
+      "id": "water_duck_house",
+      "subject": "a little floating duck house viewed from straight above, flat lay: only its roof visible, a small pointed red roof with two slopes, sitting on a round wooden raft of planks",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        200,
+        200
+      ],
+      "out": "art/props/water/duck_house.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2)."
+    },
+    {
+      "id": "water_shipwreck_1",
+      "subject": "a wrecked wooden pirate ship lying on a sandbank viewed from straight above, flat lay: a broken brown wooden hull tilted on its side with a snapped mast and a torn white sail",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        320,
+        320
+      ],
+      "out": "art/props/water/shipwreck_1.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 3 looks the user kept (2026-10-06); the course builder mixes them."
+    },
+    {
+      "id": "water_shipwreck_2",
+      "subject": "a wrecked wooden pirate ship lying on a sandbank viewed from straight above, flat lay: a broken brown wooden hull tilted on its side with a snapped mast and a torn white sail",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        320,
+        320
+      ],
+      "out": "art/props/water/shipwreck_2.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 3 looks the user kept (2026-10-06); the course builder mixes them."
+    },
+    {
+      "id": "water_shipwreck_3",
+      "subject": "a wrecked wooden pirate ship lying on a sandbank viewed from straight above, flat lay: a broken brown wooden hull tilted on its side with a snapped mast and a torn white sail",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        320,
+        320
+      ],
+      "out": "art/props/water/shipwreck_3.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 3 looks the user kept (2026-10-06); the course builder mixes them."
+    },
+    {
+      "id": "water_treasure_chest",
+      "subject": "an open treasure chest viewed from straight above, flat lay: a brown wooden chest with gold metal bands, its lid open, full of shiny gold coins",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        96,
+        96
+      ],
+      "out": "art/props/water/treasure_chest.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2)."
+    },
+    {
+      "id": "water_rock",
+      "subject": "a smooth rounded grey rock viewed from straight above, flat lay: a soft lumpy grey boulder with gentle highlights and a little green moss",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        120,
+        120
+      ],
+      "out": "art/props/water/rock.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2)."
+    },
+    {
+      "id": "water_log_1",
+      "subject": "a floating wooden log viewed from straight above, flat lay: a long round brown tree trunk lying horizontally, rough bark, pale cut rings at both ends",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        224,
+        80
+      ],
+      "out": "art/props/water/log_1.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 4 looks the user kept (2026-10-06); the course builder mixes them."
+    },
+    {
+      "id": "water_log_2",
+      "subject": "a floating wooden log viewed from straight above, flat lay: a long round brown tree trunk lying horizontally, rough bark, pale cut rings at both ends",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        224,
+        80
+      ],
+      "out": "art/props/water/log_2.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 4 looks the user kept (2026-10-06); the course builder mixes them."
+    },
+    {
+      "id": "water_log_3",
+      "subject": "a floating wooden log viewed from straight above, flat lay: a long round brown tree trunk lying horizontally, rough bark, pale cut rings at both ends",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        224,
+        80
+      ],
+      "out": "art/props/water/log_3.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 4 looks the user kept (2026-10-06); the course builder mixes them."
+    },
+    {
+      "id": "water_log_4",
+      "subject": "a floating wooden log viewed from straight above, flat lay: a long round brown tree trunk lying horizontally, rough bark, pale cut rings at both ends",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        200,
+        128
+      ],
+      "out": "art/props/water/log_4.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 4 looks the user kept (2026-10-06); the course builder mixes them. Two crossed logs: a squarer box."
+    },
+    {
+      "id": "water_ramp",
+      "subject": "a wooden jump ramp for toy boats viewed from straight above, flat lay: a rectangular platform of light wooden planks with bright yellow and red warning stripes along one short edge",
+      "seed": 12,
+      "facing": "up_right",
+      "box": [
+        320,
+        256
+      ],
+      "out": "art/props/water/ramp.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). Seed 12 is drawn three-quarter, rising toward the top right: facing up_right turns its run to +X, the way boats hit it."
+    },
+    {
+      "id": "water_footbridge",
+      "subject": "a long wooden footbridge viewed from straight above, flat lay: a straight horizontal path of brown wooden planks with rope railings and posts along both long sides",
+      "seed": 12,
+      "facing": "right",
+      "box": [
+        960,
+        224
+      ],
+      "out": "art/props/water/footbridge.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). Spans left to right as drawn; the builder turns it across the channel."
+    },
+    {
+      "id": "water_lemon_slice",
+      "subject": "a round lemon slice viewed from straight above, flat lay: a bright yellow rind ring and pale yellow juicy segments like a wheel",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        160,
+        160
+      ],
+      "out": "art/props/water/lemon_slice.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2)."
+    },
+    {
+      "id": "water_ice_cube",
+      "subject": "a big ice cube viewed from straight above, flat lay: a rounded square of pale blue translucent ice with white shiny highlights",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        104,
+        104
+      ],
+      "out": "art/props/water/ice_cube.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2)."
+    },
+    {
+      "id": "water_cocktail_umbrella_1",
+      "subject": "a paper cocktail umbrella viewed from straight above, flat lay: a round open umbrella with bright pink, yellow and turquoise segments meeting at a small centre",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        160,
+        160
+      ],
+      "out": "art/props/water/cocktail_umbrella_1.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 2 looks the user kept (2026-10-06); the course builder mixes them."
+    },
+    {
+      "id": "water_cocktail_umbrella_2",
+      "subject": "a paper cocktail umbrella viewed from straight above, flat lay: a round open umbrella with bright pink, yellow and turquoise segments meeting at a small centre",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        160,
+        160
+      ],
+      "out": "art/props/water/cocktail_umbrella_2.png",
+      "sheet_ground": "pond_water",
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). One of 2 looks the user kept (2026-10-06); the course builder mixes them."
     }
   ],
   "variants": [
@@ -1215,6 +1581,96 @@
       ],
       "out": "art/cars/setups/dragon.png",
       "_note": "In-race look of this car: the same car as its garage card."
+    },
+    {
+      "id": "card_boat_speedboat",
+      "source": "boat_speedboat",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/boats/speedboat.png",
+      "_note": "Boat Dock card: the boat as designed."
+    },
+    {
+      "id": "card_boat_jetski",
+      "source": "boat_jetski",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/boats/jetski.png",
+      "_note": "Boat Dock card: the boat as designed."
+    },
+    {
+      "id": "card_boat_hovercraft",
+      "source": "boat_hovercraft",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/boats/hovercraft.png",
+      "_note": "Boat Dock card: the boat as designed."
+    },
+    {
+      "id": "card_boat_duck",
+      "source": "boat_duck",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/boats/duck.png",
+      "_note": "Boat Dock card: the boat as designed."
+    },
+    {
+      "id": "card_boat_swan",
+      "source": "boat_swan",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/boats/swan.png",
+      "_note": "Boat Dock card: the boat as designed."
+    },
+    {
+      "id": "card_boat_banana",
+      "source": "boat_banana",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/boats/banana_boat.png",
+      "_note": "Boat Dock card: the boat as designed."
+    },
+    {
+      "id": "card_boat_tugboat",
+      "source": "boat_tugboat",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/boats/tugboat.png",
+      "_note": "Boat Dock card: the boat as designed."
+    },
+    {
+      "id": "card_boat_steamer",
+      "source": "boat_steamer",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/boats/steamer.png",
+      "_note": "Boat Dock card: the boat as designed."
+    },
+    {
+      "id": "card_boat_pirate",
+      "source": "boat_pirate",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/boats/pirate.png",
+      "_note": "Boat Dock card: the boat as designed."
     }
   ],
   "procedural": [
@@ -1245,7 +1701,7 @@
     }
   ],
   "paints": {
-    "_note": "Phase 10 paint shop: every car in five colours besides its own. Kontext recolours of each car's master; `reuse` points at an asset that already is that car in that colour (the opponents' recolours of the Starter car).",
+    "_note": "Phase 10 paint shop: every car in five colours besides its own. Kontext recolours of each car's master; `reuse` points at an asset that already is that car in that colour (the opponents' recolours of the Starter car). Phase 20: `boats` does the same for the boats, into art/boats/paint/ and art/ui/cards/boats/paint/; yellow boats reuse themselves for yellow.",
     "instruction": "Repaint the main body colour of this vehicle {colour}. Keep every other detail, decoration, wheel and window, the exact shape, the view from directly above and the plain white background exactly the same.",
     "seed": 11,
     "palette": {
@@ -1272,8 +1728,22 @@
     "reuse": {
       "starter_blue": "car_blue",
       "starter_yellow": "car_yellow",
-      "starter_green": "car_green"
+      "starter_green": "car_green",
+      "jetski_yellow": "boat_jetski",
+      "duck_yellow": "boat_duck",
+      "banana_boat_yellow": "boat_banana"
     },
-    "seeds": {}
+    "seeds": {},
+    "boats": {
+      "speedboat": "boat_speedboat",
+      "jetski": "boat_jetski",
+      "hovercraft": "boat_hovercraft",
+      "duck": "boat_duck",
+      "swan": "boat_swan",
+      "banana_boat": "boat_banana",
+      "tugboat": "boat_tugboat",
+      "steamer": "boat_steamer",
+      "pirate": "boat_pirate"
+    }
   }
 }

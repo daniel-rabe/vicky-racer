@@ -22,6 +22,13 @@ extends Node2D
 ## Bridges (docs/DESIGN.md §7.7): where the line crosses itself one pass goes over a bridge
 ## (bridge_spans). A car on a span is on the upper level: drawn above the deck, colliding
 ## only with other upper cars and the railings, while cars below drive under it.
+##
+## A boat course (docs/DESIGN.md §20) is a track whose road is a channel of deep water (the
+## theme's road_surface). It may have currents (current_spans) that carry boats along, ramps
+## (Ramps) that throw them in the air, and alternative paths: branches that leave the racing
+## line and rejoin it. A racer on a branch is measured along the branch, and its progress is
+## the stretch of lap the branch bypasses, in proportion, so laps, places and the minimap
+## need nothing new. The finish and the checkpoint never lie on a bypassed stretch.
 
 signal finish_crossed(car: Car)
 signal checkpoint_crossed(car: Car)
@@ -46,6 +53,14 @@ const SURFACES := {
 	&"crater": {"speed_mult": 0.45, "grip_mult": 0.45},
 	# Free Drive's pond (town/town.gd): wade through slowly, with a splash.
 	&"water": {"speed_mult": 0.45, "grip_mult": 0.5},
+	# Boat courses (docs/DESIGN.md §20.2). The channel is deep water at full speed; off it, each
+	# theme's shallows hold a boat back a little, and banks more (a hovercraft skims them all).
+	&"deep_water": {"speed_mult": 1.0, "grip_mult": 1.0},
+	&"pond_water": {"speed_mult": 0.6, "grip_mult": 0.8},
+	&"river_water": {"speed_mult": 0.6, "grip_mult": 0.8},
+	&"lagoon_water": {"speed_mult": 0.6, "grip_mult": 0.8},
+	&"lemonade": {"speed_mult": 0.6, "grip_mult": 0.8},
+	&"sandbank": {"speed_mult": 0.35, "grip_mult": 0.6},
 }
 const ASPHALT := preload("res://art/tiles/asphalt.png")
 const KERB := preload("res://art/tiles/kerb.png")
@@ -54,6 +69,18 @@ const ROAD_ICE := preload("res://art/tiles/snow/road_ice.png")
 const OUTLINE_COLOUR := Color(0.106, 0.118, 0.137)
 const DASH_COLOUR := Color(0.925, 0.925, 0.882)
 const KERB_WIDTH := 38.0
+## A current of strength 1 carries a boat along at this many px/s (Boat.current).
+const CURRENT_SPEED := 260.0
+## The pale lip along a channel's edge: wider than the water, see-through white.
+const LIP_COLOUR := Color(1.0, 1.0, 1.0, 0.38)
+const LIP_WIDTH := 30.0
+## How much further off a branch, px, a racer already on it may stray and still be on it.
+const BRANCH_STICK := 160.0
+## Progress settles by at most this many px a frame (_settle), unless it leaps further.
+const PROGRESS_SETTLE := 60.0
+const PROGRESS_LEAP := 2000.0
+## Over this much of each end of a branch, px, its progress eases from the racing line's.
+const BRANCH_EASE := 700.0
 ## Corner bits of the ground tiles' sand_corners custom data (see build_tileset.py).
 const TL := 8
 const TR := 4
@@ -75,11 +102,25 @@ const BR := 1
 @export var kerb_bridge_gap := 160.0
 @export var kerb_min_length := 320.0
 
+@export_group("Water")
+## Currents: x = where one starts, y = how long it is (fractions of a lap), z = its strength.
+@export var current_spans: PackedVector3Array = []
+## Alternative paths: each branch's line (world px, in driving order), the stretch of lap it
+## bypasses (x = leaves, y = rejoins, fractions of a lap), its half width, px, and the
+## strength of its current (0 = none).
+@export var branch_lines: Array[PackedVector2Array] = []
+@export var branch_spans: PackedVector2Array = []
+@export var branch_half_widths: PackedFloat32Array = []
+@export var branch_currents: PackedFloat32Array = []
+
 var _surface_of := {}  # car -> surface id
 var _measured := {}  # car -> Vector2(progress along the line, distance from it), this frame
 var _line_pts := PackedVector2Array()    # the racing line's baked points, world space
 var _line_at := PackedFloat32Array()     # distance along the line of each
 var _last_index := {}  # car -> baked point it was nearest last frame
+## car -> Vector3(branch index, px along it, px from it), for a racer on a branch this frame.
+var _on_branch := {}
+var _branch_at: Array[PackedFloat32Array] = []  # each branch's distance along it, per point
 
 ## A car is searched for within this many baked points (20 px apart) either side of where it
 ## was; further than RELOCATE_DISTANCE from the line it was teleported, and a full search runs.
@@ -106,7 +147,8 @@ func _ready() -> void:
 	process_physics_priority = -2  # measure the cars before the drivers and the race read them
 	_cache_line()
 	_build_railings()
-	var car_layers := Car.LAYER_CARS_GROUND | Car.LAYER_CARS_BRIDGE
+	_cache_branches()
+	var car_layers := Car.LAYER_CARS_GROUND | Car.LAYER_CARS_BRIDGE | Car.LAYER_AIRBORNE
 	for gate: Area2D in [$FinishLine, $Checkpoint]:
 		gate.collision_mask = car_layers
 	if has_node(^"BoostPads"):
@@ -123,21 +165,32 @@ func _ready() -> void:
 			pad.body_entered.connect(func(body: Node2D) -> void:
 				if body is Car:
 					body.boost())
+	if has_node(^"Ramps"):
+		for ramp: Area2D in $Ramps.get_children():
+			ramp.collision_mask = Car.LAYER_CARS_GROUND
+			ramp.body_entered.connect(func(body: Node2D) -> void:
+				if body is Boat:
+					body.jump())
 
 
 func _physics_process(_delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
+	var previous := _measured.duplicate()
 	_measured.clear()
 	for car: Car in get_tree().get_nodes_in_group(&"cars"):
-		var measure := _measure_car(car)
+		var measure := _settle(_measure_car(car), previous.get(car))
 		_measured[car] = measure
 		var on_road := measure.y <= road_half_width + KERB_WIDTH
 		var level := 1 if on_bridge(measure.x) and on_road else 0
 		if car.level != level:
 			car.set_level(level)
 		car.set_drawn_above_deck(level == 1 or (on_road and on_bridge(measure.x, DECK_DRAW_MARGIN)))
-		var surface := surface_at(car.global_position, measure.y)
+		var branch: Vector3 = _on_branch.get(car, Vector3(-1, 0, 0))
+		var half := road_half_width if branch.x < 0 else branch_half_widths[int(branch.x)]
+		var surface := surface_at(car.global_position, measure.y, half)
+		if car is Boat:
+			(car as Boat).current = _current_at(measure, branch, half)
 		if _surface_of.get(car) != surface:
 			_surface_of[car] = surface
 			car.surface_speed_mult = SURFACES[surface]["speed_mult"]
@@ -165,6 +218,20 @@ func on_bridge(offset: float, margin := 0.0) -> bool:
 	return false
 
 
+## Progress may move by at most PROGRESS_SETTLE px a frame (more than any car's speed): where
+## a racer passes from the racing line onto a branch or back, its two measures can differ by a
+## few hundred px, and the place shown should glide across that, never jump. A bigger leap (a
+## car put back on the line) is taken at once.
+func _settle(measure: Vector2, before: Variant) -> Vector2:
+	if before == null:
+		return measure
+	var lap := lap_length()
+	var step := fposmod(measure.x - before.x + lap / 2.0, lap) - lap / 2.0
+	if absf(step) <= PROGRESS_SETTLE or absf(step) > PROGRESS_LEAP:
+		return measure
+	return Vector2(fposmod(before.x + signf(step) * PROGRESS_SETTLE, lap), measure.y)
+
+
 ## Progress along the line and distance from it, searched near where the car was last frame.
 func _measure_car(car: Node2D) -> Vector2:
 	var pos := car.global_position
@@ -186,7 +253,39 @@ func _measure_car(car: Node2D) -> Vector2:
 		var here := progress_at(pos)
 		best = Vector3(pos.distance_to(line_point(here)), here, mini(_line_at.bsearch(here), n - 2))
 	_last_index[car] = int(best.z)
-	return Vector2(fposmod(best.y, lap_length()), best.x)
+	var main := Vector2(fposmod(best.y, lap_length()), best.x)
+	var was: int = int(_on_branch[car].x) if _on_branch.has(car) else -1
+	_on_branch.erase(car)
+	for b in branch_lines.size():
+		var on := _nearest_on(branch_lines[b], _branch_at[b], pos)
+		# Once on a branch a racer keeps to it until clearly off it, so brushing a narrow
+		# branch's edge does not flicker it between the branch and the racing line.
+		# Not at its ends, though, where it meets the line: there the nearer one wins.
+		var middle := on.x > BRANCH_STICK and on.x < _branch_at[b][-1] - BRANCH_STICK
+		var sticky := b == was and middle
+		var reach := branch_half_widths[b] + KERB_WIDTH + (BRANCH_STICK if sticky else 0.0)
+		if on.y <= reach and (on.y < main.y or sticky):
+			_on_branch[car] = Vector3(b, on.x, on.y)
+			var span := branch_spans[b]
+			var bypassed := fposmod(span.y - span.x, 1.0) * lap_length()
+			var lap := lap_length()
+			var length := maxf(_branch_at[b][-1], 1.0)
+			var mapped := span.x * lap + clampf(on.x / length, 0.0, 1.0) * bypassed
+			# Near its ends a branch is close to the racing line, which measures a racer well;
+			# further along, the branch's own measure (in proportion) counts. The weight eases
+			# with distance along the branch, so progress flows on smoothly from the line onto
+			# the branch and back. The line's search is kept at the junction the racer is
+			# nearest, so where a branch passes between two stretches of the line (Pirate
+			# Cove's Smuggler's Gap) it never hops from one to the other.
+			var near_start := on.x < length - on.x
+			var direct := fposmod(span.x * lap + on.x if near_start else span.y * lap - (length - on.x), lap)
+			_last_index[car] = clampi(_line_at.bsearch(direct), 0, _line_pts.size() - 2)
+			var ease_px := minf(BRANCH_EASE, length / 3.0)
+			var weight := smoothstep(0.0, ease_px, minf(on.x, length - on.x))
+			var gap := fposmod(mapped - main.x + lap / 2.0, lap) - lap / 2.0
+			var progress := fposmod(main.x + gap * weight, lap)
+			return Vector2(progress, on.y)
+	return main
 
 
 func _cache_line() -> void:
@@ -203,13 +302,18 @@ func _cache_line() -> void:
 		_line_at.append(total)
 
 
-## What a car at this point drives on: &"asphalt", &"grass" or &"sand". Pass `distance`
-## (from the racing line) when it is already known, to skip a search.
-func surface_at(global_pos: Vector2, distance := -1.0) -> StringName:
+## What a car at this point drives on: the road (asphalt, or a boat course's deep water),
+## ice, or the ground (grass, sand, shallows...). Pass `distance` (from the racing line, or
+## from the branch the car is on, with that branch's `half_width`) when it is already known.
+func surface_at(global_pos: Vector2, distance := -1.0, half_width := -1.0) -> StringName:
 	if distance < 0.0:
 		distance = distance_to_line(global_pos)
-	if distance <= road_half_width + KERB_WIDTH - 8.0:
-		return &"ice" if _on_road_ice(global_pos) else &"asphalt"
+	if half_width < 0.0:
+		half_width = road_half_width
+	if distance <= half_width + KERB_WIDTH - 8.0:
+		if _on_road_ice(global_pos):
+			return &"ice"
+		return theme.road_surface if theme else &"asphalt"
 	var base := theme.base_surface if theme else &"grass"
 	var patch := theme.patch_surface if theme else &"sand"
 	var local := ground.to_local(global_pos)
@@ -287,6 +391,98 @@ func world_rect() -> Rect2:
 	return Rect2(global_position, map_size)
 
 
+# --- water: branches and currents ---------------------------------------------------------
+
+## Which branch `car` is on this frame, or -1 on the racing line.
+func branch_of(car: Node2D) -> int:
+	return int(_on_branch[car].x) if _on_branch.has(car) else -1
+
+
+## How far along its branch `car` is, px (0 when not on one).
+func branch_progress_of(car: Node2D) -> float:
+	return _on_branch[car].y if _on_branch.has(car) else 0.0
+
+
+func branch_length(b: int) -> float:
+	return _branch_at[b][-1]
+
+
+## Where on the racing line branch `b` leaves it and rejoins it, px.
+func branch_entry(b: int) -> float:
+	return branch_spans[b].x * lap_length()
+
+
+func branch_exit(b: int) -> float:
+	return branch_spans[b].y * lap_length()
+
+
+## The point `offset` px along branch `b`, `sideways` px to its right. Past either end it
+## carries on along the racing line, so a driver can look ahead across the junction.
+func branch_point(b: int, offset: float, sideways := 0.0) -> Vector2:
+	if offset < 0.0:
+		return line_point(branch_entry(b) + offset, sideways)
+	if offset > branch_length(b):
+		return line_point(branch_exit(b) + offset - branch_length(b), sideways)
+	return _along(branch_lines[b], _branch_at[b], offset) + branch_tangent(b, offset).orthogonal() * sideways
+
+
+func branch_tangent(b: int, offset: float) -> Vector2:
+	if offset < 0.0:
+		return line_tangent(branch_entry(b) + offset)
+	if offset > branch_length(b):
+		return line_tangent(branch_exit(b) + offset - branch_length(b))
+	var line := branch_lines[b]
+	var at := _branch_at[b]
+	var a := _along(line, at, maxf(offset - 5.0, 0.0))
+	var c := _along(line, at, minf(offset + 5.0, at[-1]))
+	return (c - a).normalized()
+
+
+## The current where a racer is: along the racing line inside a current span, or along a
+## branch that has one; zero anywhere else, and outside the channel.
+func _current_at(measure: Vector2, branch: Vector3, half: float) -> Vector2:
+	if measure.y > half + KERB_WIDTH:
+		return Vector2.ZERO
+	if branch.x >= 0:
+		var b := int(branch.x)
+		if branch_currents[b] <= 0.0:
+			return Vector2.ZERO
+		return branch_tangent(b, branch.y) * branch_currents[b] * CURRENT_SPEED
+	var at := measure.x / lap_length()
+	for span in current_spans:
+		if fposmod(at - span.x, 1.0) <= span.y:
+			return line_tangent(measure.x) * span.z * CURRENT_SPEED
+	return Vector2.ZERO
+
+
+func _cache_branches() -> void:
+	_branch_at.clear()
+	for line in branch_lines:
+		var at := PackedFloat32Array([0.0])
+		for i in range(1, line.size()):
+			at.append(at[-1] + line[i].distance_to(line[i - 1]))
+		_branch_at.append(at)
+
+
+## (px along, px from) the nearest point of an open polyline.
+static func _nearest_on(line: PackedVector2Array, at: PackedFloat32Array, pos: Vector2) -> Vector2:
+	var best := Vector2(0.0, INF)
+	for i in line.size() - 1:
+		var a := line[i]
+		var ab := line[i + 1] - a
+		var t := clampf((pos - a).dot(ab) / maxf(ab.length_squared(), 0.001), 0.0, 1.0)
+		var d := pos.distance_to(a + ab * t)
+		if d < best.y:
+			best = Vector2(at[i] + (at[i + 1] - at[i]) * t, d)
+	return best
+
+
+static func _along(line: PackedVector2Array, at: PackedFloat32Array, offset: float) -> Vector2:
+	var i := clampi(at.bsearch(offset) - 1, 0, line.size() - 2)
+	var t := clampf((offset - at[i]) / maxf(at[i + 1] - at[i], 0.001), 0.0, 1.0)
+	return line[i].lerp(line[i + 1], t)
+
+
 # --- road drawing -------------------------------------------------------------------------
 
 func _build_road() -> void:
@@ -298,7 +494,19 @@ func _build_road() -> void:
 		return
 	var asphalt: Texture2D = theme.asphalt if theme and theme.asphalt else ASPHALT
 	var kerb: Texture2D = theme.kerb if theme and theme.kerb else KERB
-	_add_road(_line(points, road_half_width * 2.0 + 12.0, null, OUTLINE_COLOUR, true))
+	var water := theme != null and theme.water
+	if water:
+		# Branches first, so where one meets the racing line the main channel lies on top.
+		for b in branch_lines.size():
+			var width := branch_half_widths[b] * 2.0
+			var line := PackedVector2Array()
+			for p in branch_lines[b]:
+				line.append(road.to_local(p))
+			_add_road(_line(line, width + LIP_WIDTH, null, LIP_COLOUR, false))
+			_add_road(_line(line, width, asphalt, Color.WHITE, false))
+		_add_road(_line(points, road_half_width * 2.0 + LIP_WIDTH, null, LIP_COLOUR, true))
+	else:
+		_add_road(_line(points, road_half_width * 2.0 + 12.0, null, OUTLINE_COLOUR, true))
 	_add_road(_line(points, road_half_width * 2.0, asphalt, Color.WHITE, true))
 	for run in _tight_runs(points):
 		for side in [1.0, -1.0]:
@@ -308,7 +516,8 @@ func _build_road() -> void:
 			_add_road(_line(edge, KERB_WIDTH, kerb, Color.WHITE, false))
 	for span in ice_spans:
 		_add_road(_line(_span_points(span), road_half_width * 2.0 - 8.0, ROAD_ICE, Color.WHITE, false))
-	_add_road(_line(points, 12.0, _dash_texture(), DASH_COLOUR, true))
+	if not water:  # a channel has no lanes
+		_add_road(_line(points, 12.0, _dash_texture(), DASH_COLOUR, true))
 	_add_road(_finish_line())
 	for span in bridge_spans:
 		_add_road(_bridge_deck(span, asphalt))

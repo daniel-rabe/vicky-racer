@@ -46,7 +46,11 @@ func _enter_tree() -> void:
 		EventSystem.UI_settings_changed.emit({"sound_volume": 0.0, "music_volume": 0.0, "fullscreen": false,
 			"auto_accelerate": false, "steering_help": false, "difficulty": StringName(difficulty)}))
 	EventSystem.PRO_state_requested.connect(func() -> void:
-		EventSystem.PRO_state_changed.emit({"setups": [load("res://game/configs/setups/%s.tres" % setup_id)],
+		# A boat (docs/DESIGN.md §20) lives in configs/boats/; race it on a boat course.
+		var path := "res://game/configs/setups/%s.tres" % setup_id
+		if not ResourceLoader.exists(path):
+			path = "res://game/configs/boats/%s.tres" % setup_id
+		EventSystem.PRO_state_changed.emit({"setups": [load(path)],
 			"equipped": StringName(setup_id), "selected_track": StringName(track_id),
 			"tracks": [{"config": load("res://game/configs/tracks/%s.tres" % track_id)}]}))
 
@@ -111,7 +115,10 @@ func _report(start_progress: Dictionary) -> void:
 		if r["is_player"]:
 			print("  player rescues %d" % r["driver"].rescues)
 		else:
-			_check(laps.size() >= 2, "%s completed validated laps (%d)" % [name, laps.size()])
+			# All but the last lap at least: the race ends with the player, before the slowest
+			# finishes (a two-lap boat course leaves it one).
+			var needed: int = maxi(1, mini(2, race.config.laps - 1))
+			_check(laps.size() >= needed, "%s completed validated laps (%d)" % [name, laps.size()])
 			# Sensible = an average speed between 250 and 2000 px/s, whatever the track's length.
 			var length: float = race.track.lap_length()
 			var ok_times := laps.all(func(t: float) -> bool: return t > length / 2000.0 and t < length / 250.0)

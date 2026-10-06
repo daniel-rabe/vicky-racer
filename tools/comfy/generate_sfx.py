@@ -25,6 +25,7 @@ import soundfile as sf
 from PIL import Image, ImageDraw
 
 from comfy_client import ComfyClient
+import derive_sfx
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).parent
@@ -210,9 +211,9 @@ def cmd_candidates(args) -> None:
     client = ComfyClient()
     client.check_alive()
     for sound in selected(manifest, args.only):
-        if "seed" in sound and not args.only:
+        if ("seed" in sound and not args.only) or sound["kind"] == "derived":
             continue
-        seeds = list(range(FIRST_SEED, FIRST_SEED + recipe["candidates"]))
+        seeds = list(range(FIRST_SEED, FIRST_SEED + sound.get("candidates", recipe["candidates"])))
         for seed in seeds:
             render(client, recipe, sound, seed)
         print(f"{sound['id']}: {review_sheet(sound, seeds).relative_to(ROOT)}")
@@ -234,8 +235,13 @@ def cmd_build(args) -> None:
     recipe = manifest["recipe"]
     client = None
     for sound in selected(manifest, args.only):
-        if "seed" not in sound:
+        if sound.get("seed") is None:
             print(f"{sound['id']}: no seed picked yet, skipped")
+            continue
+        if sound["kind"] == "derived":  # cut from approved masters (derive_sfx.py), not generated
+            x, _ = derive_sfx.derive(sound, sound["seed"])  # already shaped, levelled and faded
+            write_wav(x, sound["out"])
+            print(f"{sound['id']}: {sound['out']} ({len(x) / RATE:.2f}s, derived from {sound['source']})")
             continue
         path = master_path(sound["id"], sound["seed"])
         if not path.exists():

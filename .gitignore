@@ -107,3 +107,22 @@ tools/comfy/masters/balloon.png
 tools/comfy/masters/balloon_raw.png
 !tools/comfy/masters/sfx/car_wash_103.flac
 !tools/comfy/masters/sfx/sparkle_103.flac
+
+# Phase 20 boats. Boat masters are kept (the paint jobs are built from them); the water props'
+# masters are leaves, reproducible from the pinned seeds in asset_manifest.json.
+tools/comfy/masters/water_*
+# Boat sound picks. wake_loop_105 and wave_ambience_105 are also the sources the splash and
+# the ramp whoosh are cut from (derive_sfx.py).
+!tools/comfy/masters/sfx/motor_loop_103.flac
+!tools/comfy/masters/sfx/jet_loop_103.flac
+!tools/comfy/masters/sfx/hover_loop_103.flac
+!tools/comfy/masters/sfx/wake_loop_105.flac
+!tools/comfy/masters/sfx/wave_ambience_105.flac
+!tools/comfy/masters/sfx/boat_bump_102.flac
+!tools/comfy/masters/sfx/horn_boat_102.flac
+!tools/comfy/masters/sfx/horn_tugboat_104.flac
+!tools/comfy/masters/sfx/horn_swan_101.flac
+!tools/comfy/masters/sfx/horn_pirate_108.flac
+!tools/comfy/masters/sfx/horn_steamer_103.flac
+# The boat sounds' listening page (MP3 previews, rebuilt by tools/comfy/listen_boats.py).
+docs/mockups/sfx/listen_boats/

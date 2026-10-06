@@ -27,8 +27,10 @@ func spawn(track: Track, config: TrackConfig, humans: Array[Dictionary], parent:
 	var human_slots := _human_slots(config.player_slot - 1, humans.size(), grid.size())
 	var racers: Array[Dictionary] = []
 	var opponent := 0
+	# Cars, or boats on a water course (docs/DESIGN.md §20): whatever the race is raced in.
+	var scene: PackedScene = config.vehicle_scene if config.vehicle_scene else CAR_SCENE
 	for slot in grid.size():
-		var car: Car = CAR_SCENE.instantiate()
+		var car: Car = scene.instantiate()
 		var human := human_slots.find(slot)
 		var racer := {"car": car, "is_player": human >= 0, "player": human + 1}
 		if human >= 0:

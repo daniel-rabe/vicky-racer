@@ -11,6 +11,8 @@ extends Node
 ##   --dev-coins=<n>         set the coin balance after loading
 ##   --fake-race=<position>  pretend a race just finished in that position
 ##   --race-mode=time_trial  the next race is a time trial (screenshots of ghosts)
+##   --vehicle=boat          the garage, PICK A RACE and the race show the boats (§20)
+##   --course=<id>           the boat course the next boat race is on
 ##   --fps                   show the frame rate in the corner (works in the release .exe:
 ##                           VickyRacer.exe -- --fps, to check a new machine keeps up)
 ##   --screenshot=<path>     save a screenshot after --wait seconds (default 2.5) and quit
@@ -68,6 +70,10 @@ func _ready() -> void:
 		garage_manager.profile.coins = int(_args["dev-coins"])
 	if _args.has("fps"):
 		_add_fps_counter()
+	if _args.has("vehicle"):
+		EventSystem.PRO_vehicle_kind_requested.emit(StringName(_args["vehicle"]))
+	if _args.has("course"):
+		EventSystem.PRO_track_select_requested.emit(StringName(_args["course"]))
 	if _args.has("race-mode"):
 		EventSystem.PRO_race_mode_requested.emit(StringName(_args["race-mode"]))
 	if _args.has("fake-race"):

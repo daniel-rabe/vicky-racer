@@ -121,6 +121,54 @@
       "max_seconds": 4.0,
       "out": "art/music/standings.ogg",
       "seed": 101
+    },
+    {
+      "id": "race_river",
+      "use": "Jungle River (boats)",
+      "prompt": "rollicking riverboat adventure racing music for a children's cartoon video game, banjo, marimba, bongos, slide whistle accents, plucked bass, splashy cymbals, major key, energetic and playful, instrumental, 124 BPM",
+      "seconds": 64.0,
+      "bpm": 124,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_river.ogg",
+      "seed": 102,
+      "_note": "Phase 20 (DESIGN.md §20.6). The user kept three takes (102, 103, 104, by ear, 2026-10-06); Jungle River plays one of them at random each race."
+    },
+    {
+      "id": "race_river_2",
+      "use": "Jungle River (boats)",
+      "prompt": "rollicking riverboat adventure racing music for a children's cartoon video game, banjo, marimba, bongos, slide whistle accents, plucked bass, splashy cymbals, major key, energetic and playful, instrumental, 124 BPM",
+      "seconds": 64.0,
+      "bpm": 124,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_river_2.ogg",
+      "seed": 103,
+      "_note": "Phase 20 (DESIGN.md §20.6). The user kept three takes (102, 103, 104, by ear, 2026-10-06); Jungle River plays one of them at random each race."
+    },
+    {
+      "id": "race_river_3",
+      "use": "Jungle River (boats)",
+      "prompt": "rollicking riverboat adventure racing music for a children's cartoon video game, banjo, marimba, bongos, slide whistle accents, plucked bass, splashy cymbals, major key, energetic and playful, instrumental, 124 BPM",
+      "seconds": 64.0,
+      "bpm": 124,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_river_3.ogg",
+      "seed": 104,
+      "_note": "Phase 20 (DESIGN.md §20.6). The user kept three takes (102, 103, 104, by ear, 2026-10-06); Jungle River plays one of them at random each race."
+    },
+    {
+      "id": "race_lagoon",
+      "use": "Pirate Cove (boats)",
+      "prompt": "jolly pirate sea shanty racing music for a children's cartoon video game, accordion, fiddle, steel drums, hand claps, stomping drums, bouncy tuba bass, major key, cheerful and adventurous, instrumental, 128 BPM",
+      "seconds": 64.0,
+      "bpm": 128,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_lagoon.ogg",
+      "seed": 101,
+      "_note": "Phase 20 (DESIGN.md §20.6). Picked by the user by ear (2026-10-06)."
     }
   ]
 }

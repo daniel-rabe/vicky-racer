@@ -12,7 +12,12 @@ const TRACK_SCRIPT := preload("res://track/track.gd")
 const GROUND_TILES := preload("res://track/ground_tiles.tres")
 const TYRES := preload("res://art/props/tyre_stack.png")
 const BOOST_PAD := preload("res://art/tiles/boost_pad.png")
-const ALL_TRACKS := "track_01,track_02,track_03,track_04,track_05,track_06,track_07"
+const ALL_TRACKS := "track_01,track_02,track_03,track_04,track_05,track_06,track_07,boat_01,boat_02,boat_03,boat_04"
+const RAMP := preload("res://art/props/water/ramp.png")
+const FOOTBRIDGE := preload("res://art/props/water/footbridge.png")
+const LOG_SCRIPT := preload("res://actors/water/drifting_log.gd")
+const LOGS: Array[String] = ["res://art/props/water/log_1.png", "res://art/props/water/log_2.png",
+	"res://art/props/water/log_3.png", "res://art/props/water/log_4.png"]
 ## Prop kind (as in the layout) -> texture and collision radius. Radii are smaller than the
 ## pictures: clipping a palm frond or a parasol's edge should not stop a car.
 const PROPS := {
@@ -35,7 +40,28 @@ const PROPS := {
 	"rocket": ["res://art/props/moon/rocket.png", 46.0],
 	"satellite_dish": ["res://art/props/moon/satellite_dish.png", 54.0],
 	"moon_rock": ["res://art/props/moon/moon_rock.png", 36.0],
+	# Boat courses (docs/DESIGN.md §20). Where the user kept several looks, a list: the
+	# props of that kind take them in turn.
+	"reeds": ["res://art/props/water/reeds.png", 40.0],
+	"lily_pad": ["res://art/props/water/lily_pad.png", 30.0],
+	"duck_house": ["res://art/props/water/duck_house.png", 70.0],
+	"shipwreck": [["res://art/props/water/shipwreck_1.png", "res://art/props/water/shipwreck_2.png",
+		"res://art/props/water/shipwreck_3.png"], 110.0],
+	"treasure_chest": ["res://art/props/water/treasure_chest.png", 34.0],
+	"rock": ["res://art/props/water/rock.png", 44.0],
+	"buoy": ["res://art/props/water/rock.png", 24.0],
+	"lemon_slice": ["res://art/props/water/lemon_slice.png", 62.0],
+	"ice_cube": ["res://art/props/water/ice_cube.png", 40.0],
+	"cocktail_umbrella": [["res://art/props/water/cocktail_umbrella_1.png",
+		"res://art/props/water/cocktail_umbrella_2.png"], 58.0],
 }
+## A ramp's trigger, across the channel and along it, px; a log's solid half-length and radius.
+const RAMP_TRIGGER := Vector2(90, 240)
+const LOG_HALF_LENGTH := 90.0
+const LOG_RADIUS := 26.0
+## Scenery bridges reach this far past the channel on both sides, px, and draw over the boats.
+const BRIDGE_OVERHANG := 190.0
+const BRIDGE_Z := 3
 const BOOST_PAD_SIZE := Vector2(150, 210)
 const WALL_THICKNESS := 64.0
 const TYRE_SPACING := 76.0
@@ -97,6 +123,8 @@ func _build(data: Dictionary, id: StringName, out_path: String) -> Error:
 	_add(_props(data, tile))
 	if not data.get("boost_pads", []).is_empty():
 		_add(_boost_pads(data["boost_pads"], line.curve))
+	if data.get("water", false):
+		_water(data, line.curve, tile)
 
 	var packed := PackedScene.new()
 	var error := packed.pack(_root)
@@ -225,10 +253,13 @@ func _props(data: Dictionary, tile: float) -> Node2D:
 	var props: Node2D = _named(Node2D.new(), "Props")
 	var kinds: Dictionary = data.get("props_tiles", {})
 	for kind: String in kinds:
-		var texture: Texture2D = load(PROPS[kind][0])
+		var first: Variant = PROPS[kind][0]
+		var texture: Texture2D = load(first[0] if first is Array else first)
 		var spots: Array = kinds[kind]
 		for i in spots.size():
 			var p: Array = spots[i]
+			if PROPS[kind][0] is Array:
+				texture = load(PROPS[kind][0][i % PROPS[kind][0].size()])
 			props.add_child(_obstacle(texture, Vector2(p[0], p[1]) * tile, PROPS[kind][1],
 				"%s%d" % [kind.to_pascal_case(), i + 1]))
 	return props
@@ -274,3 +305,135 @@ func _sprite(texture: Texture2D, pos: Vector2) -> Sprite2D:
 	sprite.texture = texture
 	sprite.position = pos
 	return sprite
+
+
+# --- boat courses (docs/DESIGN.md §20) ------------------------------------------------------
+
+## Currents and branches onto the track itself; ramps, logs and scenery bridges as children.
+func _water(data: Dictionary, curve: Curve2D, tile: float) -> void:
+	var currents := PackedVector3Array()
+	for span: Array in data.get("current_spans", []):
+		currents.append(Vector3(span[0], span[1], span[2]))
+	_root.set("current_spans", currents)
+	var lines: Array[PackedVector2Array] = []
+	var spans := PackedVector2Array()
+	var halves := PackedFloat32Array()
+	var strengths := PackedFloat32Array()
+	for branch: Dictionary in data.get("branches", []):
+		var points := PackedVector2Array()
+		for p: Array in branch["line_px"]:
+			points.append(Vector2(p[0], p[1]))
+		lines.append(points)
+		spans.append(Vector2(branch["from"], branch["to"]))
+		halves.append(float(branch["road_tiles"]) * tile / 2.0)
+		strengths.append(float(branch.get("current", 0.0)))
+	_root.set("branch_lines", lines)
+	_root.set("branch_spans", spans)
+	_root.set("branch_half_widths", halves)
+	_root.set("branch_currents", strengths)
+	var ramps: Node2D = _named(Node2D.new(), "Ramps")
+	var placed := 0
+	for fraction in data.get("ramps", []):
+		var offset := fposmod(float(fraction), 1.0) * curve.get_baked_length()
+		var at := curve.sample_baked(offset)
+		var heading := (curve.sample_baked(fposmod(offset + 8.0, curve.get_baked_length())) - at).angle()
+		placed += 1
+		ramps.add_child(_ramp(at, heading, "Ramp%d" % placed))
+	for b in lines.size():
+		var branch: Dictionary = data["branches"][b]
+		var walk := _polyline_lengths(lines[b])
+		for fraction in branch.get("ramps", []):
+			var along: float = float(fraction) * walk[-1]
+			var at := _point_along(lines[b], walk, along)
+			var heading := (_point_along(lines[b], walk, along + 8.0) - at).angle()
+			placed += 1
+			ramps.add_child(_ramp(at, heading, "Ramp%d" % placed))
+	if placed > 0:
+		_add(ramps)
+	var logs: Node2D = _named(Node2D.new(), "Logs")
+	var paths: Array = data.get("logs_px", [])
+	for i in paths.size():
+		var a := Vector2(paths[i][0][0], paths[i][0][1])
+		var b := Vector2(paths[i][1][0], paths[i][1][1])
+		logs.add_child(_log(a, b, i))
+	if not paths.is_empty():
+		_add(logs)
+	var bridges: Node2D = _named(Node2D.new(), "SceneryBridges")
+	bridges.z_index = BRIDGE_Z
+	var fractions: Array = data.get("scenery_bridges", [])
+	for i in fractions.size():
+		var offset := fposmod(float(fractions[i]), 1.0) * curve.get_baked_length()
+		var at := curve.sample_baked(offset)
+		var along := curve.sample_baked(fposmod(offset + 8.0, curve.get_baked_length())) - at
+		bridges.add_child(_scenery_bridge(at, along.angle() + PI / 2.0, float(data["road_tiles"]) * tile, i + 1))
+	if not fractions.is_empty():
+		_add(bridges)
+
+
+## A wooden ramp in the channel: a boat crossing it is thrown in the air (Boat.jump).
+func _ramp(at: Vector2, heading: float, ramp_name: String) -> Area2D:
+	var ramp: Area2D = _named(Area2D.new(), ramp_name)
+	ramp.position = at
+	ramp.rotation = heading
+	ramp.monitorable = false
+	var shape := CollisionShape2D.new()
+	var box := RectangleShape2D.new()
+	box.size = RAMP_TRIGGER
+	shape.shape = box
+	ramp.add_child(_named(shape, "Collision"))
+	ramp.add_child(_named(_sprite(RAMP, Vector2.ZERO), "Sprite"))
+	return ramp
+
+
+## A floating log drifting to and fro between a and b, lying broadside to its drift.
+func _log(a: Vector2, b: Vector2, i: int) -> AnimatableBody2D:
+	var body := AnimatableBody2D.new()
+	body.name = "Log%d" % (i + 1)
+	body.set_script(LOG_SCRIPT)
+	body.set("from", a)
+	body.set("to", b)
+	body.set("phase", fmod(i * 0.37, 1.0))
+	body.position = a
+	var across := (b - a).angle() + PI / 2.0
+	var shape := CollisionShape2D.new()
+	var capsule := CapsuleShape2D.new()
+	capsule.radius = LOG_RADIUS
+	capsule.height = LOG_HALF_LENGTH * 2.0
+	shape.shape = capsule
+	shape.rotation = across + PI / 2.0  # a capsule stands along its own y
+	body.add_child(_named(shape, "Collision"))
+	var sprite := _sprite(load(LOGS[i % LOGS.size()]), Vector2.ZERO)
+	sprite.rotation = across
+	body.add_child(_named(sprite, "Sprite"))
+	return body
+
+
+## A footbridge over the channel, drawn above the boats with its shadow on the water. Scenery:
+## nothing touches it.
+func _scenery_bridge(at: Vector2, across: float, channel: float, n: int) -> Node2D:
+	var bridge: Node2D = _named(Node2D.new(), "Bridge%d" % n)
+	bridge.position = at
+	bridge.rotation = across
+	var stretch := (channel + 2.0 * BRIDGE_OVERHANG) / FOOTBRIDGE.get_width()
+	var shadow := _sprite(FOOTBRIDGE, Vector2(18, 28).rotated(-across))
+	shadow.scale = Vector2(stretch, 1.0)
+	shadow.modulate = Color(0, 0, 0, 0.28)
+	bridge.add_child(_named(shadow, "Shadow"))
+	var deck := _sprite(FOOTBRIDGE, Vector2.ZERO)
+	deck.scale = Vector2(stretch, 1.0)
+	bridge.add_child(_named(deck, "Deck"))
+	return bridge
+
+
+static func _polyline_lengths(points: PackedVector2Array) -> PackedFloat32Array:
+	var out := PackedFloat32Array([0.0])
+	for i in range(1, points.size()):
+		out.append(out[-1] + points[i].distance_to(points[i - 1]))
+	return out
+
+
+static func _point_along(points: PackedVector2Array, lengths: PackedFloat32Array, along: float) -> Vector2:
+	along = clampf(along, 0.0, lengths[-1])
+	var i := clampi(lengths.bsearch(along) - 1, 0, points.size() - 2)
+	var t := (along - lengths[i]) / maxf(lengths[i + 1] - lengths[i], 0.001)
+	return points[i].lerp(points[i + 1], t)

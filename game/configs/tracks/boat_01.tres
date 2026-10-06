@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="TrackConfig" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://game/configs/track_config.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://track/tracks/boat_01.tscn" id="2_track"]
+[ext_resource type="Resource" path="res://game/configs/boats/jetski.tres" id="3_a"]
+[ext_resource type="Resource" path="res://game/configs/boats/duck.tres" id="4_b"]
+[ext_resource type="Resource" path="res://game/configs/boats/swan.tres" id="5_c"]
+[ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="6_setup"]
+[ext_resource type="PackedScene" path="res://actors/boat/boat.tscn" id="7_boat"]
+
+[resource]
+script = ExtResource("1_script")
+track_id = &"boat_01"
+display_name = "Duck Pond"
+track_scene = ExtResource("2_track")
+vehicle_kind = &"boat"
+vehicle_scene = ExtResource("7_boat")
+laps = 3
+player_slot = 3
+opponent_names = PackedStringArray("BLUE", "YELLOW", "GREEN")
+opponent_setups = Array[ExtResource("6_setup")]([ExtResource("3_a"), ExtResource("4_b"), ExtResource("5_c")])
+opponent_paints = Array[StringName]([&"blue", &"yellow", &"green"])
+opponent_colours = Array[Color]([Color(0.227, 0.525, 1, 1), Color(1, 0.824, 0.247, 1), Color(0.18, 0.769, 0.42, 1)])
+opponent_skills = PackedFloat32Array(0.85, 0.7, 0.55)

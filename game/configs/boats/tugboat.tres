@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="DriftSetup" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cards/boats/tugboat.png" id="2_card"]
+[ext_resource type="Texture2D" path="res://art/boats/tugboat.png" id="3_body"]
+[ext_resource type="AudioStream" path="res://art/sfx/horn_tugboat.wav" id="4_horn"]
+[ext_resource type="AudioStream" path="res://art/sfx/motor_loop.wav" id="5_engine"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"tugboat"
+kind = &"boat"
+display_name = "Tugboat"
+card_art = ExtResource("2_card")
+body = ExtResource("3_body")
+price = 300
+lateral_grip_mult = 1.4
+handbrake_grip_mult = 1.2
+engine_power_mult = 0.9
+max_speed_mult = 0.92
+steer_rate_mult = 0.9
+skid_colour = Color(0, 0, 0, 0)
+engine_pitch = 0.75
+horn = ExtResource("4_horn")
+engine_sound = ExtResource("5_engine")
+ignores_land = false
+bar_grip = 0.8
+bar_slide = 0.3
+bar_speed = 0.45

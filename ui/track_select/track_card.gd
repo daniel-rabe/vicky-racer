@@ -16,6 +16,8 @@ var unlocked := true
 var opened_by := ""
 var _line := PackedVector2Array()  # the racing line, fitted into SHAPE_RECT
 var _colour := Color(0.36, 0.73, 0.29)
+## A boat course's channel (docs/DESIGN.md §20) is drawn as water with a white lip, not as road.
+var _water := false
 var _name: Label
 var _info: Label
 var _race_info := ""
@@ -51,6 +53,7 @@ func _read_track() -> void:
 	var track: Track = config.track_scene.instantiate()
 	if track.theme:
 		_colour = track.theme.card_colour
+		_water = track.theme.water
 	var curve: Curve2D = (track.get_node("RacingLine") as Path2D).curve
 	var points := curve.get_baked_points()
 	track.free()
@@ -68,8 +71,12 @@ func _read_track() -> void:
 
 func _draw() -> void:
 	draw_rect(SHAPE_RECT.grow(10), _colour)
-	draw_polyline(_line, DARK, 26.0, true)
-	draw_polyline(_line, Color(0.37, 0.4, 0.45), 18.0, true)
+	if _water:
+		draw_polyline(_line, Color.WHITE, 26.0, true)
+		draw_polyline(_line, _colour.darkened(0.35), 18.0, true)
+	else:
+		draw_polyline(_line, DARK, 26.0, true)
+		draw_polyline(_line, Color(0.37, 0.4, 0.45), 18.0, true)
 	if not unlocked:
 		var c := SHAPE_RECT.get_center()
 		draw_rect(Rect2(c - Vector2(45, 10), Vector2(90, 70)), DARK)

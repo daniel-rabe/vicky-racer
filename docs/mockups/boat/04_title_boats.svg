@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="Public Pixel, Consolas, monospace">
+  <title>Title menu with BOATS — 1920 x 1080</title>
+  <defs><style>
+    .btn { fill: #3A86FF; stroke: #0E141C; stroke-width: 6; }
+    .t { fill: #FFFFFF; font-size: 44px; text-anchor: middle; }
+    .spec-text { fill: #FF2BD6; font-family: Consolas, monospace; font-size: 20px; stroke: #14202E; stroke-width: 5px; paint-order: stroke; }
+  </style></defs>
+  <rect width="1920" height="1080" fill="#6E8E3A"/>
+  <path d="M 0 1080 L 560 0 L 1000 0 L 440 1080 Z" fill="#4A4F57" opacity="0.9"/>
+  <path d="M 1920 1080 L 1360 0 L 920 0 L 1480 1080 Z" fill="#4A4F57" opacity="0.9"/>
+  <text x="960" y="250" font-size="150" text-anchor="middle" fill="#FFD23F" stroke="#14202E" stroke-width="10" paint-order="stroke">VICKY</text>
+  <text x="960" y="420" font-size="150" text-anchor="middle" fill="#E63946" stroke="#14202E" stroke-width="10" paint-order="stroke">RACER</text>
+
+  <rect x="758" y="504" width="196" height="124" rx="40" fill="#2EC46B" stroke="#FFD23F" stroke-width="8"/>
+  <g transform="translate(856 552) scale(0.55)"><rect x="-70" y="-40" width="140" height="80" rx="26" fill="#E63946" stroke="#0E141C" stroke-width="7"/><rect x="-10" y="-30" width="34" height="60" rx="8" fill="#96D2F0"/><rect x="-60" y="-54" width="30" height="16" rx="5" fill="#22252A"/><rect x="30" y="-54" width="30" height="16" rx="5" fill="#22252A"/><rect x="-60" y="38" width="30" height="16" rx="5" fill="#22252A"/><rect x="30" y="38" width="30" height="16" rx="5" fill="#22252A"/></g>
+  <text x="856" y="612" font-size="26" text-anchor="middle" fill="#FFFFFF">CARS</text>
+  <rect x="966" y="508" width="196" height="116" rx="40" fill="#1FA3C8" stroke="#0E141C" stroke-width="6"/>
+  <g transform="translate(1070 550) scale(0.5)"><path d="M -100 -40 L 40 -46 L 110 0 L 40 46 L -100 40 Z" fill="#FAFAF5" stroke="#0E141C" stroke-width="7"/><path d="M -86 -26 L 32 -34 L 90 0 L 32 34 L -86 26 Z" fill="#3A86FF"/><path d="M -160 -20 q 20 -12 40 0 M -160 20 q 20 -12 40 0" stroke="#FFFFFF" stroke-width="7" fill="none"/></g>
+  <text x="1064" y="612" font-size="26" text-anchor="middle" fill="#FFFFFF">BOATS</text>
+
+  <rect class="btn" x="762" y="652" width="396" height="76" rx="38"/><text class="t" x="960" y="708">TOWN</text>
+  <rect class="btn" x="762" y="744" width="396" height="76" rx="38"/><text class="t" x="960" y="800">2 PLAYERS</text>
+  <rect class="btn" x="762" y="836" width="396" height="76" rx="38"/><text class="t" x="960" y="892">SETTINGS</text>
+  <rect class="btn" x="762" y="928" width="396" height="76" rx="38"/><text class="t" x="960" y="984">QUIT</text>
+  <rect x="1230" y="500" width="150" height="150" rx="36" fill="#3A86FF" stroke="#0E141C" stroke-width="6"/>
+  <text x="1305" y="590" font-size="22" text-anchor="middle" fill="#FFD23F">SHELF</text>
+
+  <text class="spec-text" x="40" y="480">PLAY splits into two picture buttons: CARS (focused first, as PLAY was) and BOATS.</text>
+  <text class="spec-text" x="40" y="1050">No sixth row, so the menu keeps its height. 2 PLAYERS asks CARS or BOATS on the join screen. Left/right moves between CARS and BOATS.</text>
+</svg>

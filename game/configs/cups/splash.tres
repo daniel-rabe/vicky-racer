@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CupConfig" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://game/configs/cup_config.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cards/boats/duck.png" id="2_icon"]
+[ext_resource type="Script" path="res://game/configs/track_config.gd" id="3_track"]
+[ext_resource type="Resource" path="res://game/configs/tracks/boat_01.tres" id="4_boat_01"]
+[ext_resource type="Resource" path="res://game/configs/tracks/boat_02.tres" id="5_boat_02"]
+[ext_resource type="Resource" path="res://game/configs/tracks/boat_03.tres" id="6_boat_03"]
+[ext_resource type="Resource" path="res://game/configs/tracks/boat_04.tres" id="7_boat_04"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"splash"
+display_name = "Splash Cup"
+icon = ExtResource("2_icon")
+vehicle_kind = &"boat"
+tracks = Array[ExtResource("3_track")]([ExtResource("4_boat_01"), ExtResource("5_boat_02"), ExtResource("6_boat_03"), ExtResource("7_boat_04")])
+points = Array[int]([10, 7, 5, 3])

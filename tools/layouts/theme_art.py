@@ -24,7 +24,8 @@ import build_tileset as bt  # noqa: E402
 THEMES = json.loads((HERE / "themes.json").read_text(encoding="utf-8"))
 GROUND = json.loads((ROOT / "tools" / "comfy" / "pipeline.json").read_text(encoding="utf-8"))["ground"]
 RIMS = {"sand": (201, 162, 74), "grass": (78, 143, 46), "ice": (127, 191, 216), "mud": (94, 58, 30),
-        "chocolate": (92, 52, 32), "crater": (131, 122, 162)}
+        "chocolate": (92, 52, 32), "crater": (131, 122, 162), "sandbank": (201, 162, 74),
+        "candy": (217, 138, 176)}
 
 
 def fill_path(name: str) -> Path:
@@ -55,6 +56,23 @@ def boost_pad(size=(160, 224)) -> Image.Image:
         pts = [(x0, 40), (x0 + 30, h // 2), (x0, h - 40), (x0 + 16, h - 40), (x0 + 46, h // 2), (x0 + 16, 40)]
         d.polygon(pts, fill=(255, 255, 255, 255), outline=(14, 20, 28, 255))
     return img
+
+
+def buoy_strip(length: int, thickness: int, block: int, red, cream) -> Image.Image:
+    """A boat course's 'kerb' (DESIGN.md §20): a rope of round floats in the theme's two colours
+    on a transparent strip, the water showing through. Tiles along X like kerb_strip."""
+    ss = 4
+    img = Image.new("RGBA", (length * ss, thickness * ss), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    mid = thickness * ss // 2
+    d.line((0, mid, length * ss, mid), fill=(245, 240, 225, 255), width=3 * ss)
+    r = int(thickness * ss * 0.36)
+    for i, x in enumerate(range(block * ss // 2, length * ss, block * ss)):
+        colour = tuple(red) if i % 2 == 0 else tuple(cream)
+        d.ellipse((x - r + 2 * ss, mid - r + 3 * ss, x + r + 2 * ss, mid + r + 3 * ss), fill=(0, 0, 0, 60))
+        d.ellipse((x - r, mid - r, x + r, mid + r), fill=colour + (255,), outline=(30, 34, 40, 255), width=2 * ss)
+        d.ellipse((x - r * 0.5, mid - r * 0.65, x - r * 0.05, mid - r * 0.2), fill=(255, 255, 255, 170))
+    return img.resize((length, thickness), Image.LANCZOS)
 
 
 def road_ice(size=128) -> Image.Image:
@@ -89,7 +107,15 @@ def main() -> None:
         if theme_id.startswith("_"):
             continue
         k = GROUND["kerb"]
-        kerb = pp.kerb_strip(4 * k["block"] * 2, k["thickness"], k["block"], tuple(t["kerb"]["red"]), tuple(t["kerb"]["cream"]))
+        if t.get("water"):  # a boat course: buoys for kerbs, and the deep channel as the road
+            kerb = buoy_strip(4 * k["block"] * 2, k["thickness"], k["block"], t["kerb"]["red"], t["kerb"]["cream"])
+            out = ROOT / t["road_out"]
+            out.parent.mkdir(parents=True, exist_ok=True)
+            params = {k2: v for k2, v in GROUND[t["road"]].items() if not k2.startswith("_")}
+            params["base"] = tuple(params["base"])
+            pp.flat_fill(GROUND["tile_px"], seed=len(t["road"]), **params).save(out)
+        else:
+            kerb = pp.kerb_strip(4 * k["block"] * 2, k["thickness"], k["block"], tuple(t["kerb"]["red"]), tuple(t["kerb"]["cream"]))
         out = ROOT / t["kerb_out"]
         out.parent.mkdir(parents=True, exist_ok=True)
         kerb.save(out)

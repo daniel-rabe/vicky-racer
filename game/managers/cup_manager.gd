@@ -6,13 +6,15 @@ extends Node
 ## every race (CUP_progress_changed) and the trophy at the end (CUP_finished), and reads
 ## the saved progress and trophies back from PRO_state_changed.
 ##
-## A cup's next cup opens only when it has been won — 1st in the final standings.
+## A cup's next cup opens only when it has been won — 1st in the final standings. Cars and
+## boats (docs/DESIGN.md §20) are separate chains, each with its first cup open; starting or
+## going on with a cup switches the garage to its kind, so the race is raced in the right one.
 ##
 ## Phases: none (no cup) -> ready (a race is next) -> racing (on the track) -> results
 ## (race over, standings to show) -> ready ... and after the last race -> done (podium).
 
 const CUP_DIR := "res://game/configs/cups/"
-const CUP_ORDER: Array[StringName] = [&"sunshine", &"snowflake", &"starlight"]
+const CUP_ORDER: Array[StringName] = [&"sunshine", &"snowflake", &"starlight", &"splash"]
 const TROPHY_FOR_PLACE: Array[StringName] = [&"gold", &"silver", &"bronze", &"ribbon"]
 ## Better trophies first; a cup remembers the best one ever won.
 const TROPHY_RANK: Array[StringName] = [&"gold", &"silver", &"bronze", &"ribbon"]
@@ -46,8 +48,12 @@ func _ready() -> void:
 
 
 func is_unlocked(cup_id: StringName) -> bool:
-	var i := CUP_ORDER.find(cup_id)
-	return i == 0 or (i > 0 and _trophies.get(CUP_ORDER[i - 1]) == &"gold")
+	if not cups.has(cup_id):
+		return false
+	var chain := CUP_ORDER.filter(func(id: StringName) -> bool:
+		return cups[id].vehicle_kind == cups[cup_id].vehicle_kind)
+	var i := chain.find(cup_id)
+	return i == 0 or (i > 0 and _trophies.get(chain[i - 1]) == &"gold")
 
 
 func current_track() -> TrackConfig:
@@ -67,6 +73,7 @@ func start(cup_id: StringName) -> void:
 	trophy = &""
 	_save_progress()
 	phase = &"racing"
+	EventSystem.PRO_vehicle_kind_requested.emit(cup.vehicle_kind)
 	EventSystem.UI_screen_requested.emit(&"race")
 
 
@@ -76,6 +83,7 @@ func continue_cup() -> void:
 		EventSystem.UI_screen_requested.emit(&"podium")
 	elif cup:
 		phase = &"racing"
+		EventSystem.PRO_vehicle_kind_requested.emit(cup.vehicle_kind)
 		EventSystem.UI_screen_requested.emit(&"race")
 
 
