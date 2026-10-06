@@ -19,6 +19,8 @@ var _laps := {}            # racer name -> lap times
 var _bad_orders := 0
 var _results: Array = []
 var race: Node2D
+var _last_progress := {}   # racer name -> progress last frame
+var _jumps: PackedStringArray = []
 
 
 func _enter_tree() -> void:
@@ -67,6 +69,18 @@ func _ready() -> void:
 	_report(start_progress)
 
 
+## Progress must change smoothly: a jump means the ranking flickers (a lap counted while the
+## car's centre is still short of the line reads as a whole lap ahead for a moment).
+func _physics_process(_delta: float) -> void:
+	if not race or not race.manager.running:
+		return
+	for r in race.racers:
+		var last: float = _last_progress.get(r["name"], r["progress"])
+		if absf(r["progress"] - last) > 200.0 and not r["finished"]:
+			_jumps.append("%s %d -> %d" % [r["name"], last, r["progress"]])
+		_last_progress[r["name"]] = r["progress"]
+
+
 func _on_lap(car: Node, lap: int, lap_time: float) -> void:
 	_laps.get_or_add(car.name, []).append(lap_time)
 	print("  lap %d  %-7s %.2fs" % [lap, car.name, lap_time])
@@ -104,6 +118,7 @@ func _report(start_progress: Dictionary) -> void:
 			_check(ok_times, "%s lap times are sensible (%s)" % [name, laps.map(func(t: float) -> String: return "%.1f" % t)])
 			_check(r["driver"].rescues == 0, "%s never needed rescuing (%d)" % [name, r["driver"].rescues])
 	_check(_final_laps == 1, "the player's last lap was announced once (%d)" % _final_laps)
+	_check(_jumps.is_empty(), "progress never jumped (%s)" % [_jumps])
 	_check(_bad_orders == 0, "positions were always a clean 1-4 (%d bad updates)" % _bad_orders)
 	if not _results.is_empty():
 		var positions := _results.map(func(e: Dictionary) -> int: return e["position"])

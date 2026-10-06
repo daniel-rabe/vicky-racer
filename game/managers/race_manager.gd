@@ -22,6 +22,10 @@ const COUNTDOWN_FROM := 3
 const FINISH_HOLD_SECONDS := 2.5
 ## Two players: once the first has finished, the other has this long to finish too.
 const LAST_PLAYER_WAIT := 30.0
+## The gates only span the road: a car off it drives round them. So a forward step along the
+## racing line over a gate's spot counts as crossing it too — if the step is no longer than
+## this, far more than any car moves in a frame but less than a jump onto another pass.
+const MAX_GATE_STEP := 200.0
 
 var track: Track
 var config: TrackConfig
@@ -36,6 +40,7 @@ var race_time := 0.0
 var time_trial := false
 
 var _finish_offset := 0.0
+var _checkpoint_rel := 0.0  # px after the finish line
 var _players: Array[Dictionary] = []
 var _final_lap_announced := false
 var _order: Array[Dictionary] = []
@@ -49,6 +54,8 @@ func start(race_track: Track, race_config: TrackConfig, race_racers: Array[Dicti
 	difficulty = race_difficulty
 	racers = race_racers
 	_finish_offset = track.progress_at(track.get_node("FinishLine").global_position)
+	_checkpoint_rel = fposmod(track.progress_at(track.get_node("Checkpoint").global_position) - _finish_offset,
+		track.lap_length())
 	for r in racers:
 		r.merge({"laps": 0, "crossed_start": false, "checkpoint": false, "lap_start": 0.0,
 			"best_lap": 0.0, "lap_times": [], "finished": false, "finish_time": 0.0, "progress": 0.0})
@@ -75,6 +82,7 @@ func _physics_process(delta: float) -> void:
 	if not running:
 		return
 	race_time += delta
+	_cross_gates_off_road()
 	_update_positions()
 	_rubber_band()
 
@@ -120,12 +128,36 @@ func _on_finish_crossed(car: Car) -> void:
 				_wait_for_last_player()
 
 
+## Crossings of the gates by progress along the line, for the cars that went round them.
+## A car that did cross the gate gets both; the flags make the second do nothing.
+func _cross_gates_off_road() -> void:
+	var length := track.lap_length()
+	for r in racers:
+		var rel := fposmod(track.progress_of(r["car"]) - _finish_offset, length)
+		var last: float = r.get("last_rel", rel)
+		r["last_rel"] = rel
+		var step := fposmod(rel - last + length / 2.0, length) - length / 2.0  # signed, the short way round
+		if step <= 0.0 or step > MAX_GATE_STEP:
+			continue
+		var to_checkpoint := fposmod(_checkpoint_rel - last, length)
+		if to_checkpoint > 0.0 and to_checkpoint <= step:
+			r["checkpoint"] = true
+		var to_finish := fposmod(-last, length)
+		if to_finish > 0.0 and to_finish <= step:
+			_on_finish_crossed(r["car"])
+
+
 ## Progress in px from the start of the race: negative while still behind the line on the grid.
 func _progress(r: Dictionary) -> float:
 	var length := track.lap_length()
 	var rel := fposmod(track.progress_of(r["car"]) - _finish_offset, length)
 	if not r["crossed_start"]:
 		return rel - length
+	if not r["checkpoint"] and rel > _checkpoint_rel:
+		# Past the checkpoint's spot without its flag: still short of the line. The gate counts
+		# the lap as the car's nose touches it, a few frames before its centre is over the line
+		# (or it reversed back over the line) — not a whole lap ahead.
+		rel -= length
 	return r["laps"] * length + rel
 
 
