@@ -1,7 +1,8 @@
 # Vicky Racer — Plan: animated cars
 
-Status: **proposal, not built.** A plan for making the cars feel alive while they drive, starting
-with wheels that visibly roll. Nothing here changes handling; it is all drawing.
+Status: **Phase 20a (rolling tread) is built** — see §3, which now describes what was built.
+Phase 20b and the extras in §5 are still proposals. Nothing here changes handling; it is all
+drawing.
 
 ## 1. What we have today
 
@@ -47,43 +48,41 @@ extras.** The plan below is phased so each phase ships on its own.
 
 ### 3.1 Wheel rectangles
 
-A new tool, `tools/comfy/wheel_rects.py`, finds the four tyres in every car body and writes
-`art/cars/wheels.json`:
+`tools/comfy/wheel_rects.py` finds the four tyres in every car body and writes them into a
+generated script, `game/configs/car_wheels.gd` (a script rather than JSON, so the export takes it
+along with no extra filter):
 
-```json
-{
-  "res://art/cars/paint/kart_blue.png": {
-    "front_left":  [79, 2, 102, 16],
-    "front_right": [79, 57, 102, 71],
-    "rear_left":   [32, 2, 55, 16],
-    "rear_right":  [38, 57, 55, 71]
-  }
+```gdscript
+const BODIES := {
+	"setups/kart.png": [Rect2i(32, 3, 23, 9), Rect2i(81, 4, 23, 16), Rect2i(32, 60, 23, 9), Rect2i(81, 53, 23, 15)],
+	...
 }
 ```
 
-Rectangles are `[x0, y0, x1, y1]` in texture pixels; "left" is the top of the image (the car's
-left when it faces +X).
+Per body: rear left, front left, rear right, front right, in texture pixels; "left" is the top
+of the image (the car's left when it faces +X). `CarWheels.of(texture)` looks a body up.
 
-Detection: tyre pixels are opaque, dark (luma < 70) and grey (low saturation); look for runs of
-such columns in the top and bottom 18 px bands, two per band. A first naive pass already finds most
-tyres, but not all of them — e.g. the kart's rear-right tyre is only half found and the police
-car's lower tyres are split by its orange hubcaps:
+Detection: tyre pixels are opaque, dark and grey. The tyres are the outermost dark things above
+and below the body, so their columns come from the rows nearest the top and bottom edges (moving
+inwards until two tyres are found: the Dragon's wings keep its tyres a few rows in), with gaps
+of a hubcap's width bridged; each rectangle then grows inwards while its rows are mostly tyre,
+and the two tyres of an axle share one width. A first, naive pass (bands instead of edge rows)
+missed tyres like these:
 
 ![First pass of the wheel detection](screenshots/wheel_detection.png)
 
-So the tool must (1) merge runs separated by a few px of hub colour, (2) pair each paint with its
-original and warn when a rectangle moved more than ~3 px, (3) accept hand overrides from a small
-`overrides` section in `tools/comfy/asset_manifest.json`, and (4) write a contact sheet with the
-rectangles drawn on, like `postprocess.py` already does for other assets, to check all 76 at a
-glance. `generate_assets.py` calls it after it builds paints, so new cars and colours get their
-rectangles automatically.
+The tool compares each paint with its original and reports rectangles that moved, takes hand
+fixes from `wheel_overrides` in `tools/comfy/asset_manifest.json`, and draws every rectangle on
+`docs/mockups/wheel_rects.png` for a check by eye. 70 of the 76 bodies are listed; the six
+Bubble Car bodies are overridden to "none" — their tyres only peek out at the corners. Re-run
+the tool after building new cars or paints.
 
 The tyre **mask** inside a rectangle is computed in the shader from the same dark-and-grey rule,
 so hubcaps, suspension arms and body paint overlapping the rectangle are left alone.
 
 ### 3.2 The shader
 
-`actors/car/car_body.gdshader`, a `canvas_item` shader:
+`actors/car/rolling_tread.gdshader`, a `canvas_item` shader:
 
 - uniforms `vec4 wheels[4]` (rectangles in UV), `float roll_front`, `float roll_rear` (distance
   rolled, px), `float blur` (0..1);
@@ -97,47 +96,34 @@ so hubcaps, suspension arms and body paint overlapping the rectangle are left al
 
 ### 3.3 Driving it
 
-A small new script, `actors/car/car_wheels.gd`, on a `Wheels` node in `car.tscn` (keeping
+`actors/car/rolling_tread.gd` (`RollingTread`), on a `Tread` node in `car.tscn` (keeping
 `car.gd` about handling only, as its header says):
 
-- looks up `wheels.json` for `car.body_texture.resource_path` whenever the texture changes (paint
-  change, title screen, town). No entry → no material: the car just looks as it does today;
+- looks the body's texture up in `CarWheels` whenever it changes (paint change, title screen,
+  town). No entry → no material: the car just looks as it does today;
 - gives `Body` its own `ShaderMaterial` per car (`duplicate()`; the rectangles differ per paint);
-- each physics tick: `roll += car.forward_speed() * delta` — signed, so reversing rolls backwards;
+- each physics tick: `roll += car.forward_speed() * delta * ROLL_SCALE` — signed, so reversing
+  rolls backwards. `ROLL_SCALE` (0.15) slows the tread down: at the true rate it would strobe
+  from walking pace up, and a slower one still reads as rolling;
   rear wheels stop (`roll_rear` frozen) while `car.handbrake` is held, which looks like locked
   wheels in a handbrake drift; frozen cars (countdown) do not roll;
 - `blur = smoothstep(BLUR_FROM, BLUR_TO, abs(speed))`, both constants in px/s, tuned by eye.
 
-`ghost_car.gd` gets the same material and computes its roll from the distance between recorded
+`ghost_car.gd` adds a `RollingTread` of its own and feeds it the distance between recorded
 samples, so ghosts roll too.
 
 ### 3.4 Files
 
-| File | Change |
+| File | What |
 | --- | --- |
-| `tools/comfy/wheel_rects.py` | new: detect, merge, override, contact sheet, write JSON |
-| `tools/comfy/generate_assets.py` | run `wheel_rects.py` after paints |
-| `tools/comfy/asset_manifest.json` | `wheel_overrides` section for hand fixes |
-| `art/cars/wheels.json` | new, generated |
-| `actors/car/car_body.gdshader` | new |
-| `actors/car/car_wheels.gd` + `car.tscn` | new node feeding the shader |
-| `actors/ghost/ghost_car.gd` | material + roll from samples |
-| `tests/effects_test.gd` | roll advances with speed, goes backwards in reverse, rear stops on handbrake, none while frozen |
-| `tests/` (new check, or in `front_end_test.gd`) | every body texture reachable through `Paint.body` has four wheel rectangles |
-| `docs/DESIGN.md` §4 effects table | one row: rolling wheels |
-
-### 3.5 Steps
-
-1. Write `wheel_rects.py`, run it on all 76 bodies, fix misses with overrides until the contact
-   sheet is right.
-2. Write the shader; try it on one car in `game/screens/test_drive.tscn` and tune period, width,
-   darkness and blur.
-3. Add `car_wheels.gd`, hook it into `car.tscn`, check race, town (24 traffic cars), title screen,
-   split screen.
-4. Ghost cars.
-5. Tests, then `tests/perf_probe.gd` on a full race to confirm no frame-time cost (one extra
-   texture sample per pixel of 8–24 small sprites — expected negligible).
-6. DESIGN.md row and a short ROADMAP entry.
+| `tools/comfy/wheel_rects.py` | detect, compare with originals, apply overrides, contact sheet, write the script |
+| `tools/comfy/asset_manifest.json` | `wheel_overrides` (the Bubble Car: none) |
+| `game/configs/car_wheels.gd` | generated: `CarWheels`, the tyre rectangles of every body |
+| `docs/mockups/wheel_rects.png` | generated: every body with its rectangles drawn on |
+| `actors/car/rolling_tread.gdshader` | the tread |
+| `actors/car/rolling_tread.gd` + `car.tscn` | `RollingTread`, feeding the shader |
+| `actors/ghost/ghost_car.gd` | ghosts roll too |
+| `tests/effects_test.gd` | rolls with speed, backwards in reverse, rear locked on the handbrake, still while frozen, smeared at top speed, follows a paint change, none on the Bubble Car; every body in every paint has its tyres listed |
 
 ## 4. Phase 20b — Steering front wheels (optional)
 
@@ -147,8 +133,8 @@ Only if 20a is not enough. Reuses the rectangles from 20a:
    body and writes one front-wheel PNG per car (from the original; tyres are black, so the paints
    can share it — check this on the contact sheet).
 2. `car.tscn` gets two `Sprite2D` front wheels drawn behind `Body` (`show_behind_parent`), placed
-   at the rectangle centres from `wheels.json`.
-3. `car_wheels.gd` rotates them by `steer_input × MAX_WHEEL_ANGLE` (~25°), smoothed; the tread
+   at the rectangle centres from `CarWheels`.
+3. `rolling_tread.gd` rotates them by `steer_input × MAX_WHEEL_ANGLE` (~25°), smoothed; the tread
    shader runs on the wheel sprites instead of the body for the front pair.
 
 Risk: the erased body may show a hole where a tyre overlapped the body outline; that needs a hand
@@ -157,13 +143,13 @@ touch-up per car (12 originals × 6 paints). That cost is why this is a separate
 ## 5. Extras that fall out of the same work (optional, small)
 
 - **Body lean** — tilt `Body` a couple of degrees against the sideways speed while drifting, and
-  a tiny squash when hitting a wall (`CAR_wall_hit`). Pure transforms, in `car_wheels.gd` or
+  a tiny squash when hitting a wall (`CAR_wall_hit`). Pure transforms, in `rolling_tread.gd` or
   `car_effects.gd`.
 - **Idle shake** — a sub-pixel engine wobble at standstill during the countdown.
 - **Rocket flames** — the rocket's baked flames could flicker with the same shader (a flame mask
   rectangle instead of wheels) and grow with throttle/boost.
 - **Exact skid marks** — `skid_marks.gd` and `car_effects.gd` could use the real rear-wheel
-  positions from `wheels.json` instead of the fixed `Vector2(-40, 0)`.
+  positions from `CarWheels` instead of the fixed `Vector2(-40, 0)`.
 
 ## 6. Done when
 
