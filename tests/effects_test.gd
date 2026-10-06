@@ -1,6 +1,7 @@
 extends Node2D
 ## Headless checks for the Phase 8 effects (docs/DESIGN.md §4.3): skid marks while
-## drifting, dust on grass and sand, tyre smoke on the road, and the wall-hit camera shake.
+## drifting, dust on grass and sand, tyre smoke on the road, and the wall-hit camera shake;
+## and for the rolling wheels (docs/CAR_ANIMATION_PLAN.md).
 ##   Godot_console.exe --path . --headless --fixed-fps 60 res://tests/effects_test.tscn
 ## Exit code 0 = all passed. Run with a window and `-- --screenshot=<path.png>` to save a
 ## picture of a drift onto the grass, for checking the look.
@@ -23,6 +24,8 @@ func _ready() -> void:
 	await _test_dust_on_grass()
 	await _test_wall_shake()
 	await _test_car_specific_effects()
+	await _test_rolling_tread()
+	_test_every_body_has_tyres()
 	if not _screenshot.is_empty():
 		await _take_screenshot()
 		# With a window the cars' engines are audible: free them and let audio mix once, or
@@ -185,6 +188,64 @@ func _test_car_specific_effects() -> void:
 	await _drive(police, 0.6, 1.0, 1.0, true)
 	_check(lights.visible, "and flash while it drifts")
 	await _done(police)
+
+
+func _test_rolling_tread() -> void:
+	print("rolling wheels")
+	var car := _arena(ASPHALT)
+	car.setup = load("res://game/configs/setups/kart.tres")
+	var tread: RollingTread = car.get_node("Tread")
+	await _drive(car, 0.1)
+	_check(tread.active() and car.get_node("Body").material != null, "the Kart's body gets the tread shader")
+	_check(is_zero_approx(tread.roll_front), "a parked car's wheels stand still")
+	await _drive(car, 0.5, 0.0, 1.0)
+	var front := tread.roll_front
+	_check(front > 0.0 and is_equal_approx(front, tread.roll_rear), "driving rolls all four wheels forward (%.1f px)" % front)
+	await _drive(car, 0.5, 0.0, 1.0)
+	_check(tread.roll_front - front > front, "faster driving rolls them faster")
+	var rear := tread.roll_rear
+	await _drive(car, 0.3, 0.0, 0.0, true)
+	_check(tread.roll_front > front and is_equal_approx(tread.roll_rear, rear), "the handbrake locks the rear wheels only")
+	car.velocity = Vector2.ZERO
+	await _drive(car, 1.2, 0.0, -1.0)
+	_check(car.forward_speed() < 0.0, "the car reverses")
+	front = tread.roll_front
+	await _drive(car, 0.3, 0.0, -1.0)
+	_check(tread.roll_front < front, "reversing rolls the wheels backwards")
+	car.frozen = true
+	front = tread.roll_front
+	await _drive(car, 0.3, 0.0, 1.0)
+	_check(tread.roll_front == front, "a frozen car's wheels stand still")
+	car.frozen = false
+	car.velocity = Vector2.RIGHT.rotated(car.rotation) * 1200.0
+	await _drive(car, 0.05, 0.0, 1.0)
+	_check(tread.blur > 0.9, "at top speed the tread smears (blur %.2f)" % tread.blur)
+	car.body_texture = Paint.body(car.setup, &"pink")
+	await _drive(car, 0.05)
+	_check(car.get_node("Body").material.get_shader_parameter(&"wheels")[1] == _wheel_vector(CarWheels.of(car.body_texture)[1]),
+		"a new paint gets its own tyre rectangles")
+	car.setup = load("res://game/configs/setups/bubble.tres")
+	await _drive(car, 0.05)
+	_check(not tread.active() and car.get_node("Body").material == null, "the Bubble Car, whose tyres hardly show, has no tread")
+	await _done(car)
+
+
+func _wheel_vector(r: Rect2i) -> Vector4:
+	return Vector4(r.position.x, r.position.y, r.end.x, r.end.y)
+
+
+## Every body a race can show, in every paint, has its four tyres listed (but the Bubble Car).
+func _test_every_body_has_tyres() -> void:
+	var missing: PackedStringArray = []
+	for file in DirAccess.get_files_at("res://game/configs/setups"):
+		if not file.ends_with(".tres") or file == "bubble.tres":
+			continue
+		var setup: DriftSetup = load("res://game/configs/setups/" + file)
+		for colour in Paint.COLOURS:
+			var body := Paint.body(setup, colour)
+			if CarWheels.of(body).size() != 4:
+				missing.append(body.resource_path)
+	_check(missing.is_empty(), "every car in every paint has its tyres listed" + (" (not: %s)" % ", ".join(missing) if missing else ""))
 
 
 ## A drift that runs off the road onto the grass: marks, smoke and dust in one picture.
