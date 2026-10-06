@@ -1185,16 +1185,33 @@
     },
     {
       "id": "water_ramp",
-      "subject": "a wooden jump ramp for toy boats viewed from straight above, flat lay: a rectangular platform of light wooden planks with bright yellow and red warning stripes along one short edge",
-      "seed": 12,
-      "facing": "up_right",
+      "subject": "wooden jump ramp for toy boats",
+      "seed": 26,
+      "facing": "right",
       "box": [
         320,
-        256
+        224
       ],
       "out": "art/props/water/ramp.png",
       "sheet_ground": "pond_water",
-      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2). Seed 12 is drawn three-quarter, rising toward the top right: facing up_right turns its run to +X, the way boats hit it."
+      "_note": "Phase 20 boat-course prop (DESIGN.md §20.2), redrawn in Phase 21. The first pick (seed 12 of a txt2img prompt) was three-quarter and looked skewed once turned along a channel or towards an islet; now a Kontext edit of a top-down sketch (postprocess.ramp_sketch), pointing right (+X) like every sprite.",
+      "details": "seen exactly from straight above with no side visible, light wooden planks running across it, darker at the low end on the left where it dips into the water, paler towards the raised end on the right, a bright yellow and red striped edge along the raised end, two yellow arrows painted on the planks pointing right",
+      "sketch": {
+        "length": 0.62,
+        "width": 0.42,
+        "boards": 9
+      },
+      "sketch_kind": "ramp",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
     },
     {
       "id": "water_footbridge",

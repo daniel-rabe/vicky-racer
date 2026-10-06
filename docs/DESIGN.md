@@ -1508,6 +1508,14 @@ the roster in the same way as car opponents (§8).
   rather than turned, or it would sail upside down. The splash and the ramp take-off were cut
   from the approved wake and wave recordings (`derive_sfx.py`): Stable Audio's one-shot water
   sounded like wind.
+- **The ramp is drawn from above** (redrawn in Phase 21). The first ramp was a three-quarter
+  picture (a raised end on a block, seen at an angle). A ramp is turned to lie along the
+  channel, and turned by 90–160° the three-quarter picture looked skewed or upside down. It is
+  now a Kontext edit of a top-down sketch (`postprocess.ramp_sketch`, the buildings' trick):
+  planks across, darker at the low end, a striped lip at the raised end and arrows pointing the
+  way to go, so it reads at any angle. Seed 26 of eight; 25 and 26 kept the view, the rest
+  went three-quarter again ([sheet](mockups/candidates/water_ramp.png),
+  [every angle, before and after](mockups/candidates/water_ramp_angles.png)).
 
 ---
 
@@ -1615,13 +1623,13 @@ walls for boats. The town's pond stays car water, as it is now; a boat can never
 | Thing | Where | What happens |
 | --- | --- | --- |
 | **Coin trails** | Arcs of 7–9 coins round the coast, through the slalom and over the ramps | Each coin is worth 2. It is banked at once and comes back 40 s later, as in town |
-| **Lighthouse** | On a rocky islet to the north-east | Its beam sweeps slowly round. Sailing within 700 px of it counts as a place (`LIGHTHOUSE`) |
+| **Lighthouse** | On a rocky islet off the north-east corner | Its beam sweeps slowly round. Sailing within 700 px of it counts as a place (`LIGHTHOUSE`) |
 | **Two ramp islets** | East and west | A ramp in the water in front of a sandy islet with a palm. Jump the islet and collect the coins in the air (Phase 20's ramp and airborne) |
 | **Buoy slalom** | Along the north shore | Ten buoys, alternately left and right, with a coin in each gate |
-| **Shipwreck** | North-west | The Phase 20 wreck on a sandbar, with a treasure chest. Sailing within 700 px of it counts as a place (`SHIPWRECK`) |
+| **Shipwreck** | Off the north-west corner | The Phase 20 wreck on a sandbar, with a treasure chest. Sailing within 700 px of it counts as a place (`SHIPWRECK`) |
 | **Dolphins** | West | A pod of three. When a boat comes within 1,100 px they swim along beside it (up to 2,600 px from home), each leaping in an arc every 1–2.4 s, with a splash and, near the player, a whistle |
 | **Seagulls** | Two over the harbour, two over the lighthouse | They circle, flapping. A horn within 520 px sends one off crying; it fades back in over its spot 9 s later |
-| **Two sailboats** | One loops round the whole island, the other round the east islet | They follow fixed loops at a gentle speed. They are bumpers: a boat that meets one bounces off softly |
+| **Two sailboats** | One loops round the whole island, 2,100 px out (past every islet, ramp and coin trail), the other round the lighthouse | They follow fixed loops at a gentle speed. They are bumpers: a boat that meets one bounces off softly |
 
 The places at sea count towards the all-places bonus, which grows from 11 to 14 places (the
 harbour, the lighthouse and the shipwreck).
@@ -1657,7 +1665,10 @@ harbour, the lighthouse and the shipwreck).
 
 ### 21.7 Under the hood (Gate C)
 
-- **`Island`** holds every position (the mockup script has its own copy of the same numbers).
+- **`Island`** holds every position. The mockup script has its own copy of the numbers it was
+  approved with; since then the lighthouse and the wreck have moved about 600 px nearer the
+  island, so the big sailboat loop could pass outside them (the first loop, 1,250 px out, ran
+  straight through the east ramp islet).
   The outline is a rounded rectangle round the town's world rect, 80 px a point, with the
   waterline wobbling by three sine waves along it; the wobble fades out towards the harbour.
 - **`town.gd`:**

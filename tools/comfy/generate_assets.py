@@ -104,10 +104,12 @@ def post_of(entry: dict, entries: dict) -> list[str]:
 
 def render_sprite(client: ComfyClient, ref: str, entry: dict, seed: int) -> tuple[Image.Image, Image.Image]:
     """(cut-out, raw) for a sprite. A background (`size` set) has no cut-out: both are the picture.
-    A building (`sketch` set) is Kontext's edit of its block sketch (pipeline.json `buildings`)."""
+    A building (`sketch` set) is Kontext's edit of its block sketch (pipeline.json `buildings`);
+    so is anything else drawn first as a sketch in the view it must keep (`sketch_kind`: the
+    boat ramp, seen from straight above)."""
     if "sketch" in entry:
         buf = io.BytesIO()
-        pp.building_sketch(entry["sketch"]).save(buf, "PNG")
+        SKETCHES[entry.get("sketch_kind", "building")](entry["sketch"]).save(buf, "PNG")
         uploaded = client.upload_image(buf.getvalue(), f"vr_sketch_{entry['id']}.png")
         images = client.run(recipe.building_graph(uploaded, entry["subject"], entry["details"], seed))
         return (Image.open(io.BytesIO(images["save_cutout"][0])).convert("RGBA"),
@@ -120,6 +122,8 @@ def render_sprite(client: ComfyClient, ref: str, entry: dict, seed: int) -> tupl
     return (Image.open(io.BytesIO(images["save_cutout"][0])).convert("RGBA"),
             Image.open(io.BytesIO(images["save"][0])).convert("RGB"))
 
+
+SKETCHES = {"building": pp.building_sketch, "ramp": pp.ramp_sketch}
 
 # "mirror" flips left-right: a three-quarter view (the pirate ship) turned 180 degrees would hang upside down.
 POST_STEPS = {"punch_hole": pp.punch_center_hole, "sticker": pp.sticker_border,

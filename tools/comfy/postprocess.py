@@ -268,3 +268,33 @@ def building_sketch(sketch: dict, size: int = 1536) -> Image.Image:
         for wx in (inner[0], inner[1] - 220):
             d.rounded_rectangle((wx, eave + 100, wx + 220, eave + 100 + win_h), 24, fill=glass)
     return img
+
+
+def ramp_sketch(sketch: dict, size: int = 1536) -> Image.Image:
+    """A boat jump ramp seen from straight above, pointing right: planks running across it,
+    darker at the low end on the left (where it dips into the water) and paler towards the
+    raised end on the right, which has a striped lip and casts a shadow; two arrows point the
+    way the boats go. FLUX draws a ramp three-quarter however it is asked, and a three-quarter
+    ramp cannot be turned to lie along a channel; Kontext keeps this view (DESIGN.md §20.2).
+    `sketch`: width and length as fractions of `size`, and the number of boards."""
+    img = Image.new("RGB", (size, size), (250, 250, 248))
+    d = ImageDraw.Draw(img)
+    length, width = round(sketch["length"] * size), round(sketch["width"] * size)
+    x0, y0 = (size - length) // 2, (size - width) // 2
+    x1, y1 = x0 + length, y0 + width
+    d.rounded_rectangle((x0 + 40, y0 + 50, x1 + 70, y1 + 60), 40, fill=(222, 222, 220))  # the raised end's shadow
+    boards = sketch.get("boards", 9)
+    lip = round(length * 0.1)
+    each = (length - lip) / boards
+    for i in range(boards):
+        shade = 0.72 + 0.28 * i / (boards - 1)
+        colour = tuple(round(c * shade) for c in (232, 184, 120))
+        bx = x0 + i * each
+        d.rectangle((bx, y0, bx + each - 6, y1), fill=colour)
+    stripe = round(width / 6)
+    for k in range(6):
+        d.rectangle((x1 - lip, y0 + k * stripe, x1, y0 + (k + 1) * stripe), fill=(250, 205, 40) if k % 2 == 0 else (225, 60, 50))
+    for cx in (x0 + length * 0.3, x0 + length * 0.55):
+        d.line([(cx, y0 + width * 0.28), (cx + width * 0.2, y0 + width * 0.5), (cx, y0 + width * 0.72)], fill=(250, 205, 40),
+               width=round(width * 0.07), joint="curve")
+    return img

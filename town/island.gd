@@ -37,15 +37,17 @@ const SLIPWAY := Rect2(5480.0, 8650.0, 200.0, 280.0)
 
 # --- at sea (§21.5) ---------------------------------------------------------------------
 ## Islets: centre, radius across (the islet is 0.8 of that tall), what is on it.
-const LIGHTHOUSE := Vector2(9920.0 + 1250.0, -1150.0)
+## The lighthouse and the wreck sit nearer the island than in the mockups, so the big
+## sailboat loop passes outside them (checked against every islet, ramp and coin trail).
+const LIGHTHOUSE := Vector2(9920.0 + 650.0, -650.0)
 const LIGHTHOUSE_RADIUS := 420.0
 ## Ramp islets: the islet's centre and which way the ramp throws you over it.
 const RAMP_ISLETS := [[Vector2(9920.0 + 1350.0, 4700.0), Vector2.UP], [Vector2(-1450.0, 2300.0), Vector2.DOWN]]
 const RAMP_ISLET_RADIUS := 180.0
 ## The ramp stands this far before the islet's centre.
 const RAMP_LEAD := 340.0
-const WRECK := Vector2(-1500.0, -1000.0)
-const WRECK_SANDBAR := Vector2(-1240.0, -780.0)
+const WRECK := Vector2(-950.0, -700.0)
+const WRECK_SANDBAR := Vector2(-690.0, -480.0)
 const SLALOM_Y := -1250.0
 const SLALOM_X := 2400.0
 const SLALOM_GAP := 560.0
@@ -53,10 +55,12 @@ const SLALOM_BUOYS := 10
 const SLALOM_SWING := 220.0
 const DOLPHIN_HOME := Vector2(-1700.0, 6300.0)
 const GULL_SPOTS: Array[Vector2] = [Vector2(4300.0, 8320.0 + 900.0), Vector2(5600.0, 8320.0 + 1000.0),
-	Vector2(9920.0 + 1100.0, -800.0), Vector2(9920.0 + 1500.0, -1500.0)]
-## The big sailboat loop, this far out from the waterline.
-const SAIL_LOOP := 1250.0
-const SAIL_SMALL_LOOP := Vector2(820.0, 640.0)
+	Vector2(9920.0 + 450.0, -350.0), Vector2(9920.0 + 900.0, -1000.0)]
+## The big sailboat loop, this far out from the waterline: outside the islets, the ramps
+## and the coin trails, inside the outer limit.
+const SAIL_LOOP := 2100.0
+## The small loop, round the lighthouse's islet.
+const SAIL_SMALL_LOOP := Vector2(650.0, 520.0)
 
 
 static func world() -> Rect2:
@@ -146,13 +150,12 @@ static func sea_coins() -> PackedVector2Array:
 	return out
 
 
-## The big sailboat's loop round the whole island, and the small one round the east islet.
+## The big sailboat's loop round the whole island, and the small one round the lighthouse.
 static func sail_loops() -> Array[PackedVector2Array]:
 	var small := PackedVector2Array()
-	var centre: Vector2 = RAMP_ISLETS[0][0]
 	for i in 60:
 		var a := TAU * i / 60.0
-		small.append(centre + Vector2(cos(a) * SAIL_SMALL_LOOP.x, sin(a) * SAIL_SMALL_LOOP.y))
+		small.append(LIGHTHOUSE + Vector2(cos(a) * SAIL_SMALL_LOOP.x, sin(a) * SAIL_SMALL_LOOP.y))
 	return [outline(SAIL_LOOP, 0.3), small]
 
 
