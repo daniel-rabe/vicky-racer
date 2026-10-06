@@ -2,11 +2,14 @@ class_name Town
 extends Node2D
 ## Free Drive's town (docs/DESIGN.md §19), built in _ready from TownLayout: grass, pavements
 ## and two-lane streets on a grid, the buildings along the blocks with solid walls, a park
-## with a fountain and a pond, trees, and an edge to the world.
+## with a fountain and a pond, and trees. Round it lies the island (§21, Island): a beach,
+## the sea out to a ring of buoys, a harbour with a pier, and islets, a lighthouse, a
+## shipwreck and a buoy slalom out at sea.
 ##
 ## Like a race track it owns surfaces: every physics frame it tells each car in the "cars"
 ## group what it drives on — the road and the pavements are asphalt, a block's lawn is
-## grass, the pond is water.
+## grass, the pond is water, the beach is sand; at sea a boat is slowed in the shallows by
+## the shore and goes full speed on deep water.
 ##
 ## It is also the traffic's map. Junctions are grid cells (Vector2i); lane_points() and
 ## turn_points() give the line a car follows along a road and through a junction, on the
@@ -25,6 +28,31 @@ const PLAYGROUND := preload("res://art/town/props/playground.png")
 const BENCH := preload("res://art/town/props/bench.png")
 const FLOWER_BED := preload("res://art/town/props/flower_bed.png")
 const BUILDING_ART := "res://art/town/buildings/%s.png"
+const OPEN_SEA := preload("res://art/town/island/open_sea.png")
+const SEA := preload("res://art/town/island/sea.png")
+const SHALLOWS := preload("res://art/tiles/lagoon_water.png")
+const WET_SAND := preload("res://art/town/island/wet_sand.png")
+const BEACH := preload("res://art/tiles/beach.png")
+const PLANKS := preload("res://art/town/island/planks.png")
+const PALM := preload("res://art/props/beach/palm_tree.png")
+const PARASOL := preload("res://art/props/beach/parasol.png")
+const BEACH_BALL := preload("res://art/props/beach/beach_ball.png")
+const ROCK := preload("res://art/props/water/rock.png")
+const RAMP := preload("res://art/props/water/ramp.png")
+const WRECK := preload("res://art/props/water/shipwreck_2.png")
+const CHEST := preload("res://art/props/water/treasure_chest.png")
+const LIGHTHOUSE := preload("res://art/town/island/lighthouse.png")
+const SAILBOAT := preload("res://art/town/island/sailboat.png")
+const MOORING_POST := preload("res://art/town/island/mooring_post.png")
+const FOAM := Color(1, 1, 1, 0.8)
+const PAD_COLOUR := Color(0.24, 0.59, 0.86, 0.92)
+## The ramp's trigger, as on a boat course (track/build/build_track.gd).
+const RAMP_TRIGGER := Vector2(150, 190)
+## Sailing this close to the lighthouse's or the wreck's islet counts as a visit.
+const SEA_PLACE_REACH := 700.0
+## The shallows are drawn as this many faint bands, each nearer the shore, so they pale
+## smoothly towards the sand.
+const SHALLOWS_STEPS := 7
 
 ## Lanes: px from the road's centre line to a car's line, on the right of the road.
 const LANE := 80.0
@@ -55,11 +83,18 @@ var footprints: Array[Rect2] = []
 var places: Array[Dictionary] = []
 ## The car wash's pad, where a car is washed (Rect2() if the town has none).
 var wash_pad := Rect2()
+## Islet outlines (§21.5): sand in the sea, walls to a boat.
+var islets: Array[PackedVector2Array] = []
 
 var _reserved := {}    # Vector2i -> the car crossing that junction
 var _surface_of := {}  # car -> surface id
 var _solid: StaticBody2D
 var _rng := RandomNumberGenerator.new()
+# The island's bands, for surface_at: inside the grass line is grass, then sand to the
+# waterline, then the shallows out to their line, then deep water.
+var _grass_line: PackedVector2Array
+var _water_line: PackedVector2Array
+var _shallows_line: PackedVector2Array
 
 @onready var _ground := Node2D.new()
 @onready var _things := Node2D.new()
@@ -76,10 +111,15 @@ func _ready() -> void:
 	_solid.collision_layer = Car.LAYER_WORLD
 	_solid.collision_mask = 0
 	add_child(_solid)
+	_grass_line = Island.outline(-Island.BEACH)
+	_water_line = Island.outline(0.0)
+	_shallows_line = Island.outline(Island.SHALLOWS)
 	_build_graph()
 	_build_ground()
 	_build_blocks()
-	_build_edge()
+	_build_coast()
+	_build_harbour()
+	_build_sea()
 
 
 func _physics_process(_delta: float) -> void:
@@ -92,8 +132,14 @@ func _physics_process(_delta: float) -> void:
 			EventSystem.CAR_surface_changed.emit(car, surface)
 
 
+## The town's own square of land (the sky's balloons and clouds stay over it).
 func world_rect() -> Rect2:
 	return Rect2(Vector2.ZERO, TownLayout.world_size())
+
+
+## The island and all its sea: the camera's limits.
+func map_rect() -> Rect2:
+	return Island.map_rect()
 
 
 ## Everything inside the outer ring road's pavement: where the town is.
@@ -109,11 +155,27 @@ func surface_at(pos: Vector2) -> StringName:
 		if pos.distance_to(Vector2(pond.x, pond.y)) < pond.z - 20.0:
 			return &"water"
 	if not streets_rect().has_point(pos):
-		return &"grass"
+		return _coast_surface(pos)
 	for lawn in lawns:
 		if lawn.grow(-8.0).has_point(pos):
 			return &"grass"
 	return &"asphalt"
+
+
+## Outside the streets: the harbour's paving, the grass, the beach, the sea.
+func _coast_surface(pos: Vector2) -> StringName:
+	if Island.QUAY.has_point(pos) or _drive_rect().has_point(pos):
+		return &"asphalt"
+	if Geometry2D.is_point_in_polygon(pos, _grass_line):
+		return &"grass"
+	if Geometry2D.is_point_in_polygon(pos, _water_line):
+		return &"beach"
+	for islet in islets:
+		if Geometry2D.is_point_in_polygon(pos, islet):
+			return &"sandbank"
+	if Geometry2D.is_point_in_polygon(pos, _shallows_line):
+		return &"lagoon_water"
+	return &"deep_water"
 
 
 # --- the traffic's map ----------------------------------------------------------------
@@ -197,8 +259,7 @@ func _join(a: Vector2i, b: Vector2i) -> void:
 
 
 func _build_ground() -> void:
-	var world := world_rect()
-	_ground.add_child(_textured(_rect_points(world), GRASS))
+	_build_coast_ground()
 	_ground.add_child(_textured(_rect_points(streets_rect(), 140.0), PAVEMENT))
 	var half := TownLayout.ROAD_HALF
 	# Kerbs first, all of them, then the asphalt over them, so junctions come out clean.
@@ -297,7 +358,7 @@ func _row_of_buildings(ids: Array, lawn: Rect2, bottom: bool) -> Array[Rect2]:
 	return out
 
 
-func _building(id: String, picture: Texture2D, rect: Rect2, on_street: bool) -> void:
+func _building(id: String, picture: Texture2D, rect: Rect2, on_street: bool, on_lawn := true) -> void:
 	var sprite := Sprite2D.new()
 	sprite.name = id.capitalize().replace(" ", "")
 	sprite.texture = picture
@@ -307,7 +368,8 @@ func _building(id: String, picture: Texture2D, rect: Rect2, on_street: bool) -> 
 	var used := Rect2(picture.get_image().get_used_rect()) if picture.get_image() else Rect2(Vector2.ZERO, rect.size)
 	var solid := Rect2(rect.position + used.position, used.size).grow(-WALL_INSET)
 	_add_box(solid)
-	footprints.append(solid)
+	if on_lawn:
+		footprints.append(solid)
 	if on_street and TownLayout.PLACE_NAMES.has(id):
 		# The doorstep: the pavement in front of the door, and a little of the road.
 		var door := Vector2(solid.get_center().x, rect.end.y + 10.0 + TownLayout.SIDEWALK * 0.5)
@@ -521,37 +583,329 @@ func _tree(at: Vector2, size: float) -> void:
 	_add_circle(at, TREE_TRUNK * size)
 
 
-## The edge of the world: a wall round the map, hidden in a ring of trees.
-func _build_edge() -> void:
-	var world := world_rect()
-	var t := 200.0
-	for rect: Rect2 in [Rect2(-t, -t, world.size.x + 2 * t, t + 40), Rect2(-t, world.size.y - 40, world.size.x + 2 * t, t + 40),
-			Rect2(-t, 0, t + 40, world.size.y), Rect2(world.size.x - 40, 0, t + 40, world.size.y)]:
-		_add_box(rect)
+## The island's ground (§21.1), from the outside in: open sea, the sea inside the outer
+## limit, the shallows (in steps, paler towards the shore), foam where the waves meet the
+## sand, wet sand, the beach, and the island's grass.
+func _build_coast_ground() -> void:
+	_ground.add_child(_textured(_rect_points(map_rect()), OPEN_SEA))
+	_ground.add_child(_textured(Island.limit_outline(), SEA))
+	for k in SHALLOWS_STEPS:
+		var band := _textured(Island.outline(Island.SHALLOWS * (1.0 - 0.75 * float(k) / SHALLOWS_STEPS)), SHALLOWS)
+		band.color = Color(1, 1, 1, 0.22)
+		_ground.add_child(band)
+	var foam := Line2D.new()
+	foam.points = Island.outline(18.0)
+	foam.closed = true
+	foam.width = 26.0
+	foam.default_color = FOAM
+	_ground.add_child(foam)
+	_ground.add_child(_textured(_water_line, WET_SAND))
+	_ground.add_child(_textured(Island.outline(-Island.WET), BEACH))
+	_ground.add_child(_textured(_grass_line, GRASS))
+
+
+## Palms where the grass meets the sand, parasols and beach balls along the beach, a few
+## trees on the grass round the town, and the waterline as a wall: cars stop at the wet
+## sand, boats in the shallows.
+func _build_coast() -> void:
+	var palms := Island.outline(-Island.BEACH - 60.0)
+	for i in range(0, palms.size(), 9):
+		if not _near_harbour(palms[i], 300.0):
+			var palm := _sprite(PALM, palms[i], 220.0 * _rng.randf_range(0.85, 1.1), _rng.randf() * TAU)
+			palm.z_index = TREE_Z
+			_add_circle(palms[i], TREE_TRUNK)
+	var sand := Island.outline(-Island.BEACH * 0.45)
+	for i in range(5, sand.size(), 37):
+		if not _near_harbour(sand[i], 500.0):
+			_sprite(PARASOL, sand[i], 190.0)
+			_sprite(BEACH_BALL, sand[i] + Vector2(150, 60), 70.0)
+	# A few round trees on the grass between the ring road and the beach.
 	var streets := streets_rect()
-	var step := 170.0
-	var x := 80.0
-	while x < world.size.x:
-		for y in [80.0, world.size.y - 80.0]:
-			_tree(Vector2(x, y), 1.0)
-		x += step
-	var y := 80.0 + step
-	while y < world.size.y - step:
-		for edge_x in [80.0, world.size.x - 80.0]:
-			_tree(Vector2(edge_x, y), 1.0)
-		y += step
-	# A few more scattered on the grass between the ring road and the edge.
-	var grass: Array[Rect2] = [Rect2(world.position, Vector2(world.size.x, streets.position.y)),
-		Rect2(Vector2(0, streets.end.y), Vector2(world.size.x, world.size.y - streets.end.y)),
-		Rect2(Vector2(0, streets.position.y), Vector2(streets.position.x, streets.size.y)),
-		Rect2(Vector2(streets.end.x, streets.position.y), Vector2(world.size.x - streets.end.x, streets.size.y))]
-	for band in grass:
-		var inner := band.grow(-260.0)
-		if inner.size.x <= 0.0 or inner.size.y <= 0.0:
+	var inner := Island.outline(-Island.BEACH - 200.0)
+	for i in 60:
+		var spot := Vector2(_rng.randf_range(-200.0, world_rect().end.x + 200.0), _rng.randf_range(-200.0, world_rect().end.y + 200.0))
+		if streets.grow(160.0).has_point(spot) or not Geometry2D.is_point_in_polygon(spot, inner) or _near_harbour(spot, 500.0):
 			continue
-		for i in int(band.get_area() / 900000.0):
-			_tree(Vector2(_rng.randf_range(inner.position.x, inner.end.x), _rng.randf_range(inner.position.y, inner.end.y)),
-				_rng.randf_range(0.8, 1.1))
+		_tree(spot, _rng.randf_range(0.8, 1.1))
+	_wall_line(_wall(Car.LAYER_SEA_EDGE | Car.LAYER_LAND_EDGE, "Shore"), Island.shoreline())
+
+
+## The harbour (§21.2): a road down from the ring road to a stone quay, the harbour master's
+## boathouse facing onto it with the land pad in front, the pier out to the mooring, a
+## slipway, and boats tied up.
+func _build_harbour() -> void:
+	var quay := Island.QUAY
+	var drive := _drive_rect()
+	_ground.add_child(_flat(_rect_points(Rect2(drive.position + Vector2(-7, 20), drive.size + Vector2(14, 20))), KERB_COLOUR))
+	_ground.add_child(_textured(_rect_points(drive.grow_individual(0, 0, 0, 40)), ASPHALT))
+	var y := drive.position.y + 160.0
+	while y < drive.end.y - 80.0:
+		_ground.add_child(_flat(_rect_points(Rect2(Island.DRIVE_X - 5.0, y, 10.0, 80.0)), DASH_COLOUR))
+		y += 160.0
+	_ground.add_child(_textured(_rect_points(quay), PAVEMENT))
+	var edge := Color(0.59, 0.55, 0.49)
+	for strip: Rect2 in [Rect2(quay.position.x, quay.end.y - 30.0, quay.size.x, 30.0),
+			Rect2(quay.position.x, quay.position.y, 24.0, quay.size.y), Rect2(quay.end.x - 24.0, quay.position.y, 24.0, quay.size.y)]:
+		_ground.add_child(_flat(_rect_points(strip), edge))
+	var x := quay.position.x + 120.0
+	while x < quay.end.x - 60.0:
+		if _clear_of(x, Island.PIER) and _clear_of(x, Island.SLIPWAY):
+			_ground.add_child(_disc(Vector2(x, quay.end.y - 28.0), 22.0, Color(0.24, 0.24, 0.26)))
+		x += 220.0
+	# Crates and a coil of rope on the quay; the crates are solid.
+	for crate: Array in [[Vector2(5630, 8250), Color(0.77, 0.47, 0.24)], [Vector2(5700, 8250), Color(0.27, 0.55, 0.78)],
+			[Vector2(5665, 8190), Color(0.86, 0.71, 0.24)]]:
+		var box := Rect2(crate[0] - Vector2(34, 34), Vector2(68, 68))
+		_things.add_child(_flat(_rect_points(box), crate[1]))
+		var rim := Line2D.new()
+		rim.points = _rect_points(box)
+		rim.closed = true
+		rim.width = 5.0
+		rim.default_color = Color(0.24, 0.16, 0.08)
+		_things.add_child(rim)
+	_add_box(Rect2(5596, 8156, 138, 128))
+	var rope := Line2D.new()
+	for k in 25:
+		rope.add_point(Vector2(5220, 8510) + Vector2.from_angle(TAU * k / 24.0) * 32.0)
+	rope.width = 14.0
+	rope.default_color = Color(0.75, 0.63, 0.43)
+	_ground.add_child(rope)
+	# The slipway: concrete fading into the water.
+	var slip := Polygon2D.new()
+	var s := Island.SLIPWAY
+	slip.polygon = PackedVector2Array([s.position, Vector2(s.end.x, s.position.y), s.end, Vector2(s.position.x, s.end.y)])
+	var concrete := Color(0.77, 0.75, 0.71)
+	slip.vertex_colors = PackedColorArray([concrete, concrete, Color(concrete, 0.0), Color(concrete, 0.0)])
+	_ground.add_child(slip)
+	# The harbour master's boathouse, its front on the quay: a named place, like the shops.
+	var picture: Texture2D = load(BUILDING_ART % "harbour")
+	var size := Vector2(picture.get_size())
+	_building("harbour", picture, Rect2(Vector2(Island.BUILDING_CENTRE_X - size.x / 2.0, quay.position.y - 10.0 - size.y), size),
+		true, false)
+	# The land pad: a boat drawn on it, for what you will become. (The screen swaps a vehicle
+	# that stops on a pad: Island.LAND_PAD, Island.MOORING.)
+	_ground.add_child(_flat(_rect_points(Island.LAND_PAD, 30.0), PAD_COLOUR))
+	_outline_rect(Island.LAND_PAD, 30.0, Color.WHITE, 8.0)
+	_icon(Island.LAND_PAD.get_center(), &"boat", Color.WHITE)
+	# The pier: planks out to the mooring, posts down both sides; a wall to boats.
+	var pier := Island.PIER
+	_ground.add_child(_flat(_rect_points(Rect2(pier.position + Vector2(14, 14), pier.size)), Color(0, 0, 0, 0.18)))
+	_ground.add_child(_textured(_rect_points(pier), PLANKS))
+	y = pier.position.y + 60.0
+	while y < pier.end.y + 40.0:
+		for post_x in [pier.position.x - 6.0, pier.end.x + 6.0]:
+			_sprite(MOORING_POST, Vector2(post_x, y), 56.0)
+		y += 150.0
+	var pier_shape := CollisionShape2D.new()
+	var pier_box := RectangleShape2D.new()
+	pier_box.size = pier.size + Vector2(24, 0)
+	pier_shape.shape = pier_box
+	pier_shape.position = pier.get_center()
+	_wall(Car.LAYER_LAND_EDGE, "Pier").add_child(pier_shape)
+	# The mooring: water in a ring of floating buoys, a car drawn on it.
+	var mooring := Island.MOORING
+	_ground.add_child(_flat(_rect_points(mooring, 60.0), Color(1, 1, 1, 0.27)))
+	var ring := _rect_points(mooring, 60.0)
+	for i in range(0, ring.size(), 3):
+		if ring[i].y < mooring.position.y + 30.0 and absf(ring[i].x - mooring.get_center().x) < 100.0:
+			continue  # the pier side stays open
+		_ground.add_child(_buoy(ring[i], 17.0, Color(0.98, 0.78, 0.16) if i % 2 else Color.WHITE))
+	_icon(mooring.get_center() + Vector2(0, 30), &"car", Color(1, 1, 1, 0.78))
+	# Boats tied up beside the pier and the quay: bumpers to a boat sailing in.
+	for moored: Array in [["res://art/boats/tugboat.png", Vector2(pier.position.x - 110.0, 8880), 150.0, PI / 2.0],
+			["res://art/boats/duck.png", Vector2(pier.end.x + 100.0, 8820), 120.0, PI / 2.0],
+			["res://art/boats/swan.png", Vector2(4120, 8780), 120.0, PI * 0.62]]:
+		_sprite(load(moored[0]), moored[1], moored[2], moored[3])
+		_add_circle(moored[1], moored[2] * 0.3)
+	_sprite(SAILBOAT, Vector2(5840, 8800), 200.0)
+	_add_circle(Vector2(5840, 8860), 50.0)
+
+
+## Out at sea (§21.5): the lighthouse's islet, the ramp islets, the slalom, the wreck, and
+## the outer limit's ring of buoys and rocks.
+func _build_sea() -> void:
+	var islands := _wall(Car.LAYER_LAND_EDGE, "Islets")
+	_islet(Island.LIGHTHOUSE, Island.LIGHTHOUSE_RADIUS, islands, 0)
+	var light := _sprite(LIGHTHOUSE, Island.LIGHTHOUSE + Vector2(0, -80), 420.0)
+	light.z_index = TREE_Z
+	_sea_place("lighthouse", Island.LIGHTHOUSE, LIGHTHOUSE)
+	for i in Island.RAMP_ISLETS.size():
+		var centre: Vector2 = Island.RAMP_ISLETS[i][0]
+		var throw: Vector2 = Island.RAMP_ISLETS[i][1]
+		_islet(centre, Island.RAMP_ISLET_RADIUS, islands, 1, false)
+		var ramp := Area2D.new()
+		ramp.name = "Ramp%d" % (i + 1)
+		ramp.position = Island.ramp_at(i)
+		ramp.rotation = throw.angle()
+		ramp.monitorable = false
+		ramp.collision_layer = 0
+		ramp.collision_mask = Car.LAYER_CARS_GROUND
+		var trigger := CollisionShape2D.new()
+		var box := RectangleShape2D.new()
+		box.size = RAMP_TRIGGER
+		trigger.shape = box
+		ramp.add_child(trigger)
+		var picture := Sprite2D.new()
+		picture.texture = RAMP
+		ramp.add_child(picture)
+		ramp.body_entered.connect(func(body: Node2D) -> void:
+			if body is Boat:
+				body.jump())
+		_things.add_child(ramp)
+	var gates := Island.slalom_buoys()
+	for k in gates.size():
+		_things.add_child(_buoy(gates[k], 30.0, Color(0.94, 0.59, 0.16) if k % 2 else Color(0.9, 0.27, 0.24)))
+		_add_circle(gates[k], 30.0)
+	_islet(Island.WRECK_SANDBAR, 170.0, islands, 0, false)
+	_sprite(WRECK, Island.WRECK, 420.0, 0.4)
+	_sprite(CHEST, Island.WRECK_SANDBAR + Vector2(40, -10), 110.0)
+	var wreck_shape := CollisionShape2D.new()
+	var hull := CircleShape2D.new()
+	hull.radius = 150.0
+	wreck_shape.shape = hull
+	wreck_shape.position = Island.WRECK
+	islands.add_child(wreck_shape)
+	_sea_place("shipwreck", Island.WRECK, WRECK)
+	# The outer limit: red buoys all round, clumps of rock, and a wall a boat bounces off.
+	var limit := Island.limit_outline()
+	for i in range(0, limit.size(), 15):
+		_things.add_child(_buoy(limit[i], 30.0, Color(0.9, 0.27, 0.24)))
+	for i in range(7, limit.size(), 60):
+		for k in 3:
+			_sprite(ROCK, limit[i] + Vector2(_rng.randf_range(-120, 120), _rng.randf_range(-120, 120)), 150.0, _rng.randf() * TAU)
+	_wall_line(_wall(Car.LAYER_WORLD, "OuterLimit"), limit)
+
+
+## An islet: pale water round it, sand, rocks and palms; solid to a boat.
+func _islet(centre: Vector2, radius: float, body: StaticBody2D, palms: int, rocks := true) -> void:
+	var shape := Island.islet(centre, radius)
+	var halo := PackedVector2Array()
+	for p in shape:
+		halo.append(centre + (p - centre) * 1.35)
+	var water := _textured(halo, SHALLOWS)
+	water.color = Color(1, 1, 1, 0.8)
+	_ground.add_child(water)
+	_ground.add_child(_textured(shape, BEACH))
+	if rocks:
+		for k in 4:
+			var a := _rng.randf() * TAU
+			_sprite(ROCK, centre + Vector2(cos(a) * radius * 0.95, sin(a) * radius * 0.75), 110.0, a)
+	for k in palms:
+		var palm := _sprite(PALM, centre + Vector2((k - (palms - 1) / 2.0) * 140.0, -20.0), 200.0, _rng.randf() * TAU)
+		palm.z_index = TREE_Z
+	var solid := CollisionPolygon2D.new()
+	solid.polygon = shape
+	body.add_child(solid)
+	islets.append(shape)
+
+
+## A place out at sea (the lighthouse, the wreck): sailing near it counts as a visit.
+func _sea_place(id: String, centre: Vector2, picture: Texture2D) -> void:
+	places.append({"id": id, "name": TownLayout.PLACE_NAMES[id], "door": centre, "picture": picture})
+	var area := Area2D.new()
+	area.name = id.capitalize().replace(" ", "") + "Visit"
+	area.position = centre
+	area.collision_layer = 0
+	area.collision_mask = Car.LAYER_CARS_GROUND | Car.LAYER_AIRBORNE
+	var shape := CollisionShape2D.new()
+	var circle := CircleShape2D.new()
+	circle.radius = SEA_PLACE_REACH
+	shape.shape = circle
+	area.add_child(shape)
+	_things.add_child(area)
+	area.body_entered.connect(func(body: Node2D) -> void:
+		if body is Car and body.has_node(^"PlayerInput"):
+			place_reached.emit(id, TownLayout.PLACE_NAMES[id], picture))
+
+
+## What a pad turns you into, drawn on it: a boat (a hull, a sail, a wave) or a car.
+func _icon(at: Vector2, kind: StringName, colour: Color) -> void:
+	if kind == &"boat":
+		_ground.add_child(_flat(PackedVector2Array([at + Vector2(-110, -10), at + Vector2(110, -10), at + Vector2(70, 50),
+			at + Vector2(-80, 50)]), colour))
+		_ground.add_child(_flat(PackedVector2Array([at + Vector2(-10, -20), at + Vector2(-10, -120), at + Vector2(70, -20)]), colour))
+		var wave := Line2D.new()
+		for k in 6:
+			wave.add_point(at + Vector2(-130 + 50 * k, 85 if k % 2 == 0 else 70))
+		wave.width = 12.0
+		wave.default_color = colour
+		wave.joint_mode = Line2D.LINE_JOINT_ROUND
+		_ground.add_child(wave)
+	else:
+		_ground.add_child(_flat(_rect_points(Rect2(at + Vector2(-110, -50), Vector2(220, 80)), 26.0), colour))
+		_ground.add_child(_flat(_rect_points(Rect2(at + Vector2(-60, -100), Vector2(120, 70)), 20.0), colour))
+		for wheel_x in [-60.0, 60.0]:
+			_ground.add_child(_disc(at + Vector2(wheel_x, 40), 30.0, colour))
+
+
+## A buoy seen from above: a coloured float with a white band and a yellow top.
+func _buoy(at: Vector2, radius: float, colour: Color) -> Node2D:
+	var buoy := Node2D.new()
+	buoy.position = at
+	buoy.add_child(_disc(Vector2(3, 6) * radius / 30.0, radius, Color(0, 0, 0, 0.22)))
+	buoy.add_child(_disc(Vector2.ZERO, radius, Color(0.16, 0.16, 0.2)))
+	buoy.add_child(_disc(Vector2.ZERO, radius * 0.9, colour))
+	buoy.add_child(_flat(_rect_points(Rect2(-radius * 0.9, -radius * 0.2, radius * 1.8, radius * 0.4)), Color.WHITE))
+	buoy.add_child(_disc(Vector2.ZERO, radius * 0.3, Color(0.98, 0.86, 0.31)))
+	return buoy
+
+
+func _near_harbour(at: Vector2, margin: float) -> bool:
+	return at.y > world_rect().end.y - 400.0 and at.x > Island.HARBOUR_X.x - margin and at.x < Island.HARBOUR_X.y + margin
+
+
+static func _clear_of(x: float, rect: Rect2) -> bool:
+	return x < rect.position.x - 40.0 or x > rect.end.x + 40.0
+
+
+## The harbour road, from the ring road's kerb to the quay.
+func _drive_rect() -> Rect2:
+	var top := streets_rect().end.y - TownLayout.SIDEWALK - 10.0
+	return Rect2(Island.DRIVE_X - Island.DRIVE_HALF, top, Island.DRIVE_HALF * 2.0, Island.QUAY.position.y - top)
+
+
+## A static body for one kind of wall, on `layers`.
+func _wall(layers: int, wall_name: String) -> StaticBody2D:
+	var body := StaticBody2D.new()
+	body.name = wall_name
+	body.collision_layer = layers
+	body.collision_mask = 0
+	add_child(body)
+	return body
+
+
+## A closed line as a wall: solid along its edges only, so it holds things on either side.
+func _wall_line(body: StaticBody2D, points: PackedVector2Array) -> void:
+	var line := CollisionPolygon2D.new()
+	line.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+	line.polygon = points
+	body.add_child(line)
+
+
+func _sprite(texture: Texture2D, at: Vector2, size: float, angle := 0.0) -> Sprite2D:
+	var sprite := Sprite2D.new()
+	sprite.texture = texture
+	sprite.position = at
+	sprite.rotation = angle
+	sprite.scale = Vector2.ONE * size / maxf(texture.get_width(), texture.get_height())
+	_things.add_child(sprite)
+	return sprite
+
+
+func _disc(at: Vector2, radius: float, colour: Color) -> Polygon2D:
+	var points := PackedVector2Array()
+	for k in 20:
+		points.append(at + Vector2.from_angle(TAU * k / 20.0) * radius)
+	return _flat(points, colour)
+
+
+func _outline_rect(rect: Rect2, radius: float, colour: Color, width: float) -> void:
+	var line := Line2D.new()
+	line.points = _rect_points(rect, radius)
+	line.closed = true
+	line.width = width
+	line.default_color = colour
+	_ground.add_child(line)
 
 
 func _add_box(rect: Rect2) -> void:

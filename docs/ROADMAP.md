@@ -329,7 +329,7 @@ are shared with the cars.
   - `tests/boat_test.gd`, plus the whole suite to prove the cars are unchanged.
   - A balance pass.
 
-## Phase 21 — The island: harbour and ocean in Free Drive 🚧 Gate C
+## Phase 21 — The island: harbour and ocean in Free Drive ✅ done
 
 The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats and water).
 
@@ -346,6 +346,14 @@ The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats a
 - **Gate B: art and sound** (approved 2026-10-06): the harbour building (a Kontext edit of
   its block sketch), lighthouse, sailboat, dolphin, seagull and mooring post; wet sand, sea,
   open sea and pier planks; the swap bell, a seagull and a dolphin. DESIGN §21.6.
+- **Gate C: code** (built 2026-10-06; DESIGN §21.7):
+  - `town/island.gd` holds the coast, the harbour and the sea as data.
+  - The town builds them round the streets and knows their surfaces.
+  - Cars and boats keep to their side of one waterline (two new collision layers).
+  - The screen swaps the player between car and boat at the harbour.
+  - Sea life: sailboats, dolphins, gulls and the lighthouse's beam.
+  - The HUD fades for the swap, shows the boat while sailing, and maps the coast.
+  - `tests/island_test.gd` is new; the whole suite passes. 100 fps on land and at sea.
 
 ---
 

@@ -24,6 +24,10 @@ var _map: TownMinimap
 var _places_total := 0
 var _shown_coins := -1
 var _hints: Label
+## The boat, beside the coins while sailing (§21.3).
+var _vehicle_icon: TextureRect
+## The harbour's swap: the screen goes white and comes back with the other vehicle.
+var _fade: ColorRect
 
 
 func _ready() -> void:
@@ -45,6 +49,13 @@ func _ready() -> void:
 	row.add_child(icon)
 	_coins = _label(44, YELLOW)
 	row.add_child(_coins)
+	_vehicle_icon = TextureRect.new()
+	_vehicle_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_vehicle_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_vehicle_icon.custom_minimum_size = Vector2(150, 0)
+	_vehicle_icon.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_SHRINK_END
+	_vehicle_icon.visible = false
+	row.add_child(_vehicle_icon)
 	# The map, top right.
 	var map_panel := _panel(root, Vector2(1, 0), Vector2(-MAP_SIZE.x - 32, 28), MAP_SIZE)
 	_map = TownMinimap.new()
@@ -85,6 +96,12 @@ func _ready() -> void:
 	_hints.offset_bottom = -14.0
 	_hints.modulate.a = 0.75
 	root.add_child(_hints)
+	_fade = ColorRect.new()
+	_fade.color = Color.WHITE
+	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade.modulate.a = 0.0
+	root.add_child(_fade)
 
 
 ## Show the controls for whichever device was used last.
@@ -98,6 +115,21 @@ func _input(event: InputEvent) -> void:
 func setup(town: Town, player: Car, traffic: Array[Car], places_total: int) -> void:
 	_places_total = places_total
 	_map.setup(town, player, traffic)
+
+
+## After a swap at the harbour: the map follows the new vehicle (and shows the whole sea
+## while sailing), and a little boat sits beside the coins.
+func set_vehicle(player: Car, sailing: bool) -> void:
+	_map.set_player(player, sailing)
+	_vehicle_icon.texture = player.body_texture
+	_vehicle_icon.visible = sailing
+
+
+## Fade the screen to white (`to_white`) or back. Await it: 0.18 s in, 0.25 s out.
+func fade(to_white: bool) -> void:
+	var tween := create_tween()
+	tween.tween_property(_fade, "modulate:a", 1.0 if to_white else 0.0, 0.18 if to_white else 0.25)
+	await tween.finished
 
 
 func show_coins(total: int) -> void:

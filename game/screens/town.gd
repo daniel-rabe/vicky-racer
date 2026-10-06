@@ -7,7 +7,12 @@ extends Node2D
 ## door shows its sign. Visiting every kind of place once pays a bonus. Driving onto the car
 ## wash's pad washes the car: foam and soap bubbles, then it sparkles for a while.
 ##
-## Escape / Start pauses (RESUME / SETTINGS / GARAGE).
+## The town is an island (§21). At the harbour, driving slowly onto the land pad swaps the
+## car for the boat equipped in the Boat Dock, waiting at the end of the pier; sailing back
+## into the mooring swaps back. At sea there are coins, a lighthouse, ramp islets, a slalom,
+## a wreck, dolphins, gulls and sailboats.
+##
+## Escape / Start pauses (RESUME / SETTINGS / GARAGE; the Boat Dock while sailing).
 ##
 ## Dev flags, after `--`:
 ##   --overview    frame the whole town in one view
@@ -16,8 +21,13 @@ extends Node2D
 ##   --start=x,y   start the player there instead (screenshots of one corner of town)
 ##   --start=duck  start the player by the first duck family's crossing
 ##   --start=wash  start the player on the car wash's pad (it is washed at once)
+##   --start=harbour  start the player on the quay, next to the land pad
+##   --start=sea   start the player sailing, in the boat, at the mooring
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
+const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
+const BOAT_DIR := "res://game/configs/boats/"
+const DEFAULT_BOAT := &"speedboat"
 const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
 const PLAYER_INPUT := preload("res://actors/car/player_input.gd")
 const PLAYER_MARKER := preload("res://actors/car/player_marker.gd")
@@ -36,6 +46,13 @@ const DUCK_CROSSINGS := 4
 ## Their voices, if built (tools/comfy/sfx_manifest.json).
 const VOICES := {"dog": "res://art/sfx/woof.wav", "cat": "res://art/sfx/meow.wav", "duck": "res://art/sfx/quack.wav"}
 const AMBIENCE := "res://art/sfx/town_ambience.wav"
+## Under the town's ambience, louder while sailing (the boat races' waves).
+const WAVES := "res://art/sfx/wave_ambience.wav"
+const WAVES_DB := Vector2(-34.0, -12.0)  # driving, sailing
+const SWAP_SOUND := "res://art/sfx/harbour_swap.wav"
+const SEA_VOICES := {"dolphin": "res://art/sfx/dolphin.wav", "seagull": "res://art/sfx/seagull.wav"}
+## A pad swaps only a vehicle going slower than this, so racing across it does nothing.
+const SWAP_MAX_SPEED := 300.0
 const COINS := 36
 const COIN_VALUE := 2
 const COIN_GAP := 300.0
@@ -49,11 +66,25 @@ const START_AT := 0.35
 const START_CLEAR := 900.0
 
 var town: Town
+## The vehicle the player is driving now: the car, or the boat while sailing.
 var player: Car
+## The player's car and boat. The one not being driven waits at the harbour; the boat is
+## made at the first swap.
+var car: Car
+var boat: Boat
+var sailing := false
 var traffic: Array[Car] = []
 var visited: Dictionary = {}  # place id -> true, this drive
 var _setup: DriftSetup
 var _paint: StringName = Paint.ORIGINAL
+var _boat_setup: DriftSetup
+var _boat_paint: StringName = Paint.ORIGINAL
+## A pad swaps once the vehicle that came off it has left it again.
+var _pad_armed := true
+var _swapping := false
+var _sea_life: SeaLife
+var _waves: AudioStreamPlayer
+var _bell: AudioStreamPlayer
 var _rng := RandomNumberGenerator.new()
 
 @onready var _world: Node2D = $World
@@ -78,6 +109,11 @@ func _on_state_changed(state: Dictionary) -> void:
 		if setup.id == equipped:
 			_setup = setup
 	_paint = state.get("paint", {}).get(equipped, Paint.ORIGINAL)
+	# And the equipped boat, for the harbour.
+	var boat_id: StringName = state.get("equipped_boat", DEFAULT_BOAT)
+	if _boat_setup == null or _boat_setup.id != boat_id:
+		_boat_setup = load(BOAT_DIR + String(boat_id) + ".tres")
+	_boat_paint = state.get("paint", {}).get(boat_id, Paint.ORIGINAL)
 	if hud and is_node_ready():
 		hud.show_coins(state["coins"])
 
@@ -96,6 +132,7 @@ func _ready() -> void:
 	_spawn_walkers()
 	_spawn_coins()
 	_add_sky()
+	_add_sea_life()
 	_add_ambience()
 	town.place_reached.connect(_on_place_reached)
 	hud.setup(town, player, traffic, TownLayout.PLACE_NAMES.size())
@@ -130,22 +167,37 @@ func _report_traffic() -> void:
 
 
 func _spawn_player(autodrive: bool) -> void:
-	player = CAR_SCENE.instantiate()
-	player.name = "Player"
+	car = CAR_SCENE.instantiate()
+	car.name = "Player"
 	if _setup:
-		player.setup = _setup
-		player.body_texture = Paint.body(_setup, _paint)
+		car.setup = _setup
+		car.body_texture = Paint.body(_setup, _paint)
+	_cars.add_child(car)
+	var a: Vector2i = START_ROAD[0]
+	var b: Vector2i = START_ROAD[1]
+	var lane := town.lane_points(a, b)
+	car.global_position = lane[int(START_AT * (lane.size() - 1))]
+	car.rotation = town.heading(a, b).angle()
+	car.reset_physics_interpolation()
 	if autodrive:
 		var driver := TrafficDriver.new()
 		driver.name = "TrafficDriver"
 		driver.town = town
 		driver.cruise_speed = 520.0
-		player.add_child(driver)
-	else:
-		var input := Node.new()
-		input.name = "PlayerInput"
+		car.add_child(driver)
+		driver.place_on(a, b, START_AT)
+	_drive(car, autodrive)
+
+
+## Hand the player `vehicle`: their controls (or, autodriving, a stand-in with PlayerInput's
+## name, which the shops and coins look for), the chase camera and the marker over it.
+func _drive(vehicle: Car, autodrive := false) -> void:
+	player = vehicle
+	var input := Node.new()
+	input.name = "PlayerInput"
+	if not autodrive:
 		input.set_script(PLAYER_INPUT)
-		player.add_child(input)
+	vehicle.add_child(input)
 	var rig := Node2D.new()
 	rig.name = "ChaseCamera"
 	rig.set_script(CAMERA_SCRIPT)
@@ -153,26 +205,101 @@ func _spawn_player(autodrive: bool) -> void:
 	camera.name = "Camera"
 	camera.process_callback = Camera2D.CAMERA2D_PROCESS_PHYSICS
 	rig.add_child(camera)
-	player.add_child(rig)
+	vehicle.add_child(rig)
 	var marker := Node2D.new()
 	marker.name = "PlayerMarker"
 	marker.set_script(PLAYER_MARKER)
-	player.add_child(marker)
-	_cars.add_child(player)
-	rig.set_world_bounds(town.world_rect())
-	var a: Vector2i = START_ROAD[0]
-	var b: Vector2i = START_ROAD[1]
-	var lane := town.lane_points(a, b)
-	player.global_position = lane[int(START_AT * (lane.size() - 1))]
-	player.rotation = town.heading(a, b).angle()
-	player.reset_physics_interpolation()
+	vehicle.add_child(marker)
+	rig.set_world_bounds(town.map_rect())
 	rig.snap_to_car()
-	if autodrive:
-		player.get_node(^"TrafficDriver").place_on(a, b, START_AT)
-		# Autodrive keeps PlayerInput's name for the shops and coins, without its controls.
-		var stand_in := Node.new()
-		stand_in.name = "PlayerInput"
-		player.add_child(stand_in)
+	vehicle.frozen = false
+	vehicle.get_node(^"Audio").process_mode = Node.PROCESS_MODE_INHERIT
+
+
+## Leave `vehicle` waiting at the harbour: still, quiet, nobody's.
+func _park(vehicle: Car) -> void:
+	for part in [^"PlayerInput", ^"ChaseCamera", ^"PlayerMarker"]:
+		var node := vehicle.get_node_or_null(part)
+		if node:
+			vehicle.remove_child(node)
+			node.queue_free()
+	vehicle.frozen = true
+	vehicle.velocity = Vector2.ZERO
+	vehicle.get_node(^"Audio").process_mode = Node.PROCESS_MODE_DISABLED
+
+
+## The equipped boat, in its paint, made the first time it is needed.
+func _the_boat() -> Boat:
+	if boat == null:
+		boat = BOAT_SCENE.instantiate()
+		boat.name = "PlayerBoat"
+		if _boat_setup:
+			boat.setup = _boat_setup
+			boat.body_texture = Paint.body(_boat_setup, _boat_paint)
+		_cars.add_child(boat)
+	return boat
+
+
+# --- the harbour (§21.3) ----------------------------------------------------------------
+
+func _physics_process(_delta: float) -> void:
+	if _swapping or player == null or player.has_node(^"TrafficDriver"):
+		return
+	var pad := Island.MOORING if sailing else Island.LAND_PAD
+	var on_pad := pad.has_point(player.global_position)
+	if not on_pad and not pad.grow(60.0).has_point(player.global_position):
+		_pad_armed = true
+	elif on_pad and _pad_armed and player.velocity.length() < SWAP_MAX_SPEED:
+		_swap()
+
+
+## The bell, a quick fade to white, and on the far side the other vehicle: the boat at the
+## mooring pointing out to sea, or the car on the land pad facing up the harbour road.
+func _swap() -> void:
+	_swapping = true
+	_pad_armed = false
+	_ring_bell()
+	await hud.fade(true)
+	_swap_now()
+	await hud.fade(false)
+	_swapping = false
+
+
+func _swap_now() -> void:
+	var from := player
+	var to: Car = car if sailing else _the_boat()
+	_park(from)
+	# The boat is tied up at the mooring, pointing out to sea, whether it is leaving or
+	# arriving; the car comes back on the land pad, facing up the harbour road.
+	_place(boat, Island.MOORING.get_center(), PI / 2.0)
+	if to == car:
+		_place(car, Island.LAND_PAD.get_center(), -PI / 2.0)
+	_drive(to)
+	sailing = to == boat
+	_pad_armed = false
+	_sea_life.player = player
+	hud.set_vehicle(player, sailing)
+	EventSystem.PRO_vehicle_kind_requested.emit(&"boat" if sailing else &"car")  # the pause menu's GARAGE
+	if _waves:
+		_waves.create_tween().tween_property(_waves, "volume_db", WAVES_DB.y if sailing else WAVES_DB.x, 1.0)
+
+
+func _place(vehicle: Car, at: Vector2, angle: float) -> void:
+	vehicle.global_position = at
+	vehicle.rotation = angle
+	vehicle.velocity = Vector2.ZERO
+	vehicle.reset_physics_interpolation()
+
+
+func _ring_bell() -> void:
+	if _bell == null:
+		_bell = AudioStreamPlayer.new()
+		_bell.name = "Bell"
+		_bell.stream = _sound(SWAP_SOUND)
+		_bell.bus = &"SFX"
+		add_child(_bell)
+	if _bell.stream:
+		_bell.play()
 
 
 ## Town vehicles and cars in every paint, spread round the roads away from the player.
@@ -295,6 +422,15 @@ func _spawn_coins() -> void:
 		coin.position = _coin_spot()
 		coin.collected.connect(_on_coin_collected)
 		_coins.add_child(coin)
+	# At sea the coins lie in trails and come back where they were; those over the ramp
+	# islets are picked up in the air.
+	for at in Island.sea_coins():
+		var coin := TownCoin.new()
+		coin.position = at
+		coin.set_meta(&"sea", true)
+		coin.collected.connect(_on_coin_collected)
+		_coins.add_child(coin)
+		coin.collision_mask |= Car.LAYER_AIRBORNE
 
 
 ## Somewhere on a road, in a lane or between them, clear of the junctions and of the other
@@ -319,7 +455,7 @@ func _on_coin_collected(coin: TownCoin) -> void:
 	hud.coin_popped(coin.global_position)
 	get_tree().create_timer(COIN_RESPAWN, false).timeout.connect(func() -> void:
 		if is_instance_valid(coin):
-			coin.reappear(_coin_spot()))
+			coin.reappear(coin.position if coin.has_meta(&"sea") else _coin_spot()))
 
 
 func _on_place_reached(_place_id: String, display_name: String, picture: Texture2D) -> void:
@@ -340,6 +476,16 @@ func _add_sky() -> void:
 	_sky.add_child(sky)
 
 
+## The sailboats, the dolphins, the gulls and the lighthouse's beam.
+func _add_sea_life() -> void:
+	_sea_life = SeaLife.new()
+	_sea_life.name = "SeaLife"
+	_sea_life.player = player
+	_sea_life.dolphin_voice = _sound(SEA_VOICES["dolphin"])
+	_sea_life.gull_voice = _sound(SEA_VOICES["seagull"])
+	_world.add_child(_sea_life)
+
+
 func _sound(path: String) -> AudioStream:
 	return load(path) if ResourceLoader.exists(path) else null
 
@@ -357,6 +503,16 @@ func _add_ambience() -> void:
 	add_child(player)
 	player.finished.connect(player.play)
 	player.play()
+	var waves := _sound(WAVES)
+	if waves:
+		_waves = AudioStreamPlayer.new()
+		_waves.name = "Waves"
+		_waves.stream = waves
+		_waves.bus = &"SFX"
+		_waves.volume_db = WAVES_DB.y if sailing else WAVES_DB.x
+		add_child(_waves)
+		_waves.finished.connect(_waves.play)
+		_waves.play()
 
 
 func _dev_start(where: String) -> void:
@@ -367,6 +523,12 @@ func _dev_start(where: String) -> void:
 	elif where == "wash":
 		at = town.wash_pad.get_center() + Vector2(0, 40)
 		player.rotation = -PI / 2.0  # facing the car wash
+	elif where == "harbour":
+		at = Vector2(Island.LAND_PAD.end.x + 260.0, Island.LAND_PAD.get_center().y)
+		player.rotation = PI  # facing the land pad
+	elif where == "sea":
+		_swap_now()
+		return
 	else:
 		at = Vector2(float(where.get_slice(",", 0)), float(where.get_slice(",", 1)))
 	player.global_position = at
@@ -375,7 +537,7 @@ func _dev_start(where: String) -> void:
 
 
 func _show_overview() -> void:
-	var rect := town.world_rect()
+	var rect := town.map_rect()
 	var view := Camera2D.new()
 	var fit := minf(1920.0 / rect.size.x, 1080.0 / rect.size.y)
 	view.zoom = Vector2(fit, fit)

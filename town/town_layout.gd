@@ -60,6 +60,10 @@ const PLACE_NAMES := {
 	"police_station": "POLICE",
 	"school": "SCHOOL",
 	"car_wash": "CAR WASH",
+	# The island (docs/DESIGN.md §21): the harbour on the coast, two places out at sea.
+	"harbour": "HARBOUR",
+	"lighthouse": "LIGHTHOUSE",
+	"shipwreck": "SHIPWRECK",
 }
 
 

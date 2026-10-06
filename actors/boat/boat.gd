@@ -53,6 +53,11 @@ func set_level(value: int) -> void:
 		collision_mask = LAYER_WORLD
 
 
+## A boat stays on the water: the shore, the quay and the islets stop it.
+func _edge_layer() -> int:
+	return LAYER_LAND_EDGE
+
+
 ## Shallows and banks hold a boat back; not one in the air, nor a hovercraft.
 func _offroad(mult: float) -> float:
 	if is_airborne() or (setup and setup.ignores_land):

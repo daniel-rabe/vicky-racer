@@ -14,6 +14,10 @@ const LAYER_CARS_BRIDGE := 4
 const LAYER_RAILINGS := 8
 ## A boat in the air off a ramp (Boat): only the gates see it, so it sails over the others.
 const LAYER_AIRBORNE := 16
+## Free Drive's island (docs/DESIGN.md §21): the waterline is two walls on one line. Cars
+## stop at the sea edge, boats at the land edge (the shore, the quay, the pier, the islets).
+const LAYER_SEA_EDGE := 32
+const LAYER_LAND_EDGE := 64
 ## Cars on a bridge draw above its deck (Track.DECK_Z).
 const BRIDGE_Z := 2
 
@@ -86,7 +90,12 @@ func set_level(value: int) -> void:
 	level = value
 	set_drawn_above_deck(value == 1)
 	collision_layer = LAYER_CARS_BRIDGE if value == 1 else LAYER_CARS_GROUND
-	collision_mask = LAYER_WORLD | (LAYER_CARS_BRIDGE | LAYER_RAILINGS if value == 1 else LAYER_CARS_GROUND)
+	collision_mask = LAYER_WORLD | _edge_layer() | (LAYER_CARS_BRIDGE | LAYER_RAILINGS if value == 1 else LAYER_CARS_GROUND)
+
+
+## The side of the waterline this vehicle keeps to: a car stays on the land.
+func _edge_layer() -> int:
+	return LAYER_SEA_EDGE
 
 
 func _resolve_config() -> void:
