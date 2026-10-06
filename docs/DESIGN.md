@@ -1259,6 +1259,23 @@ and keeps to the right-hand lane except when overtaking.
 
 Pause has RESUME, SETTINGS and GARAGE; there is nothing to restart.
 
+### 19.6 The camera handover
+
+Free Drive is the first screen reached straight from the title, and the title's attract-mode
+race has a camera of its own. That camera was still current when the town's camera entered,
+so the town's never took over: the view froze where the car started while the car drove off
+it (reported in play; it never showed in screenshots taken with `--screen=town`, which skips
+the title). The chase camera now makes itself current, deferred, when it is not — once the old
+screen is gone. The same fix covers CONTINUE CUP from the title. Checked by
+[`tests/camera_handover_test.gd`](../tests/camera_handover_test.gd) (title, TOWN, drive: the car
+must still be on screen), which fails without the fix.
+
+Two more traffic rules came from running the town test over and over (traffic picks its way
+at random, so every run differs): a vehicle waiting for its turn at a junction stops with its
+front 125 px before it, clear of the zebra crossing; and a duck family does not set off while
+any vehicle stands on its crossing (a bus that had crept onto it behind a queue looked, to the
+ducks, like a car waiting for them).
+
 ### 19.5 Surfaces
 
 Roads and pavements are asphalt, lawns and the grass round the town are grass, and the ponds are

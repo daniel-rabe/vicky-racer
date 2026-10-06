@@ -33,7 +33,7 @@ func _ready() -> void:
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	# Coins, top left.
-	var purse := _panel(root, Vector2(32, 28), Vector2(260, 96))
+	var purse := _panel(root, Vector2(0, 0), Vector2(32, 28), Vector2(260, 96))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 16)
 	purse.add_child(row)
@@ -46,11 +46,11 @@ func _ready() -> void:
 	_coins = _label(44, YELLOW)
 	row.add_child(_coins)
 	# The map, top right.
-	var map_panel := _panel(root, Vector2(1920 - MAP_SIZE.x - 32, 28), MAP_SIZE)
+	var map_panel := _panel(root, Vector2(1, 0), Vector2(-MAP_SIZE.x - 32, 28), MAP_SIZE)
 	_map = TownMinimap.new()
 	map_panel.add_child(_map)
 	# The shop sign, top middle; hidden until a shop is reached.
-	_sign = _panel(root, Vector2(660, 40), Vector2(600, 170))
+	_sign = _panel(root, Vector2(0.5, 0), Vector2(-300, 40), Vector2(600, 170))
 	var sign_row := HBoxContainer.new()
 	sign_row.add_theme_constant_override("separation", 24)
 	_sign.add_child(sign_row)
@@ -70,15 +70,19 @@ func _ready() -> void:
 	_sign.modulate.a = 0.0
 	# A big line across the middle, for the all-places bonus.
 	_banner = _label(56, YELLOW)
-	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	_banner.position = Vector2(0, 300)
-	_banner.size = Vector2(1920, 100)
+	_banner.anchor_right = 1.0  # the full width, however wide the window
+	_banner.offset_top = 300.0
+	_banner.offset_bottom = 400.0
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_banner.modulate.a = 0.0
 	root.add_child(_banner)
 	_hints = _label(22, Color.WHITE)
 	_hints.text = HINTS_KEYBOARD
-	_hints.position = Vector2(32, 1030)
+	_hints.anchor_top = 1.0
+	_hints.anchor_bottom = 1.0
+	_hints.offset_left = 32.0
+	_hints.offset_top = -50.0
+	_hints.offset_bottom = -14.0
 	_hints.modulate.a = 0.75
 	root.add_child(_hints)
 
@@ -155,7 +159,7 @@ func bubbles() -> void:
 		style.set_corner_radius_all(int(size))
 		bubble.add_theme_stylebox_override("panel", style)
 		bubble.size = Vector2(size, size)
-		bubble.position = Vector2(randf_range(200.0, 1720.0), randf_range(900.0, 1150.0))
+		bubble.position = Vector2(randf_range(0.1, 0.9) * root.size.x, root.size.y * randf_range(0.85, 1.05))
 		bubble.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		root.add_child(bubble)
 		var tween := bubble.create_tween()
@@ -166,11 +170,20 @@ func bubbles() -> void:
 		tween.tween_callback(bubble.queue_free)
 
 
-func _panel(parent: Control, at: Vector2, size: Vector2) -> PanelContainer:
+## A HUD panel pinned to a point of the screen (`anchor`: 0..1 across and down, so (1, 0) is
+## the top right corner), `offset` px from it. Anchored rather than placed, so on a window
+## wider than 16:9 the map stays in the corner instead of floating in from it.
+func _panel(parent: Control, anchor: Vector2, offset: Vector2, size: Vector2) -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.theme_type_variation = &"HudPanel"
-	panel.position = at
-	panel.size = size
+	panel.anchor_left = anchor.x
+	panel.anchor_right = anchor.x
+	panel.anchor_top = anchor.y
+	panel.anchor_bottom = anchor.y
+	panel.offset_left = offset.x
+	panel.offset_top = offset.y
+	panel.offset_right = offset.x + size.x
+	panel.offset_bottom = offset.y + size.y
 	panel.custom_minimum_size = size
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(panel)

@@ -14,6 +14,9 @@ const TOWN_SCENE := preload("res://game/screens/town.tscn")
 const SOAK_SECONDS := 60.0
 ## A car standing this long has jammed (a junction wait is a few seconds at most).
 const JAM_SECONDS := 12.0
+## Longer than this on the other side of the road is lost, not just steering back in after
+## overtaking the parked player (the line moves back first, the car follows within ~1.5 s).
+const WRONG_LANE_SECONDS := 2.5
 
 var screen: Node2D
 var _time := 0.0
@@ -71,6 +74,9 @@ func _physics_process(delta: float) -> void:
 			var start: Vector2 = town.junctions[driver._from]
 			wrong = (car.global_position - start).dot(Town.right_of(town.heading(driver._from, driver._to))) < -20.0
 		_wrong_lane[car] = _wrong_lane.get(car, 0.0) + delta if wrong else 0.0
+		if _wrong_lane[car] > WRONG_LANE_SECONDS and _wrong_lane[car] - delta <= WRONG_LANE_SECONDS:
+			print("  other side: %s at %s rot %.2f v %s: %s" % [car.body_texture.resource_path.get_file(),
+				car.global_position.round(), car.rotation, car.velocity.round(), driver.describe()])
 		_longest_wrong = maxf(_longest_wrong, _wrong_lane[car])
 	for walker: Node2D in get_tree().get_nodes_in_group(&"walkers"):
 		for car: Car in screen.traffic:
@@ -143,7 +149,7 @@ func _finish() -> void:
 	# A minute of traffic.
 	check.call(_longest_still < JAM_SECONDS, "no jams: the longest any vehicle stood still was %.1f s" % _longest_still)
 	check.call(_off_street == 0, "traffic kept to the streets (%d frames off)" % _off_street)
-	check.call(_longest_wrong < 1.0, "traffic keeps to the right-hand lane (longest the other side %.1f s)" % _longest_wrong)
+	check.call(_longest_wrong < WRONG_LANE_SECONDS, "traffic keeps to the right-hand lane (longest the other side %.1f s)" % _longest_wrong)
 	check.call(_run_over == 0, "traffic never drove over an animal (%d frames)" % _run_over)
 	var mean := 0.0
 	for car: Car in screen.traffic:

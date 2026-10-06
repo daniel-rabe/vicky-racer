@@ -17,7 +17,11 @@ const LOOKAHEAD_PER_SPEED := 0.3
 const STEER_FULL_ANGLE := 0.5
 const TURN_SPEED := 190.0
 ## How far before a junction it asks to cross, and slows for a turn, px.
-const ASK_DISTANCE := 150.0
+const ASK_DISTANCE := 360.0
+## Waiting to cross, its front stops this far before the junction: clear of the zebra
+## crossing in front of it (which ends 110 px before the junction), so ducks never walk
+## through a waiting car.
+const STOP_BEFORE_JUNCTION := 125.0
 const SLOW_DISTANCE := 320.0
 ## What counts as in the way: ahead, and within this far either side of its line.
 const BLOCK_HALF_WIDTH := 70.0
@@ -206,10 +210,17 @@ func _wanted_speed(delta: float) -> float:
 				if _wait > MAX_WAIT:
 					_holds = true
 				else:
-					wanted = minf(wanted, maxf(0.0, (to_line - 80.0) * 2.0))
+					var stop := STOP_BEFORE_JUNCTION + _half_length()
+					wanted = minf(wanted, maxf(0.0, (to_line - stop) * 2.0))
 		if _holds:
 			_wait = 0.0
 	return minf(wanted, _clear_road_speed(delta))
+
+
+## Half the vehicle's length (a bus is longer than a car), from its collision box.
+func _half_length() -> float:
+	var box := car.get_node(^"Collision").shape as RectangleShape2D
+	return box.size.x / 2.0 if box else 60.0
 
 
 ## Nothing walking across the road just past the junction, where it will come out.

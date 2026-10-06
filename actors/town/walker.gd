@@ -29,6 +29,8 @@ const FOLLOW_GAP := 34.0
 const HEAR_HORN := 520.0
 ## A crossing animal waits until no vehicle is this near the crossing.
 const CLEAR_DISTANCE := 520.0
+## Any vehicle this near the crossing's line is on it (a bus is 208 px long).
+const ON_CROSSING := 160.0
 
 var _target := 1
 var _step := 1
@@ -125,12 +127,13 @@ func _road_clear() -> bool:
 	var a := route[0]
 	var b := route[route.size() - 1]
 	for car: Car in get_tree().get_nodes_in_group(&"cars"):
-		if car.velocity.length() < 40.0:
-			continue  # standing still: it is waiting for us
 		var p := car.global_position
 		var t := clampf((p - a).dot(b - a) / (b - a).length_squared(), 0.0, 1.0)
-		if p.distance_to(a.lerp(b, t)) < CLEAR_DISTANCE:
-			return false
+		var away := p.distance_to(a.lerp(b, t))
+		if away < ON_CROSSING:
+			return false  # standing on the crossing: wait until it has gone
+		if away < CLEAR_DISTANCE and car.velocity.length() >= 40.0:
+			return false  # coming; one standing still further off is waiting for us
 	return true
 
 

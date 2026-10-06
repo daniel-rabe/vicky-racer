@@ -40,6 +40,11 @@ func _ready() -> void:
 	camera.ignore_rotation = true
 	camera.zoom = Vector2(zoom_level, zoom_level)
 	snap_to_car()
+	# Coming from a screen with a camera of its own (the title's attract-mode race), that
+	# camera is still current while this one enters, so this one never takes over and the
+	# view freezes. Take over once the old screen is gone.
+	if not camera.is_current():
+		camera.make_current.call_deferred()
 
 
 func _physics_process(delta: float) -> void:
