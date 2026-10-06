@@ -1275,5 +1275,9 @@
       "starter_green": "car_green"
     },
     "seeds": {}
+  },
+  "wheel_overrides": {
+    "_note": "Hand fixes for tools/comfy/wheel_rects.py. The Bubble Car's tyres only peek out at its corners, too little to show a rolling tread.",
+    "*bubble*.png": "none"
   }
 }
