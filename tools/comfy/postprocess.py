@@ -298,3 +298,58 @@ def ramp_sketch(sketch: dict, size: int = 1536) -> Image.Image:
         d.line([(cx, y0 + width * 0.28), (cx + width * 0.2, y0 + width * 0.5), (cx, y0 + width * 0.72)], fill=(250, 205, 40),
                width=round(width * 0.07), joint="curve")
     return img
+
+
+def driver_sketch(sketch: dict, size: int = 1536) -> Image.Image:
+    """A driver (DESIGN.md §22): head and shoulders of a toy figure seen from straight above,
+    facing up, arms reaching forward (to a steering wheel when `wheel`). FLUX draws a figure
+    from the front however it is asked; Kontext keeps this view. `sketch`: `hat` colour and
+    `hat_kind` (helmet, cap, peaked, fire), an optional `decal` colour for a stripe down the
+    helmet, `body` colour, `hair` colour and `hair_style` (tufts, pigtails, ponytail, curls,
+    short), `wheel`, and `scale` (1.0 a child, about 1.2 a grown-up)."""
+    img = Image.new("RGB", (size, size), (250, 250, 248))
+    d = ImageDraw.Draw(img)
+    u = size / 64 * sketch.get("scale", 1.0)  # one unit; the figure is about 30 units across
+    c = size / 2
+    col = lambda key, default=(0, 0, 0): tuple(sketch.get(key, default))  # noqa: E731
+    dark = lambda rgb, f=0.7: tuple(round(v * f) for v in rgb)  # noqa: E731
+    skin, body, hat, hair = (246, 205, 170), col("body"), col("hat"), col("hair", (120, 72, 40))
+    style = sketch.get("hair_style", "short")
+    # Hair that shows behind the head (down is behind: the figure faces up).
+    if style == "pigtails":
+        for s in (-1, 1):
+            d.ellipse((c + s * 7 * u - 3 * u, c + 4 * u, c + s * 7 * u + 3 * u, c + 11 * u), fill=hair)
+    elif style == "ponytail":
+        d.ellipse((c - 2.5 * u, c + 5 * u, c + 2.5 * u, c + 14 * u), fill=hair)
+    # Shoulders across the figure, a little behind the head.
+    d.ellipse((c - 12 * u, c - 3 * u, c + 12 * u, c + 9 * u), fill=body, outline=dark(body), width=round(u * 0.6))
+    # Arms forward, hands on the wheel.
+    for s in (-1, 1):
+        d.line([(c + s * 9 * u, c + 1 * u), (c + s * 5.5 * u, c - 10 * u)], fill=body, width=round(4 * u))
+        d.ellipse((c + s * 5.5 * u - 2 * u, c - 12 * u, c + s * 5.5 * u + 2 * u, c - 8 * u), fill=skin)
+    if sketch.get("wheel"):
+        d.arc((c - 8 * u, c - 14 * u, c + 8 * u, c - 6 * u), 180, 360, fill=(40, 40, 46), width=round(2 * u))
+    # The head: hair round the edge, then the hat or helmet on top.
+    if style in ("curls", "tufts", "short", "pigtails", "ponytail"):
+        r = 7.8 if style == "curls" else 7.3
+        d.ellipse((c - r * u, c - r * u + 0.8 * u, c + r * u, c + r * u + 0.8 * u), fill=hair)
+    kind = sketch.get("hat_kind", "helmet")
+    if kind == "helmet":
+        d.ellipse((c - 7 * u, c - 7 * u, c + 7 * u, c + 7 * u), fill=hat, outline=dark(hat), width=round(u * 0.6))
+        d.chord((c - 6 * u, c - 7 * u, c + 6 * u, c + 2 * u), 200, 340, fill=(36, 42, 66))  # visor, at the front
+        if "decal" in sketch:
+            d.rectangle((c - 1.2 * u, c - 3 * u, c + 1.2 * u, c + 7 * u), fill=col("decal"))
+    elif kind == "fire":
+        d.ellipse((c - 9 * u, c - 9.5 * u, c + 9 * u, c + 8 * u), fill=dark(hat, 0.9))  # brim
+        d.ellipse((c - 6.5 * u, c - 6.5 * u, c + 6.5 * u, c + 6.5 * u), fill=hat, outline=dark(hat), width=round(u * 0.6))
+        d.rectangle((c - 1 * u, c - 6.5 * u, c + 1 * u, c + 6.5 * u), fill=dark(hat, 0.85))  # comb
+    else:  # cap or peaked cap: the crown, and the peak at the front
+        d.chord((c - 6 * u, c - 12 * u, c + 6 * u, c - 2 * u), 180, 360, fill=dark(hat, 0.85))
+        d.ellipse((c - 6.5 * u, c - 6.5 * u, c + 6.5 * u, c + 6.5 * u), fill=hat, outline=dark(hat), width=round(u * 0.6))
+        if kind == "peaked" and "decal" in sketch:
+            d.ellipse((c - 1.5 * u, c - 6 * u, c + 1.5 * u, c - 3 * u), fill=col("decal"))  # badge
+        d.ellipse((c - 1 * u, c - 1 * u, c + 1 * u, c + 1 * u), fill=dark(hat, 0.8))  # the button on top
+    if style == "tufts":
+        for dx in (-3, 0, 3):
+            d.polygon([(c + dx * u - 1.5 * u, c + 6 * u), (c + dx * u, c + 9 * u), (c + dx * u + 1.5 * u, c + 6 * u)], fill=hair)
+    return img

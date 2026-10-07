@@ -331,5 +331,9 @@
   "buildings": {
     "_about": "Town buildings (Free Drive). FLUX draws every building isometric, however it is asked (docs/mockups/town/probes/01_view_search.png), and img2img from a drawing is either flat or isometric again. FLUX Kontext keeps the layout of an image it edits: it is given a flat block drawing in the street view (postprocess.building_sketch: roof from above, front wall facing straight down) and adds the clay detail. Uses the `variants` Kontext settings.",
     "instruction_template": "Turn this flat drawing into a detailed soft matte clay toy {subject}, keeping exactly the same straight-on camera angle and layout: {details}, gentle soft shading, children's picture book style"
+  },
+  "drivers": {
+    "_about": "Drivers (DESIGN.md §22). Kontext edit of postprocess.driver_sketch, like the buildings, but with an overhead instruction: the buildings' 'straight-on' wording made Kontext redraw the figure from the front.",
+    "instruction_template": "Turn this flat drawing into a soft matte clay toy {subject} photographed from directly overhead, a bird's-eye view looking straight down at the top of its head and shoulders, keeping exactly the same layout and colours: {details}, gentle soft shading, children's picture book style"
   }
 }

@@ -1387,6 +1387,603 @@
       "sheet_ground": "lagoon_deep",
       "out": "art/town/island/mooring_post.png",
       "_note": "Phase 21 island (DESIGN.md §21). Along the pier and the quay."
+    },
+    {
+      "id": "driver_car_vicky",
+      "subject": "child racing driver figure",
+      "seed": 26,
+      "facing": "down",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/car/vicky.png",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a shiny bright red racing helmet with one white stripe from front to back and a dark visor at the front, blond hair peeking out round it, small rounded shoulders in a racing suit the same colour as the helmet either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          230,
+          57,
+          70
+        ],
+        "hat_kind": "helmet",
+        "decal": [
+          255,
+          255,
+          255
+        ],
+        "body": [
+          184,
+          46,
+          56
+        ],
+        "hair": [
+          246,
+          214,
+          112
+        ],
+        "hair_style": "short"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_car_p2",
+      "subject": "child racing driver figure",
+      "seed": 24,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/car/p2.png",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a shiny purple racing helmet with a yellow stripe and a dark visor at the front, curly dark brown hair peeking out round it, small rounded shoulders in a racing suit the same colour as the helmet either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          158,
+          89,
+          242
+        ],
+        "hat_kind": "helmet",
+        "decal": [
+          255,
+          214,
+          64
+        ],
+        "body": [
+          126,
+          71,
+          194
+        ],
+        "hair": [
+          80,
+          50,
+          30
+        ],
+        "hair_style": "curls"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_car_blue",
+      "subject": "child racing driver figure",
+      "seed": 22,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/car/blue.png",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a shiny bright blue racing helmet with a yellow stripe and a dark visor at the front, small rounded shoulders in a racing suit the same colour as the helmet either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          58,
+          134,
+          255
+        ],
+        "hat_kind": "helmet",
+        "decal": [
+          255,
+          214,
+          64
+        ],
+        "body": [
+          46,
+          107,
+          204
+        ],
+        "hair": [
+          40,
+          34,
+          32
+        ],
+        "hair_style": "short"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_car_yellow",
+      "subject": "child racing driver figure",
+      "seed": 27,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/car/yellow.png",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a shiny sunny yellow racing helmet with a black stripe and a dark visor at the front, two dark brown pigtails sticking out at the back, small rounded shoulders in a racing suit the same colour as the helmet either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          255,
+          210,
+          63
+        ],
+        "hat_kind": "helmet",
+        "decal": [
+          40,
+          40,
+          40
+        ],
+        "body": [
+          204,
+          168,
+          50
+        ],
+        "hair": [
+          110,
+          66,
+          36
+        ],
+        "hair_style": "pigtails"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_car_green",
+      "subject": "child racing driver figure",
+      "seed": 22,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/car/green.png",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a shiny bright green racing helmet with a white stripe and a dark visor at the front, a ginger ponytail sticking out at the back, small rounded shoulders in a racing suit the same colour as the helmet either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          46,
+          196,
+          107
+        ],
+        "hat_kind": "helmet",
+        "decal": [
+          255,
+          255,
+          255
+        ],
+        "body": [
+          37,
+          157,
+          86
+        ],
+        "hair": [
+          214,
+          110,
+          48
+        ],
+        "hair_style": "ponytail"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_boat_vicky",
+      "subject": "child figure in a life vest",
+      "seed": 25,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/boat/vicky.png",
+      "sheet_ground": "pond_water",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a bright red baseball cap with the peak at the front, blond hair peeking out round it, small rounded shoulders in a bright orange life vest either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          230,
+          57,
+          70
+        ],
+        "hat_kind": "cap",
+        "body": [
+          255,
+          140,
+          40
+        ],
+        "hair": [
+          246,
+          214,
+          112
+        ],
+        "hair_style": "short"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_boat_p2",
+      "subject": "child figure in a life vest",
+      "seed": 26,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/boat/p2.png",
+      "sheet_ground": "pond_water",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a purple baseball cap with the peak at the front, curly dark brown hair peeking out round it, small rounded shoulders in a bright orange life vest either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          158,
+          89,
+          242
+        ],
+        "hat_kind": "cap",
+        "body": [
+          255,
+          140,
+          40
+        ],
+        "hair": [
+          80,
+          50,
+          30
+        ],
+        "hair_style": "curls"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_boat_blue",
+      "subject": "child figure in a life vest",
+      "seed": 25,
+      "facing": "down",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/boat/blue.png",
+      "sheet_ground": "pond_water",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a bright blue baseball cap with the peak at the front, short black hair round it, small rounded shoulders in a bright orange life vest either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          58,
+          134,
+          255
+        ],
+        "hat_kind": "cap",
+        "body": [
+          255,
+          140,
+          40
+        ],
+        "hair": [
+          40,
+          34,
+          32
+        ],
+        "hair_style": "short"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_boat_yellow",
+      "subject": "child figure in a life vest",
+      "seed": 25,
+      "facing": "down",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/boat/yellow.png",
+      "sheet_ground": "pond_water",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a sunny yellow baseball cap with the peak at the front, two dark brown pigtails sticking out at the back, small rounded shoulders in a bright orange life vest either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          255,
+          210,
+          63
+        ],
+        "hat_kind": "cap",
+        "body": [
+          255,
+          140,
+          40
+        ],
+        "hair": [
+          110,
+          66,
+          36
+        ],
+        "hair_style": "pigtails"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_boat_green",
+      "subject": "child figure in a life vest",
+      "seed": 25,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/boat/green.png",
+      "sheet_ground": "pond_water",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a bright green baseball cap with the peak at the front, a ginger ponytail sticking out at the back, small rounded shoulders in a bright orange life vest either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          46,
+          196,
+          107
+        ],
+        "hat_kind": "cap",
+        "body": [
+          255,
+          140,
+          40
+        ],
+        "hair": [
+          214,
+          110,
+          48
+        ],
+        "hair_style": "ponytail"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_traffic_bus",
+      "subject": "grown-up driver figure",
+      "seed": 22,
+      "facing": "up",
+      "box": [
+        44,
+        44
+      ],
+      "out": "art/drivers/traffic/bus.png",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a navy blue peaked bus driver's cap with a small gold badge at the front, small rounded shoulders in a navy blue uniform jacket either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          40,
+          56,
+          110
+        ],
+        "hat_kind": "peaked",
+        "body": [
+          50,
+          66,
+          120
+        ],
+        "hair": [
+          90,
+          60,
+          40
+        ],
+        "hair_style": "short",
+        "scale": 1.2,
+        "decal": [
+          240,
+          196,
+          60
+        ]
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_traffic_fire",
+      "subject": "grown-up driver figure",
+      "seed": 25,
+      "facing": "up",
+      "box": [
+        44,
+        44
+      ],
+      "out": "art/drivers/traffic/fire.png",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a shiny yellow firefighter's helmet with a wide brim, small rounded shoulders in a dark red firefighter's jacket either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          250,
+          200,
+          40
+        ],
+        "hat_kind": "fire",
+        "body": [
+          150,
+          40,
+          40
+        ],
+        "hair": [
+          60,
+          40,
+          30
+        ],
+        "hair_style": "short",
+        "scale": 1.2
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_traffic_garbage",
+      "subject": "grown-up driver figure",
+      "seed": 23,
+      "facing": "up",
+      "box": [
+        44,
+        44
+      ],
+      "out": "art/drivers/traffic/garbage.png",
+      "_note": "Driver (DESIGN.md §22): a toy figure's head and shoulders seen from straight above, drawn on top of the vehicle by actors/car/driver_rider.gd. FLUX alone drew front views (and a whole kart), so it is a Kontext edit of a flat sketch (postprocess.driver_sketch). Faces UP: face and arms toward the top.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a green baseball cap with the peak at the front, small rounded shoulders in a bright orange high-visibility vest either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          60,
+          150,
+          70
+        ],
+        "hat_kind": "cap",
+        "body": [
+          255,
+          130,
+          30
+        ],
+        "hair": [
+          130,
+          90,
+          60
+        ],
+        "hair_style": "short",
+        "scale": 1.2
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
     }
   ],
   "variants": [
@@ -1576,6 +2173,42 @@
       "out": "art/ui/cups/trophy_bronze.png",
       "instruction": "Change the trophy's gold metal to warm shiny bronze. Keep the exact shape, the handles, the base, the view and the plain white background exactly the same.",
       "_note": "Phase 12: recolour of the gold trophy, identical shape."
+    },
+    {
+      "id": "empty_kart",
+      "source": "card_kart",
+      "seed": 11,
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/kart.png",
+      "instruction": "Remove the driver and helmet from the seat so the seat is empty. Keep everything else exactly the same: the same vehicle, colours, angle and position, and the plain white background.",
+      "_note": "In-race look: the garage card's car with its painted driver taken out; DriverRider seats the racer's own driver (DESIGN.md §22.2).",
+      "candidate_seeds": [
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "empty_formula",
+      "source": "card_formula",
+      "seed": 13,
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/formula.png",
+      "instruction": "Remove the driver and helmet from the seat so the seat is empty. Keep everything else exactly the same: the same vehicle, colours, angle and position, and the plain white background.",
+      "_note": "In-race look: the garage card's car with its painted driver taken out; DriverRider seats the racer's own driver (DESIGN.md §22.2).",
+      "candidate_seeds": [
+        11,
+        12,
+        13,
+        14
+      ]
     }
   ],
   "copies": [
@@ -1630,16 +2263,6 @@
       "_note": "In-race look of this setup: the same car as its garage card."
     },
     {
-      "id": "body_kart",
-      "source": "card_kart",
-      "box": [
-        128,
-        72
-      ],
-      "out": "art/cars/setups/kart.png",
-      "_note": "In-race look of this setup: the same car as its garage card."
-    },
-    {
       "id": "body_banana",
       "source": "card_banana",
       "box": [
@@ -1677,16 +2300,6 @@
         72
       ],
       "out": "art/cars/setups/icecream.png",
-      "_note": "In-race look of this car: the same car as its garage card."
-    },
-    {
-      "id": "body_formula",
-      "source": "card_formula",
-      "box": [
-        128,
-        72
-      ],
-      "out": "art/cars/setups/formula.png",
       "_note": "In-race look of this car: the same car as its garage card."
     },
     {
@@ -1886,6 +2499,26 @@
       "tugboat": "boat_tugboat",
       "steamer": "boat_steamer",
       "pirate": "boat_pirate"
+    },
+    "empty_seat": {
+      "_note": "Cars whose card has a painted driver: their race bodies are Kontext edits of the paint with the seat emptied (DESIGN.md §22.2). A null seed: run variant-candidates, then pick empty_<car>_<colour> <seed>.",
+      "vehicles": [
+        "kart",
+        "formula"
+      ],
+      "instruction": "Remove the driver and helmet from the seat so the seat is empty. Keep everything else exactly the same: the same vehicle, colours, angle and position, and the plain white background.",
+      "seeds": {
+        "kart_blue": 12,
+        "kart_yellow": 12,
+        "kart_green": 11,
+        "kart_purple": 12,
+        "kart_pink": 11,
+        "formula_blue": 13,
+        "formula_yellow": 14,
+        "formula_green": 13,
+        "formula_purple": 13,
+        "formula_pink": 11
+      }
     }
   },
   "wheel_overrides": {

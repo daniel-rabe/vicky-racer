@@ -164,6 +164,7 @@ func _build_attract_mode() -> void:
 		var car: Car = CAR_SCENE.instantiate()
 		car.setup = setups[i]
 		car.body_texture = Paint.body(setups[i], paints[i])
+		car.driver_id = DriverLook.VICKY if i == 0 else DriverLook.OPPONENTS[(i - 1) % DriverLook.OPPONENTS.size()]
 		car.transform = grid[i]
 		var audio := car.get_node("Audio")  # a quiet menu: no engines
 		car.remove_child(audio)

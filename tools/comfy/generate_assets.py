@@ -57,6 +57,8 @@ def expand(manifest: dict) -> dict:
     if not paints:
         return manifest
     variants, copies = list(manifest["variants"]), list(manifest["copies"])
+    # Cars whose card has a driver painted in: in the race the driver is DriverRider's (DESIGN.md §22.2).
+    empty = paints.get("empty_seat", {"vehicles": [], "seeds": {}})
     groups = (("cars", "art/ui/cards/paint", "art/cars/paint"),
               ("boats", "art/ui/cards/boats/paint", "art/boats/paint"))
     for group, card_dir, body_dir in groups:
@@ -73,6 +75,10 @@ def expand(manifest: dict) -> dict:
                 variants.append({"id": f"paint_{key}", "source": source, "box": [312, 190], "out": card_out,
                                  "seed": paints.get("seeds", {}).get(key, paints["seed"]),
                                  "instruction": paints["instruction"].format(colour=words)})
+                if vehicle in empty["vehicles"]:  # its race body is the paint with the seat emptied
+                    variants.append({"id": f"empty_{key}", "source": f"paint_{key}", "box": [128, 72], "out": body_out,
+                                     "seed": empty["seeds"].get(key), "instruction": empty["instruction"]})
+                    continue
                 copies.append({"id": f"paint_{key}_body", "source": f"paint_{key}", "box": [128, 72], "out": body_out})
     return {**manifest, "variants": variants, "copies": copies}
 
@@ -111,7 +117,8 @@ def render_sprite(client: ComfyClient, ref: str, entry: dict, seed: int) -> tupl
         buf = io.BytesIO()
         SKETCHES[entry.get("sketch_kind", "building")](entry["sketch"]).save(buf, "PNG")
         uploaded = client.upload_image(buf.getvalue(), f"vr_sketch_{entry['id']}.png")
-        images = client.run(recipe.building_graph(uploaded, entry["subject"], entry["details"], seed))
+        section = "drivers" if entry.get("sketch_kind") == "driver" else "buildings"
+        images = client.run(recipe.building_graph(uploaded, entry["subject"], entry["details"], seed, section=section))
         return (Image.open(io.BytesIO(images["save_cutout"][0])).convert("RGBA"),
                 Image.open(io.BytesIO(images["save"][0])).convert("RGB"))
     if "size" in entry:
@@ -123,7 +130,7 @@ def render_sprite(client: ComfyClient, ref: str, entry: dict, seed: int) -> tupl
             Image.open(io.BytesIO(images["save"][0])).convert("RGB"))
 
 
-SKETCHES = {"building": pp.building_sketch, "ramp": pp.ramp_sketch}
+SKETCHES = {"building": pp.building_sketch, "ramp": pp.ramp_sketch, "driver": pp.driver_sketch}
 
 # "mirror" flips left-right: a three-quarter view (the pirate ship) turned 180 degrees would hang upside down.
 POST_STEPS = {"punch_hole": pp.punch_center_hole, "sticker": pp.sticker_border,
@@ -233,6 +240,17 @@ def cmd_variant_candidates(only: list[str] | None) -> None:
 
 def cmd_pick(asset_id: str, seed: int) -> None:
     manifest = load_manifest()
+    if asset_id.startswith("empty_") and asset_id[len("empty_"):] in manifest["paints"]["empty_seat"]["seeds"]:
+        # A painted body with its seat emptied: pinned in paints.empty_seat.seeds.
+        key = asset_id[len("empty_"):]
+        manifest["paints"]["empty_seat"]["seeds"][key] = seed
+        save_manifest(manifest)
+        candidate = CANDIDATES / f"{asset_id}_s{seed}.png"
+        if candidate.exists():
+            Image.open(candidate).save(MASTERS / f"{asset_id}.png")
+            Image.open(CANDIDATES / f"{asset_id}_s{seed}_raw.png").save(MASTERS / f"{asset_id}_raw.png")
+        print(f"{asset_id}: seed {seed} pinned")
+        return
     if asset_id.startswith("paint_"):
         # A paint re-roll: pinned in paints.seeds; delete the old master so build re-renders it.
         key = asset_id[len("paint_"):]

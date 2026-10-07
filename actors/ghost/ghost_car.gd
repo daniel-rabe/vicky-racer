@@ -18,6 +18,7 @@ var ghost: GhostLap:
 		if ghost:
 			texture = Paint.body(load("res://game/configs/setups/%s.tres" % ghost.setup_id), ghost.paint) \
 				if ResourceLoader.exists("res://game/configs/setups/%s.tres" % ghost.setup_id) else texture
+			_seat_driver()
 ## The ghost's colour: see-through white for the player's own best, gold for the developer's.
 var tint := Color(1, 1, 1, 0.45)
 ## Physics ticks since this lap started.
@@ -33,6 +34,15 @@ func _ready() -> void:
 	_tread = RollingTread.new()
 	_tread.sprite = self
 	add_child(_tread)
+
+
+## Vicky at the wheel, see-through with the rest of the ghost (docs/DESIGN.md §22).
+func _seat_driver() -> void:
+	var old := get_node_or_null(^"Driver")
+	if old:
+		remove_child(old)
+		old.queue_free()
+	DriverRider.build(self, DriverLook.texture(DriverLook.VICKY, &"car"))
 
 
 func start() -> void:

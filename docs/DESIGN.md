@@ -1709,3 +1709,81 @@ harbour, the lighthouse and the shipwreck).
   at the mooring); `--overview` now frames the whole sea.
 - **Checks:** [`tests/island_test.gd`](../tests/island_test.gd), and the whole suite.
   `town_test` passes unchanged (14 kinds of place now, and the harbour stands on no lawn).
+
+## 22. Drivers
+
+*Built through the three gates: mockups (approved 2026-10-06), then art, then code, finished 2026-10-07.*
+
+Every car and boat gets a visible driver, so the child can see **Vicky** at the wheel and
+tell the other racers apart by who is driving. A driver is a separate sprite on top of the
+vehicle, not painted into it. That way one driver works with all six paints, and the same car can
+carry Vicky in one race and an opponent in the next.
+
+### 22.1 Who drives
+
+The driver follows the racer's colour, which the HUD, the names and the 2P markers already use.
+
+| Racer | Driver | Colour |
+| --- | --- | --- |
+| Player 1, Free Drive, the title car, time-trial ghosts (shown only in open and glass vehicles) | Vicky (he/him), blond | red `#E63946` |
+| Player 2 | a friend | purple `#9E59F2` |
+| BLUE, YELLOW, GREEN opponents | three different kids | their racer colour |
+| Town traffic | grown-ups: a bus driver, a firefighter, a bin collector | |
+
+- **In cars**, each kid wears a racing helmet in their colour with their own decal.
+- **On boats**, each kid wears a sun cap in their colour and an orange life vest.
+- **The art:** 5 kids × 2 outfits + 3 grown-ups = 13 small top-down head-and-shoulders
+  sprites, about 30 px across in a 128×72 body, facing +X like the bodies.
+
+### 22.2 Seats
+
+A vehicle that shows its driver has one seat. All its paints share it, because a paint is a recolour of the same picture.
+
+- **Open seats:** the driver is drawn straight on top of the vehicle. These are the speedboat,
+  jet ski, duck, swan, banana boat, pirate deck and tugboat deck, and the kart and
+  formula.
+- **Baked drivers:** the kart and formula already have a driver painted in. Their race bodies
+  and paints are edited to show an empty seat; their garage cards keep the painted driver.
+- **Glass:** the bubble car's dome, and the windscreens of the bus, the fire engine and the garbage truck. The driver is
+  clipped to the glass, and a tint and a sheen are laid over the driver.
+- **Closed roofs show no driver:** the starter, grippy, ice cream, slider, rocket, monster,
+  police, banana and dragon, the hovercraft and steamer, and the delivery van (whose windscreen
+  is its face). The mockup's option A, a pop-up sunroof, was built and tried in the game. The user
+  turned it down on 2026-10-07 because the drivers looked as if they sat on top of the vehicle, not
+  inside it. So these vehicles have no seat, and their driver stays hidden under the roof.
+
+The driver leans a few pixels into a turn. On a boat it bobs and jumps with the hull, because it
+is a child of the body sprite.
+
+The mockup is [`driver_mockup.png`](mockups/drivers/driver_mockup.png), with a game-size strip in
+[`driver_mockup_1x.png`](mockups/drivers/driver_mockup_1x.png). Both are drawn by
+[`tools/layouts/driver_mockup.py`](../tools/layouts/driver_mockup.py) with rough placeholder heads
+on the real sprites.
+
+### 22.3 Built
+
+| Piece | What it is | File |
+| --- | --- | --- |
+| Seats | The seat of each vehicle that shows its driver: where, open or glass. All paints share one entry | [`game/configs/driver_seats.gd`](../game/configs/driver_seats.gd) |
+| Look | Driver ids (`vicky`, `p2`, `blue`, `yellow`, `green`, the four grown-ups) and their pictures | [`game/configs/driver_look.gd`](../game/configs/driver_look.gd) |
+| Rider | Draws the driver as a child of the body sprite: the glass, and the lean | [`actors/car/driver_rider.gd`](../actors/car/driver_rider.gd) |
+| Car | `driver_id`; the rider is rebuilt when the body or driver changes | [`actors/car/car.gd`](../actors/car/car.gd) |
+| Checks | Seats (and none for closed roofs), pictures for every driver, glass, repaint, boats, 1P and 2P races | [`tests/driver_test.gd`](../tests/driver_test.gd) |
+
+Who sets `driver_id`:
+- `RacerSpawner`: player 1 is Vicky and player 2 the friend; opponents go by their slot (BLUE, YELLOW, GREEN).
+- The title screen's race.
+- Free Drive: Vicky in the car and the boat. The trucks get their grown-up and the little cars get random kids.
+- `GhostCar`: Vicky, see-through.
+
+The art:
+- **How it is made:** each driver is a Kontext edit of a flat sketch (`postprocess.driver_sketch`, using
+  the pipeline.json `drivers` instruction), picked from 8 seeds each. The sheets are
+  `docs/mockups/candidates/driver_*.png`.
+- **Why sketches:** FLUX on its own drew the figures from the front. Kontext sometimes turns the
+  figure round, so a pick that came out facing down has `"facing": "down"`.
+- **Kart and Formula:** their race bodies and paints are Kontext edits with the seat emptied (the
+  manifest's `paints.empty_seat`); their cards keep the painted driver.
+- **Checking seats:** the seat sheet [`driver_sheet.png`](mockups/drivers/driver_sheet.png) is drawn by
+  [`tools/layouts/driver_sheet.py`](../tools/layouts/driver_sheet.py) the way the rider draws, for
+  tuning seats without running the game.

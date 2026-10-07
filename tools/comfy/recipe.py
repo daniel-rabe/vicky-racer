@@ -58,7 +58,9 @@ def background_graph(scene: str, seed: int, size: tuple[int, int], uploaded_refe
                            style=style_ref(uploaded_reference), prefix=prefix)
 
 
-def building_graph(uploaded_sketch: str, subject: str, details: str, seed: int, prefix: str = "vr_building") -> dict:
-    """A town building: Kontext turns the uploaded block sketch into the clay look, keeping its layout."""
-    instruction = PIPELINE["buildings"]["instruction_template"].format(subject=subject, details=details)
+def building_graph(uploaded_sketch: str, subject: str, details: str, seed: int, prefix: str = "vr_building",
+                   section: str = "buildings") -> dict:
+    """A town building: Kontext turns the uploaded block sketch into the clay look, keeping its layout.
+    `section`: the pipeline.json section whose instruction is used ("drivers" for a driver)."""
+    instruction = PIPELINE[section]["instruction_template"].format(subject=subject, details=details)
     return variant_graph(uploaded_sketch, instruction, seed, prefix=prefix)

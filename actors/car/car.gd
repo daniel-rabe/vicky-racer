@@ -45,6 +45,14 @@ const OVERSPEED_DECEL := 1500.0
 		body_texture = value
 		if is_node_ready():
 			$Body.texture = value
+			_update_rider()
+## Who is at the wheel (DriverLook, docs/DESIGN.md §22): drawn in the seat DriverSeats gives
+## the body. &"" seats nobody.
+@export var driver_id: StringName:
+	set(value):
+		driver_id = value
+		if is_node_ready():
+			_update_rider()
 
 # Written by the driver every physics frame.
 var steer_input := 0.0      ## -1 (left) .. 1 (right)
@@ -82,6 +90,18 @@ func _ready() -> void:
 		$Body.texture = body_texture
 	_resolve_config()
 	set_level(0)
+	_update_rider()
+
+
+## The driver in the seat, rebuilt for the current body and driver.
+func _update_rider() -> void:
+	var body: Sprite2D = $Body
+	var old := body.get_node_or_null(^"Driver")
+	if old:
+		body.remove_child(old)
+		old.queue_free()
+	var kind := setup.kind if setup else &"car"
+	DriverRider.build(body, DriverLook.texture(driver_id, kind), self)
 
 
 ## Move between the ground and a bridge: what the car can touch, and (with the margin the

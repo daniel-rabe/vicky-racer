@@ -172,6 +172,7 @@ func _spawn_player(autodrive: bool) -> void:
 	if _setup:
 		car.setup = _setup
 		car.body_texture = Paint.body(_setup, _paint)
+	car.driver_id = DriverLook.VICKY
 	_cars.add_child(car)
 	var a: Vector2i = START_ROAD[0]
 	var b: Vector2i = START_ROAD[1]
@@ -236,6 +237,7 @@ func _the_boat() -> Boat:
 		if _boat_setup:
 			boat.setup = _boat_setup
 			boat.body_texture = Paint.body(_boat_setup, _boat_paint)
+		boat.driver_id = DriverLook.VICKY
 		_cars.add_child(boat)
 	return boat
 
@@ -323,6 +325,8 @@ func _spawn_traffic() -> void:
 		if entry[1]:
 			car.setup = entry[1]  # its own horn: the police car's siren, the ice-cream van's tune
 		car.body_texture = body
+		# Grown-ups drive the big vehicles; the other children are out in the little cars.
+		car.driver_id = DriverLook.for_traffic(body) if entry[1] == null 			else DriverLook.KIDS[1 + _rng.randi() % (DriverLook.KIDS.size() - 1)]
 		_fit_body(car, body)
 		var driver := TrafficDriver.new()
 		driver.name = "TrafficDriver"

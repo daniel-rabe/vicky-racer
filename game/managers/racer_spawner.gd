@@ -37,6 +37,7 @@ func spawn(track: Track, config: TrackConfig, humans: Array[Dictionary], parent:
 			var who: Dictionary = humans[human]
 			car.setup = who["setup"]
 			car.body_texture = Paint.body(who["setup"], who.get("paint", Paint.ORIGINAL))
+			car.driver_id = DriverLook.for_player(human + 1)
 			racer.merge({"name": who.get("name", "YOU"), "body": car.body_texture.resource_path,
 				"colour": who.get("colour", PLAYER_COLOUR)})
 			if autopilot:
@@ -63,6 +64,8 @@ func spawn(track: Track, config: TrackConfig, humans: Array[Dictionary], parent:
 			car.setup = setup
 			var body := Paint.body(setup, config.opponent_paints[opponent])
 			car.body_texture = body
+			# The driver goes with the racer's colour: BLUE, YELLOW, GREEN (docs/DESIGN.md §22.1).
+			car.driver_id = DriverLook.OPPONENTS[opponent % DriverLook.OPPONENTS.size()]
 			racer.merge({"name": config.opponent_names[opponent], "body": body.resource_path,
 				"colour": config.opponent_colours[opponent]})
 			var skill := clampf(config.opponent_skills[opponent] + skill_offset, 0.0, 1.0)
