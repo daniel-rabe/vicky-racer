@@ -23,8 +23,8 @@ const REMOVED_ROADS := [["v", 3, 1]]
 
 ## What stands in each block, keyed by its top-left cell. bottom / top: building ids from
 ## art/town/buildings/, spread evenly along that edge. park: the big park's furniture.
-## pond / playground: one each in the middle of a block. trees / flowers: trees and flower
-## beds, scattered where there is room.
+## pond / playground: one each in the middle of a block. football: a pitch with two goals
+## (docs/DESIGN.md §23). trees / flowers: trees and flower beds, scattered where there is room.
 const BLOCKS := {
 	Vector2i(0, 0): {"bottom": ["house_red", "house_blue"], "top": ["house_green"], "trees": 3, "flowers": 2},
 	Vector2i(1, 0): {"bottom": ["candy_shop", "ice_cream_shop"], "top": ["house_blue", "house_red"], "trees": 2, "flowers": 2},
@@ -43,8 +43,8 @@ const BLOCKS := {
 	Vector2i(0, 3): {"pond": true, "trees": 6, "flowers": 1},
 	Vector2i(1, 3): {"bottom": ["house_red", "house_blue"], "top": ["house_green", "house_red"], "trees": 2, "flowers": 2},
 	Vector2i(2, 3): {"bottom": ["toy_shop", "pizza_place"], "top": ["house_blue"], "trees": 3, "flowers": 2},
-	Vector2i(3, 3): {"bottom": ["house_green", "house_red"], "top": ["house_blue", "house_green"], "trees": 2, "flowers": 2},
-	Vector2i(4, 3): {"playground": true, "trees": 5, "flowers": 1},
+	Vector2i(3, 3): {"bottom": ["paint_shop", "house_red"], "top": ["house_blue", "house_green"], "trees": 2, "flowers": 2},
+	Vector2i(4, 3): {"football": true, "trees": 3, "flowers": 1},
 }
 
 ## Shown when the player pulls up at the door. Houses have no sign.
@@ -60,11 +60,29 @@ const PLACE_NAMES := {
 	"police_station": "POLICE",
 	"school": "SCHOOL",
 	"car_wash": "CAR WASH",
+	"paint_shop": "PAINT SHOP",
 	# The island (docs/DESIGN.md §21): the harbour on the coast, two places out at sea.
 	"harbour": "HARBOUR",
 	"lighthouse": "LIGHTHOUSE",
 	"shipwreck": "SHIPWRECK",
 }
+
+
+## More to do in town (docs/DESIGN.md §23).
+## Bus stops: on the road from junction a to junction b, this far along, on the pavement to
+## the right of a bus driving that way. All on roads up and down the screen, where no shop
+## door opens.
+const BUS_STOPS := [[Vector2i(1, 0), Vector2i(1, 1), 0.5], [Vector2i(3, 1), Vector2i(3, 0), 0.5],
+	[Vector2i(4, 2), Vector2i(4, 1), 0.5], [Vector2i(2, 3), Vector2i(2, 4), 0.5]]
+## Jump ramps on the grass between the ring road and the beach: where the ramp stands and
+## which way it throws a car. Each has a paved run-up, coins in the air beyond it, and cones
+## to land in.
+const RAMPS := [[Vector2(3600.0, 450.0), Vector2.RIGHT], [Vector2(450.0, 4300.0), Vector2.UP],
+	[Vector2(9470.0, 3500.0), Vector2.DOWN]]
+## A ramp's run-up starts this far before it and runs on this far past it, px; this wide.
+const RUNWAY_BEFORE := 800.0
+const RUNWAY_AFTER := 900.0
+const RUNWAY_WIDTH := 240.0
 
 
 static func junction(cell: Vector2i) -> Vector2:

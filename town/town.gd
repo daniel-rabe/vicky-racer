@@ -11,12 +11,18 @@ extends Node2D
 ## grass, the pond is water, the beach is sand; at sea a boat is slowed in the shallows by
 ## the shore and goes full speed on deep water.
 ##
+## Phase 23 (§23) adds things to do: a football pitch, a paint shop's pad, the fire station's
+## and the school's pads (the fire engine and the school bus), bus stops, jump ramps on paved
+## run-ups, and puddles that show on the roads when it rains.
+##
 ## It is also the traffic's map. Junctions are grid cells (Vector2i); lane_points() and
 ## turn_points() give the line a car follows along a road and through a junction, on the
 ## right-hand side, and a car asks to reserve a junction before it drives into it, so two
 ## cars never cross it at once.
 
 signal place_reached(place_id: String, display_name: String, picture: Texture2D)
+## The player's car drove onto a pad that does something to it at once (&"paint").
+signal pad_reached(kind: StringName, car: Car)
 
 const GRASS := preload("res://art/tiles/grass.png")
 const ASPHALT := preload("res://art/tiles/asphalt.png")
@@ -44,6 +50,8 @@ const CHEST := preload("res://art/props/water/treasure_chest.png")
 const LIGHTHOUSE := preload("res://art/town/island/lighthouse.png")
 const SAILBOAT := preload("res://art/town/island/sailboat.png")
 const MOORING_POST := preload("res://art/town/island/mooring_post.png")
+const FIRE_ENGINE := preload("res://art/town/vehicles/fire_engine.png")
+const BUS := preload("res://art/town/vehicles/bus.png")
 const FOAM := Color(1, 1, 1, 0.8)
 const PAD_COLOUR := Color(0.24, 0.59, 0.86, 0.92)
 ## The ramp's trigger, as on a boat course (track/build/build_track.gd).
@@ -71,6 +79,16 @@ const WASH_COLOUR := Color(0.55, 0.82, 0.96, 0.9)
 ## How far the car wash's pad reaches into the road past the pavement, px: the near lane's
 ## cars pass clear of it, a car steering in drives onto it.
 const WASH_PAD_INTO_ROAD := 30.0
+const FIRE_PAD_COLOUR := Color(0.86, 0.25, 0.22, 0.9)
+const BUS_PAD_COLOUR := Color(0.98, 0.76, 0.18, 0.92)
+## The football pitch (§23): its size, and the goal mouths at each end.
+const PITCH_SIZE := Vector2(1000.0, 700.0)
+const GOAL_MOUTH := 280.0
+const GOAL_DEPTH := 80.0
+const POST_RADIUS := 14.0
+## Puddles in the road, seen only when it rains.
+const PUDDLES := 26
+const PUDDLE_COLOUR := Color(0.36, 0.45, 0.58, 0.55)
 
 var junctions := {}  # Vector2i -> Vector2, world position
 var links := {}      # Vector2i -> Array[Vector2i], junctions joined by a road
@@ -85,6 +103,34 @@ var places: Array[Dictionary] = []
 var wash_pad := Rect2()
 ## Islet outlines (§21.5): sand in the sea, walls to a boat.
 var islets: Array[PackedVector2Array] = []
+# Things to do (§23).
+## Houses whose door opens onto a street: {id, door (Vector2), sprite}. Deliveries go here.
+var houses: Array[Dictionary] = []
+## Pads in front of the fire station, the school (the bus) and the paint shop.
+var fire_pad := Rect2()
+var bus_pad := Rect2()
+var paint_pad := Rect2()
+## The football pitch, and its two goal mouths (the ball is in when its middle is inside one).
+var pitch := Rect2()
+var goals: Array[Rect2] = []
+## Where a beach ball lies, by a parasol.
+var beach_balls: Array[Vector2] = []
+## The park's fountain: where it is, and its spray (it shoots higher when a car splashes by).
+var fountain_at := Vector2.ZERO
+var fountain_spray: CPUParticles2D
+var flower_beds: Array[Sprite2D] = []
+var tree_spots: Array[Vector2] = []
+## Bus stops: {stop (the bus's spot in the lane), kerb (where passengers wait), along (the
+## road's direction)}.
+var bus_stops: Array[Dictionary] = []
+## Jump ramps (§23): {at, throw (direction), runway (Rect2)}.
+var ramps: Array[Dictionary] = []
+## Puddles: x, y, radius. Wet (it is raining, or still drying) they are a surface.
+var puddles: Array[Vector3] = []
+var wet := false
+## Grass that trees and flower beds keep off: the pitch, bus shelters, ramp run-ups.
+var _keep_clear: Array[Rect2] = []
+var _puddle_layer: Node2D
 
 var _reserved := {}    # Vector2i -> the car crossing that junction
 var _surface_of := {}  # car -> surface id
@@ -115,11 +161,13 @@ func _ready() -> void:
 	_water_line = Island.outline(0.0)
 	_shallows_line = Island.outline(Island.SHALLOWS)
 	_build_graph()
+	_plan_extras()
 	_build_ground()
 	_build_blocks()
 	_build_coast()
 	_build_harbour()
 	_build_sea()
+	_build_extras()
 
 
 func _physics_process(_delta: float) -> void:
@@ -154,8 +202,15 @@ func surface_at(pos: Vector2) -> StringName:
 	for pond in ponds:
 		if pos.distance_to(Vector2(pond.x, pond.y)) < pond.z - 20.0:
 			return &"water"
+	for ramp in ramps:
+		if ramp["runway"].has_point(pos):
+			return &"asphalt"
 	if not streets_rect().has_point(pos):
 		return _coast_surface(pos)
+	if wet:
+		for puddle in puddles:
+			if pos.distance_to(Vector2(puddle.x, puddle.y)) < puddle.z:
+				return &"puddle"
 	for lawn in lawns:
 		if lawn.grow(-8.0).has_point(pos):
 			return &"grass"
@@ -328,6 +383,8 @@ func _build_blocks() -> void:
 			placed.append_array(_park(lawn))
 		if spec.get("pond", false):
 			placed.append(_pond(lawn.get_center(), 300.0))
+		if spec.get("football", false):
+			placed.append(_football_pitch(lawn))
 		if spec.get("playground", false):
 			var spot := Vector2(lawn.get_center().x, lawn.position.y + lawn.size.y * 0.42) if spec.has("bottom") \
 				else lawn.get_center()
@@ -387,8 +444,19 @@ func _building(id: String, picture: Texture2D, rect: Rect2, on_street: bool, on_
 		area.body_entered.connect(func(body: Node2D) -> void:
 			if body is Car and body.has_node(^"PlayerInput"):
 				place_reached.emit(id, TownLayout.PLACE_NAMES[id], picture))
+	if on_street and id.begins_with("house_"):
+		houses.append({"id": id, "door": Vector2(solid.get_center().x, rect.end.y + 10.0 + TownLayout.SIDEWALK * 0.5),
+			"sprite": sprite})
 	if on_street and id == "car_wash":
 		_wash_pad(solid, rect)
+	elif on_street and id == "fire_station":
+		fire_pad = _front_pad(solid, rect, FIRE_PAD_COLOUR)
+		_ghost(FIRE_ENGINE, fire_pad.get_center(), PI / 2.0)
+	elif on_street and id == "school":
+		bus_pad = _front_pad(solid, rect, BUS_PAD_COLOUR)
+		_ghost(BUS, bus_pad.get_center(), PI / 2.0)
+	elif on_street and id == "paint_shop":
+		_paint_pad(solid, rect)
 
 
 ## The car wash's pad: a wet blue strip with soap bubbles and arrows pointing in, from the
@@ -396,12 +464,9 @@ func _building(id: String, picture: Texture2D, rect: Rect2, on_street: bool, on_
 ## car onto it washes the car (CAR_washed): foam, then it sparkles. Steering in is needed —
 ## a car keeping to its lane passes by.
 func _wash_pad(solid: Rect2, rect: Rect2) -> void:
-	var width := solid.size.x * 0.7
-	var top := rect.end.y - 14.0
-	var bottom := rect.end.y + 10.0 + TownLayout.SIDEWALK + WASH_PAD_INTO_ROAD
-	var pad := Rect2(solid.get_center().x - width / 2.0, top, width, bottom - top)
+	var pad := _front_pad(solid, rect, WASH_COLOUR, false)
+	var width := pad.size.x
 	wash_pad = pad
-	_ground.add_child(_flat(_rect_points(pad, 26.0), WASH_COLOUR))
 	for i in 18:
 		var bubble := Polygon2D.new()
 		var at := Vector2(_rng.randf_range(pad.position.x + 20.0, pad.end.x - 20.0),
@@ -440,6 +505,59 @@ func _wash_pad(solid: Rect2, rect: Rect2) -> void:
 			EventSystem.CAR_washed.emit(body))
 
 
+## A pad in front of a building, as the car wash's: from its front wall across the pavement
+## and a little way into the road, so a car keeping to its lane passes it by.
+func _front_pad(solid: Rect2, rect: Rect2, colour: Color, rim := true) -> Rect2:
+	var width := solid.size.x * 0.7
+	var top := rect.end.y - 14.0
+	var bottom := rect.end.y + 10.0 + TownLayout.SIDEWALK + WASH_PAD_INTO_ROAD
+	var pad := Rect2(solid.get_center().x - width / 2.0, top, width, bottom - top)
+	_ground.add_child(_flat(_rect_points(pad, 26.0), colour))
+	if rim:
+		_outline_rect(pad, 26.0, Color(1, 1, 1, 0.85), 6.0)
+	return pad
+
+
+## What a pad turns you into, drawn faintly on it: the vehicle itself, pointing out.
+func _ghost(picture: Texture2D, at: Vector2, angle: float) -> void:
+	var ghost := Sprite2D.new()
+	ghost.texture = picture
+	ghost.position = at
+	ghost.rotation = angle
+	ghost.modulate = Color(1, 1, 1, 0.45)
+	_ground.add_child(ghost)
+
+
+## The paint shop's pad: stripes of every paint. Driving the player's car onto it paints the
+## car its next colour (pad_reached &"paint").
+func _paint_pad(solid: Rect2, rect: Rect2) -> void:
+	var pad := _front_pad(solid, rect, Color(1, 1, 1, 0.9))
+	paint_pad = pad
+	var stripes: Array = Paint.SWATCHES.values()
+	var each := pad.size.x / stripes.size()
+	for i in stripes.size():
+		var stripe := Rect2(pad.position.x + i * each + 6.0, pad.position.y + 16.0, each - 12.0, pad.size.y - 32.0)
+		_ground.add_child(_flat(_rect_points(stripe, 14.0), Color(stripes[i], 0.85)))
+	_pad_area(pad, &"paint")
+
+
+func _pad_area(pad: Rect2, kind: StringName) -> void:
+	var area := Area2D.new()
+	area.name = String(kind).capitalize() + "Pad"
+	area.position = pad.get_center()
+	area.collision_layer = 0
+	area.collision_mask = Car.LAYER_CARS_GROUND
+	var shape := CollisionShape2D.new()
+	var box := RectangleShape2D.new()
+	box.size = pad.size
+	shape.shape = box
+	area.add_child(shape)
+	_things.add_child(area)
+	area.body_entered.connect(func(body: Node2D) -> void:
+		if body is Car and body.has_node(^"PlayerInput"):
+			pad_reached.emit(kind, body))
+
+
 ## The big park: a fountain in the middle, the pond and the playground either side, flower
 ## beds and benches round the fountain. Trees fill in later.
 func _park(lawn: Rect2) -> Array[Rect2]:
@@ -447,12 +565,15 @@ func _park(lawn: Rect2) -> Array[Rect2]:
 	var out: Array[Rect2] = []
 	var fountain := _prop(FOUNTAIN, centre, Vector2(280, 280), 120.0)
 	out.append(fountain)
-	_things.add_child(_spray(centre))
+	fountain_at = centre
+	fountain_spray = _spray(centre)
+	_things.add_child(fountain_spray)
 	out.append(_pond(centre + Vector2(lawn.size.x * 0.3, 0), 280.0))
 	out.append(_prop(PLAYGROUND, centre - Vector2(lawn.size.x * 0.3, 0), Vector2(320, 240)))
 	for angle in [PI * 0.25, PI * 0.75, PI * 1.25, PI * 1.75]:
 		var spot := centre + Vector2.from_angle(angle) * 260.0
 		out.append(_prop(FLOWER_BED, spot, Vector2(110, 110), 0.0))
+		flower_beds.append(_things.get_child(-1))
 	for side in [-1.0, 1.0]:
 		var bench := _prop(BENCH, centre + Vector2(0, side * 230.0), Vector2(120, 60), 0.0)
 		out.append(bench)
@@ -551,6 +672,8 @@ func _scatter_trees(lawn: Rect2, count: int, taken: Array[Rect2]) -> void:
 			continue
 		if trees.any(func(t: Vector2) -> bool: return t.distance_to(spot) < TREE_SPACING):
 			continue
+		if _keep_clear.any(func(r: Rect2) -> bool: return r.grow(90.0).has_point(spot)):
+			continue
 		trees.append(spot)
 		_tree(spot, _rng.randf_range(0.8, 1.05))
 	for t in trees:
@@ -567,12 +690,16 @@ func _scatter_flowers(lawn: Rect2, count: int, taken: Array[Rect2]) -> void:
 		var spot := Vector2(_rng.randf_range(inner.position.x, inner.end.x), _rng.randf_range(inner.position.y, inner.end.y))
 		if taken.any(func(r: Rect2) -> bool: return r.grow(50.0).has_point(spot)):
 			continue
+		if _keep_clear.any(func(r: Rect2) -> bool: return r.has_point(spot)):
+			continue
 		var bed := _prop(FLOWER_BED, spot, Vector2(96, 96) * _rng.randf_range(0.85, 1.15), 0.0)
+		flower_beds.append(_things.get_child(-1))
 		taken.append(bed)
 		placed += 1
 
 
 func _tree(at: Vector2, size: float) -> void:
+	tree_spots.append(at)
 	var sprite := Sprite2D.new()
 	sprite.texture = TREE
 	sprite.position = at
@@ -618,13 +745,15 @@ func _build_coast() -> void:
 	for i in range(5, sand.size(), 37):
 		if not _near_harbour(sand[i], 500.0):
 			_sprite(PARASOL, sand[i], 190.0)
-			_sprite(BEACH_BALL, sand[i] + Vector2(150, 60), 70.0)
+			beach_balls.append(sand[i] + Vector2(150, 60))  # a ball to kick about (§23): the screen puts it there
 	# A few round trees on the grass between the ring road and the beach.
 	var streets := streets_rect()
 	var inner := Island.outline(-Island.BEACH - 200.0)
 	for i in 60:
 		var spot := Vector2(_rng.randf_range(-200.0, world_rect().end.x + 200.0), _rng.randf_range(-200.0, world_rect().end.y + 200.0))
 		if streets.grow(160.0).has_point(spot) or not Geometry2D.is_point_in_polygon(spot, inner) or _near_harbour(spot, 500.0):
+			continue
+		if _keep_clear.any(func(r: Rect2) -> bool: return r.grow(120.0).has_point(spot)):
 			continue
 		_tree(spot, _rng.randf_range(0.8, 1.1))
 	_wall_line(_wall(Car.LAYER_SEA_EDGE | Car.LAYER_LAND_EDGE, "Shore"), Island.shoreline())
@@ -960,3 +1089,197 @@ static func _dash_texture() -> ImageTexture:
 	image.fill(Color(1, 1, 1, 0))
 	image.fill_rect(Rect2i(0, 0, 80, 10), Color.WHITE)
 	return ImageTexture.create_from_image(image)
+
+
+# --- things to do (§23) -----------------------------------------------------------------
+
+## Before anything grows: the grass the bus shelters and the ramps' run-ups need, so no tree
+## or flower bed is planted there.
+func _plan_extras() -> void:
+	for entry: Array in TownLayout.BUS_STOPS:
+		var a: Vector2i = entry[0]
+		var b: Vector2i = entry[1]
+		var along := heading(a, b)
+		var side := right_of(along)
+		var middle: Vector2 = junctions[a].lerp(junctions[b], entry[2])
+		var shelter := middle + side * (TownLayout.ROAD_HALF + TownLayout.SIDEWALK + 50.0)
+		bus_stops.append({"stop": middle + side * LANE, "kerb": middle + side * (TownLayout.ROAD_HALF + TownLayout.SIDEWALK * 0.5),
+			"shelter": shelter, "along": along, "side": side})
+		_keep_clear.append(_box_along(shelter, along, 260.0, 110.0))
+	for entry: Array in TownLayout.RAMPS:
+		var at: Vector2 = entry[0]
+		var throw: Vector2 = entry[1]
+		var start := at - throw * TownLayout.RUNWAY_BEFORE
+		var end := at + throw * TownLayout.RUNWAY_AFTER
+		var runway := Rect2(start, Vector2.ZERO).expand(end).grow_individual(
+			absf(throw.y) * TownLayout.RUNWAY_WIDTH / 2.0, absf(throw.x) * TownLayout.RUNWAY_WIDTH / 2.0,
+			absf(throw.y) * TownLayout.RUNWAY_WIDTH / 2.0, absf(throw.x) * TownLayout.RUNWAY_WIDTH / 2.0)
+		ramps.append({"at": at, "throw": throw, "runway": runway})
+		_keep_clear.append(runway.grow(40.0))
+		_keep_clear.append(Rect2(end - Vector2(260, 260), Vector2(520, 520)))  # the cones beyond it
+
+
+## A rectangle round `centre`, `length` along `along` and `depth` across it.
+static func _box_along(centre: Vector2, along: Vector2, length: float, depth: float) -> Rect2:
+	var size := Vector2(absf(along.x) * length + absf(along.y) * depth, absf(along.y) * length + absf(along.x) * depth)
+	return Rect2(centre - size / 2.0, size)
+
+
+## The football pitch in the middle of its block: mown stripes, white lines, a goal at each
+## end. The goals' frames are solid; the ball counts as in when its middle is in a mouth.
+func _football_pitch(lawn: Rect2) -> Rect2:
+	pitch = Rect2(lawn.get_center() - PITCH_SIZE / 2.0, PITCH_SIZE)
+	var stripes := 10
+	for i in stripes:
+		if i % 2 == 0:
+			var stripe := Rect2(pitch.position.x + i * pitch.size.x / stripes, pitch.position.y, pitch.size.x / stripes, pitch.size.y)
+			_ground.add_child(_flat(_rect_points(stripe), Color(0.1, 0.3, 0.05, 0.12)))
+	var white := Color(1, 1, 1, 0.9)
+	_outline_rect(pitch, 0.0, white, 8.0)
+	var halfway := Line2D.new()
+	halfway.points = PackedVector2Array([Vector2(pitch.get_center().x, pitch.position.y), Vector2(pitch.get_center().x, pitch.end.y)])
+	halfway.width = 8.0
+	halfway.default_color = white
+	_ground.add_child(halfway)
+	var circle := Line2D.new()
+	for k in 33:
+		circle.add_point(pitch.get_center() + Vector2.from_angle(TAU * k / 32.0) * 110.0)
+	circle.width = 8.0
+	circle.default_color = white
+	_ground.add_child(circle)
+	_ground.add_child(_disc(pitch.get_center(), 10.0, white))
+	for side in [-1.0, 1.0]:
+		var line_x: float = pitch.position.x if side < 0.0 else pitch.end.x
+		var box := Rect2(Vector2(line_x - (0.0 if side < 0.0 else 170.0), pitch.get_center().y - 210.0), Vector2(170, 420))
+		_outline_rect(box, 0.0, white, 8.0)
+		# The goal: a net behind the line, a white frame round it, posts at the mouth.
+		var mouth := Rect2(Vector2(line_x - (GOAL_DEPTH if side < 0.0 else 0.0), pitch.get_center().y - GOAL_MOUTH / 2.0),
+			Vector2(GOAL_DEPTH, GOAL_MOUTH))
+		goals.append(mouth)
+		_things.add_child(_flat(_rect_points(mouth), Color(1, 1, 1, 0.35)))
+		for k in range(1, 9):
+			var y := mouth.position.y + k * GOAL_MOUTH / 9.0
+			var strand := Line2D.new()
+			strand.points = PackedVector2Array([Vector2(mouth.position.x, y), Vector2(mouth.end.x, y)])
+			strand.width = 2.0
+			strand.default_color = Color(1, 1, 1, 0.7)
+			_things.add_child(strand)
+		var back_x := mouth.position.x if side < 0.0 else mouth.end.x
+		var frame := Line2D.new()
+		frame.points = PackedVector2Array([Vector2(line_x, mouth.position.y), Vector2(back_x, mouth.position.y),
+			Vector2(back_x, mouth.end.y), Vector2(line_x, mouth.end.y)])
+		frame.width = 10.0
+		frame.default_color = Color.WHITE
+		frame.joint_mode = Line2D.LINE_JOINT_ROUND
+		_things.add_child(frame)
+		for post_y in [mouth.position.y, mouth.end.y]:
+			_things.add_child(_disc(Vector2(line_x, post_y), POST_RADIUS, Color.WHITE))
+			_add_circle(Vector2(line_x, post_y), POST_RADIUS)
+		_add_box(Rect2(Vector2(minf(line_x, back_x), mouth.position.y - 6.0), Vector2(GOAL_DEPTH, 12.0)))
+		_add_box(Rect2(Vector2(minf(line_x, back_x), mouth.end.y - 6.0), Vector2(GOAL_DEPTH, 12.0)))
+		_add_box(Rect2(Vector2(back_x - 6.0, mouth.position.y), Vector2(12.0, GOAL_MOUTH)))
+	return pitch.grow(GOAL_DEPTH + 40.0)
+
+
+## After the rest: the bus stops, the ramps with their run-ups, and the puddles.
+func _build_extras() -> void:
+	for stop in bus_stops:
+		_bus_shelter(stop)
+	for ramp in ramps:
+		_ramp(ramp)
+	_puddle_layer = Node2D.new()
+	_puddle_layer.name = "Puddles"
+	_puddle_layer.modulate.a = 0.0
+	_ground.add_child(_puddle_layer)
+	for i in PUDDLES:
+		var road: Array = roads[_rng.randi() % roads.size()]
+		var a: Vector2 = junctions[road[0]]
+		var b: Vector2 = junctions[road[1]]
+		var d := (b - a).normalized()
+		var at := a.lerp(b, _rng.randf_range(0.28, 0.72)) + right_of(d) * _rng.randf_range(-1.1, 1.1) * LANE
+		var radius := _rng.randf_range(60.0, 100.0)
+		puddles.append(Vector3(at.x, at.y, radius))
+		var points := PackedVector2Array()
+		var stretch := _rng.randf_range(1.2, 1.6)
+		for k in 24:
+			var angle := TAU * k / 24.0
+			var wobble := 1.0 + 0.1 * sin(angle * 3.0 + i)
+			points.append(at + (Vector2(cos(angle) * stretch, sin(angle)) * radius * wobble).rotated(d.angle()))
+		_puddle_layer.add_child(_flat(points, PUDDLE_COLOUR))
+		var shine := _flat(points, Color(1, 1, 1, 0.18))
+		shine.scale = Vector2.ONE * 0.5
+		shine.position = at * 0.5 + Vector2(-12, -10)
+		_puddle_layer.add_child(shine)
+
+
+## How wet the roads are, 0 (dry) to 1 (pouring): the puddles show, and are slippery while
+## they are more than a shine.
+func set_wet(amount: float) -> void:
+	_puddle_layer.modulate.a = amount
+	wet = amount > 0.35
+
+
+## A bus stop: a shelter on the grass behind the pavement, with a roof and a bench, and a
+## sign with a bus on it at the kerb.
+func _bus_shelter(stop: Dictionary) -> void:
+	var along: Vector2 = stop["along"]
+	var side: Vector2 = stop["side"]
+	var at: Vector2 = stop["shelter"]
+	_things.add_child(_flat(_rect_points(_box_along(at + Vector2(8, 10), along, 240.0, 90.0), 14.0), Color(0, 0, 0, 0.18)))
+	_things.add_child(_flat(_rect_points(_box_along(at, along, 240.0, 90.0), 14.0), Color(0.24, 0.55, 0.85)))
+	_things.add_child(_flat(_rect_points(_box_along(at - side * 6.0, along, 210.0, 56.0), 10.0), Color(0.55, 0.78, 0.95)))
+	var bench := _box_along(at + side * 0.0 - side * 40.0, along, 160.0, 16.0)
+	_things.add_child(_flat(_rect_points(bench, 6.0), Color(0.6, 0.4, 0.25)))
+	var sign_at: Vector2 = stop["kerb"] + along * 150.0 - side * 20.0
+	var pole := Line2D.new()
+	pole.points = PackedVector2Array([sign_at, sign_at + Vector2(0, -60)])
+	pole.width = 6.0
+	pole.default_color = Color(0.4, 0.4, 0.42)
+	_things.add_child(pole)
+	_things.add_child(_disc(sign_at + Vector2(0, -70), 30.0, Color(0.98, 0.76, 0.18)))
+	_things.add_child(_disc(sign_at + Vector2(0, -70), 24.0, Color.WHITE))
+	var icon := Sprite2D.new()
+	icon.texture = BUS
+	icon.position = sign_at + Vector2(0, -70)
+	icon.scale = Vector2.ONE * 40.0 / BUS.get_width()
+	_things.add_child(icon)
+
+
+## A jump ramp on the grass: a paved run-up with arrows, the ramp, and paving on beyond it
+## to land on. Driving over the ramp the way it points throws a car into the air (CarHop).
+func _ramp(ramp: Dictionary) -> void:
+	var runway: Rect2 = ramp["runway"]
+	var throw: Vector2 = ramp["throw"]
+	var at: Vector2 = ramp["at"]
+	_ground.add_child(_flat(_rect_points(runway.grow(7.0), 30.0), KERB_COLOUR))
+	_ground.add_child(_textured(_rect_points(runway, 26.0), ASPHALT))
+	for k in 4:
+		var tip := at - throw * (620.0 - k * 130.0)
+		var arrow := Line2D.new()
+		var across := right_of(throw) * 40.0
+		arrow.points = PackedVector2Array([tip - throw * 34.0 - across, tip, tip - throw * 34.0 + across])
+		arrow.width = 12.0
+		arrow.default_color = Color(1, 1, 1, 0.8)
+		arrow.joint_mode = Line2D.LINE_JOINT_ROUND
+		arrow.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		arrow.end_cap_mode = Line2D.LINE_CAP_ROUND
+		_ground.add_child(arrow)
+	var area := Area2D.new()
+	area.name = "LandRamp"
+	area.position = at
+	area.rotation = throw.angle()
+	area.monitorable = false
+	area.collision_layer = 0
+	area.collision_mask = Car.LAYER_CARS_GROUND
+	var trigger := CollisionShape2D.new()
+	var box := RectangleShape2D.new()
+	box.size = RAMP_TRIGGER
+	trigger.shape = box
+	area.add_child(trigger)
+	var picture := Sprite2D.new()
+	picture.texture = RAMP
+	area.add_child(picture)
+	area.body_entered.connect(func(body: Node2D) -> void:
+		if body is Car and not body is Boat and body.velocity.dot(throw) > 150.0:
+			CarHop.launch(body))
+	_things.add_child(area)

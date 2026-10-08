@@ -20,6 +20,8 @@ var _town: Town
 var _player: Car
 var _sailing := false
 var _traffic: Array[Car] = []
+## Things to point out (§23): [world position, colour] — where a delivery goes, fires.
+var marks: Array = []
 var _scale := 1.0
 var _origin := Vector2.ZERO
 var _sand := PackedVector2Array()
@@ -98,6 +100,10 @@ func _draw() -> void:
 	for car in _traffic:
 		if is_instance_valid(car):
 			draw_circle(_map(car.global_position), 4.0, TRAFFIC)
+	for mark: Array in marks:
+		var spot := _map(mark[0]).clamp(Vector2(6, 6), size - Vector2(6, 6))
+		draw_circle(spot, 9.0, Color.WHITE)
+		draw_circle(spot, 6.5, mark[1])
 	if is_instance_valid(_player):
 		var at := _map(_player.global_position).clamp(Vector2.ZERO, size)
 		draw_circle(at, 10.0, Color.WHITE)
