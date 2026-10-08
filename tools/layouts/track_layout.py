@@ -14,11 +14,16 @@ themes.json) colours the diagram the way the track will look.
 
 Where the line crosses itself, one pass goes over a bridge: `bridges` names the upper pass
 by the fraction of the lap where it crosses ({"upper_at": 0.2, "length_tiles": 18}). The
-script finds every crossing, centres a bridge span on the chosen pass, and warns about a
+the script finds every crossing, centres a bridge span on the chosen pass, and warns about a
 crossing with no bridge, or a gate, pad or ice patch on a bridge or right by a crossing.
+
+A water theme makes a boat course (DESIGN.md §20) and a space theme a space course (§23):
+branches, plus currents, ramps and logs on water, or drifting asteroids, comets and station
+tunnels in space.
 """
 import json
 import math
+import random
 import sys
 from pathlib import Path
 
@@ -50,6 +55,12 @@ PROP_STYLE = {  # kind -> (svg radius, fill, stroke)
     "duck_house": (14, "#E8B04A", "#8A5A2A"), "shipwreck": (24, "#8A5A32", "#3E2614"),
     "treasure_chest": (9, "#C98A2E", "#FFD23F"), "lemon_slice": (12, "#FFE45C", "#FFFFFF"),
     "ice_cube": (10, "#E8F6FF", "#9CCBE6"), "cocktail_umbrella": (12, "#FF5FA2", "#FFFFFF"),
+    # Space courses (DESIGN.md §23): asteroids in the dust are bumpers, the rest is scenery.
+    "asteroid": (12, "#8C8494", "#4E4858"), "moon_base": (20, "#E6E8EE", "#6C7080"),
+    "ringed_planet": (70, "#E8B86A", "#9A6A2A"), "little_moon": (26, "#C8C4D6", "#7A7490"),
+    "space_station": (34, "#D8DCE6", "#5A6070"), "solar_panel": (12, "#3A6AC8", "#E6E8EE"),
+    "lollipop_planet": (40, "#FF6FA8", "#FFFFFF"), "gumball": (11, "#7BD88F", "#FFFFFF"),
+    "star_buoy": (6, "#FFD23F", "#FFFFFF"),
 }
 
 
@@ -146,6 +157,100 @@ def water_overlay(spec, pts, lengths, half, branches=()):
             yy = -length / 2 + k * length / 6
             out.append(f'<line x1="-14" y1="{yy:.1f}" x2="14" y2="{yy:.1f}" stroke="#4A2E14" stroke-width="1.5" '
                        f'transform="translate({x:.1f} {y:.1f}) rotate({ang:.1f})"/>')
+    return out
+
+
+def starfield(W, H, seed):
+    """Deterministic stars for a space course's diagram: a dot field, a few with a twinkle cross."""
+    rng, out = random.Random(seed), []
+    for _ in range(int(W * H / 2600)):
+        x, y, r = rng.uniform(0, W), rng.uniform(0, H), rng.choice((0.8, 1.0, 1.2, 1.8))
+        out.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{r}" fill="#FFFFFF" fill-opacity="{rng.uniform(0.35, 0.9):.2f}"/>')
+        if r > 1.5:
+            out.append(f'<path d="M {x - 5:.0f} {y:.0f} H {x + 5:.0f} M {x:.0f} {y - 5:.0f} V {y + 5:.0f}" stroke="#FFFFFF" '
+                       'stroke-opacity="0.6" stroke-width="1"/>')
+    return out
+
+
+def space_course(spec, theme, pts, kerb_runs, W, H, patches, branches=()):
+    """A space course's lane (DESIGN.md §23): stars, a ring of big asteroids at the map edge
+    (the wall), the theme's clouds, the glowing star lane, and beacon lights on the tight bends."""
+    colours = theme["svg"]
+    road = spec["road_tiles"]
+    half = road / 2
+    band = svg(0.9)
+    out = starfield(W, H, len(spec["id"]) * 7 + sum(spec["map_tiles"]))
+    out.append(f'<path d="M0 0 H{W} V{H} H0 Z M{band} {band} V{H - band} H{W - band} V{band} Z" fill="{colours["edge"]}" '
+               'fill-rule="evenodd"/>')
+    rng = random.Random(len(spec["id"]))
+    for k in range(int(2 * (W + H) / 22)):  # lumpy rocks along the edge band
+        t = k * 22
+        if t < W:
+            x, y = t, band / 2
+        elif t < W + H:
+            x, y = W - band / 2, t - W
+        elif t < 2 * W + H:
+            x, y = W - (t - W - H), H - band / 2
+        else:
+            x, y = band / 2, H - (t - 2 * W - H)
+        out.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{rng.uniform(8, 15):.0f}" fill="{colours["edge"]}" '
+                   'stroke="#2A2630" stroke-width="2"/>')
+    out.extend(patches)  # clouds over the stars, under the lane
+    road_path = poly(pts, closed=True)
+    for br in branches:
+        w = br["road_tiles"]
+        out.append(f'<path d="{poly(br["line"])}" fill="none" stroke="{colours["glow"]}" stroke-opacity="0.3" stroke-width="{svg(w) + 14}" stroke-linejoin="round" stroke-linecap="round"/>')
+        out.append(f'<path d="{poly(br["line"])}" fill="none" stroke="{colours["road"]}" stroke-width="{svg(w)}" stroke-linejoin="round" stroke-linecap="round"/>')
+        out.append(f'<path d="{poly(br["line"])}" fill="none" stroke="#FFD23F" stroke-opacity="0.9" stroke-width="2" stroke-dasharray="3 7"/>')
+        mid = br["line"][len(br["line"]) // 2]
+        out.append(f'<text x="{svg(mid[0]):.1f}" y="{svg(mid[1]) - svg(w / 2) - 8:.1f}" text-anchor="middle" font-size="10" '
+                   f'fill="#FFFFFF" stroke="#0E141C" stroke-width="3" paint-order="stroke">{br["name"].upper()}</text>')
+    out.append(f'<path d="{road_path}" fill="none" stroke="{colours["glow"]}" stroke-opacity="0.3" stroke-width="{svg(road) + 14}" stroke-linejoin="round"/>')
+    out.append(f'<path d="{road_path}" fill="none" stroke="{colours["road"]}" stroke-width="{svg(road)}" stroke-linejoin="round"/>')
+    out.append(f'<path d="{road_path}" fill="none" stroke="{colours["glow"]}" stroke-opacity="0.4" stroke-width="{svg(road) - 22}" stroke-linejoin="round"/>')
+    kerb = theme["kerb"]
+    for run in kerb_runs:
+        for j, i in enumerate(run[::6]):
+            tx, ty = tangent(pts, i)
+            for side in (1, -1):
+                x, y = pts[i][0] - ty * side * (half + 0.15), pts[i][1] + tx * side * (half + 0.15)
+                c = kerb["red"] if j % 2 == 0 else kerb["cream"]
+                out.append(f'<circle cx="{svg(x):.1f}" cy="{svg(y):.1f}" r="7" fill="rgb{tuple(c)}" fill-opacity="0.35"/>')
+                out.append(f'<circle cx="{svg(x):.1f}" cy="{svg(y):.1f}" r="3.5" fill="rgb{tuple(c)}" stroke="#0E141C" stroke-width="1"/>')
+    return out
+
+
+def space_overlay(spec, pts, lengths, half):
+    """What flies over a space course: drifting asteroids and their paths, comets with the
+    streak they cross the lane on, and the station tunnels the ships pass under."""
+    out = []
+    for (ax, ay), (bx, by) in spec.get("asteroids", []):
+        out.append(f'<line x1="{svg(ax)}" y1="{svg(ay)}" x2="{svg(bx)}" y2="{svg(by)}" stroke="#C8C0D6" stroke-opacity="0.8" '
+                   'stroke-width="2" stroke-dasharray="4 5"/>')
+        mx, my = svg((ax + bx) / 2), svg((ay + by) / 2)
+        out.append(f'<path d="M -14 -4 L -8 -13 L 5 -14 L 14 -5 L 12 9 L 0 14 L -11 10 Z" fill="#8C8494" stroke="#3E3848" '
+                   f'stroke-width="2.5" transform="translate({mx:.1f} {my:.1f})"/>')
+        out.append(f'<circle cx="{mx - 3:.1f}" cy="{my - 2:.1f}" r="3.5" fill="#6A6274"/>')
+    for c in spec.get("comets", []):
+        (ax, ay), (bx, by) = c["path"]
+        ang = math.degrees(math.atan2(by - ay, bx - ax))
+        out.append(f'<line x1="{svg(ax)}" y1="{svg(ay)}" x2="{svg(bx)}" y2="{svg(by)}" stroke="#FFE45C" stroke-opacity="0.85" '
+                   'stroke-width="3" stroke-dasharray="10 6"/>')
+        hx, hy = svg(ax + (bx - ax) * 0.25), svg(ay + (by - ay) * 0.25)
+        out.append(f'<path d="M 0 0 L -60 -9 L -60 9 Z" fill="#FFE45C" fill-opacity="0.55" transform="translate({hx:.1f} {hy:.1f}) rotate({ang:.1f})"/>')
+        out.append(f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="9" fill="#FFFFFF" stroke="#FFB020" stroke-width="3"/>')
+        out.append(f'<text x="{hx:.1f}" y="{hy - 16:.1f}" text-anchor="middle" font-size="9" fill="#FFE45C" stroke="#0E141C" '
+                   f'stroke-width="3" paint-order="stroke">COMET every {c.get("every", 8):g} s</text>')
+    for t in spec.get("tunnels", []):
+        i = at_fraction(pts, lengths, t["at"])
+        n = int(t.get("length_tiles", 8) / (lengths[-1] / len(pts)))
+        deck = [pts[(i + k) % len(pts)] for k in range(-n // 2, n // 2)]
+        out.append(f'<path d="{poly([(x + 0.4, y + 0.7) for x, y in deck])}" fill="none" stroke="#000" stroke-opacity="0.3" stroke-width="{svg(2 * half + 1.5)}"/>')
+        out.append(f'<path d="{poly(deck)}" fill="none" stroke="#3E4452" stroke-width="{svg(2 * half + 1.5)}"/>')
+        out.append(f'<path d="{poly(deck)}" fill="none" stroke="#D8DCE6" stroke-width="{svg(2 * half + 0.9)}"/>')
+        out.append(f'<path d="{poly(deck)}" fill="none" stroke="#9AA2B4" stroke-width="{svg(2 * half + 0.9)}" stroke-dasharray="3 22"/>')
+        mx, my = deck[len(deck) // 2]
+        out.append(f'<text x="{svg(mx):.1f}" y="{svg(my) + 4:.1f}" text-anchor="middle" font-size="10" fill="#3E4452">TUNNEL</text>')
     return out
 
 
@@ -405,15 +510,19 @@ def build(spec: dict) -> None:
     for y in range(map_tiles[1] + 1):
         s.append(f'<line x1="0" y1="{svg(y)}" x2="{W}" y2="{svg(y)}" stroke="#000" stroke-opacity="0.07" stroke-width="1"/>')
     s.append(f'<rect x="4" y="4" width="{W - 8}" height="{H - 8}" fill="none" stroke="#2A2E35" stroke-width="8" stroke-dasharray="8 6"/>')
-    for (cx, cy), (rx, ry) in spec.get("patches", []):
-        s.append(f'<ellipse cx="{svg(cx)}" cy="{svg(cy)}" rx="{svg(rx)}" ry="{svg(ry)}" fill="{colours_svg["patch"]}" '
-                 f'stroke="{colours_svg["patch_rim"]}" stroke-width="3"/>')
+    patches = [f'<ellipse cx="{svg(cx)}" cy="{svg(cy)}" rx="{svg(rx)}" ry="{svg(ry)}" fill="{colours_svg["patch"]}" '
+               f'stroke="{colours_svg["patch_rim"]}" stroke-width="3"/>' for (cx, cy), (rx, ry) in spec.get("patches", [])]
+    space = theme.get("space", False)
+    if not space:  # a space course draws them over its stars
+        s.extend(patches)
 
     road_path = poly(pts, closed=True)
     kerb = theme["kerb"]
     water = theme.get("water", False)
     if water:
         s.extend(water_course(spec, theme, pts, lengths, lap_tiles, kerb_runs, W, H, branches))
+    elif space:
+        s.extend(space_course(spec, theme, pts, kerb_runs, W, H, patches, branches))
     else:
         s.append(f'<path d="{road_path}" fill="none" stroke="#1B1E23" stroke-width="{svg(road) + 8}" stroke-linejoin="round"/>')
         for run in kerb_runs:
@@ -474,6 +583,8 @@ def build(spec: dict) -> None:
             s.append(f'<circle cx="{svg(tx)}" cy="{svg(ty)}" r="{r}" fill="{fill}" stroke="{stroke}" stroke-width="3"/>')
     if water:
         s.extend(water_overlay(spec, pts, lengths, half, branches))
+    elif space:
+        s.extend(space_overlay(spec, pts, lengths, half))
 
     centroid = (sum(p[0] for p in control) / len(control), sum(p[1] for p in control) / len(control))
     for label, idx in spec.get("corner_labels", {}).items():
@@ -500,6 +611,12 @@ def build(spec: dict) -> None:
             "Dark channel = deep water (full speed). Pale water = shallows (slower). Patches = banks (slowest; hovercraft skim them).",
             "Buoys mark the tight bends. White chevrons = current. Brown wedge = jump ramp. Orange = fizz/boost. Shore = wall.",
         ] + [f"Gold dashes = {br['name']}: {br['length']:.0f} tiles, {br['road_tiles']:g} wide, instead of {br['bypassed']:.0f} tiles of main channel"
+             for br in branches]
+    elif space:
+        info[2:] = [
+            "Glowing path = star lane (full speed). Starry space = dust (slower). Clouds / moon = slowest. Pale stretch = slippery ice.",
+            "Beacons light the tight bends. Grey rocks on dashes = drifting asteroids. Yellow streak = comet path. Orange = boost. Rock ring = wall.",
+        ] + [f"Gold dashes = {br['name']}: {br['length']:.0f} tiles, {br['road_tiles']:g} wide, instead of {br['bypassed']:.0f} tiles of main lane"
              for br in branches]
     for k, line in enumerate(info):
         s.append(f'<text x="12" y="{H + 24 + k * 24}" font-size="9" fill="#E6EDF5">{line}</text>')
@@ -528,9 +645,17 @@ def build(spec: dict) -> None:
         "bridge_spans": [[b["start"], b["length"]] for b in bridges],
         "crossings_px": [to_px(c["point"]) for c in crossings],
     }
-    if water:
+    if space:
         data |= {
-            "water": True,
+            "space": True,
+            "asteroids_px": [[to_px(a), to_px(b)] for a, b in spec.get("asteroids", [])],
+            "comets": [{"path_px": [to_px(c["path"][0]), to_px(c["path"][1])], "every": c.get("every", 8.0),
+                        "offset": c.get("offset", 0.0)} for c in spec.get("comets", [])],
+            "tunnels": [[t["at"] % 1.0, t.get("length_tiles", 8) / lap_tiles] for t in spec.get("tunnels", [])],
+        }
+    if water or space:  # both have branches; currents, ramps and logs are only ever in water specs
+        data |= {
+            "water": water,
             "current_spans": [[c["at"] % 1.0, c["length_tiles"] / lap_tiles, c.get("strength", 1.0)]
                               for c in spec.get("currents", [])],
             "ramps": spec.get("ramps", []),

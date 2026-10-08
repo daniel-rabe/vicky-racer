@@ -27,13 +27,14 @@ def make_seamless(img: Image.Image) -> Image.Image:
 
 def flat_fill(size: int, base: tuple[int, int, int], variation: float = 0.0, waves: int = 4,
               speckle_density: float = 0.0, speckle_shift: int = 12, speckle_size: int = 2,
-              seed: int = 0) -> Image.Image:
+              speckle_sign: int = 0, seed: int = 0) -> Image.Image:
     """A near-flat ground tile that tiles perfectly by construction.
 
     Matches the chosen style frame, whose ground is flat colour: `variation` adds soft
     blotches (fraction of brightness) built from sine waves with whole numbers of cycles
     per tile, so the left edge always meets the right. Speckles wrap around the edges
-    for the same reason.
+    for the same reason. `speckle_sign` 1 makes every speckle brighter (stars on a space
+    fill); 0 picks lighter or darker at random.
     """
     rng = np.random.default_rng(seed)
     # Blotches from a coarse random grid, upsampled smoothly. The grid is tiled 3 x 3 before
@@ -49,7 +50,7 @@ def flat_fill(size: int, base: tuple[int, int, int], variation: float = 0.0, wav
     count = int(size * size * speckle_density / (speckle_size * speckle_size))
     for _ in range(count):
         cx, cy = rng.integers(0, size, size=2)
-        shift = speckle_shift * rng.choice([-1, 1])
+        shift = speckle_shift * (speckle_sign or rng.choice([-1, 1]))
         for dy in range(speckle_size):
             for dx in range(speckle_size):
                 img[(cy + dy) % size, (cx + dx) % size] += shift

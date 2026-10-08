@@ -311,6 +311,146 @@
       "speckle_density": 0.0,
       "speckle_shift": 10,
       "_note": "Phase 21: the sea beyond the island's outer limit."
+    },
+    "space_navy": {
+      "base": [
+        40,
+        48,
+        96
+      ],
+      "variation": 0.06,
+      "waves": 4,
+      "speckle_density": 0.0016,
+      "speckle_shift": 150,
+      "speckle_sign": 1,
+      "speckle_size": 2,
+      "_note": "Space courses (DESIGN.md §23): off the lane, Asteroid Alley. Speckles are stars, always brighter (speckle_sign 1)."
+    },
+    "space_teal": {
+      "base": [
+        24,
+        58,
+        86
+      ],
+      "variation": 0.06,
+      "waves": 4,
+      "speckle_density": 0.0016,
+      "speckle_shift": 150,
+      "speckle_sign": 1,
+      "speckle_size": 2,
+      "_note": "Space: off the lane, Ring Road."
+    },
+    "space_purple": {
+      "base": [
+        60,
+        38,
+        96
+      ],
+      "variation": 0.06,
+      "waves": 4,
+      "speckle_density": 0.0016,
+      "speckle_shift": 150,
+      "speckle_sign": 1,
+      "speckle_size": 2,
+      "_note": "Space: off the lane, Nebula Station."
+    },
+    "space_plum": {
+      "base": [
+        72,
+        32,
+        76
+      ],
+      "variation": 0.06,
+      "waves": 4,
+      "speckle_density": 0.0016,
+      "speckle_shift": 150,
+      "speckle_sign": 1,
+      "speckle_size": 2,
+      "_note": "Space: off the lane, Candy Galaxy."
+    },
+    "starlane_moon": {
+      "base": [
+        112,
+        128,
+        206
+      ],
+      "variation": 0.03,
+      "waves": 5,
+      "speckle_density": 0.0,
+      "speckle_shift": 10,
+      "_note": "Space: the lane on Asteroid Alley, a soft glowing path."
+    },
+    "starlane_ice": {
+      "base": [
+        168,
+        214,
+        236
+      ],
+      "variation": 0.03,
+      "waves": 5,
+      "speckle_density": 0.0,
+      "speckle_shift": 10,
+      "_note": "Space: the lane on Ring Road, the ring's ice."
+    },
+    "starlane_lilac": {
+      "base": [
+        172,
+        148,
+        234
+      ],
+      "variation": 0.03,
+      "waves": 5,
+      "speckle_density": 0.0,
+      "speckle_shift": 10,
+      "_note": "Space: the lane on Nebula Station."
+    },
+    "starlane_mint": {
+      "base": [
+        128,
+        216,
+        182
+      ],
+      "variation": 0.03,
+      "waves": 5,
+      "speckle_density": 0.0,
+      "speckle_shift": 10,
+      "_note": "Space: the lane on Candy Galaxy."
+    },
+    "ring_dust": {
+      "base": [
+        222,
+        190,
+        132
+      ],
+      "variation": 0.05,
+      "waves": 4,
+      "speckle_density": 0.004,
+      "speckle_shift": 14,
+      "_note": "Space: Ring Road's dust patches (slow)."
+    },
+    "nebula_cloud": {
+      "base": [
+        232,
+        132,
+        198
+      ],
+      "variation": 0.07,
+      "waves": 3,
+      "speckle_density": 0.0,
+      "speckle_shift": 10,
+      "_note": "Space: Nebula Station's cloud patches (slow)."
+    },
+    "cotton_candy": {
+      "base": [
+        250,
+        192,
+        222
+      ],
+      "variation": 0.06,
+      "waves": 3,
+      "speckle_density": 0.002,
+      "speckle_shift": 18,
+      "_note": "Space: Candy Galaxy's cotton-candy clouds (slow)."
     }
   },
   "selection": {

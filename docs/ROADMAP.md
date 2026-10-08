@@ -32,6 +32,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 19 | Free Drive: the town | Somewhere to just drive, with nobody to beat | L |
 | 20 | Boats: racing on water | A second racing game with its own boats, courses and cup | L |
 | 21 | The island: harbour and ocean in Free Drive | Take the boat out from the town, round the island | M |
+| 22 | Space: racing among the stars | A third racing game with spaceships, asteroids and comets | L |
 
 ---
 
@@ -354,6 +355,46 @@ The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats a
   - Sea life: sailboats, dolphins, gulls and the lighthouse's beam.
   - The HUD fades for the swap, shows the boat while sailing, and maps the coast.
   - `tests/island_test.gd` is new; the whole suite passes. 100 fps on land and at sea.
+
+## Phase 22 — Space: racing among the stars 🚧 Gate A
+
+A third racing game beside the cars and the boats (DESIGN.md §23), asked for on 2026-10-07. It
+is a full parallel mode like the boats: a SPACE button on the title, its own **Hangar** of nine
+spaceships with paint jobs, four space courses, the **Comet Cup**, 2 PLAYERS and time trial.
+Coins and stickers are shared.
+
+The user chose these on 2026-10-07:
+- **How it feels:** floaty drift, plus asteroids and comets. Planet gravity and warp rings were
+  left out.
+- **The ships:** saucers and fighters, plus fun ships.
+- **The places:** the moon and an asteroid belt, the rings of a giant planet, a nebula with a
+  space station, and a candy galaxy.
+
+- **Gate A: design and mockups** (2026-10-07, waiting for approval):
+  - DESIGN §23.
+  - Four course layouts, `space_01`–`space_04`, drawn by `track_layout.py` from four new space
+    themes. Each has two alternative paths, drifting asteroids, comets and, on Nebula Station,
+    station tunnels.
+  - The space ground fills in `pipeline.json`; stars come from `speckle_sign`.
+  - The look probe and theme sheet, drawn by `space_probe.py`.
+  - The Hangar and title layouts.
+  - Everything is in `docs/mockups/space/` and `docs/mockups/space_0N_layout.png`.
+- **Gate B: art and sound:**
+  - Nine ships, their paints and cards.
+  - Space theme tiles.
+  - Planets, a station, asteroids, gumballs and the comet.
+  - Space-helmet drivers.
+  - Engine, comet, bonk and horn sounds, picked by ear.
+  - Two music pieces.
+  - The cup icon and stickers.
+- **Gate C: code:**
+  - `Ship extends Car`.
+  - A third vehicle kind through the garage, title, join screen and track select.
+  - Space surfaces, drifting asteroids, comets and tunnels in the track builder and `Track`.
+  - The Comet Cup.
+  - Save schema 5.
+  - `tests/space_test.gd` and the whole suite.
+  - A balance pass.
 
 ---
 

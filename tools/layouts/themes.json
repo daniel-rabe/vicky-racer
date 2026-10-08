@@ -1,5 +1,5 @@
 {
-  "_about": "Track themes (docs/DESIGN.md \u00a77.5). theme_art.py builds every texture listed here; the Godot side is game/configs/themes/<id>.tres. 'base' is the ground everywhere off the road, 'patch' the shapes painted on it (a sand trap, an ice pond); both name a fill in tools/comfy/pipeline.json ground and a surface in track.gd SURFACES. A theme with \"water\": true is a boat course (DESIGN.md \u00a720): 'road' names the deep-water channel's fill, the kerb colours are the channel's buoys, 'base' is the shallows.",
+  "_about": "Track themes (docs/DESIGN.md \u00a77.5). theme_art.py builds every texture listed here; the Godot side is game/configs/themes/<id>.tres. 'base' is the ground everywhere off the road, 'patch' the shapes painted on it (a sand trap, an ice pond); both name a fill in tools/comfy/pipeline.json ground and a surface in track.gd SURFACES. A theme with \"water\": true is a boat course (DESIGN.md \u00a720): 'road' names the deep-water channel's fill, the kerb colours are the channel's buoys, 'base' is the shallows. A theme with \"space\": true is a space course (DESIGN.md \u00a723): 'road' is the star lane's fill, the kerb colours are its beacon lights, 'base' is open space (dust) and 'patch' the clouds.",
   "meadow": {
     "name": "Meadow",
     "base": "grass",
@@ -294,6 +294,130 @@
       "patch_rim": "#D98AB0",
       "road": "#F5C448",
       "shore": "#F6BED6"
+    }
+  },
+  "moonbelt": {
+    "name": "Asteroid Alley",
+    "space": true,
+    "base": "space_navy",
+    "patch": "moondust",
+    "road": "starlane_moon",
+    "kerb": {
+      "red": [
+        255,
+        210,
+        63
+      ],
+      "cream": [
+        255,
+        255,
+        255
+      ]
+    },
+    "kerb_out": "art/tiles/space/moonbelt/beacons.png",
+    "atlas_out": "art/tiles/space/moonbelt/ground_atlas.png",
+    "road_out": "art/tiles/space/moonbelt/lane.png",
+    "tileset_out": "track/themes/ground_moonbelt.tres",
+    "svg": {
+      "ground": "#283060",
+      "patch": "#D6D2E2",
+      "patch_rim": "#837AA2",
+      "road": "#7080CE",
+      "glow": "#B4C2FF",
+      "edge": "#5A5560"
+    }
+  },
+  "rings": {
+    "name": "Ring Road",
+    "space": true,
+    "base": "space_teal",
+    "patch": "ring_dust",
+    "road": "starlane_ice",
+    "kerb": {
+      "red": [
+        255,
+        122,
+        26
+      ],
+      "cream": [
+        255,
+        255,
+        255
+      ]
+    },
+    "kerb_out": "art/tiles/space/rings/beacons.png",
+    "atlas_out": "art/tiles/space/rings/ground_atlas.png",
+    "road_out": "art/tiles/space/rings/lane.png",
+    "tileset_out": "track/themes/ground_rings.tres",
+    "svg": {
+      "ground": "#183A56",
+      "patch": "#DEBE84",
+      "patch_rim": "#A8844A",
+      "road": "#A8D6EC",
+      "glow": "#E6F6FF",
+      "edge": "#4E5A66"
+    }
+  },
+  "nebula": {
+    "name": "Nebula Station",
+    "space": true,
+    "base": "space_purple",
+    "patch": "nebula_cloud",
+    "road": "starlane_lilac",
+    "kerb": {
+      "red": [
+        62,
+        201,
+        167
+      ],
+      "cream": [
+        255,
+        255,
+        255
+      ]
+    },
+    "kerb_out": "art/tiles/space/nebula/beacons.png",
+    "atlas_out": "art/tiles/space/nebula/ground_atlas.png",
+    "road_out": "art/tiles/space/nebula/lane.png",
+    "tileset_out": "track/themes/ground_nebula.tres",
+    "svg": {
+      "ground": "#3C2660",
+      "patch": "#E884C6",
+      "patch_rim": "#B0508E",
+      "road": "#AC94EA",
+      "glow": "#F0D8FF",
+      "edge": "#6A7080"
+    }
+  },
+  "candy_galaxy": {
+    "name": "Candy Galaxy",
+    "space": true,
+    "base": "space_plum",
+    "patch": "cotton_candy",
+    "road": "starlane_mint",
+    "kerb": {
+      "red": [
+        255,
+        79,
+        139
+      ],
+      "cream": [
+        255,
+        255,
+        255
+      ]
+    },
+    "kerb_out": "art/tiles/space/candy_galaxy/beacons.png",
+    "atlas_out": "art/tiles/space/candy_galaxy/ground_atlas.png",
+    "road_out": "art/tiles/space/candy_galaxy/lane.png",
+    "tileset_out": "track/themes/ground_candy_galaxy.tres",
+    "svg": {
+      "ground": "#48204C",
+      "patch": "#FAC0DE",
+      "patch_rim": "#D07AA8",
+      "road": "#80D8B6",
+      "glow": "#E0FFF2",
+      "edge": "#7A4A70"
     }
   }
 }

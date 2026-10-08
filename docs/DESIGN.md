@@ -1787,3 +1787,217 @@ The art:
 - **Checking seats:** the seat sheet [`driver_sheet.png`](mockups/drivers/driver_sheet.png) is drawn by
   [`tools/layouts/driver_sheet.py`](../tools/layouts/driver_sheet.py) the way the rider draws, for
   tuning seats without running the game.
+
+---
+
+## 23. Space: racing among the stars
+
+*Gate A: design and mockups, waiting for approval. Asked for on 2026-10-07.*
+
+**SPACE** on the title screen is a third racing game beside the cars and the boats. It has its
+own spaceships in its own **Hangar**, four space courses and the **Comet Cup**, and works with
+2 PLAYERS and time trial. As with the boats, coins are shared and the shelf collects stickers
+from all three.
+
+What makes space feel different (the user's choice, 2026-10-07):
+- **Floaty drift.** Ships slide further than boats.
+- **Asteroids and comets.** Drifting asteroids are soft bumpers. Comets streak across the lane
+  now and then.
+
+There is no planet gravity and there are no warp rings: those were offered and left out.
+
+![Asteroid Alley at race scale](mockups/space/01_space_look.png)
+
+| Piece | What it is | File |
+| --- | --- | --- |
+| Courses | Spec, then points, then scene, exactly as for tracks (§7.2) and boat courses (§20.3), with a space theme | [`tools/layouts/tracks/space_0N.json`](../tools/layouts/tracks/) |
+| Layouts | `track_layout.py` draws a space theme as stars, an asteroid-ring wall and a glowing lane, and writes asteroids, comets and tunnels into the points JSON | [`tools/layouts/track_layout.py`](../tools/layouts/track_layout.py) |
+| Themes | `moonbelt`, `rings`, `nebula`, `candy_galaxy` with `"space": true`; their fills in `pipeline.json` `ground` (stars are speckles that are always brighter, `speckle_sign` 1) | [`tools/layouts/themes.json`](../tools/layouts/themes.json) |
+| Look probe | The lane at race scale, and the four space themes | [`tools/layouts/space_probe.py`](../tools/layouts/space_probe.py) |
+| Screens | The Hangar and the title with SPACE | [`docs/mockups/space/`](mockups/space/) |
+
+### 23.1 How a ship flies
+
+A ship uses the same velocity model as a car (§4) and a boat (§20.1). Different numbers make it
+float. These are the starting values, to be tuned in the balance pass:
+
+| | Car | Boat | Ship | Why |
+| --- | --- | --- | --- | --- |
+| `forward_drag` | 0.6 | 0.35 | 0.25 | Let go and a ship coasts on and on |
+| `lateral_grip` | 9.0 | 4.0 | 3.3 | Turns carry a ship wide: the longest, softest drift in the game |
+| `handbrake_lateral_grip` | 1.8 | 1.4 | 1.2 | A handbrake turn swings the tail round slowly |
+| `engine_power` | 1400 | 1150 | 1200 | |
+| `max_speed` | 1100 | 1050 | 1100 | The lane is the widest of the three (5.5 tiles) |
+| `wall_speed_scrub` | 0.15 | 0.08 | 0.08 | Asteroids, the edge and other ships bounce you off softly |
+
+- **Never a spin-out.** Steering fades in with speed and `MIN_LATERAL_GRIP` (3.0) still holds.
+  The base grip sits just above it, so the slidiest ships all end up near the floor. They are
+  told apart by drag and power instead.
+- **Floating.** The sprite hovers: it sways a little and its shadow sits further below it than
+  a car's, so the ship reads as off the ground. The collision shape never moves.
+- **Exhaust.** A fading glow ribbon trails from the engine, longer at speed. When the ship slides
+  wide, stardust puffs replace the drift smoke and the boat's spray.
+
+### 23.2 The lane, dust, clouds, asteroids and comets
+
+A space course is a race track whose **road is a glowing star lane** (§7.2). As on water
+(§20.2), the theme names the surfaces:
+
+| Surface | Speed | Grip | Where |
+| --- | --- | --- | --- |
+| star lane | 1.0 | 1.0 | the lane, a soft glowing path with a bright rim |
+| space dust | 0.6 | 0.8 | everywhere off the lane, starry; each theme has its own colour, all handle the same |
+| cloud | 0.35 | 0.6 | the theme's patches: the moon's surface, ring dust, nebula clouds, cotton candy |
+| ice | (§7.3) | | Ring Road's icy stretches of ring, the existing ice surface |
+
+- **Beacons** light the tight bends, where cars have kerbs and boats have buoys.
+- **The wall** at the map edge is a ring of big asteroids, as the shore is on water.
+- **Asteroids are bumpers, never crashes.**
+  - Some float still in the dust as scenery that bounces you off.
+  - Others drift slowly to and fro across the lane on a short path. These are the boats'
+    floating logs (`drifting_log.gd`) with a rock in place of the log.
+- **Comets** cross the course on a fixed path, every 7–10 s (`comets` in the spec: path, period,
+  offset). They are made to be fair to a small child:
+  1. 1.5 s before a comet comes, its path glows on the lane as a dashed yellow streak, and a
+     soft rising chime plays.
+  2. The comet whooshes along the streak with a sparkly tail and is gone in under a second.
+  3. A ship it touches gets a sideways nudge (about 300 px/s) and a shower of sparkles. It never
+     stops the ship, never spins it and never takes control away.
+  4. A comet's period starts with the race (`offset`), so the same comet comes at the same moment
+     every lap. A child can learn it.
+- **Station tunnels** on Nebula Station are scenery, as the bridges over a river are: drawn
+  above the ships, with a shadow, never solid.
+- **Boost pads** (§7.3) are the same as on the road, two or three per course.
+- **The sky** is the base fill with small stars, plus one parallax layer of bigger twinkling
+  stars that drifts slower than the ground, so space has depth. The probe draws that layer.
+
+### 23.3 The courses
+
+Four courses make the **Comet Cup**. The first space cup is open from the start. Inside the
+space cups the rule from §12 holds: the next cup opens when the previous one is **won**.
+
+The courses are the size of the boat courses (88×56 to 104×58 tiles) with a 5.5-tile lane. As on
+water, every course has **two alternative paths** (`branches`, §20.3). The progress mapping, the
+AI's choice by skill and "a trade, not a free win" all carry over unchanged.
+
+| Course | Theme | Map | Main lane | Alternative paths | Lap |
+| --- | --- | --- | --- | --- | --- |
+| **Asteroid Alley** | moonbelt: navy space, the moon, moon base, grey asteroids | 88×56 | the easy one: a wide loop round the moon, one comet, two boosts | **Rock Garden**: narrow, along the top through the belt, two asteroids drifting across it (40 tiles for 45). **Crater Cut**: narrow, across the corner by a little crater, near where the comet ends (28 for 39) | ~31 s |
+| **Ring Road** | rings: teal space, a huge ringed planet in the middle | 104×58 | rides the planet's ring: two icy stretches, two comets | **Inner Ring**: a little longer, round the inside, and misses the icy wiggle (53 for 48). **Moon Loop**: round a little moon, a little longer, and misses a comet (46 for 41) | ~34 s |
+| **Nebula Station** | nebula: purple space, pink clouds, a space station | 96×62 | a long winding course through two station tunnels, two comets | **Docking Gap**: a tight 3-tile gap past the station with an asteroid drifting across it, the daring one (29 for 74). **Cloud Hop**: a calm lane through the nebula (42 for 38) | ~52 s |
+| **Candy Galaxy** | candy_galaxy: plum space, a lollipop planet, gumballs, cotton candy | 96×60 | three boosts, two comets | **Gumball Gap**: 2.8 tiles wide, two gumballs drifting across it (25 for 31). **Sugar Rush**: along the right edge, missing the wiggle (28 for 30) | ~37 s |
+
+Lap times are estimates at the AI's average speed. Races are 3 laps, apart from Nebula Station
+(2 laps, about 1¾ minutes).
+
+![Asteroid Alley](mockups/space_01_layout.png)
+![Ring Road](mockups/space_02_layout.png)
+![Nebula Station](mockups/space_03_layout.png)
+![Candy Galaxy](mockups/space_04_layout.png)
+
+![The four space themes](mockups/space/02_space_themes.png)
+
+Asteroid Alley is not Moon Base (§7.1, track 7). Moon Base is a car track on the moon's dust.
+Asteroid Alley is flown in space past the moon, and the moon is a slow cloud in its middle.
+
+### 23.4 The ships
+
+There are nine ships, saucers and fighters plus fun ships (the user's choice). The bars in the
+Hangar are GRIP, **FLOAT** (in place of SLIDE) and SPEED. Prices sit beside the boats'
+(a first proposal):
+
+| Ship | Kind | Character | Driver seen? | Price |
+| --- | --- | --- | --- | --- |
+| **Star Fighter** | fighter | the all-rounder, the starter ship | glass canopy | free |
+| **Racing Pod** | fighter | small and nimble, turns sharpest, light, bounces furthest | glass canopy | 100 |
+| **Flying Saucer** | saucer | grippy and steady, the easiest ship; lights round the rim | glass dome | 150 |
+| **Cardboard Rocket** | fun | a homemade box rocket with a drawn-on flame, slow to pull away, grippy | open top | 200 |
+| **Space Taxi** | fun | yellow and chequered, steady, "beep beep" | glass roof | 250 |
+| **Rocket Armchair** | fun | a comfy armchair on a rocket, floats wide | open | 300 |
+| **Teacup Saucer** | fun | a flying teacup, very grippy, slow; clinks | open | 350 |
+| **Space Whale** | fun | big and heavy, pushes other ships aside, fast on the straights; whale-song horn | none (closed) | 450 |
+| **Comet Racer** | fighter | the top ship: fastest, a long tail of sparks | glass canopy | 600 |
+
+- **Sprites:** each ship is made with the frozen recipe (§11.1), 4 candidates and one pick, and
+  gets six paint jobs as Kontext recolours (§9.3). The boats taught us that FLUX draws some
+  things side-on (§20.8), so any ship that comes out side-on gets the Kontext-from-a-flat-sketch
+  treatment straight away.
+- **Drivers (§22):** the seats above show the driver; a closed ship shows none. In space the
+  drivers wear a round **space helmet** (a third look beside the helmet and the cap).
+- **Opponents** pick from the roster as car and boat opponents do (§8).
+
+### 23.5 Screens
+
+![Hangar](mockups/space/03_hangar_layout.png)
+
+- **Title:** the picture row gets a third button: **CARS · BOATS · SPACE**. SPACE is a starry
+  purple tile with a rocket. The row grows wider, not taller, and left/right moves along it.
+  CARS is still focused first. 2 PLAYERS cycles CARS / BOATS / SPACE on the join screen.
+  ![Title](mockups/space/04_title_space.png)
+- **Pick a race:** the same screen. It shows the space courses and space cups when SPACE was
+  chosen.
+- **Hangar:** the garage screen (§9) in night-sky colours, with the ship roster, FLOAT and FLY!.
+- **HUD, results, podium, pause:** unchanged.
+
+### 23.6 Art, sound and music (Gate B)
+
+- **Ships:** 9 sprites × 4 candidates, then 6 paints each, and card art.
+- **Ground:** the space fills are already in `pipeline.json` (Gate A). `theme_art.py` builds
+  each theme's atlas and its beacon strip, and the lane texture, as for water.
+- **Props:**
+  - asteroids (3 shapes), gumballs;
+  - the moon base, the ringed planet, the little moon, the space station and its tunnel
+    module, solar panels, the lollipop planet;
+  - the comet head and its sparkle.
+
+  Big scenery (the planets, the station) comes from ComfyUI. Simple pieces come from
+  `prop_art.py`.
+- **Drivers:** a space-helmet set, made as Kontext edits of `driver_sketch` (§22).
+- **Sound**, using Stable Audio with the §11.2 recipe, picked **by ear** on a listening page:
+  - thruster loop (fighters), saucer warble loop, rocket rumble loop (cardboard, armchair);
+  - comet chime and whoosh;
+  - asteroid bonk;
+  - a soft space hum under the race;
+  - horns: taxi beep, whale song, teacup clink.
+- **Music:** two new pieces, `race_rings` and `race_nebula`. Asteroid Alley reuses `race_moon`
+  and Candy Galaxy reuses `race_candy`.
+- **Cup icon:** `cup_comet`, made like `cup_splash`.
+- **Stickers:** "First Flight" and "Win the Comet Cup". The boat stickers still have no art, so
+  both sets can be made together.
+
+### 23.7 Under the hood (Gate C)
+
+The boat seam carries almost everything. This is the plan:
+- **`Ship`.** `class_name Ship extends Car` in `actors/ship/` is built like `Boat`: same node
+  layout, a capsule hull, and the hover sway in place of the bob. It has a shadow offset and the
+  exhaust and stardust effects (`ship_effects.gd`), and engine loops pitched by speed
+  (`ship_audio.gd`). Boat and ship share the sway code rather than copying it.
+- **`DriftSetup.kind`** gains `&"ship"`. `base_ship.tres` holds the numbers in §23.1. The roster
+  goes in `game/configs/ships/`.
+- **`GarageManager`:**
+  - `PRO_vehicle_kind_requested` accepts `&"ship"`.
+  - The roster, equipped ship, paint and selected track are kept per kind, as for boats.
+  - The save goes to schema 5 (`owned_ships`, `equipped_ship`, `ship_paint`) and migrates
+    from 4.
+- **`Track`:**
+  - adds the `lane`, `space_dust` and `cloud` surfaces, chosen by `TrackTheme.road_surface`;
+  - reads `asteroids_px` (into the drifting-obstacle actor, which is the drifting log with a
+    texture setting), `comets` (a new `actors/space/comet.gd`: the warning streak, the
+    fly-by and the nudge) and `tunnels` (scenery above the ships, like `scenery_bridges`).
+- **Branches** work as on water. The points JSON already writes them for space courses.
+- **Title, join screen, track select:** a third kind wherever `car` / `boat` are tested today:
+  `title_screen.gd`, `join_screen.gd`, `track_select.gd`, `garage_screen.gd`, and the folder
+  in `DriverLook`. A three-way toggle, not another `if`.
+- **Cups:** `game/configs/cups/comet.tres`, `vehicle_kind = &"ship"`.
+- **Ghosts:** developer ghosts for the four space courses (`record_ghosts.gd`).
+- **Checks:** `tests/space_test.gd`, covering:
+  - a ship is a Car, and floats further than a boat;
+  - surfaces;
+  - a drifting asteroid bumps a ship;
+  - a comet nudges a ship but never stops or spins it, and its timing repeats every lap;
+  - branch progress;
+  - the garage's three kinds;
+  - a v4 save migrates.
+
+  Then full races: `race_test -- --autopilot --track=space_0N --setup=<ship>`, and the whole
+  suite to prove cars and boats are unchanged.
