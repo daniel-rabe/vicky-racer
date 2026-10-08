@@ -12,12 +12,16 @@ const TRACK_SCRIPT := preload("res://track/track.gd")
 const GROUND_TILES := preload("res://track/ground_tiles.tres")
 const TYRES := preload("res://art/props/tyre_stack.png")
 const BOOST_PAD := preload("res://art/tiles/boost_pad.png")
-const ALL_TRACKS := "track_01,track_02,track_03,track_04,track_05,track_06,track_07,boat_01,boat_02,boat_03,boat_04"
+const ALL_TRACKS := "track_01,track_02,track_03,track_04,track_05,track_06,track_07,boat_01,boat_02,boat_03,boat_04," \
+	+ "space_01,space_02,space_03,space_04"
 const RAMP := preload("res://art/props/water/ramp.png")
 const FOOTBRIDGE := preload("res://art/props/water/footbridge.png")
 const LOG_SCRIPT := preload("res://actors/water/drifting_log.gd")
 const LOGS: Array[String] = ["res://art/props/water/log_1.png", "res://art/props/water/log_2.png",
 	"res://art/props/water/log_3.png", "res://art/props/water/log_4.png"]
+const ASTEROID := preload("res://art/props/space/asteroid.png")
+const TUNNEL := preload("res://art/props/space/tunnel.png")
+const COMET_SCRIPT := preload("res://actors/space/comet.gd")
 ## Prop kind (as in the layout) -> texture and collision radius. Radii are smaller than the
 ## pictures: clipping a palm frond or a parasol's edge should not stop a car.
 const PROPS := {
@@ -54,11 +58,24 @@ const PROPS := {
 	"ice_cube": ["res://art/props/water/ice_cube.png", 40.0],
 	"cocktail_umbrella": [["res://art/props/water/cocktail_umbrella_1.png",
 		"res://art/props/water/cocktail_umbrella_2.png"], 58.0],
+	# Space courses (docs/DESIGN.md §23). Everything is a soft bumper; the planets and the
+	# station stand inside the loops, so a ship cutting across bounces off.
+	"asteroid": ["res://art/props/space/asteroid.png", 56.0],
+	"gumball": ["res://art/props/space/gumball.png", 42.0],
+	"moon_base": ["res://art/props/space/moon_base.png", 130.0],
+	"ringed_planet": ["res://art/props/space/ringed_planet.png", 150.0],
+	"little_moon": ["res://art/props/space/little_moon.png", 90.0],
+	"space_station": ["res://art/props/space/station.png", 150.0],
+	"solar_panel": ["res://art/props/space/solar_panel.png", 50.0],
+	"lollipop_planet": ["res://art/props/space/lollipop_planet.png", 220.0],
 }
 ## A ramp's trigger, across the channel and along it, px; a log's solid half-length and radius.
 const RAMP_TRIGGER := Vector2(90, 240)
 const LOG_HALF_LENGTH := 90.0
 const LOG_RADIUS := 26.0
+## A drifting asteroid's solid radius, px, and how long one crossing takes, s (slower than a log).
+const ASTEROID_RADIUS := 56.0
+const ASTEROID_CROSSING := 7.0
 ## Scenery bridges reach this far past the channel on both sides, px, and draw over the boats.
 const BRIDGE_OVERHANG := 190.0
 const BRIDGE_Z := 3
@@ -123,8 +140,11 @@ func _build(data: Dictionary, id: StringName, out_path: String) -> Error:
 	_add(_props(data, tile))
 	if not data.get("boost_pads", []).is_empty():
 		_add(_boost_pads(data["boost_pads"], line.curve))
-	if data.get("water", false):
+	# Branches (and on water currents, ramps and logs) for boat and space courses alike.
+	if data.get("water", false) or data.get("space", false):
 		_water(data, line.curve, tile)
+	if data.get("space", false):
+		_space(data, line.curve, tile)
 
 	var packed := PackedScene.new()
 	var error := packed.pack(_root)
@@ -365,7 +385,8 @@ func _water(data: Dictionary, curve: Curve2D, tile: float) -> void:
 		var offset := fposmod(float(fractions[i]), 1.0) * curve.get_baked_length()
 		var at := curve.sample_baked(offset)
 		var along := curve.sample_baked(fposmod(offset + 8.0, curve.get_baked_length())) - at
-		bridges.add_child(_scenery_bridge(at, along.angle() + PI / 2.0, float(data["road_tiles"]) * tile, i + 1))
+		bridges.add_child(_scenery_bridge(at, along.angle() + PI / 2.0, float(data["road_tiles"]) * tile, i + 1,
+			FOOTBRIDGE))
 	if not fractions.is_empty():
 		_add(bridges)
 
@@ -408,21 +429,80 @@ func _log(a: Vector2, b: Vector2, i: int) -> AnimatableBody2D:
 	return body
 
 
-## A footbridge over the channel, drawn above the boats with its shadow on the water. Scenery:
-## nothing touches it.
-func _scenery_bridge(at: Vector2, across: float, channel: float, n: int) -> Node2D:
+## A footbridge over the channel (or a space station's tunnel over the star lane), drawn above
+## the racers with its shadow below. Scenery: nothing touches it.
+func _scenery_bridge(at: Vector2, across: float, channel: float, n: int, picture: Texture2D) -> Node2D:
 	var bridge: Node2D = _named(Node2D.new(), "Bridge%d" % n)
 	bridge.position = at
 	bridge.rotation = across
-	var stretch := (channel + 2.0 * BRIDGE_OVERHANG) / FOOTBRIDGE.get_width()
-	var shadow := _sprite(FOOTBRIDGE, Vector2(18, 28).rotated(-across))
+	var stretch := (channel + 2.0 * BRIDGE_OVERHANG) / picture.get_width()
+	var shadow := _sprite(picture, Vector2(18, 28).rotated(-across))
 	shadow.scale = Vector2(stretch, 1.0)
 	shadow.modulate = Color(0, 0, 0, 0.28)
 	bridge.add_child(_named(shadow, "Shadow"))
-	var deck := _sprite(FOOTBRIDGE, Vector2.ZERO)
+	var deck := _sprite(picture, Vector2.ZERO)
 	deck.scale = Vector2(stretch, 1.0)
 	bridge.add_child(_named(deck, "Deck"))
 	return bridge
+
+
+# --- space courses (docs/DESIGN.md §23) -----------------------------------------------------
+
+## Drifting asteroids, comets and the station's tunnels, as children of the track.
+func _space(data: Dictionary, curve: Curve2D, tile: float) -> void:
+	var rocks: Node2D = _named(Node2D.new(), "Asteroids")
+	var paths: Array = data.get("asteroids_px", [])
+	for i in paths.size():
+		rocks.add_child(_asteroid(Vector2(paths[i][0][0], paths[i][0][1]), Vector2(paths[i][1][0], paths[i][1][1]), i))
+	if not paths.is_empty():
+		_add(rocks)
+	var comets: Node2D = _named(Node2D.new(), "Comets")
+	var flights: Array = data.get("comets", [])
+	for i in flights.size():
+		var comet := Node2D.new()
+		comet.name = "Comet%d" % (i + 1)
+		comet.set_script(COMET_SCRIPT)
+		var path: Array = flights[i]["path_px"]
+		comet.set("from", Vector2(path[0][0], path[0][1]))
+		comet.set("to", Vector2(path[1][0], path[1][1]))
+		comet.set("period", float(flights[i].get("every", 8.0)))
+		comet.set("offset", float(flights[i].get("offset", 0.0)))
+		comets.add_child(comet)
+	if not flights.is_empty():
+		_add(comets)
+	var tunnels: Node2D = _named(Node2D.new(), "Tunnels")
+	tunnels.z_index = BRIDGE_Z
+	var spans: Array = data.get("tunnels", [])
+	var length := curve.get_baked_length()
+	for i in spans.size():
+		var offset := fposmod(float(spans[i][0]), 1.0) * length
+		var at := curve.sample_baked(offset)
+		var along := curve.sample_baked(fposmod(offset + 8.0, length)) - at
+		tunnels.add_child(_scenery_bridge(at, along.angle() + PI / 2.0, float(data["road_tiles"]) * tile, i + 1, TUNNEL))
+	if not spans.is_empty():
+		_add(tunnels)
+
+
+## An asteroid drifting slowly to and fro between a and b (the floating log's script): solid, so
+## a ship that meets it bounces off.
+func _asteroid(a: Vector2, b: Vector2, i: int) -> AnimatableBody2D:
+	var body := AnimatableBody2D.new()
+	body.name = "Asteroid%d" % (i + 1)
+	body.set_script(LOG_SCRIPT)
+	body.set("from", a)
+	body.set("to", b)
+	body.set("crossing_seconds", ASTEROID_CROSSING)
+	body.set("phase", fmod(i * 0.37, 1.0))
+	body.position = a
+	var shape := CollisionShape2D.new()
+	var circle := CircleShape2D.new()
+	circle.radius = ASTEROID_RADIUS
+	shape.shape = circle
+	body.add_child(_named(shape, "Collision"))
+	var sprite := _sprite(ASTEROID, Vector2.ZERO)
+	sprite.rotation = fmod(i * 1.9, TAU)  # every rock lies a different way round
+	body.add_child(_named(sprite, "Sprite"))
+	return body
 
 
 static func _polyline_lengths(points: PackedVector2Array) -> PackedFloat32Array:

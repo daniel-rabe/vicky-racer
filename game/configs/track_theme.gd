@@ -30,3 +30,11 @@ extends Resource
 @export var road_surface := &"asphalt"
 ## More than one take of the race music: one is picked at random each race.
 @export var music_takes: Array[MusicPiece] = []
+
+@export_group("Space (space courses)")
+## A space course (docs/DESIGN.md §23): `asphalt` is the star lane and `kerb` its beacon lights;
+## the lane gets a soft glow along its edge instead of the road's dark outline, and no lane dashes.
+## `road_surface` is then the star lane.
+@export var space := false
+## The glow along the star lane's edge.
+@export var lane_glow := Color(0.71, 0.76, 1.0, 0.45)

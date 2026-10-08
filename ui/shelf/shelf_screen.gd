@@ -21,6 +21,8 @@ const HINTS_GAMEPAD := "STICK LOOK   B BACK"
 const SHELF_TOP := 628.0
 const TROPHY_SIZE := 220.0
 const TROPHY_GAP := 420.0
+## From the first trophy's centre to the last's at most, px.
+const SHELF_SPAN := 1600.0
 ## The sticker book: a page pinned to the wall above the shelf, one row of stickers.
 const BOOK_RECT := Rect2(150, 36, 1620, 350)
 ## Under the shelf, on the floor: what the focused prize is.
@@ -69,7 +71,9 @@ func _build_trophies() -> Array[Button]:
 	for i in cups.size():
 		var cup: CupConfig = cups[i]["config"]
 		var trophy: StringName = cups[i]["trophy"]
-		var centre_x := 960.0 + (i - (cups.size() - 1) / 2.0) * TROPHY_GAP
+		# Closer together when there are more cups, so the row always fits the shelf.
+		var gap := minf(TROPHY_GAP, SHELF_SPAN / maxf(cups.size() - 1, 1))
+		var centre_x := 960.0 + (i - (cups.size() - 1) / 2.0) * gap
 		var rect := Rect2(centre_x - TROPHY_SIZE / 2.0, SHELF_TOP - TROPHY_SIZE + 12.0, TROPHY_SIZE, TROPHY_SIZE)
 		var slot := _slot(rect, TROPHY_ART.get(trophy, TROPHY_ART[&"gold"]), trophy != &"", 0.0)
 		slot.name = "Trophy_" + String(cup.id)
@@ -111,13 +115,15 @@ func _build_book() -> Array[Button]:
 	var row: Array[Button] = []
 	var count := StickerManager.ORDER.size()
 	var step := (BOOK_RECT.size.x - 80.0) / count
+	# Smaller when there are more stickers, so they never overlap.
+	var size := minf(STICKER_SIZE, step - 8.0)
 	for i in count:
 		var id := StickerManager.ORDER[i]
 		var sticker: StickerConfig = load(StickerManager.STICKER_DIR + String(id) + ".tres")
 		var won := id in earned
-		var spot := Vector2(BOOK_RECT.position.x + 40.0 + step * (i + 0.5) - STICKER_SIZE / 2.0,
-			BOOK_RECT.position.y + 112.0)
-		var slot := _slot(Rect2(spot, Vector2.ONE * STICKER_SIZE), sticker.texture, won, TILTS[i % TILTS.size()])
+		var spot := Vector2(BOOK_RECT.position.x + 40.0 + step * (i + 0.5) - size / 2.0,
+			BOOK_RECT.position.y + 112.0 + (STICKER_SIZE - size) / 2.0)
+		var slot := _slot(Rect2(spot, Vector2.ONE * size), sticker.texture, won, TILTS[i % TILTS.size()])
 		slot.name = "Sticker_" + String(id)
 		slot.set_meta(&"caption", sticker.display_name.to_upper() + "!" if won else sticker.hint)
 		row.append(slot)

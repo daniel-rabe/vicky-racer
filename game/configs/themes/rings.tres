@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TrackTheme" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://game/configs/track_theme.gd" id="1_script"]
+[ext_resource type="TileSet" path="res://track/themes/ground_rings.tres" id="2_tiles"]
+[ext_resource type="Texture2D" path="res://art/tiles/space/rings/lane.png" id="3_lane"]
+[ext_resource type="Texture2D" path="res://art/tiles/space/rings/beacons.png" id="4_beacons"]
+[ext_resource type="Texture2D" path="res://art/props/space/asteroid.png" id="5_wall"]
+[ext_resource type="Resource" path="res://game/configs/music/race_rings.tres" id="6_music"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"rings"
+display_name = "Ring Road"
+ground_tiles = ExtResource("2_tiles")
+base_surface = &"space_teal"
+patch_surface = &"ring_dust"
+asphalt = ExtResource("3_lane")
+kerb = ExtResource("4_beacons")
+wall_prop = ExtResource("5_wall")
+wall_spacing = 120.0
+card_colour = Color(0.09, 0.23, 0.34, 1)
+music = ExtResource("6_music")
+road_surface = &"star_lane"
+space = true
+lane_glow = Color(0.9, 0.96, 1.0, 0.45)

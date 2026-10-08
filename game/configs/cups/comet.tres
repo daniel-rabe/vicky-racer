@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CupConfig" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://game/configs/cup_config.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cups/cup_comet.png" id="2_icon"]
+[ext_resource type="Script" path="res://game/configs/track_config.gd" id="3_track"]
+[ext_resource type="Resource" path="res://game/configs/tracks/space_01.tres" id="4_space_01"]
+[ext_resource type="Resource" path="res://game/configs/tracks/space_02.tres" id="5_space_02"]
+[ext_resource type="Resource" path="res://game/configs/tracks/space_03.tres" id="6_space_03"]
+[ext_resource type="Resource" path="res://game/configs/tracks/space_04.tres" id="7_space_04"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"comet"
+display_name = "Comet Cup"
+icon = ExtResource("2_icon")
+vehicle_kind = &"ship"
+tracks = Array[ExtResource("3_track")]([ExtResource("4_space_01"), ExtResource("5_space_02"), ExtResource("6_space_03"), ExtResource("7_space_04")])
+points = Array[int]([10, 7, 5, 3])

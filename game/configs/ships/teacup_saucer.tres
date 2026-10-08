@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="DriftSetup" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cards/ships/teacup_saucer.png" id="2_card"]
+[ext_resource type="Texture2D" path="res://art/ships/teacup_saucer.png" id="3_body"]
+[ext_resource type="AudioStream" path="res://art/sfx/horn_teacup.wav" id="4_horn"]
+[ext_resource type="AudioStream" path="res://art/sfx/saucer_loop.wav" id="5_engine"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"teacup_saucer"
+kind = &"ship"
+display_name = "Teacup Saucer"
+card_art = ExtResource("2_card")
+body = ExtResource("3_body")
+price = 350
+lateral_grip_mult = 1.6
+handbrake_grip_mult = 1.4
+engine_power_mult = 0.85
+max_speed_mult = 0.9
+steer_rate_mult = 1.0
+skid_colour = Color(0, 0, 0, 0)
+engine_pitch = 1.25
+horn = ExtResource("4_horn")
+engine_sound = ExtResource("5_engine")
+bar_grip = 0.9
+bar_slide = 0.2
+bar_speed = 0.35

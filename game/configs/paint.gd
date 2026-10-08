@@ -18,16 +18,21 @@ const SWATCHES := {
 }
 
 
-## The car's race body in this paint (128 x 72, facing +X). Boats keep theirs in art/boats/paint/.
+## Where each kind keeps its painted race bodies and cards (docs/DESIGN.md §20.4, §23.4).
+const BODIES := {&"car": "res://art/cars/paint/%s_%s.png", &"boat": "res://art/boats/paint/%s_%s.png",
+	&"ship": "res://art/ships/paint/%s_%s.png"}
+const CARDS := {&"car": "res://art/ui/cards/paint/%s_%s.png", &"boat": "res://art/ui/cards/boats/paint/%s_%s.png",
+	&"ship": "res://art/ui/cards/ships/paint/%s_%s.png"}
+
+
+## The car's race body in this paint (128 x 72, facing +X).
 static func body(setup: DriftSetup, colour: StringName) -> Texture2D:
-	var pattern := "res://art/boats/paint/%s_%s.png" if setup.kind == &"boat" else "res://art/cars/paint/%s_%s.png"
-	return _painted(pattern, setup, colour, setup.body)
+	return _painted(BODIES.get(setup.kind, BODIES[&"car"]), setup, colour, setup.body)
 
 
 ## The car's garage card art in this paint.
 static func card(setup: DriftSetup, colour: StringName) -> Texture2D:
-	var pattern := "res://art/ui/cards/boats/paint/%s_%s.png" if setup.kind == &"boat" else "res://art/ui/cards/paint/%s_%s.png"
-	return _painted(pattern, setup, colour, setup.card_art)
+	return _painted(CARDS.get(setup.kind, CARDS[&"car"]), setup, colour, setup.card_art)
 
 
 ## The colour after `colour` in the cycle, wrapping round to the original.

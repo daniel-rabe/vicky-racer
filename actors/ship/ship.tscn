@@ -1,0 +1,35 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://actors/ship/ship.gd" id="1_ship"]
+[ext_resource type="Resource" path="res://game/configs/cars/base_ship.tres" id="2_base"]
+[ext_resource type="Resource" path="res://game/configs/ships/fighter.tres" id="3_setup"]
+[ext_resource type="Texture2D" path="res://art/ships/fighter.png" id="4_body"]
+[ext_resource type="Script" path="res://actors/ship/ship_effects.gd" id="5_effects"]
+[ext_resource type="Script" path="res://actors/ship/ship_audio.gd" id="6_audio"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hull"]
+radius = 30.0
+height = 112.0
+
+[node name="Ship" type="CharacterBody2D"]
+script = ExtResource("1_ship")
+base_config = ExtResource("2_base")
+setup = ExtResource("3_setup")
+body_texture = ExtResource("4_body")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 0.28)
+texture = ExtResource("4_body")
+
+[node name="Body" type="Sprite2D" parent="."]
+texture = ExtResource("4_body")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_hull")
+
+[node name="Effects" type="Node2D" parent="."]
+script = ExtResource("5_effects")
+
+[node name="Audio" type="Node2D" parent="."]
+script = ExtResource("6_audio")

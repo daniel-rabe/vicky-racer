@@ -19,6 +19,7 @@ extends Node2D
 
 const HUD_SCENE := preload("res://ui/hud/race_hud.tscn")
 const WAVES := preload("res://art/sfx/wave_ambience.wav")
+const SPACE_HUM := preload("res://art/sfx/space_ambience.wav")
 const THEME := preload("res://ui/theme/vicky_theme.tres")
 const DEVELOPER_GHOSTS := "res://game/configs/ghosts/%s.res"
 const OWN_GHOST_TINT := Color(1, 1, 1, 0.45)
@@ -83,7 +84,9 @@ func _ready() -> void:
 		var takes := track.theme.music_takes
 		EventSystem.UI_music_requested.emit(takes.pick_random() if not takes.is_empty() else track.theme.music)
 		if track.theme.water:
-			_add_waves()
+			_add_ambience(&"Waves", WAVES)
+		elif track.theme.space:
+			_add_ambience(&"SpaceHum", SPACE_HUM)
 	EventSystem.UI_settings_requested.emit()  # likewise: sets _difficulty_id
 	var difficulty := DifficultyConfig.named(_difficulty_id)
 	var args := OS.get_cmdline_user_args()
@@ -177,13 +180,14 @@ func _on_race_over() -> void:
 	EventSystem.UI_screen_requested.emit(&"results")
 
 
-## A boat course (docs/DESIGN.md §20.6): small waves lapping, quietly, under the race.
-func _add_waves() -> void:
+## Quietly under the race: small waves lapping on a boat course (docs/DESIGN.md §20.6), a soft
+## hum of space on a space course (§23.6).
+func _add_ambience(player_name: StringName, stream: AudioStream) -> void:
 	if not SoundManager.audible():
 		return
 	var player := AudioStreamPlayer.new()
-	player.name = "Waves"
-	player.stream = WAVES
+	player.name = player_name
+	player.stream = stream
 	player.bus = &"SFX"
 	player.volume_db = -16.0
 	add_child(player)

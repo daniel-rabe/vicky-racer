@@ -13,21 +13,28 @@ const DEFAULT_PATH := "user://vicky_racer.cfg"
 ## as they are and are written back as the current version.
 ## 4 added the boats (docs/DESIGN.md §20): the equipped boat and the selected boat course;
 ## older files load with the Speedboat owned and the first course selected.
-const SCHEMA_VERSION := 4
-const READABLE_VERSIONS: Array[int] = [1, 2, 3, 4]
+## 5 added the spaceships (docs/DESIGN.md §23): the equipped ship and the selected space course;
+## older files load with the Star Fighter owned and the first space course selected.
+const SCHEMA_VERSION := 5
+const READABLE_VERSIONS: Array[int] = [1, 2, 3, 4, 5]
 ## Below this version, saved best laps belong to the old, shorter tracks.
 const TRACKS_REBUILT_VERSION := 3
 const STARTER_SETUP := &"starter"
 const STARTER_BOAT := &"speedboat"
 const FIRST_COURSE := &"boat_01"
+const STARTER_SHIP := &"fighter"
+const FIRST_SPACE := &"space_01"
 
 var coins := 0
-## Cars and boats both: their ids never clash (the boat is &"banana_boat", the car &"banana").
-var owned_setups: Array[StringName] = [STARTER_SETUP, STARTER_BOAT]
+## Cars, boats and ships alike: their ids never clash (the boat is &"banana_boat", the car &"banana").
+var owned_setups: Array[StringName] = [STARTER_SETUP, STARTER_BOAT, STARTER_SHIP]
 var equipped_setup: StringName = STARTER_SETUP
 var equipped_boat: StringName = STARTER_BOAT
 ## The boat course the next boat race is on.
 var selected_course: StringName = FIRST_COURSE
+var equipped_ship: StringName = STARTER_SHIP
+## The space course the next space race is on.
+var selected_space: StringName = FIRST_SPACE
 ## track id -> best lap in seconds
 var best_laps := {}
 var completed_tracks: Array[StringName] = []
@@ -71,13 +78,17 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 	profile.owned_setups = _string_names(file.get_value("profile", "owned_setups", []))
 	if STARTER_SETUP not in profile.owned_setups:
 		profile.owned_setups.push_front(STARTER_SETUP)
-	if STARTER_BOAT not in profile.owned_setups:
-		profile.owned_setups.append(STARTER_BOAT)
+	for starter in [STARTER_BOAT, STARTER_SHIP]:
+		if starter not in profile.owned_setups:
+			profile.owned_setups.append(starter)
 	var equipped := StringName(str(file.get_value("profile", "equipped_setup", STARTER_SETUP)))
 	profile.equipped_setup = equipped if equipped in profile.owned_setups else STARTER_SETUP
 	var boat := StringName(str(file.get_value("profile", "equipped_boat", STARTER_BOAT)))
 	profile.equipped_boat = boat if boat in profile.owned_setups else STARTER_BOAT
 	profile.selected_course = StringName(str(file.get_value("profile", "selected_course", FIRST_COURSE)))
+	var ship := StringName(str(file.get_value("profile", "equipped_ship", STARTER_SHIP)))
+	profile.equipped_ship = ship if ship in profile.owned_setups else STARTER_SHIP
+	profile.selected_space = StringName(str(file.get_value("profile", "selected_space", FIRST_SPACE)))
 	profile.completed_tracks = _string_names(file.get_value("profile", "completed_tracks", []))
 	profile.selected_track = StringName(str(file.get_value("profile", "selected_track", "track_01")))
 	var progress: Variant = file.get_value("cup", "progress", {})
@@ -117,6 +128,8 @@ func save_to(path := DEFAULT_PATH) -> Error:
 	file.set_value("profile", "selected_track", String(selected_track))
 	file.set_value("profile", "equipped_boat", String(equipped_boat))
 	file.set_value("profile", "selected_course", String(selected_course))
+	file.set_value("profile", "equipped_ship", String(equipped_ship))
+	file.set_value("profile", "selected_space", String(selected_space))
 	for track in best_laps:
 		file.set_value("best_laps", String(track), best_laps[track])
 	for id in paint:

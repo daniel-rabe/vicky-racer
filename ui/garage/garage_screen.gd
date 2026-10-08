@@ -17,7 +17,12 @@ const PAGE_SIZE := 6
 const COLUMNS := 3
 const SWATCH := 44
 const YELLOW := Color(1, 0.824, 0.247)
-const DOCK_BACKGROUND := Color(0.063, 0.165, 0.227)
+## The garage in each kind's colours and words: the Boat Dock (docs/DESIGN.md §20.5) and the
+## Hangar (§23.5). Cars use the scene as it is.
+const LOOKS := {
+	&"boat": {"title": "BOAT DOCK", "background": Color(0.063, 0.165, 0.227), "slide": "GLIDE", "race": "SAIL!"},
+	&"ship": {"title": "HANGAR", "background": Color(0.102, 0.094, 0.22), "slide": "FLOAT", "race": "FLY!"},
+}
 
 var _state := {}
 var _cards := {}  # setup id -> SetupCard
@@ -64,11 +69,12 @@ func _ready() -> void:
 
 func _on_state_changed(state: Dictionary) -> void:
 	_state = state
-	if state.get("vehicle_kind", &"car") == &"boat":
-		$Title.text = "BOAT DOCK"
-		$Background.color = DOCK_BACKGROUND
-		%SlideLabel.text = "GLIDE"
-		_race.text = "SAIL!"
+	var look: Dictionary = LOOKS.get(state.get("vehicle_kind", &"car"), {})
+	if not look.is_empty():
+		$Title.text = look["title"]
+		$Background.color = look["background"]
+		%SlideLabel.text = look["slide"]
+		_race.text = look["race"]
 	_count_coins_to(state["coins"])
 	var paint: Dictionary = state.get("paint", {})
 	for setup: DriftSetup in state["setups"]:

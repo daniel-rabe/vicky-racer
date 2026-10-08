@@ -46,10 +46,12 @@ func _enter_tree() -> void:
 		EventSystem.UI_settings_changed.emit({"sound_volume": 0.0, "music_volume": 0.0, "fullscreen": false,
 			"auto_accelerate": false, "steering_help": false, "difficulty": StringName(difficulty)}))
 	EventSystem.PRO_state_requested.connect(func() -> void:
-		# A boat (docs/DESIGN.md §20) lives in configs/boats/; race it on a boat course.
+		# A boat (docs/DESIGN.md §20) lives in configs/boats/ and a ship (§23) in configs/ships/;
+		# race them on a boat or space course.
 		var path := "res://game/configs/setups/%s.tres" % setup_id
-		if not ResourceLoader.exists(path):
-			path = "res://game/configs/boats/%s.tres" % setup_id
+		for dir in ["boats", "ships"]:
+			if not ResourceLoader.exists(path):
+				path = "res://game/configs/%s/%s.tres" % [dir, setup_id]
 		EventSystem.PRO_state_changed.emit({"setups": [load(path)],
 			"equipped": StringName(setup_id), "selected_track": StringName(track_id),
 			"tracks": [{"config": load("res://game/configs/tracks/%s.tres" % track_id)}]}))

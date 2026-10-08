@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="DriftSetup" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/configs/drift_setup.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui/cards/ships/comet_racer.png" id="2_card"]
+[ext_resource type="Texture2D" path="res://art/ships/comet_racer.png" id="3_body"]
+[ext_resource type="AudioStream" path="res://art/sfx/horn_ship.wav" id="4_horn"]
+[ext_resource type="AudioStream" path="res://art/sfx/thruster_loop.wav" id="5_engine"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"comet_racer"
+kind = &"ship"
+display_name = "Comet Racer"
+card_art = ExtResource("2_card")
+body = ExtResource("3_body")
+price = 600
+lateral_grip_mult = 1.1
+handbrake_grip_mult = 1.0
+engine_power_mult = 1.15
+max_speed_mult = 1.2
+steer_rate_mult = 0.95
+skid_colour = Color(0, 0, 0, 0)
+engine_pitch = 1.3
+horn = ExtResource("4_horn")
+engine_sound = ExtResource("5_engine")
+bar_grip = 0.6
+bar_slide = 0.45
+bar_speed = 0.95

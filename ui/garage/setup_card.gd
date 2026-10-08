@@ -11,6 +11,8 @@ const RED := Color(0.902, 0.224, 0.275)
 const DIM := 0.55
 const NAME_SIZE := 30
 const NAME_SIZE_LONG := 22
+## The longest names (CARDBOARD ROCKET) need smaller still to stay on the card.
+const NAME_SIZE_LONGEST := 19
 
 var setup: DriftSetup
 
@@ -33,7 +35,9 @@ func show_setup(value: DriftSetup, art: Texture2D, owned: bool, equipped: bool, 
 	_art.texture = art
 	_name.text = setup.display_name.to_upper()
 	# Long names (MONSTER TRUCK, ICE-CREAM VAN) step down a size so they stay on the card.
-	_name.add_theme_font_size_override("font_size", NAME_SIZE if _name.text.length() <= 9 else NAME_SIZE_LONG)
+	var length := _name.text.length()
+	_name.add_theme_font_size_override("font_size",
+		NAME_SIZE if length <= 9 else (NAME_SIZE_LONG if length <= 14 else NAME_SIZE_LONGEST))
 	_equipped.visible = equipped
 	_owned.visible = owned and not equipped
 	_price_row.visible = not owned

@@ -11,6 +11,8 @@ extends Node
 const MAIN := preload("res://game/main.tscn")
 const ECONOMY := preload("res://game/configs/economy.tres")
 const CAR_SCENE := preload("res://actors/car/car.tscn")
+const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
+const SHIP_SCENE := preload("res://actors/ship/ship.tscn")
 const SAVE := "user://sticker_test.cfg"
 const SETTINGS := "user://sticker_test_settings.cfg"
 
@@ -39,6 +41,7 @@ func _ready() -> void:
 	_test_clean_lap()
 	_test_first_win_and_coins()
 	_test_every_track_and_all_cars()
+	await _test_boat_and_space_stickers()
 	_test_never_twice_never_lost()
 	await _test_popup()
 	_drop()
@@ -117,7 +120,8 @@ func _count(id: StringName) -> int:
 func _test_definitions() -> void:
 	print("the sticker book")
 	_managers()
-	_check(_stickers.stickers.size() == 7, "seven stickers (%d)" % _stickers.stickers.size())
+	_check(_stickers.stickers.size() == StickerManager.ORDER.size() and StickerManager.ORDER.size() == 11,
+		"eleven stickers (%d)" % _stickers.stickers.size())
 	for id: StringName in StickerManager.ORDER:
 		var sticker: StickerConfig = _stickers.stickers[id]
 		_check(sticker != null and sticker.id == id and sticker.texture != null and sticker.hint != "",
@@ -196,14 +200,36 @@ func _test_every_track_and_all_cars() -> void:
 	_check(_count(&"all_cars") == 1, "buying the last car earns CAR COLLECTOR")
 
 
+## A race finished in a boat, then in a ship (docs/DESIGN.md §20, §23); the boat and space cups won.
+func _test_boat_and_space_stickers() -> void:
+	print("boats and spaceships")
+	for pair in [[BOAT_SCENE, &"first_splash"], [SHIP_SCENE, &"first_flight"]]:
+		var vehicle: Car = (pair[0] as PackedScene).instantiate()
+		var marker := Node2D.new()
+		marker.name = "PlayerMarker"
+		vehicle.add_child(marker)
+		add_child(vehicle)
+		await get_tree().physics_frame
+		EventSystem.RAC_race_started.emit()
+		_finish(3, &"boat_01" if pair[1] == &"first_splash" else &"space_01")
+		_check(_count(pair[1]) == 1, "finishing a race in a %s earns %s" % ["boat" if pair[1] == &"first_splash" else "ship", pair[1]])
+		vehicle.free()
+	EventSystem.CUP_finished.emit(&"splash", [], &"silver")
+	_check(_count(&"splash_cup") == 0, "2nd in the Splash Cup does not earn its sticker")
+	EventSystem.CUP_finished.emit(&"splash", [], &"gold")
+	EventSystem.CUP_finished.emit(&"comet", [], &"gold")
+	_check(_count(&"splash_cup") == 1 and _count(&"comet_cup") == 1, "winning the Splash and Comet Cups earns theirs")
+
+
 func _test_never_twice_never_lost() -> void:
 	print("never twice, never lost")
-	_check(_stickers.earned.size() == 7 and _garage.profile.stickers.size() == 7, "all seven are in the book")
+	var all := StickerManager.ORDER.size()
+	_check(_stickers.earned.size() == all and _garage.profile.stickers.size() == all, "all %d are in the book" % all)
 	for id: StringName in StickerManager.ORDER:
 		_check(_count(id) == 1, "%s was earned exactly once" % id)
 	_emitted.clear()
 	_managers()  # as if the game was closed and opened again
-	_check(_garage.profile.stickers.size() == 7 and _stickers.earned.size() == 7, "the book survives closing the game")
+	_check(_garage.profile.stickers.size() == all and _stickers.earned.size() == all, "the book survives closing the game")
 	_check(_emitted.is_empty(), "loading the save awards nothing again, though every condition still holds")
 	EventSystem.RAC_race_started.emit()
 	EventSystem.CAR_drift_started.emit(_player)

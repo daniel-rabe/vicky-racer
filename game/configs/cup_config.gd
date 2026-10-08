@@ -6,7 +6,8 @@ extends Resource
 @export var id: StringName
 @export var display_name := ""
 @export var icon: Texture2D
-## &"car" or &"boat" (docs/DESIGN.md §20): which PICK A RACE shows it, and what it is raced in.
+## &"car", &"boat" or &"ship" (docs/DESIGN.md §20, §23): which PICK A RACE shows it, and what it is
+## raced in.
 @export var vehicle_kind := &"car"
 @export var tracks: Array[TrackConfig] = []
 ## Points by finishing position, index 0 = 1st. Never zero: a child always scores.

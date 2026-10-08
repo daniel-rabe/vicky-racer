@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CarConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/configs/car_config.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+engine_power = 1200.0
+brake_power = 1800.0
+max_speed = 1100.0
+max_steer_rate = 3.0
+forward_drag = 0.25
+lateral_grip = 3.3
+handbrake_lateral_grip = 1.2
+drift_threshold = 260.0
+wall_speed_scrub = 0.08

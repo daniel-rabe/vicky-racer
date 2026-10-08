@@ -14,7 +14,7 @@ extends Node
 ## (race over, standings to show) -> ready ... and after the last race -> done (podium).
 
 const CUP_DIR := "res://game/configs/cups/"
-const CUP_ORDER: Array[StringName] = [&"sunshine", &"snowflake", &"starlight", &"splash"]
+const CUP_ORDER: Array[StringName] = [&"sunshine", &"snowflake", &"starlight", &"splash", &"comet"]
 const TROPHY_FOR_PLACE: Array[StringName] = [&"gold", &"silver", &"bronze", &"ribbon"]
 ## Better trophies first; a cup remembers the best one ever won.
 const TROPHY_RANK: Array[StringName] = [&"gold", &"silver", &"bronze", &"ribbon"]

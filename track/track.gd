@@ -29,6 +29,9 @@ extends Node2D
 ## line and rejoin it. A racer on a branch is measured along the branch, and its progress is
 ## the stretch of lap the branch bypasses, in proportion, so laps, places and the minimap
 ## need nothing new. The finish and the checkpoint never lie on a bypassed stretch.
+##
+## A space course (docs/DESIGN.md §23) works the same way: its road is a glowing star lane, it
+## has branches, and its asteroids, comets and station tunnels are children the builder adds.
 
 signal finish_crossed(car: Car)
 signal checkpoint_crossed(car: Car)
@@ -61,6 +64,18 @@ const SURFACES := {
 	&"lagoon_water": {"speed_mult": 0.6, "grip_mult": 0.8},
 	&"lemonade": {"speed_mult": 0.6, "grip_mult": 0.8},
 	&"sandbank": {"speed_mult": 0.35, "grip_mult": 0.6},
+	# Space courses (docs/DESIGN.md §23.2). The star lane is full speed; off it, every theme's
+	# starry dust holds a ship back a little, and the clouds (the moon, ring dust, a nebula,
+	# cotton candy) more.
+	&"star_lane": {"speed_mult": 1.0, "grip_mult": 1.0},
+	&"space_navy": {"speed_mult": 0.6, "grip_mult": 0.8},
+	&"space_teal": {"speed_mult": 0.6, "grip_mult": 0.8},
+	&"space_purple": {"speed_mult": 0.6, "grip_mult": 0.8},
+	&"space_plum": {"speed_mult": 0.6, "grip_mult": 0.8},
+	&"moon_surface": {"speed_mult": 0.35, "grip_mult": 0.6},
+	&"ring_dust": {"speed_mult": 0.35, "grip_mult": 0.6},
+	&"nebula_cloud": {"speed_mult": 0.35, "grip_mult": 0.6},
+	&"cotton_candy": {"speed_mult": 0.35, "grip_mult": 0.6},
 }
 const ASPHALT := preload("res://art/tiles/asphalt.png")
 const KERB := preload("res://art/tiles/kerb.png")
@@ -495,16 +510,19 @@ func _build_road() -> void:
 	var asphalt: Texture2D = theme.asphalt if theme and theme.asphalt else ASPHALT
 	var kerb: Texture2D = theme.kerb if theme and theme.kerb else KERB
 	var water := theme != null and theme.water
-	if water:
+	var space := theme != null and theme.space
+	if water or space:
+		# A channel's pale lip, or a star lane's glow.
+		var lip := theme.lane_glow if space else LIP_COLOUR
 		# Branches first, so where one meets the racing line the main channel lies on top.
 		for b in branch_lines.size():
 			var width := branch_half_widths[b] * 2.0
 			var line := PackedVector2Array()
 			for p in branch_lines[b]:
 				line.append(road.to_local(p))
-			_add_road(_line(line, width + LIP_WIDTH, null, LIP_COLOUR, false))
+			_add_road(_line(line, width + LIP_WIDTH, null, lip, false))
 			_add_road(_line(line, width, asphalt, Color.WHITE, false))
-		_add_road(_line(points, road_half_width * 2.0 + LIP_WIDTH, null, LIP_COLOUR, true))
+		_add_road(_line(points, road_half_width * 2.0 + LIP_WIDTH, null, lip, true))
 	else:
 		_add_road(_line(points, road_half_width * 2.0 + 12.0, null, OUTLINE_COLOUR, true))
 	_add_road(_line(points, road_half_width * 2.0, asphalt, Color.WHITE, true))
@@ -516,7 +534,7 @@ func _build_road() -> void:
 			_add_road(_line(edge, KERB_WIDTH, kerb, Color.WHITE, false))
 	for span in ice_spans:
 		_add_road(_line(_span_points(span), road_half_width * 2.0 - 8.0, ROAD_ICE, Color.WHITE, false))
-	if not water:  # a channel has no lanes
+	if not water and not space:  # a channel or a star lane has no lanes
 		_add_road(_line(points, 12.0, _dash_texture(), DASH_COLOUR, true))
 	_add_road(_finish_line())
 	for span in bridge_spans:

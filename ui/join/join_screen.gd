@@ -17,6 +17,9 @@ const CARD_SIZE := Vector2(780, 640)
 ## A stick pushed past this picks the next car once, until it comes back to the middle.
 const STICK_PICK := 0.6
 
+## The kinds V / X cycles through, in order, and what the screen calls them.
+const KIND_NAMES := {&"car": "CARS", &"boat": "BOATS", &"ship": "SPACE"}
+
 var _garage := {}
 var _party := {}
 var _owned: Array[DriftSetup] = []
@@ -83,7 +86,7 @@ func _refresh() -> void:
 	for i in 2:
 		_fill_card(_cards[i], i, players[i] if i < players.size() else {})
 	_opponents.text = "%s     ( V / X )          OPPONENTS:  %s     ( O / Y )" % [
-		"BOATS" if _garage.get("vehicle_kind", &"car") == &"boat" else "CARS",
+		KIND_NAMES.get(_garage.get("vehicle_kind", &"car"), "CARS"),
 		"ON" if _party.get("opponents", true) else "OFF"]
 	_hints.text = "BOTH IN?  PRESS YOUR BUTTON AGAIN TO RACE!     ESC / B  BACK" if players.size() == 2 \
 		else "GAMEPAD: A     KEYBOARD: SPACE (W A S D)  OR  ENTER (ARROWS)     ESC / B  BACK"
@@ -169,11 +172,12 @@ func _input(event: InputEvent) -> void:
 	_pick_car(event)
 
 
-## Cars or boats: every player who has joined moves into the matching vehicle of the other kind
-## (the equipped one for player 1, the next one owned for player 2), so nobody drives a car
-## on the water.
+## Cars, boats, spaceships, round again: every player who has joined moves into the matching
+## vehicle of the next kind (the equipped one for player 1, the next one owned for player 2), so
+## nobody drives a car on the water.
 func _switch_kind() -> void:
-	var kind := &"car" if _garage.get("vehicle_kind", &"car") == &"boat" else &"boat"
+	var kinds := KIND_NAMES.keys()
+	var kind: StringName = kinds[(kinds.find(_garage.get("vehicle_kind", &"car")) + 1) % kinds.size()]
 	EventSystem.PRO_vehicle_kind_requested.emit(kind)  # answered at once: _garage and _owned follow
 	var players := _players()
 	for index in players.size():

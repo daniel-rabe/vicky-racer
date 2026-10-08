@@ -11,13 +11,21 @@ extends Sprite2D
 ## between samples.
 
 const FADE_SECONDS := 0.4
+## Where a lap's setup may live: a car, a boat (docs/DESIGN.md §20) or a ship (§23).
+const SETUP_DIRS: Array[String] = ["res://game/configs/setups/", "res://game/configs/boats/",
+	"res://game/configs/ships/"]
 
 var ghost: GhostLap:
 	set(value):
 		ghost = value
 		if ghost:
-			texture = Paint.body(load("res://game/configs/setups/%s.tres" % ghost.setup_id), ghost.paint) \
-				if ResourceLoader.exists("res://game/configs/setups/%s.tres" % ghost.setup_id) else texture
+			for dir in SETUP_DIRS:
+				var path := dir + "%s.tres" % ghost.setup_id
+				if ResourceLoader.exists(path):
+					var setup: DriftSetup = load(path)
+					texture = Paint.body(setup, ghost.paint)
+					_kind = setup.kind
+					break
 			_seat_driver()
 ## The ghost's colour: see-through white for the player's own best, gold for the developer's.
 var tint := Color(1, 1, 1, 0.45)
@@ -26,6 +34,8 @@ var tick := 0
 var running := false
 
 var _tread: RollingTread
+## What the lap was driven in: a boat's driver wears a cap and life vest, not a helmet.
+var _kind := &"car"
 
 
 func _ready() -> void:
@@ -42,7 +52,7 @@ func _seat_driver() -> void:
 	if old:
 		remove_child(old)
 		old.queue_free()
-	DriverRider.build(self, DriverLook.texture(DriverLook.VICKY, &"car"))
+	DriverRider.build(self, DriverLook.texture(DriverLook.VICKY, _kind))
 
 
 func start() -> void:
