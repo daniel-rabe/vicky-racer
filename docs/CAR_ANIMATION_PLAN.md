@@ -1,7 +1,8 @@
 # Vicky Racer — Plan: animated cars
 
-Status: **Phase 20a (rolling tread) is built** — see §3, which now describes what was built.
-Phase 20b and the extras in §5 are still proposals. Nothing here changes handling; it is all
+Status: **Phase 20a (rolling tread) and 20b (steering front wheels) are built**, and so is the
+body lean from §5 — §3, §4 and §5 now describe what was built. The other extras in §5 are still
+proposals. Nothing here changes handling; it is all
 drawing.
 
 ## 1. What we have today
@@ -125,26 +126,39 @@ samples, so ghosts roll too.
 | `actors/ghost/ghost_car.gd` | ghosts roll too |
 | `tests/effects_test.gd` | rolls with speed, backwards in reverse, rear locked on the handbrake, still while frozen, smeared at top speed, follows a paint change, none on the Bubble Car; every body in every paint has its tyres listed |
 
-## 4. Phase 20b — Steering front wheels (optional)
+## 4. Phase 20b — Steering front wheels
 
-Only if 20a is not enough. Reuses the rectangles from 20a:
+The plan was to cut the front tyres out of every body (approach B) and draw them as sprites.
+That would have meant 76 touched-up images; the shader of 20a turned out to be able to do it
+with no new art at all:
 
-1. `wheel_rects.py --cut` erases the two **front** tyres' pixels (the tyre mask only) from every
-   body and writes one front-wheel PNG per car (from the original; tyres are black, so the paints
-   can share it — check this on the contact sheet).
-2. `car.tscn` gets two `Sprite2D` front wheels drawn behind `Body` (`show_behind_parent`), placed
-   at the rectangle centres from `CarWheels`.
-3. `rolling_tread.gd` rotates them by `steer_input × MAX_WHEEL_ANGLE` (~25°), smoothed; the tread
-   shader runs on the wheel sprites instead of the body for the front pair.
+1. `rolling_tread.gd` turns the front wheels towards `steer_input × MAX_STEER` (20°), smoothed
+   (`STEER_RATE`), and hands the angle to the shader as `steer`. They turn on the grid during
+   the countdown too, as something to do. Ghosts do not steer.
+2. While turned, the shader takes the **rubber** of each front tyre out of the body (the tyre
+   rule, widened by `SHINE` to the grey shine on the rubber; lights and hubs stay) and draws
+   the tyre again, turned round its middle, **behind** the body, as a rounded block in the
+   tyre's own colours with the tread sliding along it.
+3. Only the outer part of most tyres shows. A whole tyre is taken to be at least `TYRE_WIDTH`
+   (13 px) wide, the rest hidden under the body; turned, that part peeks out in plain rubber.
+4. The picture is drawn `PAD` (6 px) taller above and below, so a turned tyre at the edge of
+   the texture is not cut off.
+5. Straight ahead the shader does just what it did in 20a, so no car looks any different.
 
-Risk: the erased body may show a hole where a tyre overlapped the body outline; that needs a hand
-touch-up per car (12 originals × 6 paints). That cost is why this is a separate, optional phase.
+Checked by eye on every car with `tools/dev/steer_sheet.tscn` (every body in its original and
+pink paint, turned left, straight, right) and `tools/dev/steer_clip.tscn` (frames of a short
+drive with drifts). On the Kart, whose thin dark suspension arms count as rubber, the arms are
+hidden while the wheels are turned. `tests/effects_test.gd` checks that the wheels turn each
+way, come back straight, turn on the grid, and that a drift leans the body outwards and lets
+it settle.
 
 ## 5. Extras that fall out of the same work (optional, small)
 
-- **Body lean** — tilt `Body` a couple of degrees against the sideways speed while drifting, and
-  a tiny squash when hitting a wall (`CAR_wall_hit`). Pure transforms, in `rolling_tread.gd` or
-  `car_effects.gd`.
+- **Body lean ✅ built** — `actors/car/body_lean.gd` (`BodyLean`, the `Lean` node in
+  `car.tscn`): sliding sideways faster than `FROM` (120 px/s), the body shifts towards the
+  outside of the drift (up to 3 px) and swings its tail further out (up to 5°), in full from
+  `FULL` (450 px/s). Only `Body` moves (its driver and roof load with it); `Body.scale` stays
+  free for the town's ramp hop. Still open: a tiny squash when hitting a wall (`CAR_wall_hit`).
 - **Idle shake** — a sub-pixel engine wobble at standstill during the countdown.
 - **Rocket flames** — the rocket's baked flames could flicker with the same shader (a flame mask
   rectangle instead of wheels) and grow with throttle/boost.

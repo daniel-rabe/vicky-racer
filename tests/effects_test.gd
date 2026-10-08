@@ -1,7 +1,7 @@
 extends Node2D
 ## Headless checks for the Phase 8 effects (docs/DESIGN.md §4.3): skid marks while
 ## drifting, dust on grass and sand, tyre smoke on the road, and the wall-hit camera shake;
-## and for the rolling wheels (docs/CAR_ANIMATION_PLAN.md).
+## and for the rolling and steering wheels and the drift lean (docs/CAR_ANIMATION_PLAN.md).
 ##   Godot_console.exe --path . --headless --fixed-fps 60 res://tests/effects_test.tscn
 ## Exit code 0 = all passed. Run with a window and `-- --screenshot=<path.png>` to save a
 ## picture of a drift onto the grass, for checking the look.
@@ -25,6 +25,8 @@ func _ready() -> void:
 	await _test_wall_shake()
 	await _test_car_specific_effects()
 	await _test_rolling_tread()
+	await _test_steering_wheels()
+	await _test_body_lean()
 	_test_every_body_has_tyres()
 	if not _screenshot.is_empty():
 		await _take_screenshot()
@@ -227,6 +229,48 @@ func _test_rolling_tread() -> void:
 	car.setup = load("res://game/configs/setups/bubble.tres")
 	await _drive(car, 0.05)
 	_check(not tread.active() and car.get_node("Body").material == null, "the Bubble Car, whose tyres hardly show, has no tread")
+	await _done(car)
+
+
+func _test_steering_wheels() -> void:
+	print("steering front wheels")
+	var car := _arena(ASPHALT)
+	car.setup = load("res://game/configs/setups/kart.tres")
+	var tread: RollingTread = car.get_node("Tread")
+	await _drive(car, 0.1)
+	var material: ShaderMaterial = car.get_node("Body").material
+	_check(tread.steer == 0.0 and material.get_shader_parameter(&"steer") == 0.0, "straight ahead the wheels are not turned")
+	await _drive(car, 0.4, 1.0, 1.0)
+	_check(tread.steer > 0.9 * RollingTread.MAX_STEER, "steering right turns them right (%.0f°)" % rad_to_deg(tread.steer))
+	_check(is_equal_approx(material.get_shader_parameter(&"steer"), tread.steer), "and the shader draws them so")
+	await _drive(car, 0.4, -1.0, 1.0)
+	_check(tread.steer < -0.9 * RollingTread.MAX_STEER, "steering left turns them left")
+	await _drive(car, 0.6, 0.0, 1.0)
+	_check(absf(tread.steer) < 0.01, "let go, they come back straight")
+	car.frozen = true
+	await _drive(car, 0.4, 1.0)
+	_check(tread.steer > 0.9 * RollingTread.MAX_STEER, "they turn on the grid too, before the start")
+	await _done(car)
+
+
+func _test_body_lean() -> void:
+	print("leaning out of a drift")
+	var car := _arena(ASPHALT)
+	var lean: BodyLean = car.get_node("Lean")
+	var body: Sprite2D = car.get_node("Body")
+	await _drive(car, 1.0, 0.0, 1.0)
+	_check(absf(lean.lean) < 0.05 and body.position.is_zero_approx(), "driving straight the body sits still")
+	await _drive(car, 0.9, 1.0, 1.0, true)
+	var sliding_right := car.velocity.dot(Vector2.DOWN.rotated(car.rotation))
+	_check(car.is_drifting and absf(lean.lean) > 0.5, "drifting, the body leans (%.2f)" % lean.lean)
+	_check(signf(body.position.y) == signf(sliding_right), "towards the outside of the drift")
+	_check(absf(body.rotation) <= deg_to_rad(BodyLean.MAX_DEGREES) + 0.001, "by a few degrees at most")
+	await _drive(car, 2.5, 0.0, -1.0)
+	_check(absf(lean.lean) < 0.1, "out of the drift it settles back (%.2f)" % lean.lean)
+	car.velocity = Vector2.DOWN.rotated(car.rotation) * 600.0
+	car.frozen = true
+	await _drive(car, 1.0)
+	_check(absf(lean.lean) < 0.05, "a frozen car does not lean")
 	await _done(car)
 
 
