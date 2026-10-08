@@ -1909,28 +1909,32 @@ There are nine ships, saucers and fighters plus fun ships (the user's choice). T
 Hangar are GRIP, **FLOAT** (in place of SLIDE) and SPEED. Prices sit beside the boats'
 (a first proposal):
 
-| Ship | Kind | Character | Driver seen? | Price |
+| Ship | Kind | Character | Pilot | Price |
 | --- | --- | --- | --- | --- |
-| **Star Fighter** | fighter | the all-rounder, the starter ship | glass canopy | free |
-| **Racing Pod** | fighter | small and nimble, turns sharpest, light, bounces furthest | glass canopy | 100 |
-| **Flying Saucer** | saucer | grippy and steady, the easiest ship; lights round the rim | glass dome | 150 |
-| **Cardboard Rocket** | fun | a homemade box rocket with a drawn-on flame, slow to pull away, grippy | open top | 200 |
-| **Space Taxi** | fun | yellow and chequered, steady, "beep beep" | glass roof | 250 |
-| **Star Surfer** | fun | a hover surfboard with twin rockets, the slidiest, floats wide | standing on it | 300 |
-| **Teacup Saucer** | fun | a flying teacup, very grippy, slow; clinks | open | 350 |
+| **Star Fighter** | fighter | the all-rounder, the starter ship | in the cockpit bubble | free |
+| **Racing Pod** | fighter | small and nimble, turns sharpest, light, bounces furthest | under the canopy | 100 |
+| **Flying Saucer** | saucer | grippy and steady, the easiest ship; lights round the rim | in the dome | 150 |
+| **Cardboard Rocket** | fun | a homemade box rocket, slow to pull away, grippy | in the open box | 200 |
+| **Space Taxi** | fun | yellow and chequered, steady, "beep beep" | under the bubble roof | 250 |
+| **Star Glider** | fun | a five-pointed star with a bubble cockpit, the slidiest, floats wide | in the bubble | 300 |
+| **Teacup Saucer** | fun | a flying teacup, very grippy, slow; clinks | in the cup | 350 |
 | **Star Freighter** | fun | a big cargo ship stacked with containers, heavy, pushes other ships aside, fast on the straights; a deep toot | none (closed) | 450 |
-| **Comet Racer** | fighter | the top ship: fastest, a long tail of sparks | glass canopy | 600 |
+| **Comet Racer** | fighter | the top ship: fastest, a long tail of sparks | in the cockpit | 600 |
 
 - **Sprites:** each ship is made with the frozen recipe (§11.1), 4 candidates and one pick, and
   gets six paint jobs as Kontext recolours (§9.3). The boats taught us that FLUX draws some
   things side-on (§20.8), so any ship that comes out side-on gets the Kontext-from-a-flat-sketch
   treatment straight away.
-- **Drivers (§22):** the seats above show the driver; a closed ship shows none. In space the
-  drivers wear a round **space helmet** (a third look beside the helmet and the cap).
+- **Pilots are part of the ship picture**, not the §22 driver layer. A little astronaut in a
+  clear bubble helmet sits in each cockpit, one per ship, made as a Kontext edit of the empty
+  ship (`ship_*_pilot`). Its suit is the ship's colour, so the paint jobs recolour it too. The
+  closed Star Freighter shows none. The empty ships are kept in `art/ships/empty/`.
 - **Opponents** pick from the roster as car and boat opponents do (§8).
-- **Two swaps at Gate B (2026-10-08).** The Rocket Armchair and the Space Whale were drawn, and
-  the user dropped both: they "do not fit in space". The Star Surfer and the Star Freighter took
-  their places in the roster, at the same prices and with the same handling.
+- **Three swaps at Gate B (2026-10-08).** The Rocket Armchair and the Space Whale were drawn,
+  and the user dropped both: they "do not fit in space". The Star Surfer and the Star Freighter
+  took their places, at the same prices and with the same handling. Then the Star Surfer went
+  too: no try put a pilot on its open board convincingly, so the **Star Glider** (a star with a
+  bubble cockpit) took its place.
 
 ![Every ship in every paint](mockups/space/06_ship_paints.png)
 
@@ -1954,15 +1958,15 @@ page (https://claude.ai/artifact/TV2K4Q8xXwKwUmuHm35aNV, built by `tools/comfy/l
 
 | Piece | What was made | Where |
 | --- | --- | --- |
-| Ships | 9 sprites (FLUX, frozen recipe), Hangar cards, 6 paints each (Kontext recolours; the yellow pod and taxi are their own yellow) | `art/ships/`, `art/ships/paint/`, `art/ui/cards/ships/` |
-| Drivers | Vicky, P2 and the three kids in a bubble space helmet: Kontext edits of `driver_sketch` with the new `hat_kind` `space` | `art/drivers/space/` |
+| Ships | 9 sprites (FLUX, frozen recipe), each with its pilot baked in (a Kontext edit), Hangar cards, 6 paints each (Kontext recolours of the piloted ship; the yellow pod and taxi are their own yellow) | `art/ships/`, `art/ships/empty/`, `art/ships/paint/`, `art/ui/cards/ships/` |
+| Drivers | Vicky, P2 and the three kids in a bubble space helmet (`driver_sketch` with `hat_kind` `space`). Made first, then not used: laid over the ships they looked stuck on top, so the pilots were baked in | `art/drivers/space/` |
 | Ground | The four themes' dust and cloud atlases and TileSets, the star lane, and a beacon strip in place of kerbs (`theme_art.beacon_strip`) | `art/tiles/space/`, `track/themes/ground_*.tres` |
 | Props | ringed planet, lollipop planet, space station and its tunnel, moon base, little moon, asteroid, gumball, solar panel, comet | `art/props/space/` |
 | Icons | the Comet Cup; stickers First Flight and Comet Cup, plus the boats' First Splash and Splash Cup | `art/ui/cups/`, `art/ui/stickers/` |
 | Sounds | thruster, saucer and rocket loops; space ambience; comet chime and whoosh; asteroid bonk; horns for the ships, the taxi, the freighter and the teacup | `art/sfx/` |
 | Music | `race_rings` (Ring Road) and `race_nebula` (Nebula Station) | `art/music/` |
 
-![Drivers in the ships](mockups/space/07_drivers_on_ships.png)
+![The ships with their pilots, at 2x and at game size](mockups/space/07_ships_in_race.png)
 ![Props and icons](mockups/space/08_props_and_icons.png)
 ![Space tiles](mockups/space/05_tiles.png)
 
@@ -1981,12 +1985,23 @@ What making it taught:
 - **Ring Road's music (seed 101) fails the loop-seam check** (2.22 against a limit of 1.0). It was
   kept because the user chose it by ear, having heard the jump back on the listening page.
   Seed 105 is the clean fallback.
+- **A pilot laid over a ship looks stuck on top** (as the cars' sunroof did, §22). Baked in by
+  Kontext, the pilot sits in the cockpit under the glass, lit like the ship. Kontext always draws
+  the figure upright and looking out, head towards the top of the picture. The user wanted the
+  head towards the tail, so the empty ship is turned 180° before the edit (`source_turn`) and
+  the result faces down.
+- **A figure on an open board never worked.** On the Star Surfer, Kontext laid the pilot flat,
+  drew a front-view surfer on a side-view board, or a figure that looked out at the camera, even
+  from a pose sketch drawn on the board. A seat or a cockpit is what makes a pilot read as
+  sitting in a ship.
 - **The user kept Vicky's seed 25**, a front view with his face, although it is not used in the
   game: `tools/comfy/masters/keep/`.
 
 ### 23.7 Under the hood (Gate C)
 
 The boat seam carries almost everything. This is the plan:
+- **No driver layer.** The pilots are in the ship pictures, so `DriverSeats` lists no ship and
+  the rider draws nothing on them.
 - **`Ship`.** `class_name Ship extends Car` in `actors/ship/` is built like `Boat`: same node
   layout, a capsule hull, and the hover sway in place of the bob. It has a shadow offset and the
   exhaust and stardust effects (`ship_effects.gd`), and engine loops pitched by speed
@@ -2005,8 +2020,8 @@ The boat seam carries almost everything. This is the plan:
     fly-by and the nudge) and `tunnels` (scenery above the ships, like `scenery_bridges`).
 - **Branches** work as on water. The points JSON already writes them for space courses.
 - **Title, join screen, track select:** a third kind wherever `car` / `boat` are tested today:
-  `title_screen.gd`, `join_screen.gd`, `track_select.gd`, `garage_screen.gd`, and the folder
-  in `DriverLook`. A three-way toggle, not another `if`.
+  `title_screen.gd`, `join_screen.gd`, `track_select.gd` and `garage_screen.gd`. A three-way
+  toggle, not another `if`.
 - **Cups:** `game/configs/cups/comet.tres`, `vehicle_kind = &"ship"`.
 - **Ghosts:** developer ghosts for the four space courses (`record_ghosts.gd`).
 - **Checks:** `tests/space_test.gd`, covering:

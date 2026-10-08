@@ -110,6 +110,18 @@ def post_of(entry: dict, entries: dict) -> list[str]:
     return steps
 
 
+def source_bytes(entry: dict) -> bytes:
+    """A variant's source picture as uploaded to Kontext. `source_turn` (degrees) turns it first:
+    the ships' pilots (DESIGN.md §23.4) are drawn upright by Kontext, so turning the ship 180
+    degrees puts the pilot's head towards its tail; the variant then records `facing` "down"."""
+    path = MASTERS / f"{entry['source']}_raw.png"
+    if not entry.get("source_turn"):
+        return path.read_bytes()
+    buf = io.BytesIO()
+    Image.open(path).rotate(entry["source_turn"], expand=True).save(buf, "PNG")
+    return buf.getvalue()
+
+
 def render_sprite(client: ComfyClient, ref: str, entry: dict, seed: int) -> tuple[Image.Image, Image.Image]:
     """(cut-out, raw) for a sprite. A background (`size` set) has no cut-out: both are the picture.
     A building (`sketch` set) is Kontext's edit of its block sketch (pipeline.json `buildings`);
@@ -223,9 +235,9 @@ def cmd_variant_candidates(only: list[str] | None) -> None:
     SHEETS.mkdir(parents=True, exist_ok=True)
     uploads = {}
     for entry in pending:
-        source = entry["source"]
+        source = entry["source"] + (f"_turn{entry['source_turn']}" if entry.get("source_turn") else "")
         if source not in uploads:
-            uploads[source] = client.upload_image((MASTERS / f"{source}_raw.png").read_bytes(), f"vr_src_{source}.png")
+            uploads[source] = client.upload_image(source_bytes(entry), f"vr_src_{source}.png")
         cells = []
         for seed in entry.get("candidate_seeds", manifest["candidate_seeds"]):
             path = CANDIDATES / f"{entry['id']}_s{seed}.png"
@@ -315,7 +327,8 @@ def cmd_build(only: list[str] | None, force: bool) -> None:
                 print(f"  {entry['id']}: source {entry['source']} has no master yet, skipped")
                 continue
             c = comfy()
-            uploaded = c.upload_image(source_raw.read_bytes(), f"vr_src_{entry['source']}.png")
+            turn = f"_turn{entry['source_turn']}" if entry.get("source_turn") else ""
+            uploaded = c.upload_image(source_bytes(entry), f"vr_src_{entry['source']}{turn}.png")
             images = c.run(recipe.variant_graph(uploaded, entry["instruction"], entry["seed"], prefix="vr_variant"))
             Image.open(io.BytesIO(images["save_cutout"][0])).convert("RGBA").save(master)
             Image.open(io.BytesIO(images["save"][0])).convert("RGB").save(MASTERS / f"{entry['id']}_raw.png")

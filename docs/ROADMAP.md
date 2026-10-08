@@ -380,11 +380,12 @@ The user chose these on 2026-10-07:
   - The Hangar and title layouts.
   - Everything is in `docs/mockups/space/` and `docs/mockups/space_0N_layout.png`.
 - **Gate B: art and sound** (done 2026-10-08; DESIGN §23.6). Every seed was picked by the user.
-  The Rocket Armchair and Space Whale became the Star Surfer and Star Freighter.
+  The Rocket Armchair and Space Whale became the Star Surfer and Star Freighter; the Star Surfer
+  then became the Star Glider, the one ship whose pilot could not sit convincingly.
   - Nine ships, their paints and cards.
   - Space theme tiles.
   - Planets, a station, asteroids, gumballs and the comet.
-  - Space-helmet drivers.
+  - Pilots baked into the ships' cockpits (Kontext edits; the overlay drivers looked stuck on top).
   - Engine, comet, bonk and horn sounds, picked by ear.
   - Two music pieces.
   - The cup icon and stickers.

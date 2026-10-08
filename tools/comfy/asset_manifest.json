@@ -2016,9 +2016,9 @@
         128,
         72
       ],
-      "out": "art/ships/fighter.png",
+      "out": "art/ships/empty/fighter.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "ship_pod",
@@ -2029,9 +2029,9 @@
         128,
         72
       ],
-      "out": "art/ships/pod.png",
+      "out": "art/ships/empty/pod.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "ship_saucer",
@@ -2042,9 +2042,9 @@
         128,
         72
       ],
-      "out": "art/ships/saucer.png",
+      "out": "art/ships/empty/saucer.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "ship_cardboard",
@@ -2055,9 +2055,9 @@
         128,
         72
       ],
-      "out": "art/ships/cardboard_rocket.png",
+      "out": "art/ships/empty/cardboard_rocket.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Second prompt: round 1 (seeds 11-14) came out photographic (real cardboard). Picked by the user 2026-10-08.",
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Second prompt: round 1 (seeds 11-14) came out photographic (real cardboard). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08).",
       "candidate_seeds": [
         15,
         16,
@@ -2074,9 +2074,9 @@
         128,
         72
       ],
-      "out": "art/ships/space_taxi.png",
+      "out": "art/ships/empty/space_taxi.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "ship_teacup",
@@ -2087,9 +2087,9 @@
         128,
         72
       ],
-      "out": "art/ships/teacup_saucer.png",
+      "out": "art/ships/empty/teacup_saucer.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Second prompt: round 1 (seeds 11-14) came out full of realistic tea, no rockets. Picked by the user 2026-10-08.",
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Second prompt: round 1 (seeds 11-14) came out full of realistic tea, no rockets. Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08).",
       "candidate_seeds": [
         15,
         16,
@@ -2106,9 +2106,9 @@
         128,
         72
       ],
-      "out": "art/ships/comet_racer.png",
+      "out": "art/ships/empty/comet_racer.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "space_asteroid",
@@ -2533,27 +2533,6 @@
       ]
     },
     {
-      "id": "ship_surfer",
-      "subject": "a chunky toy space hover surfboard, smooth matte clay toy, seen from straight above as a flat lay map icon, only its top visible, no side view: a long rounded teal and white surfboard with a yellow lightning stripe down the middle, an empty standing spot with two round foot pads near the middle, two small silver rocket nozzles with orange flames at the back end, its pointed nose at the top, perfectly symmetrical",
-      "seed": 11,
-      "facing": "up",
-      "box": [
-        128,
-        72
-      ],
-      "out": "art/ships/star_surfer.png",
-      "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4): Star Surfer, the slidiest; the driver stands on it. Replaced the Rocket Armchair on 2026-10-08 (the user: it did not fit in space). Picked by the user 2026-10-08.",
-      "candidate_seeds": [
-        11,
-        12,
-        13,
-        14,
-        15,
-        16
-      ]
-    },
-    {
       "id": "ship_freighter",
       "subject": "a big chunky toy cargo spaceship, smooth matte clay toy, seen from straight above as a flat lay map icon, only its top visible, no side view: a long wide grey body with rows of stacked red, blue, yellow and green cargo containers on its flat back, a small cockpit with dark windows at the front, four round orange engine nozzles at the back, pointing straight up, perfectly symmetrical",
       "seed": 16,
@@ -2573,6 +2552,27 @@
         15,
         16
       ]
+    },
+    {
+      "id": "ship_glider",
+      "subject": "a chunky toy star-shaped space glider, smooth matte clay toy, seen from straight above as a flat lay map icon, only its top visible, no side view: a wide flat five-pointed star body in teal with white edges and little yellow lights on the tips, one point at the front, an empty clear glass bubble cockpit in the middle, two small round rocket nozzles at the back between the two lower points, pointing straight up, perfectly symmetrical",
+      "seed": 15,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/empty/star_glider.png",
+      "sheet_ground": "space_navy",
+      "candidate_seeds": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "_note": "Phase 22 ship (DESIGN.md §23.4): Star Glider, the slidiest, floats wide. Replaced the Star Surfer on 2026-10-08: no try put a pilot on the open board convincingly (lying, front-on, or side-on boards). Its out is the EMPTY ship; the race body is ship_glider_pilot. Picked by the user 2026-10-08 (seed 15)."
     }
   ],
   "variants": [
@@ -2798,6 +2798,182 @@
         13,
         14
       ]
+    },
+    {
+      "id": "ship_fighter_pilot",
+      "source": "ship_fighter",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/fighter.png",
+      "seed": 26,
+      "instruction": "Put one small cute toy child astronaut sitting in the glass cockpit bubble of this spaceship, seen exactly from straight above so only the top of a round clear glass space helmet and the shoulders of a bright red space suit show, small enough to fit inside, as if really sitting in it. Keep the spaceship, its colours, its shape, the view from directly above and the plain white background exactly the same.",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "source_turn": 180,
+      "facing": "down"
+    },
+    {
+      "id": "ship_pod_pilot",
+      "source": "ship_pod",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/pod.png",
+      "seed": 26,
+      "instruction": "Put one small cute toy child astronaut sitting in the glass canopy of this spaceship, seen exactly from straight above so only the top of a round clear glass space helmet and the shoulders of a sunny yellow space suit show, small enough to fit inside, as if really sitting in it. Keep the spaceship, its colours, its shape, the view from directly above and the plain white background exactly the same.",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "source_turn": 180,
+      "facing": "down"
+    },
+    {
+      "id": "ship_saucer_pilot",
+      "source": "ship_saucer",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/saucer.png",
+      "seed": 24,
+      "instruction": "Put one small cute toy child astronaut sitting in the glass dome in the middle of this spaceship, seen exactly from straight above so only the top of a round clear glass space helmet and the shoulders of a golden yellow space suit show, small enough to fit inside, as if really sitting in it. Keep the spaceship, its colours, its shape, the view from directly above and the plain white background exactly the same.",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "source_turn": 180,
+      "facing": "down"
+    },
+    {
+      "id": "ship_cardboard_pilot",
+      "source": "ship_cardboard",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/cardboard_rocket.png",
+      "seed": 35,
+      "instruction": "Put one small cute toy child astronaut sitting on the seat inside the open box in the middle of this rocket, below the rim of the box, seen exactly from straight above so only the top of a round clear glass space helmet and the shoulders of a light brown space suit show, small enough to fit inside the box. Keep the rocket, its colours, its shape, the view from directly above and the plain white background exactly the same.",
+      "candidate_seeds": [
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose. Round 3 (seeds 31-36): round 2 put the pilot outside, at the tail, on every seed.",
+      "source_turn": 180,
+      "facing": "down"
+    },
+    {
+      "id": "ship_taxi_pilot",
+      "source": "ship_taxi",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/space_taxi.png",
+      "seed": 25,
+      "instruction": "Put one small cute toy child astronaut sitting in the glass bubble roof of this spaceship, seen exactly from straight above so only the top of a round clear glass space helmet and the shoulders of a sunny yellow space suit show, small enough to fit inside, as if really sitting in it. Keep the spaceship, its colours, its shape, the view from directly above and the plain white background exactly the same.",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "source_turn": 180,
+      "facing": "down"
+    },
+    {
+      "id": "ship_teacup_pilot",
+      "source": "ship_teacup",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/teacup_saucer.png",
+      "seed": 26,
+      "instruction": "Put one small cute toy child astronaut sitting in the cup of this spaceship, seen exactly from straight above so only the top of a round clear glass space helmet and the shoulders of a white space suit show, small enough to fit inside, as if really sitting in it. Keep the spaceship, its colours, its shape, the view from directly above and the plain white background exactly the same.",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "source_turn": 180,
+      "facing": "down"
+    },
+    {
+      "id": "ship_comet_pilot",
+      "source": "ship_comet",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/comet_racer.png",
+      "seed": 23,
+      "instruction": "Put one small cute toy child astronaut sitting in the glass canopy of this spaceship, seen exactly from straight above so only the top of a round clear glass space helmet and the shoulders of a purple space suit show, small enough to fit inside, as if really sitting in it. Keep the spaceship, its colours, its shape, the view from directly above and the plain white background exactly the same.",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "source_turn": 180,
+      "facing": "down"
+    },
+    {
+      "id": "ship_glider_pilot",
+      "source": "ship_glider",
+      "source_turn": 180,
+      "facing": "down",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/star_glider.png",
+      "seed": 26,
+      "instruction": "Put one small cute toy child astronaut sitting in the glass bubble cockpit of this spaceship, seen exactly from straight above so only the top of a round clear glass space helmet and the shoulders of a teal space suit show, small enough to fit inside, as if really sitting in it. Keep the spaceship, its colours, its shape, the view from directly above and the plain white background exactly the same.",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Turned like the other pilots (source_turn 180, faces DOWN)."
     }
   ],
   "copies": [
@@ -3013,7 +3189,7 @@
     },
     {
       "id": "card_ship_fighter",
-      "source": "ship_fighter",
+      "source": "ship_fighter_pilot",
       "box": [
         312,
         190
@@ -3023,7 +3199,7 @@
     },
     {
       "id": "card_ship_pod",
-      "source": "ship_pod",
+      "source": "ship_pod_pilot",
       "box": [
         312,
         190
@@ -3033,7 +3209,7 @@
     },
     {
       "id": "card_ship_saucer",
-      "source": "ship_saucer",
+      "source": "ship_saucer_pilot",
       "box": [
         312,
         190
@@ -3043,7 +3219,7 @@
     },
     {
       "id": "card_ship_cardboard",
-      "source": "ship_cardboard",
+      "source": "ship_cardboard_pilot",
       "box": [
         312,
         190
@@ -3053,7 +3229,7 @@
     },
     {
       "id": "card_ship_taxi",
-      "source": "ship_taxi",
+      "source": "ship_taxi_pilot",
       "box": [
         312,
         190
@@ -3063,7 +3239,7 @@
     },
     {
       "id": "card_ship_teacup",
-      "source": "ship_teacup",
+      "source": "ship_teacup_pilot",
       "box": [
         312,
         190
@@ -3073,22 +3249,12 @@
     },
     {
       "id": "card_ship_comet",
-      "source": "ship_comet",
+      "source": "ship_comet_pilot",
       "box": [
         312,
         190
       ],
       "out": "art/ui/cards/ships/comet_racer.png",
-      "_note": "Hangar card: the ship as designed."
-    },
-    {
-      "id": "card_ship_surfer",
-      "source": "ship_surfer",
-      "box": [
-        312,
-        190
-      ],
-      "out": "art/ui/cards/ships/star_surfer.png",
       "_note": "Hangar card: the ship as designed."
     },
     {
@@ -3099,6 +3265,16 @@
         190
       ],
       "out": "art/ui/cards/ships/star_freighter.png",
+      "_note": "Hangar card: the ship as designed."
+    },
+    {
+      "id": "card_ship_glider",
+      "source": "ship_glider_pilot",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/star_glider.png",
       "_note": "Hangar card: the ship as designed."
     }
   ],
@@ -3177,8 +3353,8 @@
       "jetski_yellow": "boat_jetski",
       "duck_yellow": "boat_duck",
       "banana_boat_yellow": "boat_banana",
-      "pod_yellow": "ship_pod",
-      "space_taxi_yellow": "ship_taxi"
+      "pod_yellow": "ship_pod_pilot",
+      "space_taxi_yellow": "ship_taxi_pilot"
     },
     "seeds": {},
     "boats": {
@@ -3213,15 +3389,15 @@
       }
     },
     "ships": {
-      "fighter": "ship_fighter",
-      "pod": "ship_pod",
-      "saucer": "ship_saucer",
-      "cardboard_rocket": "ship_cardboard",
-      "space_taxi": "ship_taxi",
-      "teacup_saucer": "ship_teacup",
-      "comet_racer": "ship_comet",
-      "star_surfer": "ship_surfer",
-      "star_freighter": "ship_freighter"
+      "fighter": "ship_fighter_pilot",
+      "pod": "ship_pod_pilot",
+      "saucer": "ship_saucer_pilot",
+      "cardboard_rocket": "ship_cardboard_pilot",
+      "space_taxi": "ship_taxi_pilot",
+      "teacup_saucer": "ship_teacup_pilot",
+      "comet_racer": "ship_comet_pilot",
+      "star_freighter": "ship_freighter",
+      "star_glider": "ship_glider_pilot"
     }
   },
   "wheel_overrides": {
