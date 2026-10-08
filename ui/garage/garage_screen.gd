@@ -18,7 +18,7 @@ const COLUMNS := 3
 const SWATCH := 44
 const YELLOW := Color(1, 0.824, 0.247)
 ## The garage in each kind's colours and words: the Boat Dock (docs/DESIGN.md §20.5) and the
-## Hangar (§23.5). Cars use the scene as it is.
+## Hangar (§24.5). Cars use the scene as it is.
 const LOOKS := {
 	&"boat": {"title": "BOAT DOCK", "background": Color(0.063, 0.165, 0.227), "slide": "GLIDE", "race": "SAIL!"},
 	&"ship": {"title": "HANGAR", "background": Color(0.102, 0.094, 0.22), "slide": "FLOAT", "race": "FLY!"},

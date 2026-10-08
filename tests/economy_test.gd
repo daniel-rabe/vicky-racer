@@ -79,7 +79,7 @@ func _test_fresh_profile() -> void:
 	var m := _manager()
 	_check(m.profile.coins == 0, "starts with 0 coins")
 	# The Starter car, the Speedboat for racing on water and the Star Fighter for space
-	# (docs/DESIGN.md §20, §23).
+	# (docs/DESIGN.md §20, §24).
 	_check(m.owns(&"starter") and m.owns(&"speedboat") and m.owns(&"fighter") and m.profile.owned_setups.size() == 3,
 		"owns only the Starter car, the Speedboat and the Star Fighter")
 	_check(m.profile.equipped_setup == &"starter", "Starter equipped")

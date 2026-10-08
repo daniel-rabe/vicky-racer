@@ -1,4 +1,4 @@
-"""Look probe for the space courses (docs/DESIGN.md §23), drawn before any game code exists.
+"""Look probe for the space courses (docs/DESIGN.md §24), drawn before any game code exists.
 
     python tools/layouts/space_probe.py
 

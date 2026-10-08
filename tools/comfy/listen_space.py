@@ -1,4 +1,4 @@
-"""Listening page for the Phase 22 space sounds and music (DESIGN.md §23.6).
+"""Listening page for the Phase 22 space sounds and music (DESIGN.md §24.6).
 
     python tools/comfy/listen_space.py
 

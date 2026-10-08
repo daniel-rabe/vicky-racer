@@ -18,7 +18,7 @@ const SWATCHES := {
 }
 
 
-## Where each kind keeps its painted race bodies and cards (docs/DESIGN.md §20.4, §23.4).
+## Where each kind keeps its painted race bodies and cards (docs/DESIGN.md §20.4, §24.4).
 const BODIES := {&"car": "res://art/cars/paint/%s_%s.png", &"boat": "res://art/boats/paint/%s_%s.png",
 	&"ship": "res://art/ships/paint/%s_%s.png"}
 const CARDS := {&"car": "res://art/ui/cards/paint/%s_%s.png", &"boat": "res://art/ui/cards/boats/paint/%s_%s.png",

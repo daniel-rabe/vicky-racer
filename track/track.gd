@@ -30,7 +30,7 @@ extends Node2D
 ## the stretch of lap the branch bypasses, in proportion, so laps, places and the minimap
 ## need nothing new. The finish and the checkpoint never lie on a bypassed stretch.
 ##
-## A space course (docs/DESIGN.md §23) works the same way: its road is a glowing star lane, it
+## A space course (docs/DESIGN.md §24) works the same way: its road is a glowing star lane, it
 ## has branches, and its asteroids, comets and station tunnels are children the builder adds.
 
 signal finish_crossed(car: Car)
@@ -56,6 +56,8 @@ const SURFACES := {
 	&"crater": {"speed_mult": 0.45, "grip_mult": 0.45},
 	# Free Drive's pond (town/town.gd): wade through slowly, with a splash.
 	&"water": {"speed_mult": 0.45, "grip_mult": 0.5},
+	# Free Drive's puddles when it rains (docs/DESIGN.md §23): full speed, slippery, a splash.
+	&"puddle": {"speed_mult": 1.0, "grip_mult": 0.5},
 	# Boat courses (docs/DESIGN.md §20.2). The channel is deep water at full speed; off it, each
 	# theme's shallows hold a boat back a little, and banks more (a hovercraft skims them all).
 	&"deep_water": {"speed_mult": 1.0, "grip_mult": 1.0},
@@ -64,7 +66,7 @@ const SURFACES := {
 	&"lagoon_water": {"speed_mult": 0.6, "grip_mult": 0.8},
 	&"lemonade": {"speed_mult": 0.6, "grip_mult": 0.8},
 	&"sandbank": {"speed_mult": 0.35, "grip_mult": 0.6},
-	# Space courses (docs/DESIGN.md §23.2). The star lane is full speed; off it, every theme's
+	# Space courses (docs/DESIGN.md §24.2). The star lane is full speed; off it, every theme's
 	# starry dust holds a ship back a little, and the clouds (the moon, ring dust, a nebula,
 	# cotton candy) more.
 	&"star_lane": {"speed_mult": 1.0, "grip_mult": 1.0},

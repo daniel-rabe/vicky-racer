@@ -1,5 +1,5 @@
 extends "res://actors/car/car_audio.gd"
-## A spaceship's sounds (docs/DESIGN.md §23.6): its engine (the setup's engine_sound: a
+## A spaceship's sounds (docs/DESIGN.md §24.6): its engine (the setup's engine_sound: a
 ## thruster, a saucer's warble, a homemade rocket's fizz) pitched by speed as a car's is; no
 ## tyres, so nothing squeals in a slide; a soft rubbery bonk on an asteroid, the edge or
 ## another ship; and a twinkle when a comet brushes past.

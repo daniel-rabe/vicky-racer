@@ -11,7 +11,7 @@ extends Sprite2D
 ## between samples.
 
 const FADE_SECONDS := 0.4
-## Where a lap's setup may live: a car, a boat (docs/DESIGN.md §20) or a ship (§23).
+## Where a lap's setup may live: a car, a boat (docs/DESIGN.md §20) or a ship (§24).
 const SETUP_DIRS: Array[String] = ["res://game/configs/setups/", "res://game/configs/boats/",
 	"res://game/configs/ships/"]
 

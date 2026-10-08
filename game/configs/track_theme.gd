@@ -32,7 +32,7 @@ extends Resource
 @export var music_takes: Array[MusicPiece] = []
 
 @export_group("Space (space courses)")
-## A space course (docs/DESIGN.md §23): `asphalt` is the star lane and `kerb` its beacon lights;
+## A space course (docs/DESIGN.md §24): `asphalt` is the star lane and `kerb` its beacon lights;
 ## the lane gets a soft glow along its edge instead of the road's dark outline, and no lane dashes.
 ## `road_surface` is then the star lane.
 @export var space := false

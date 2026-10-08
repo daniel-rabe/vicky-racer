@@ -1,5 +1,5 @@
 extends Node
-## Headless checks for the spaceships and space courses (docs/DESIGN.md §23).
+## Headless checks for the spaceships and space courses (docs/DESIGN.md §24).
 ##   Godot_console.exe --path . --headless --fixed-fps 60 res://tests/space_test.tscn
 ## Exit code 0 = all passed. Uses its own save file, never the player's.
 ##

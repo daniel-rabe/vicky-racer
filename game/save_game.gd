@@ -13,7 +13,7 @@ const DEFAULT_PATH := "user://vicky_racer.cfg"
 ## as they are and are written back as the current version.
 ## 4 added the boats (docs/DESIGN.md §20): the equipped boat and the selected boat course;
 ## older files load with the Speedboat owned and the first course selected.
-## 5 added the spaceships (docs/DESIGN.md §23): the equipped ship and the selected space course;
+## 5 added the spaceships (docs/DESIGN.md §24): the equipped ship and the selected space course;
 ## older files load with the Star Fighter owned and the first space course selected.
 const SCHEMA_VERSION := 5
 const READABLE_VERSIONS: Array[int] = [1, 2, 3, 4, 5]

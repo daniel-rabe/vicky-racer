@@ -200,7 +200,7 @@ func _test_every_track_and_all_cars() -> void:
 	_check(_count(&"all_cars") == 1, "buying the last car earns CAR COLLECTOR")
 
 
-## A race finished in a boat, then in a ship (docs/DESIGN.md §20, §23); the boat and space cups won.
+## A race finished in a boat, then in a ship (docs/DESIGN.md §20, §24); the boat and space cups won.
 func _test_boat_and_space_stickers() -> void:
 	print("boats and spaceships")
 	for pair in [[BOAT_SCENE, &"first_splash"], [SHIP_SCENE, &"first_flight"]]:

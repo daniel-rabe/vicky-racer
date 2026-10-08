@@ -33,6 +33,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 20 | Boats: racing on water | A second racing game with its own boats, courses and cup | L |
 | 21 | The island: harbour and ocean in Free Drive | Take the boat out from the town, round the island | M |
 | 22 | Space: racing among the stars | A third racing game with spaceships, asteroids and comets | L |
+| 23 | Free Drive: more to do | Things to play with and small jobs in the town | M |
 
 ---
 
@@ -358,7 +359,7 @@ The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats a
 
 ## Phase 22 — Space: racing among the stars ✅ done
 
-A third racing game beside the cars and the boats (DESIGN.md §23), asked for on 2026-10-07. It
+A third racing game beside the cars and the boats (DESIGN.md §24), asked for on 2026-10-07. It
 is a full parallel mode like the boats: a SPACE button on the title, its own **Hangar** of nine
 spaceships with paint jobs, four space courses, the **Comet Cup**, 2 PLAYERS and time trial.
 Coins and stickers are shared.
@@ -371,7 +372,7 @@ The user chose these on 2026-10-07:
   space station, and a candy galaxy.
 
 - **Gate A: design and mockups** (approved 2026-10-07):
-  - DESIGN §23.
+  - DESIGN §24.
   - Four course layouts, `space_01`–`space_04`, drawn by `track_layout.py` from four new space
     themes. Each has two alternative paths, drifting asteroids, comets and, on Nebula Station,
     station tunnels.
@@ -379,7 +380,7 @@ The user chose these on 2026-10-07:
   - The look probe and theme sheet, drawn by `space_probe.py`.
   - The Hangar and title layouts.
   - Everything is in `docs/mockups/space/` and `docs/mockups/space_0N_layout.png`.
-- **Gate B: art and sound** (done 2026-10-08; DESIGN §23.6). Every seed was picked by the user.
+- **Gate B: art and sound** (done 2026-10-08; DESIGN §24.6). Every seed was picked by the user.
   The Rocket Armchair and Space Whale became the Star Surfer and Star Freighter; the Star Surfer
   then became the Star Glider, the one ship whose pilot could not sit convincingly.
   - Nine ships, their paints and cards.
@@ -389,7 +390,7 @@ The user chose these on 2026-10-07:
   - Engine, comet, bonk and horn sounds, picked by ear.
   - Two music pieces.
   - The cup icon and stickers.
-- **Gate C: code** (built 2026-10-08; DESIGN §23.7). The whole suite passes.
+- **Gate C: code** (built 2026-10-08; DESIGN §24.7). The whole suite passes.
   - `Ship extends Boat` (so a Car).
   - A third vehicle kind through the garage, title, join screen and track select.
   - Space surfaces, drifting asteroids, comets and tunnels in the track builder and `Track`.
@@ -397,6 +398,17 @@ The user chose these on 2026-10-07:
   - Save schema 5.
   - `tests/space_test.gd` and the whole suite.
   - A balance pass.
+
+## Phase 23 — Free Drive: more to do 🚧 in progress
+
+Asked for on 2026-10-08: ideas 1, 2, 5–12 and 14 from the Free Drive plan. DESIGN §23.
+
+- **Built (Gate C):** football and goals, beach balls, cones, fountain splash, treats on the
+  roof, the paint shop, deliveries, the lost puppy, the fire engine and bonfires, ramps, the
+  school bus with animal passengers, and rain with puddles, wipers and a rainbow.
+  `tests/town_fun_test.gd` is new.
+- **Open (Gate B):** the paint shop, ice cream and pizza pictures are placeholders; rain, cheer,
+  water spray, fire out and bus bell sounds are still to be picked from seeds.
 
 ---
 
@@ -406,7 +418,7 @@ Not planned, but worth keeping in mind:
 
 
 - **Track editor for the child** — place pieces on a grid and race on it. Delightful but large.
-- **Weather** — rain on any track (puddles = low-grip patches, wipers on the HUD).
+- **Weather on the race tracks** — rain in races too (Free Drive has it since Phase 23).
 - **Collectable coins on the track** — coins lying on the racing line, adding to the payout.
 - **Car customisation beyond paint** — stickers and spoilers on the car itself.
 - **Touch controls** — only if the game ever leaves the PC.

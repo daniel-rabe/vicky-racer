@@ -2018,7 +2018,7 @@
       ],
       "out": "art/ships/empty/fighter.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
+      "_note": "Phase 22 ship (DESIGN.md §24.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "ship_pod",
@@ -2031,7 +2031,7 @@
       ],
       "out": "art/ships/empty/pod.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
+      "_note": "Phase 22 ship (DESIGN.md §24.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "ship_saucer",
@@ -2044,7 +2044,7 @@
       ],
       "out": "art/ships/empty/saucer.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
+      "_note": "Phase 22 ship (DESIGN.md §24.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "ship_cardboard",
@@ -2057,7 +2057,7 @@
       ],
       "out": "art/ships/empty/cardboard_rocket.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Second prompt: round 1 (seeds 11-14) came out photographic (real cardboard). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08).",
+      "_note": "Phase 22 ship (DESIGN.md §24.4). Second prompt: round 1 (seeds 11-14) came out photographic (real cardboard). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08).",
       "candidate_seeds": [
         15,
         16,
@@ -2076,7 +2076,7 @@
       ],
       "out": "art/ships/empty/space_taxi.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
+      "_note": "Phase 22 ship (DESIGN.md §24.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "ship_teacup",
@@ -2089,7 +2089,7 @@
       ],
       "out": "art/ships/empty/teacup_saucer.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Second prompt: round 1 (seeds 11-14) came out full of realistic tea, no rockets. Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08).",
+      "_note": "Phase 22 ship (DESIGN.md §24.4). Second prompt: round 1 (seeds 11-14) came out full of realistic tea, no rockets. Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08).",
       "candidate_seeds": [
         15,
         16,
@@ -2108,7 +2108,7 @@
       ],
       "out": "art/ships/empty/comet_racer.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
+      "_note": "Phase 22 ship (DESIGN.md §24.4). Picked by the user 2026-10-08. Its out is the EMPTY ship (art/ships/empty/); the race body is ship_*_pilot, the Kontext edit with the astronaut baked in (2026-10-08)."
     },
     {
       "id": "space_asteroid",
@@ -2121,7 +2121,7 @@
       ],
       "out": "art/props/space/asteroid.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08."
     },
     {
       "id": "space_gumball",
@@ -2134,7 +2134,7 @@
       ],
       "out": "art/props/space/gumball.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08."
     },
     {
       "id": "space_moon_base",
@@ -2147,7 +2147,7 @@
       ],
       "out": "art/props/space/moon_base.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08."
     },
     {
       "id": "space_ringed_planet",
@@ -2160,7 +2160,7 @@
       ],
       "out": "art/props/space/ringed_planet.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08 (seed 12): a three-quarter picture-book view, so it is never rotated, like the island's sailboat."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08 (seed 12): a three-quarter picture-book view, so it is never rotated, like the island's sailboat."
     },
     {
       "id": "space_little_moon",
@@ -2173,7 +2173,7 @@
       ],
       "out": "art/props/space/little_moon.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08."
     },
     {
       "id": "space_station",
@@ -2186,7 +2186,7 @@
       ],
       "out": "art/props/space/station.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08."
     },
     {
       "id": "space_tunnel",
@@ -2199,7 +2199,7 @@
       ],
       "out": "art/props/space/tunnel.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08."
     },
     {
       "id": "space_solar_panel",
@@ -2212,7 +2212,7 @@
       ],
       "out": "art/props/space/solar_panel.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08."
     },
     {
       "id": "space_lollipop_planet",
@@ -2225,7 +2225,7 @@
       ],
       "out": "art/props/space/lollipop_planet.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08."
     },
     {
       "id": "space_comet",
@@ -2238,7 +2238,7 @@
       ],
       "out": "art/props/space/comet.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08 (seed 12). Drawn diagonally: head at the top right, tail to the bottom left, so it faces UP_RIGHT."
+      "_note": "Phase 22 space-course prop (DESIGN.md §24.2). Picked by the user 2026-10-08 (seed 12). Drawn diagonally: head at the top right, tail to the bottom left, so it faces UP_RIGHT."
     },
     {
       "id": "cup_comet",
@@ -2323,7 +2323,7 @@
       ],
       "out": "art/drivers/space/vicky.png",
       "sheet_ground": "space_navy",
-      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "_note": "Driver (DESIGN.md §22, §24.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
       "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, blond hair inside it, sitting on a bright red collar ring, small rounded shoulders in a bright red space suit either side, two short arms reaching forward, plain white background",
       "sketch": {
         "hat": [
@@ -2367,7 +2367,7 @@
       ],
       "out": "art/drivers/space/p2.png",
       "sheet_ground": "space_navy",
-      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "_note": "Driver (DESIGN.md §22, §24.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
       "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, curly dark brown hair inside it, sitting on a purple collar ring, small rounded shoulders in a purple space suit either side, two short arms reaching forward, plain white background",
       "sketch": {
         "hat": [
@@ -2411,7 +2411,7 @@
       ],
       "out": "art/drivers/space/blue.png",
       "sheet_ground": "space_navy",
-      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "_note": "Driver (DESIGN.md §22, §24.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
       "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, short black hair inside it, sitting on a bright blue collar ring, small rounded shoulders in a bright blue space suit either side, two short arms reaching forward, plain white background",
       "sketch": {
         "hat": [
@@ -2455,7 +2455,7 @@
       ],
       "out": "art/drivers/space/yellow.png",
       "sheet_ground": "space_navy",
-      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "_note": "Driver (DESIGN.md §22, §24.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
       "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, dark brown hair with two little pigtails inside it, sitting on a sunny yellow collar ring, small rounded shoulders in a sunny yellow space suit either side, two short arms reaching forward, plain white background",
       "sketch": {
         "hat": [
@@ -2499,7 +2499,7 @@
       ],
       "out": "art/drivers/space/green.png",
       "sheet_ground": "space_navy",
-      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "_note": "Driver (DESIGN.md §22, §24.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
       "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, ginger hair with a little ponytail inside it, sitting on a bright green collar ring, small rounded shoulders in a bright green space suit either side, two short arms reaching forward, plain white background",
       "sketch": {
         "hat": [
@@ -2543,7 +2543,7 @@
       ],
       "out": "art/ships/star_freighter.png",
       "sheet_ground": "space_navy",
-      "_note": "Phase 22 ship (DESIGN.md §23.4): Star Freighter, big and heavy, no driver shown. Replaced the Space Whale on 2026-10-08 (the user: it did not fit in space). Picked by the user 2026-10-08 (seed 16). Faces LEFT as drawn: the green cockpit dome is the front, the engines on the right.",
+      "_note": "Phase 22 ship (DESIGN.md §24.4): Star Freighter, big and heavy, no driver shown. Replaced the Space Whale on 2026-10-08 (the user: it did not fit in space). Picked by the user 2026-10-08 (seed 16). Faces LEFT as drawn: the green cockpit dome is the front, the engines on the right.",
       "candidate_seeds": [
         11,
         12,
@@ -2572,7 +2572,66 @@
         15,
         16
       ],
-      "_note": "Phase 22 ship (DESIGN.md §23.4): Star Glider, the slidiest, floats wide. Replaced the Star Surfer on 2026-10-08: no try put a pilot on the open board convincingly (lying, front-on, or side-on boards). Its out is the EMPTY ship; the race body is ship_glider_pilot. Picked by the user 2026-10-08 (seed 15)."
+      "_note": "Phase 22 ship (DESIGN.md §24.4): Star Glider, the slidiest, floats wide. Replaced the Star Surfer on 2026-10-08: no try put a pilot on the open board convincingly (lying, front-on, or side-on boards). Its out is the EMPTY ship; the race body is ship_glider_pilot. Picked by the user 2026-10-08 (seed 15)."
+    },
+    {
+      "id": "paint_shop",
+      "subject": "paint shop",
+      "details": "a roof seen from above striped in rainbow colours with giant paint pots and a big paint brush lying on it, the cream front wall below with one wide open drive-in spray booth, colourful paint splashes on the wall, spray cans on a shelf",
+      "seed": null,
+      "facing": null,
+      "box": [
+        480,
+        430
+      ],
+      "out": "art/town/buildings/paint_shop.png",
+      "sketch": {
+        "width": 0.62,
+        "roof": 0.32,
+        "wall": 0.24,
+        "roof_colour": [
+          240,
+          120,
+          170
+        ],
+        "wall_colour": [
+          252,
+          232,
+          190
+        ],
+        "front": "garages",
+        "count": 1,
+        "door_colour": [
+          150,
+          200,
+          240
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings). Phase 23 (DESIGN.md §23): Gate B, not picked yet. A flat stand-in from tools/layouts/town_placeholders.py is in the game until then."
+    },
+    {
+      "id": "ice_cream_cone",
+      "subject": "an ice cream cone with two round scoops, pink strawberry and vanilla, with a cherry on top, a crisp waffle cone, lying flat, seen from directly above, flat lay",
+      "seed": null,
+      "facing": null,
+      "box": [
+        96,
+        96
+      ],
+      "out": "art/town/treats/ice_cream_cone.png",
+      "_note": "The ice cream parlour's treat, riding on the car's roof. Phase 23 (DESIGN.md §23): Gate B, not picked yet. A flat stand-in from tools/layouts/town_placeholders.py is in the game until then."
+    },
+    {
+      "id": "pizza",
+      "subject": "a whole round pizza with tomato, melted cheese and pepperoni slices seen from directly above, flat lay",
+      "seed": null,
+      "facing": null,
+      "box": [
+        96,
+        96
+      ],
+      "out": "art/town/treats/pizza.png",
+      "_note": "The pizza place's delivery, riding on the car's roof. Phase 23 (DESIGN.md §23): Gate B, not picked yet. A flat stand-in from tools/layouts/town_placeholders.py is in the game until then."
     }
   ],
   "variants": [
@@ -2817,7 +2876,7 @@
         25,
         26
       ],
-      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "_note": "Phase 22 (DESIGN.md §24.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
       "source_turn": 180,
       "facing": "down"
     },
@@ -2839,7 +2898,7 @@
         25,
         26
       ],
-      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "_note": "Phase 22 (DESIGN.md §24.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
       "source_turn": 180,
       "facing": "down"
     },
@@ -2861,7 +2920,7 @@
         25,
         26
       ],
-      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "_note": "Phase 22 (DESIGN.md §24.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
       "source_turn": 180,
       "facing": "down"
     },
@@ -2883,7 +2942,7 @@
         35,
         36
       ],
-      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose. Round 3 (seeds 31-36): round 2 put the pilot outside, at the tail, on every seed.",
+      "_note": "Phase 22 (DESIGN.md §24.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose. Round 3 (seeds 31-36): round 2 put the pilot outside, at the tail, on every seed.",
       "source_turn": 180,
       "facing": "down"
     },
@@ -2905,7 +2964,7 @@
         25,
         26
       ],
-      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "_note": "Phase 22 (DESIGN.md §24.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
       "source_turn": 180,
       "facing": "down"
     },
@@ -2927,7 +2986,7 @@
         25,
         26
       ],
-      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "_note": "Phase 22 (DESIGN.md §24.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
       "source_turn": 180,
       "facing": "down"
     },
@@ -2949,7 +3008,7 @@
         25,
         26
       ],
-      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
+      "_note": "Phase 22 (DESIGN.md §24.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Round 2: the user wanted the pilots turned 180 degrees (head towards the tail), so the ship is turned 180 degrees before the edit (source_turn) and the result faces DOWN. Round 1 (seeds 11-16) had the head towards the nose.",
       "source_turn": 180,
       "facing": "down"
     },
@@ -2973,7 +3032,7 @@
         25,
         26
       ],
-      "_note": "Phase 22 (DESIGN.md §23.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Turned like the other pilots (source_turn 180, faces DOWN)."
+      "_note": "Phase 22 (DESIGN.md §24.4): the race body with its pilot baked in, the user's choice 2026-10-08 after the overlay drivers looked stuck on top. One astronaut per ship; the paint jobs are recoloured from this, so the suit follows the paint. Turned like the other pilots (source_turn 180, faces DOWN)."
     }
   ],
   "copies": [

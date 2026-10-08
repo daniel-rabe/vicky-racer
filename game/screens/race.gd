@@ -181,7 +181,7 @@ func _on_race_over() -> void:
 
 
 ## Quietly under the race: small waves lapping on a boat course (docs/DESIGN.md §20.6), a soft
-## hum of space on a space course (§23.6).
+## hum of space on a space course (§24.6).
 func _add_ambience(player_name: StringName, stream: AudioStream) -> void:
 	if not SoundManager.audible():
 		return

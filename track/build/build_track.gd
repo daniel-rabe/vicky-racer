@@ -58,7 +58,7 @@ const PROPS := {
 	"ice_cube": ["res://art/props/water/ice_cube.png", 40.0],
 	"cocktail_umbrella": [["res://art/props/water/cocktail_umbrella_1.png",
 		"res://art/props/water/cocktail_umbrella_2.png"], 58.0],
-	# Space courses (docs/DESIGN.md §23). Everything is a soft bumper; the planets and the
+	# Space courses (docs/DESIGN.md §24). Everything is a soft bumper; the planets and the
 	# station stand inside the loops, so a ship cutting across bounces off.
 	"asteroid": ["res://art/props/space/asteroid.png", 56.0],
 	"gumball": ["res://art/props/space/gumball.png", 42.0],
@@ -446,7 +446,7 @@ func _scenery_bridge(at: Vector2, across: float, channel: float, n: int, picture
 	return bridge
 
 
-# --- space courses (docs/DESIGN.md §23) -----------------------------------------------------
+# --- space courses (docs/DESIGN.md §24) -----------------------------------------------------
 
 ## Drifting asteroids, comets and the station's tunnels, as children of the track.
 func _space(data: Dictionary, curve: Curve2D, tile: float) -> void:

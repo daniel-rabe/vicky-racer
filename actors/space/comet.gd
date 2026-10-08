@@ -1,5 +1,5 @@
 extends Node2D
-## A comet crossing a space course (docs/DESIGN.md §23.2), made to be fair to a small child:
+## A comet crossing a space course (docs/DESIGN.md §24.2), made to be fair to a small child:
 ##   1. WARNING seconds before it comes, its path glows on the course as a dashed yellow streak
 ##      and a soft rising chime plays;
 ##   2. it whooshes along the streak with its sparkly tail, in FLIGHT seconds, and is gone;

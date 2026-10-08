@@ -17,7 +17,7 @@ by the fraction of the lap where it crosses ({"upper_at": 0.2, "length_tiles": 1
 the script finds every crossing, centres a bridge span on the chosen pass, and warns about a
 crossing with no bridge, or a gate, pad or ice patch on a bridge or right by a crossing.
 
-A water theme makes a boat course (DESIGN.md §20) and a space theme a space course (§23):
+A water theme makes a boat course (DESIGN.md §20) and a space theme a space course (§24):
 branches, plus currents, ramps and logs on water, or drifting asteroids, comets and station
 tunnels in space.
 """
@@ -55,7 +55,7 @@ PROP_STYLE = {  # kind -> (svg radius, fill, stroke)
     "duck_house": (14, "#E8B04A", "#8A5A2A"), "shipwreck": (24, "#8A5A32", "#3E2614"),
     "treasure_chest": (9, "#C98A2E", "#FFD23F"), "lemon_slice": (12, "#FFE45C", "#FFFFFF"),
     "ice_cube": (10, "#E8F6FF", "#9CCBE6"), "cocktail_umbrella": (12, "#FF5FA2", "#FFFFFF"),
-    # Space courses (DESIGN.md §23): asteroids in the dust are bumpers, the rest is scenery.
+    # Space courses (DESIGN.md §24): asteroids in the dust are bumpers, the rest is scenery.
     "asteroid": (12, "#8C8494", "#4E4858"), "moon_base": (20, "#E6E8EE", "#6C7080"),
     "ringed_planet": (70, "#E8B86A", "#9A6A2A"), "little_moon": (26, "#C8C4D6", "#7A7490"),
     "space_station": (34, "#D8DCE6", "#5A6070"), "solar_panel": (12, "#3A6AC8", "#E6E8EE"),
@@ -173,7 +173,7 @@ def starfield(W, H, seed):
 
 
 def space_course(spec, theme, pts, kerb_runs, W, H, patches, branches=()):
-    """A space course's lane (DESIGN.md §23): stars, a ring of big asteroids at the map edge
+    """A space course's lane (DESIGN.md §24): stars, a ring of big asteroids at the map edge
     (the wall), the theme's clouds, the glowing star lane, and beacon lights on the tight bends."""
     colours = theme["svg"]
     road = spec["road_tiles"]

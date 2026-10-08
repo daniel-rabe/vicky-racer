@@ -443,7 +443,7 @@
       "peak_db": -3.0,
       "out": "art/sfx/thruster_loop.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 101
     },
     {
@@ -455,7 +455,7 @@
       "peak_db": -4.0,
       "out": "art/sfx/saucer_loop.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 103
     },
     {
@@ -467,7 +467,7 @@
       "peak_db": -4.0,
       "out": "art/sfx/rocket_rumble_loop.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 104
     },
     {
@@ -479,7 +479,7 @@
       "peak_db": -12.0,
       "out": "art/sfx/space_ambience.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 104
     },
     {
@@ -491,7 +491,7 @@
       "peak_db": -6.0,
       "out": "art/sfx/comet_chime.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 103
     },
     {
@@ -503,7 +503,7 @@
       "peak_db": -3.0,
       "out": "art/sfx/comet_whoosh.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 101
     },
     {
@@ -515,7 +515,7 @@
       "peak_db": -4.0,
       "out": "art/sfx/asteroid_bonk.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 104
     },
     {
@@ -527,7 +527,7 @@
       "peak_db": -4.0,
       "out": "art/sfx/horn_ship.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 103
     },
     {
@@ -539,7 +539,7 @@
       "peak_db": -4.0,
       "out": "art/sfx/horn_taxi.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 101
     },
     {
@@ -551,7 +551,7 @@
       "peak_db": -4.0,
       "out": "art/sfx/horn_freighter.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6). Was horn_whale until the Space Whale became the Star Freighter (2026-10-08).",
+      "_note": "Phase 22 space (DESIGN.md §24.6). Was horn_whale until the Space Whale became the Star Freighter (2026-10-08).",
       "seed": 102
     },
     {
@@ -563,8 +563,73 @@
       "peak_db": -4.0,
       "out": "art/sfx/horn_teacup.wav",
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 104
+    },
+    {
+      "id": "rain_loop",
+      "prompt": "gentle summer rain falling on a quiet small town street, soft steady patter of raindrops, calm, continuous, field recording",
+      "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, thunder, wind, traffic, engine",
+      "seconds": 12.0,
+      "kind": "loop",
+      "loop_seconds": 8.0,
+      "peak_db": -10.0,
+      "out": "art/sfx/rain_loop.wav",
+      "seed": null,
+      "candidates": 8,
+      "_note": "Phase 23 (DESIGN.md §23): rain in town. Gate B, not picked yet; the rain is silent until then."
+    },
+    {
+      "id": "cheer",
+      "prompt": "a small group of happy young children cheering yay and clapping, short and joyful, close up, clean sound effect",
+      "negative": "music, melody, distortion, clipping, low quality, muffled, adults, crowd noise, stadium",
+      "seconds": 3.0,
+      "kind": "oneshot",
+      "max_seconds": 1.6,
+      "peak_db": -5.0,
+      "out": "art/sfx/cheer.wav",
+      "seed": null,
+      "candidates": 8,
+      "_note": "Phase 23 (DESIGN.md §23): a goal, a delivery, the puppy home. Gate B, not picked yet; the sparkle chime stands in."
+    },
+    {
+      "id": "water_spray",
+      "prompt": "a fire hose spraying a strong jet of water, steady hissing rush of water, close up, continuous, clean sound effect",
+      "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, fire, sirens, rain",
+      "seconds": 6.0,
+      "kind": "loop",
+      "loop_seconds": 3.0,
+      "peak_db": -8.0,
+      "out": "art/sfx/water_spray.wav",
+      "seed": null,
+      "candidates": 8,
+      "_note": "Phase 23 (DESIGN.md §23): the fire engine's hose. Gate B, not picked yet; silent until then."
+    },
+    {
+      "id": "fire_out",
+      "prompt": "a small campfire being put out with water, a short soft sizzle and hiss of steam, close up, clean sound effect",
+      "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, explosion, crackling",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.2,
+      "peak_db": -6.0,
+      "out": "art/sfx/fire_out.wav",
+      "seed": null,
+      "candidates": 8,
+      "_note": "Phase 23 (DESIGN.md §23): a fire put out. Gate B, not picked yet; the splash stands in."
+    },
+    {
+      "id": "bus_bell",
+      "prompt": "a bus stop bell, a single friendly ding ding of a city bus bell, close up, clean sound effect",
+      "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, engine, traffic",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.0,
+      "peak_db": -6.0,
+      "out": "art/sfx/bus_bell.wav",
+      "seed": null,
+      "candidates": 8,
+      "_note": "Phase 23 (DESIGN.md §23): passengers getting on and off. Gate B, not picked yet; the harbour bell stands in."
     }
   ],
   "synth": [

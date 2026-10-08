@@ -12,7 +12,7 @@ const STICKER_DIR := "res://game/configs/stickers/"
 ## Book order.
 const ORDER: Array[StringName] = [&"drift", &"long_drift", &"first_win", &"clean_lap", &"coins",
 	&"every_track", &"all_cars", &"first_splash", &"splash_cup", &"first_flight", &"comet_cup"]
-## A race finished in a boat, or in a spaceship (docs/DESIGN.md §20, §23), and a cup won outright
+## A race finished in a boat, or in a spaceship (docs/DESIGN.md §20, §24), and a cup won outright
 ## in one, earn these.
 const FIRST_RACE_IN := {&"boat": &"first_splash", &"ship": &"first_flight"}
 const CUP_WON := {&"splash": &"splash_cup", &"comet": &"comet_cup"}

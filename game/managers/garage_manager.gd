@@ -7,7 +7,7 @@ extends Node
 ## PRO_equip_requested in, PRO_state_changed (the whole state) and feedback signals out.
 ## Every change is saved straight away.
 ##
-## Cars, boats and spaceships (docs/DESIGN.md §20, §23): one wallet, one list of what is owned,
+## Cars, boats and spaceships (docs/DESIGN.md §20, §24): one wallet, one list of what is owned,
 ## but each kind has its own roster, equipped vehicle, tracks and selected track. vehicle_kind
 ## (CARS, BOATS or SPACE on the title) says which the screens are showing: the state's setups,
 ## tracks, equipped and selected_track are that kind's, so the garage, PICK A RACE and the race

@@ -179,7 +179,7 @@
       "bars": 16,
       "intro_bars": 0,
       "out": "art/music/race_rings.ogg",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 101
     },
     {
@@ -191,7 +191,7 @@
       "bars": 16,
       "intro_bars": 0,
       "out": "art/music/race_nebula.ogg",
-      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "_note": "Phase 22 space (DESIGN.md §24.6).",
       "seed": 104
     }
   ]

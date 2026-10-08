@@ -44,7 +44,7 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_build_attract_mode()
-	# PLAY is three picture buttons (docs/DESIGN.md §20.5, §23.5): CARS, BOATS and SPACE.
+	# PLAY is three picture buttons (docs/DESIGN.md §20.5, §24.5): CARS, BOATS and SPACE.
 	var row := _split_play()
 	var boats: Button = row[0]
 	var space: Button = row[1]

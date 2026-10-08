@@ -5,7 +5,7 @@ extends Resource
 ## (docs/DESIGN.md §4.2).
 
 @export var id: StringName
-## &"car", &"boat" or &"ship" (docs/DESIGN.md §20, §23): which garage sells it and which races it
+## &"car", &"boat" or &"ship" (docs/DESIGN.md §20, §24): which garage sells it and which races it
 ## drives in.
 @export var kind := &"car"
 @export var display_name := ""

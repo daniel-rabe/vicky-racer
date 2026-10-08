@@ -1,5 +1,5 @@
 extends "res://actors/boat/boat_effects.gd"
-## What a spaceship leaves in space (docs/DESIGN.md §23.1), drawn in code like the boats' wake
+## What a spaceship leaves in space (docs/DESIGN.md §24.1), drawn in code like the boats' wake
 ## and the cars' puffs:
 ##   - the exhaust: a fading glow ribbon from the engine, longer at speed;
 ##   - stardust puffing off the outside when the ship slides wide, in place of spray;

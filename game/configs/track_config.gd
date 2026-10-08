@@ -6,7 +6,7 @@ extends Resource
 @export var track_id := &"track_01"
 @export var display_name := ""
 @export var track_scene: PackedScene
-## &"car", &"boat" or &"ship" (docs/DESIGN.md §20, §23), and the scene every racer is made from;
+## &"car", &"boat" or &"ship" (docs/DESIGN.md §20, §24), and the scene every racer is made from;
 ## null = the car.
 @export var vehicle_kind := &"car"
 @export var vehicle_scene: PackedScene

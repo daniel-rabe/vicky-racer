@@ -52,7 +52,7 @@ def save_manifest(manifest: dict) -> None:
 
 def expand(manifest: dict) -> dict:
     """The manifest with its `paints` section unrolled into variants and copies: every car,
-    every boat (DESIGN.md §20.4) and every ship (§23.4), into folders of their own, in every
+    every boat (DESIGN.md §20.4) and every ship (§24.4), into folders of their own, in every
     palette colour."""
     paints = manifest.get("paints")
     if not paints:
@@ -112,7 +112,7 @@ def post_of(entry: dict, entries: dict) -> list[str]:
 
 def source_bytes(entry: dict) -> bytes:
     """A variant's source picture as uploaded to Kontext. `source_turn` (degrees) turns it first:
-    the ships' pilots (DESIGN.md §23.4) are drawn upright by Kontext, so turning the ship 180
+    the ships' pilots (DESIGN.md §24.4) are drawn upright by Kontext, so turning the ship 180
     degrees puts the pilot's head towards its tail; the variant then records `facing` "down"."""
     path = MASTERS / f"{entry['source']}_raw.png"
     if not entry.get("source_turn"):

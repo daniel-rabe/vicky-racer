@@ -46,7 +46,7 @@ func _enter_tree() -> void:
 		EventSystem.UI_settings_changed.emit({"sound_volume": 0.0, "music_volume": 0.0, "fullscreen": false,
 			"auto_accelerate": false, "steering_help": false, "difficulty": StringName(difficulty)}))
 	EventSystem.PRO_state_requested.connect(func() -> void:
-		# A boat (docs/DESIGN.md §20) lives in configs/boats/ and a ship (§23) in configs/ships/;
+		# A boat (docs/DESIGN.md §20) lives in configs/boats/ and a ship (§24) in configs/ships/;
 		# race them on a boat or space course.
 		var path := "res://game/configs/setups/%s.tres" % setup_id
 		for dir in ["boats", "ships"]:

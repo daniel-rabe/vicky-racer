@@ -30,10 +30,10 @@ signal CAR_washed(car: Node)
 ## A boat flew off a ramp, and came down again (docs/DESIGN.md §20.2): whoosh, then splash.
 signal CAR_jumped(car: Node)
 signal CAR_landed(car: Node)
-## A comet brushed a ship and pushed it sideways (docs/DESIGN.md §23.2): sparkles and a chime.
+## A comet brushed a ship and pushed it sideways (docs/DESIGN.md §24.2): sparkles and a chime.
 signal CAR_comet_nudged(car: Node)
 
-# Space (docs/DESIGN.md §23.2)
+# Space (docs/DESIGN.md §24.2)
 ## A comet's path has started to glow: it comes in COMET_WARNING seconds.
 signal SPC_comet_warned(comet: Node)
 ## The comet itself is flying along its path now.

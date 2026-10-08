@@ -77,7 +77,7 @@ def buoy_strip(length: int, thickness: int, block: int, red, cream) -> Image.Ima
 
 
 def beacon_strip(length: int, thickness: int, block: int, red, cream) -> Image.Image:
-    """A space course's 'kerb' (DESIGN.md §23.2): little round beacon lamps in the theme's two
+    """A space course's 'kerb' (DESIGN.md §24.2): little round beacon lamps in the theme's two
     colours, each in a soft glow, on a transparent strip so the lane and dust show through.
     Tiles along X like kerb_strip."""
     ss = 4

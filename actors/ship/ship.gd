@@ -1,6 +1,6 @@
 class_name Ship
 extends Boat
-## One racing spaceship (docs/DESIGN.md §23.1). A Boat underneath, so a Car in every way the
+## One racing spaceship (docs/DESIGN.md §24.1). A Boat underneath, so a Car in every way the
 ## race, the AI, the HUD and the ghosts care about: it bounces softly off asteroids, the edge
 ## and other ships as a boat bounces off the shore, and leaves no skid marks. The rest is
 ## numbers (base_ship.tres: the longest, softest drift in the game) and the look of floating:
