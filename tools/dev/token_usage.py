@@ -5,6 +5,9 @@ counts each API response once (transcripts repeat a response for every content b
 and writes docs/TOKEN_USAGE.md with totals, a per-session table and a per-day table. Re-run it any
 time to refresh the log; it always rebuilds from the transcripts, so it never double-counts.
 
+The cost column prices the same tokens at Anthropic's pay-as-you-go API list rates (PRICES), i.e.
+what the work would have cost without a Claude subscription.
+
     python tools/dev/token_usage.py [--out docs/TOKEN_USAGE.md] [--transcripts <dir>]
 """
 import argparse
@@ -15,7 +18,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 FIELDS = ["input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens", "output_tokens"]
-HEADERS = ["Input", "Cache write", "Cache read", "Output", "Total"]
+HEADERS = ["Input", "Cache write", "Cache read", "Output", "Total", "API cost"]
+# US$ per million tokens: (input, cache read, output), first-party API list price as of 2026-10.
+# Cache writes cost 1.25x input for the 5-minute cache and 2x input for the 1-hour cache.
+PRICES = {
+    "claude-opus-5-5": (4.00, 0.20, 20.00),
+    "claude-opus-5": (5.00, 0.50, 25.00),
+}
 
 
 def default_transcripts() -> Path:
@@ -51,14 +60,25 @@ def title_of(path: Path) -> str:
         return path.stem[:8]
 
 
-def add(total: dict, usage: dict) -> None:
+def cost(model: str, usage: dict) -> float:
+    price_in, price_read, price_out = PRICES.get(model, PRICES["claude-opus-5-5"])
+    writes = usage.get("cache_creation") or {}
+    write_1h = writes.get("ephemeral_1h_input_tokens") or 0
+    write_5m = (usage.get("cache_creation_input_tokens") or 0) - write_1h
+    return ((usage.get("input_tokens") or 0) * price_in + write_5m * price_in * 1.25 + write_1h * price_in * 2
+            + (usage.get("cache_read_input_tokens") or 0) * price_read
+            + (usage.get("output_tokens") or 0) * price_out) / 1e6
+
+
+def add(total: dict, model: str, usage: dict) -> None:
     for field in FIELDS:
         total[field] += usage.get(field) or 0
+    total["cost"] += cost(model, usage)
 
 
 def row(label: str, t: dict, extra: list[str] = ()) -> str:
     cells = [t[f] for f in FIELDS] + [sum(t[f] for f in FIELDS)]
-    return "| " + " | ".join([label, *extra, *(f"{c:,}" for c in cells)]) + " |"
+    return "| " + " | ".join([label, *extra, *(f"{c:,}" for c in cells), f"${t['cost']:,.2f}"]) + " |"
 
 
 def main() -> None:
@@ -75,10 +95,10 @@ def main() -> None:
             continue
         total = defaultdict(int)
         for stamp, model, usage in responses.values():
-            add(total, usage)
-            add(grand, usage)
-            add(per_model[model], usage)
-            add(per_day[stamp[:10]], usage)
+            add(total, model, usage)
+            add(grand, model, usage)
+            add(per_model[model], model, usage)
+            add(per_day[stamp[:10]], model, usage)
         calls += len(responses)
         sessions.append((min(stamps), max(stamps), title_of(path), len(responses), total))
     sessions.sort()
@@ -94,6 +114,9 @@ def main() -> None:
         "",
         "- **Input**: fresh prompt tokens. **Cache write / read**: prompt tokens written to / served from the",
         "  prompt cache (reads are billed at a fraction of input). **Output**: tokens Claude wrote, including thinking.",
+        "- **API cost**: what these tokens would have cost on Anthropic's pay-as-you-go API at list price",
+        "  (no subscription), cache writes at the 1-hour rate where the transcript says so. The work itself ran",
+        "  on a Claude subscription, so this is a comparison figure, not money spent.",
         "- Counts the main conversation of each session; ComfyUI/Blender asset renders run locally and use no tokens.",
         "",
         "## Totals",
@@ -102,6 +125,7 @@ def main() -> None:
         f"- Output tokens: **{grand['output_tokens']:,}**",
         f"- Prompt tokens (input + cache write + cache read): **{sum(grand[f] for f in FIELDS[:3]):,}**",
         f"- All tokens: **{sum(grand[f] for f in FIELDS):,}**",
+        f"- Pay-as-you-go API cost without a subscription: **${grand['cost']:,.2f}**",
         "",
         "## By session",
         "",
