@@ -1795,7 +1795,7 @@ The art:
 
 ## 23. Space: racing among the stars
 
-*Gate A approved 2026-10-07 (19dda09). Gate B (art and sound) done 2026-10-08; Gate C (code) next.*
+*Built (Phase 22): Gate A 19dda09, Gate B 9e0e082 and a18c416, Gate C 39d198c, all 2026-10-07/08.*
 
 **SPACE** on the title screen is a third racing game beside the cars and the boats. It has its
 own spaceships in its own **Hangar**, four space courses and the **Comet Cup**, and works with
@@ -1999,39 +1999,44 @@ What making it taught:
 
 ### 23.7 Under the hood (Gate C)
 
-The boat seam carries almost everything. This is the plan:
-- **No driver layer.** The pilots are in the ship pictures, so `DriverSeats` lists no ship and
-  the rider draws nothing on them.
-- **`Ship`.** `class_name Ship extends Car` in `actors/ship/` is built like `Boat`: same node
-  layout, a capsule hull, and the hover sway in place of the bob. It has a shadow offset and the
-  exhaust and stardust effects (`ship_effects.gd`), and engine loops pitched by speed
-  (`ship_audio.gd`). Boat and ship share the sway code rather than copying it.
-- **`DriftSetup.kind`** gains `&"ship"`. `base_ship.tres` holds the numbers in §23.1. The roster
-  goes in `game/configs/ships/`.
-- **`GarageManager`:**
-  - `PRO_vehicle_kind_requested` accepts `&"ship"`.
-  - The roster, equipped ship, paint and selected track are kept per kind, as for boats.
-  - The save goes to schema 5 (`owned_ships`, `equipped_ship`, `ship_paint`) and migrates
-    from 4.
-- **`Track`:**
-  - adds the `lane`, `space_dust` and `cloud` surfaces, chosen by `TrackTheme.road_surface`;
-  - reads `asteroids_px` (into the drifting-obstacle actor, which is the drifting log with a
-    texture setting), `comets` (a new `actors/space/comet.gd`: the warning streak, the
-    fly-by and the nudge) and `tunnels` (scenery above the ships, like `scenery_bridges`).
-- **Branches** work as on water. The points JSON already writes them for space courses.
-- **Title, join screen, track select:** a third kind wherever `car` / `boat` are tested today:
-  `title_screen.gd`, `join_screen.gd`, `track_select.gd` and `garage_screen.gd`. A three-way
-  toggle, not another `if`.
-- **Cups:** `game/configs/cups/comet.tres`, `vehicle_kind = &"ship"`.
-- **Ghosts:** developer ghosts for the four space courses (`record_ghosts.gd`).
-- **Checks:** `tests/space_test.gd`, covering:
-  - a ship is a Car, and floats further than a boat;
-  - surfaces;
-  - a drifting asteroid bumps a ship;
-  - a comet nudges a ship but never stops or spins it, and its timing repeats every lap;
-  - branch progress;
-  - the garage's three kinds;
-  - a v4 save migrates.
+*Built 2026-10-08. Every space course raced headless with several ships, and the whole suite
+passes.*
 
-  Then full races: `race_test -- --autopilot --track=space_0N --setup=<ship>`, and the whole
-  suite to prove cars and boats are unchanged.
+![Ring Road](screenshots/space_02.png)
+![Nebula Station](screenshots/space_03.png)
+
+| Piece | What it is | File |
+| --- | --- | --- |
+| Ship | `class_name Ship extends Boat`: a boat's soft bounce and no skid marks, with a slow hover sway, a shadow far below, and `nudge()` for a comet. No currents, no ramps | [`actors/ship/ship.gd`](../actors/ship/ship.gd) |
+| Ship scene | The boat's node layout, a capsule hull, the shadow always shown | [`actors/ship/ship.tscn`](../actors/ship/ship.tscn) |
+| Exhaust and sound | A glow ribbon from the engine, stardust in a slide, sparkles on a bump or a nudge; the engine loop, a bonk, a twinkle | [`ship_effects.gd`](../actors/ship/ship_effects.gd), [`ship_audio.gd`](../actors/ship/ship_audio.gd) |
+| Roster | Nine `DriftSetup`s with `kind = &"ship"`, on `base_ship.tres` | [`game/configs/ships/`](../game/configs/ships/) |
+| Comet | The warning streak and chime, the fly-by, the nudge once a pass, a fixed rhythm per course | [`actors/space/comet.gd`](../actors/space/comet.gd) |
+| Courses | Spec, points, scene, as for boat courses; the builder adds `Asteroids` (the drifting log's script with a rock), `Comets` and `Tunnels` (scenery bridges with the tunnel picture) | [`track/build/build_track.gd`](../track/build/build_track.gd) |
+| Themes | `space = true`: the star lane and its glow, beacons for kerbs, the space surfaces in `Track.SURFACES` | [`game/configs/themes/`](../game/configs/themes/) |
+| Three kinds | `GarageManager.KINDS`: roster, equipped, selected course per kind, one wallet; the title, join screen (V / X cycles CARS / BOATS / SPACE) and the garage's `LOOKS` (the Hangar) | [`garage_manager.gd`](../game/managers/garage_manager.gd) |
+| Save | Schema 5: `equipped_ship`, `selected_space`; older saves come in with the Star Fighter | [`game/save_game.gd`](../game/save_game.gd) |
+| Cup and stickers | The Comet Cup; First Flight and Comet Cup, and the boats' First Splash and Splash Cup (a Splash Cup won before is honoured) | [`cups/comet.tres`](../game/configs/cups/comet.tres), [`sticker_manager.gd`](../game/managers/sticker_manager.gd) |
+| Ghosts | Developer ghosts for the four boat and four space courses (`record_ghosts.gd` now records every kind); a ghost finds its setup in any kind's folder | [`game/configs/ghosts/`](../game/configs/ghosts/) |
+| Checks | A ship is a Ship, a Boat and a Car; it floats further than a boat; surfaces; an asteroid bump; a comet warns, nudges once and never spins, and comes again; branch progress; three kinds in the garage; a v4 save; paints; the cup and stickers. Full races: `race_test -- --autopilot --track=space_0N --setup=<ship>` | [`tests/space_test.gd`](../tests/space_test.gd) |
+
+- **No driver layer on ships.** The pilots are in the pictures, so `DriverSeats` lists no ship.
+  The space-helmet drivers (`art/drivers/space/`) are kept for later, at the user's wish.
+- **The shelf** squeezes to fit: five cups on the shelf and eleven stickers in the book.
+
+**Balance** (Asteroid Alley, normal difficulty; gap to the winner, or lead over 2nd):
+
+| Ship | pace 1 | pace 0.85 | pace 0.7 |
+| --- | --- | --- | --- |
+| Star Fighter | 2nd +0.2s | 2nd +0.7s | 3rd +1.5s |
+| Racing Pod | 1st +0.0s | 2nd +0.7s | 3rd +1.4s |
+| Flying Saucer | 2nd +0.3s | 2nd +0.9s | 3rd +1.8s |
+| Cardboard Rocket | 1st +0.0s | 2nd +0.9s | 3rd +1.7s |
+| Space Taxi | 1st -0.2s | 2nd +0.7s | 3rd +1.5s |
+| Star Glider | 1st -0.4s | 2nd +0.5s | 3rd +1.4s |
+| Teacup Saucer | 2nd +0.4s | 3rd +1.2s | 3rd +2.3s |
+| Star Freighter | 1st -0.3s | 2nd +0.5s | 3rd +1.3s |
+| Comet Racer | 1st -0.7s | 2nd +0.3s | 3rd +1.3s |
+
+The Comet Racer first won by 3.4 s; its power and top speed came down (×1.08, ×1.12) so the
+top ship is the best, not a runaway.

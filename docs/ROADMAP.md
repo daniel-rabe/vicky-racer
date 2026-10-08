@@ -356,7 +356,7 @@ The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats a
   - The HUD fades for the swap, shows the boat while sailing, and maps the coast.
   - `tests/island_test.gd` is new; the whole suite passes. 100 fps on land and at sea.
 
-## Phase 22 — Space: racing among the stars 🚧 Gate C next
+## Phase 22 — Space: racing among the stars ✅ done
 
 A third racing game beside the cars and the boats (DESIGN.md §23), asked for on 2026-10-07. It
 is a full parallel mode like the boats: a SPACE button on the title, its own **Hangar** of nine
@@ -389,8 +389,8 @@ The user chose these on 2026-10-07:
   - Engine, comet, bonk and horn sounds, picked by ear.
   - Two music pieces.
   - The cup icon and stickers.
-- **Gate C: code:**
-  - `Ship extends Car`.
+- **Gate C: code** (built 2026-10-08; DESIGN §23.7). The whole suite passes.
+  - `Ship extends Boat` (so a Car).
   - A third vehicle kind through the garage, title, join screen and track select.
   - Space surfaces, drifting asteroids, comets and tunnels in the track builder and `Track`.
   - The Comet Cup.
