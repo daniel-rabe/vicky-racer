@@ -295,12 +295,8 @@ Plan: [CAR_ANIMATION_PLAN.md](CAR_ANIMATION_PLAN.md).
   (a shader, no new art), backwards in reverse, rear wheels locked on the handbrake, smeared at
   top speed, ghosts included. Tyre positions for all 70 bodies found by
   `tools/comfy/wheel_rects.py`; the Bubble Car's tyres hardly show, so it has none.
-- **20b, steering front wheels ✅ done:** the front tyres turn up to 20° with the steering,
-  in the same shader, so again no new art: the tyre is lifted out of the body and drawn again,
-  turned, behind it. Straight ahead every car looks exactly as before.
-- **Body lean ✅ done:** drifting, the body leans out a little (up to 5° and 3 px), the
-  collision box and handling untouched.
-- Extras still open — a squash on wall hits, flickering rocket flames.
+- 20b, steering front wheels — optional, only if 20a is not enough.
+- Extras — body lean when drifting, a squash on wall hits, flickering rocket flames.
 
 ---
 
