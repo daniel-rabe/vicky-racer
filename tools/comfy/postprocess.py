@@ -305,7 +305,7 @@ def driver_sketch(sketch: dict, size: int = 1536) -> Image.Image:
     """A driver (DESIGN.md §22): head and shoulders of a toy figure seen from straight above,
     facing up, arms reaching forward (to a steering wheel when `wheel`). FLUX draws a figure
     from the front however it is asked; Kontext keeps this view. `sketch`: `hat` colour and
-    `hat_kind` (helmet, cap, peaked, fire), an optional `decal` colour for a stripe down the
+    `hat_kind` (helmet, cap, peaked, fire, space), an optional `decal` colour for a stripe down the
     helmet, `body` colour, `hair` colour and `hair_style` (tufts, pigtails, ponytail, curls,
     short), `wheel`, and `scale` (1.0 a child, about 1.2 a grown-up)."""
     img = Image.new("RGB", (size, size), (250, 250, 248))
@@ -316,8 +316,11 @@ def driver_sketch(sketch: dict, size: int = 1536) -> Image.Image:
     dark = lambda rgb, f=0.7: tuple(round(v * f) for v in rgb)  # noqa: E731
     skin, body, hat, hair = (246, 205, 170), col("body"), col("hat"), col("hair", (120, 72, 40))
     style = sketch.get("hair_style", "short")
+    space = sketch.get("hat_kind") == "space"  # the bubble keeps all the hair inside
     # Hair that shows behind the head (down is behind: the figure faces up).
-    if style == "pigtails":
+    if space:
+        pass
+    elif style == "pigtails":
         for s in (-1, 1):
             d.ellipse((c + s * 7 * u - 3 * u, c + 4 * u, c + s * 7 * u + 3 * u, c + 11 * u), fill=hair)
     elif style == "ponytail":
@@ -340,6 +343,17 @@ def driver_sketch(sketch: dict, size: int = 1536) -> Image.Image:
         d.chord((c - 6 * u, c - 7 * u, c + 6 * u, c + 2 * u), 200, 340, fill=(36, 42, 66))  # visor, at the front
         if "decal" in sketch:
             d.rectangle((c - 1.2 * u, c - 3 * u, c + 1.2 * u, c + 7 * u), fill=col("decal"))
+    elif kind == "space":  # a round glass bubble over the hair, on a coloured collar ring
+        d.ellipse((c - 9.5 * u, c - 9.5 * u, c + 9.5 * u, c + 9.5 * u), fill=hat, outline=dark(hat), width=round(u * 0.6))
+        d.ellipse((c - 8.3 * u, c - 8.3 * u, c + 8.3 * u, c + 8.3 * u), fill=(206, 232, 248))
+        if style in ("curls", "tufts", "short", "pigtails", "ponytail"):
+            d.ellipse((c - 5.6 * u, c - 4.8 * u, c + 5.6 * u, c + 6.4 * u), fill=hair)
+        if style == "pigtails":
+            for s in (-1, 1):
+                d.ellipse((c + s * 5.5 * u - 1.8 * u, c + 3 * u, c + s * 5.5 * u + 1.8 * u, c + 7 * u), fill=hair)
+        elif style == "ponytail":
+            d.ellipse((c - 1.8 * u, c + 4.5 * u, c + 1.8 * u, c + 8 * u), fill=hair)
+        d.arc((c - 7 * u, c - 7 * u, c + 7 * u, c + 7 * u), 200, 260, fill=(255, 255, 255), width=round(1.4 * u))
     elif kind == "fire":
         d.ellipse((c - 9 * u, c - 9.5 * u, c + 9 * u, c + 8 * u), fill=dark(hat, 0.9))  # brim
         d.ellipse((c - 6.5 * u, c - 6.5 * u, c + 6.5 * u, c + 6.5 * u), fill=hat, outline=dark(hat), width=round(u * 0.6))

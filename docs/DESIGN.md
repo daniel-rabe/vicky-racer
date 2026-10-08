@@ -1795,7 +1795,7 @@ The art:
 
 ## 23. Space: racing among the stars
 
-*Gate A: design and mockups, waiting for approval. Asked for on 2026-10-07.*
+*Gate A approved 2026-10-07 (19dda09). Gate B (art and sound) done 2026-10-08; Gate C (code) next.*
 
 **SPACE** on the title screen is a third racing game beside the cars and the boats. It has its
 own spaceships in its own **Hangar**, four space courses and the **Comet Cup**, and works with
@@ -1916,9 +1916,9 @@ Hangar are GRIP, **FLOAT** (in place of SLIDE) and SPEED. Prices sit beside the 
 | **Flying Saucer** | saucer | grippy and steady, the easiest ship; lights round the rim | glass dome | 150 |
 | **Cardboard Rocket** | fun | a homemade box rocket with a drawn-on flame, slow to pull away, grippy | open top | 200 |
 | **Space Taxi** | fun | yellow and chequered, steady, "beep beep" | glass roof | 250 |
-| **Rocket Armchair** | fun | a comfy armchair on a rocket, floats wide | open | 300 |
+| **Star Surfer** | fun | a hover surfboard with twin rockets, the slidiest, floats wide | standing on it | 300 |
 | **Teacup Saucer** | fun | a flying teacup, very grippy, slow; clinks | open | 350 |
-| **Space Whale** | fun | big and heavy, pushes other ships aside, fast on the straights; whale-song horn | none (closed) | 450 |
+| **Star Freighter** | fun | a big cargo ship stacked with containers, heavy, pushes other ships aside, fast on the straights; a deep toot | none (closed) | 450 |
 | **Comet Racer** | fighter | the top ship: fastest, a long tail of sparks | glass canopy | 600 |
 
 - **Sprites:** each ship is made with the frozen recipe (§11.1), 4 candidates and one pick, and
@@ -1928,6 +1928,11 @@ Hangar are GRIP, **FLOAT** (in place of SLIDE) and SPEED. Prices sit beside the 
 - **Drivers (§22):** the seats above show the driver; a closed ship shows none. In space the
   drivers wear a round **space helmet** (a third look beside the helmet and the cap).
 - **Opponents** pick from the roster as car and boat opponents do (§8).
+- **Two swaps at Gate B (2026-10-08).** The Rocket Armchair and the Space Whale were drawn, and
+  the user dropped both: they "do not fit in space". The Star Surfer and the Star Freighter took
+  their places in the roster, at the same prices and with the same handling.
+
+![Every ship in every paint](mockups/space/06_ship_paints.png)
 
 ### 23.5 Screens
 
@@ -1944,29 +1949,40 @@ Hangar are GRIP, **FLOAT** (in place of SLIDE) and SPEED. Prices sit beside the 
 
 ### 23.6 Art, sound and music (Gate B)
 
-- **Ships:** 9 sprites × 4 candidates, then 6 paints each, and card art.
-- **Ground:** the space fills are already in `pipeline.json` (Gate A). `theme_art.py` builds
-  each theme's atlas and its beacon strip, and the lane texture, as for water.
-- **Props:**
-  - asteroids (3 shapes), gumballs;
-  - the moon base, the ringed planet, the little moon, the space station and its tunnel
-    module, solar panels, the lollipop planet;
-  - the comet head and its sparkle.
+*Done 2026-10-08. The user picked every seed; the sounds and music by ear on the listening
+page (https://claude.ai/artifact/TV2K4Q8xXwKwUmuHm35aNV, built by `tools/comfy/listen_space.py`).*
 
-  Big scenery (the planets, the station) comes from ComfyUI. Simple pieces come from
-  `prop_art.py`.
-- **Drivers:** a space-helmet set, made as Kontext edits of `driver_sketch` (§22).
-- **Sound**, using Stable Audio with the §11.2 recipe, picked **by ear** on a listening page:
-  - thruster loop (fighters), saucer warble loop, rocket rumble loop (cardboard, armchair);
-  - comet chime and whoosh;
-  - asteroid bonk;
-  - a soft space hum under the race;
-  - horns: taxi beep, whale song, teacup clink.
-- **Music:** two new pieces, `race_rings` and `race_nebula`. Asteroid Alley reuses `race_moon`
-  and Candy Galaxy reuses `race_candy`.
-- **Cup icon:** `cup_comet`, made like `cup_splash`.
-- **Stickers:** "First Flight" and "Win the Comet Cup". The boat stickers still have no art, so
-  both sets can be made together.
+| Piece | What was made | Where |
+| --- | --- | --- |
+| Ships | 9 sprites (FLUX, frozen recipe), Hangar cards, 6 paints each (Kontext recolours; the yellow pod and taxi are their own yellow) | `art/ships/`, `art/ships/paint/`, `art/ui/cards/ships/` |
+| Drivers | Vicky, P2 and the three kids in a bubble space helmet: Kontext edits of `driver_sketch` with the new `hat_kind` `space` | `art/drivers/space/` |
+| Ground | The four themes' dust and cloud atlases and TileSets, the star lane, and a beacon strip in place of kerbs (`theme_art.beacon_strip`) | `art/tiles/space/`, `track/themes/ground_*.tres` |
+| Props | ringed planet, lollipop planet, space station and its tunnel, moon base, little moon, asteroid, gumball, solar panel, comet | `art/props/space/` |
+| Icons | the Comet Cup; stickers First Flight and Comet Cup, plus the boats' First Splash and Splash Cup | `art/ui/cups/`, `art/ui/stickers/` |
+| Sounds | thruster, saucer and rocket loops; space ambience; comet chime and whoosh; asteroid bonk; horns for the ships, the taxi, the freighter and the teacup | `art/sfx/` |
+| Music | `race_rings` (Ring Road) and `race_nebula` (Nebula Station) | `art/music/` |
+
+![Drivers in the ships](mockups/space/07_drivers_on_ships.png)
+![Props and icons](mockups/space/08_props_and_icons.png)
+![Space tiles](mockups/space/05_tiles.png)
+
+What making it taught:
+- **Naming a real material still turns FLUX photographic.** "A cardboard box rocket" came out as
+  a photo of cardboard; "a toy rocket made to look like a brown paper box, smooth matte clay toy"
+  came out in the house style.
+- **Animals and furniture come out side-on or tilted**, as the town's animals did. One whale seed
+  in eight came out from above and the armchairs leaned diagonally; the user dropped both ships.
+- **Facing has to be read off every pick.** The Star Freighter came out lying sideways (`left`)
+  and the comet diagonally (`up_right`). The ringed planet is a three-quarter view and is never
+  rotated.
+- **A recolour of a white vehicle repaints all of it.** The green teacup lost its red seat and
+  pink dots on every seed tried (11–15), because the white china is the "main body colour". It
+  stays a plain green teacup.
+- **Ring Road's music (seed 101) fails the loop-seam check** (2.22 against a limit of 1.0). It was
+  kept because the user chose it by ear, having heard the jump back on the listening page.
+  Seed 105 is the clean fallback.
+- **The user kept Vicky's seed 25**, a front view with his face, although it is not used in the
+  game: `tools/comfy/masters/keep/`.
 
 ### 23.7 Under the hood (Gate C)
 

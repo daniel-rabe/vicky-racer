@@ -356,7 +356,7 @@ The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats a
   - The HUD fades for the swap, shows the boat while sailing, and maps the coast.
   - `tests/island_test.gd` is new; the whole suite passes. 100 fps on land and at sea.
 
-## Phase 22 — Space: racing among the stars 🚧 Gate A
+## Phase 22 — Space: racing among the stars 🚧 Gate C next
 
 A third racing game beside the cars and the boats (DESIGN.md §23), asked for on 2026-10-07. It
 is a full parallel mode like the boats: a SPACE button on the title, its own **Hangar** of nine
@@ -370,7 +370,7 @@ The user chose these on 2026-10-07:
 - **The places:** the moon and an asteroid belt, the rings of a giant planet, a nebula with a
   space station, and a candy galaxy.
 
-- **Gate A: design and mockups** (2026-10-07, waiting for approval):
+- **Gate A: design and mockups** (approved 2026-10-07):
   - DESIGN §23.
   - Four course layouts, `space_01`–`space_04`, drawn by `track_layout.py` from four new space
     themes. Each has two alternative paths, drifting asteroids, comets and, on Nebula Station,
@@ -379,7 +379,8 @@ The user chose these on 2026-10-07:
   - The look probe and theme sheet, drawn by `space_probe.py`.
   - The Hangar and title layouts.
   - Everything is in `docs/mockups/space/` and `docs/mockups/space_0N_layout.png`.
-- **Gate B: art and sound:**
+- **Gate B: art and sound** (done 2026-10-08; DESIGN §23.6). Every seed was picked by the user.
+  The Rocket Armchair and Space Whale became the Star Surfer and Star Freighter.
   - Nine ships, their paints and cards.
   - Space theme tiles.
   - Planets, a station, asteroids, gumballs and the comet.

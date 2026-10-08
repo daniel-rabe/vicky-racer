@@ -25,7 +25,8 @@ THEMES = json.loads((HERE / "themes.json").read_text(encoding="utf-8"))
 GROUND = json.loads((ROOT / "tools" / "comfy" / "pipeline.json").read_text(encoding="utf-8"))["ground"]
 RIMS = {"sand": (201, 162, 74), "grass": (78, 143, 46), "ice": (127, 191, 216), "mud": (94, 58, 30),
         "chocolate": (92, 52, 32), "crater": (131, 122, 162), "sandbank": (201, 162, 74),
-        "candy": (217, 138, 176)}
+        "candy": (217, 138, 176), "moondust": (150, 144, 176), "ring_dust": (168, 132, 74),
+        "nebula_cloud": (176, 80, 142), "cotton_candy": (208, 122, 168)}
 
 
 def fill_path(name: str) -> Path:
@@ -75,6 +76,29 @@ def buoy_strip(length: int, thickness: int, block: int, red, cream) -> Image.Ima
     return img.resize((length, thickness), Image.LANCZOS)
 
 
+def beacon_strip(length: int, thickness: int, block: int, red, cream) -> Image.Image:
+    """A space course's 'kerb' (DESIGN.md §23.2): little round beacon lamps in the theme's two
+    colours, each in a soft glow, on a transparent strip so the lane and dust show through.
+    Tiles along X like kerb_strip."""
+    ss = 4
+    img = Image.new("RGBA", (length * ss, thickness * ss), (0, 0, 0, 0))
+    glow = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    g, d = ImageDraw.Draw(glow), ImageDraw.Draw(img)
+    mid = thickness * ss // 2
+    r = int(thickness * ss * 0.26)
+    for i, x in enumerate(range(block * ss // 2, length * ss, block * ss)):
+        colour = tuple(red) if i % 2 == 0 else tuple(cream)
+        g.ellipse((x - r * 2.2, mid - r * 2.2, x + r * 2.2, mid + r * 2.2), fill=colour + (110,))
+    img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(5 * ss)))
+    for i, x in enumerate(range(block * ss // 2, length * ss, block * ss)):
+        colour = tuple(red) if i % 2 == 0 else tuple(cream)
+        d.ellipse((x - r - 2 * ss, mid - r - 2 * ss, x + r + 2 * ss, mid + r + 2 * ss), fill=(60, 64, 76, 255),
+                  outline=(20, 24, 30, 255), width=ss)
+        d.ellipse((x - r, mid - r, x + r, mid + r), fill=colour + (255,))
+        d.ellipse((x - r * 0.5, mid - r * 0.6, x - r * 0.05, mid - r * 0.15), fill=(255, 255, 255, 200))
+    return img.resize((length, thickness), Image.LANCZOS)
+
+
 def road_ice(size=128) -> Image.Image:
     """Tileable sheet ice for the road: pale blue, a few white streaks, partly see-through
     so the asphalt shows that this is still the road."""
@@ -107,8 +131,9 @@ def main() -> None:
         if theme_id.startswith("_"):
             continue
         k = GROUND["kerb"]
-        if t.get("water"):  # a boat course: buoys for kerbs, and the deep channel as the road
-            kerb = buoy_strip(4 * k["block"] * 2, k["thickness"], k["block"], t["kerb"]["red"], t["kerb"]["cream"])
+        if t.get("water") or t.get("space"):  # buoys or beacons for kerbs; the channel or star lane is the road
+            strip = buoy_strip if t.get("water") else beacon_strip
+            kerb = strip(4 * k["block"] * 2, k["thickness"], k["block"], t["kerb"]["red"], t["kerb"]["cream"])
             out = ROOT / t["road_out"]
             out.parent.mkdir(parents=True, exist_ok=True)
             params = {k2: v for k2, v in GROUND[t["road"]].items() if not k2.startswith("_")}

@@ -52,7 +52,8 @@ def save_manifest(manifest: dict) -> None:
 
 def expand(manifest: dict) -> dict:
     """The manifest with its `paints` section unrolled into variants and copies: every car,
-    and every boat (DESIGN.md §20.4, into folders of their own), in every palette colour."""
+    every boat (DESIGN.md §20.4) and every ship (§23.4), into folders of their own, in every
+    palette colour."""
     paints = manifest.get("paints")
     if not paints:
         return manifest
@@ -60,7 +61,8 @@ def expand(manifest: dict) -> dict:
     # Cars whose card has a driver painted in: in the race the driver is DriverRider's (DESIGN.md §22.2).
     empty = paints.get("empty_seat", {"vehicles": [], "seeds": {}})
     groups = (("cars", "art/ui/cards/paint", "art/cars/paint"),
-              ("boats", "art/ui/cards/boats/paint", "art/boats/paint"))
+              ("boats", "art/ui/cards/boats/paint", "art/boats/paint"),
+              ("ships", "art/ui/cards/ships/paint", "art/ships/paint"))
     for group, card_dir, body_dir in groups:
         for vehicle, source in paints.get(group, {}).items():
             for colour, words in paints["palette"].items():
@@ -196,7 +198,7 @@ def cmd_candidates(only: list[str] | None) -> None:
             continue
         top = pp.contact_sheet(big, len(big), (256, 256), f"{entry['id'].upper()}: CANDIDATES", checker=True)
         side = max(256, small[0][0].width)
-        where = "WATER" if "sheet_ground" in entry else "GRASS"
+        where = "GRASS" if "sheet_ground" not in entry else ("SPACE" if entry["sheet_ground"].startswith("space") else "WATER")
         bottom = pp.contact_sheet(small, len(small), (side, side), f"AT GAME SIZE ON {where} (2x)")
         sheet = Image.new("RGB", (max(top.width, bottom.width), top.height + bottom.height), (40, 44, 52))
         sheet.paste(top, (0, 0))

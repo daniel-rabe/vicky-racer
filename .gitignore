@@ -137,3 +137,22 @@ tools/comfy/masters/island_*
 # The island sounds' listening page (MP3 previews, rebuilt by tools/comfy/listen_island.py).
 docs/mockups/sfx/listen_island/
 .vscode/settings.json
+
+# Phase 22 space. Ship masters are kept (the paint jobs are built from them); the space props'
+# and the space drivers' masters are leaves, reproducible from the pinned seeds in asset_manifest.json.
+tools/comfy/masters/space_*
+tools/comfy/masters/driver_space_*
+# Space sound picks.
+!tools/comfy/masters/sfx/thruster_loop_101.flac
+!tools/comfy/masters/sfx/saucer_loop_103.flac
+!tools/comfy/masters/sfx/rocket_rumble_loop_104.flac
+!tools/comfy/masters/sfx/space_ambience_104.flac
+!tools/comfy/masters/sfx/comet_chime_103.flac
+!tools/comfy/masters/sfx/comet_whoosh_101.flac
+!tools/comfy/masters/sfx/asteroid_bonk_104.flac
+!tools/comfy/masters/sfx/horn_ship_103.flac
+!tools/comfy/masters/sfx/horn_taxi_101.flac
+!tools/comfy/masters/sfx/horn_freighter_102.flac
+!tools/comfy/masters/sfx/horn_teacup_104.flac
+# The space sounds' listening page (MP3 previews, rebuilt by tools/comfy/listen_space.py).
+docs/mockups/sfx/listen_space/

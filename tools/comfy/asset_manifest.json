@@ -2006,6 +2006,573 @@
         27,
         28
       ]
+    },
+    {
+      "id": "ship_fighter",
+      "subject": "a chunky toy space fighter seen from straight above as a flat lay map icon, only its top visible, no side view: a pointed bright red body down the middle with an empty clear glass cockpit bubble near the nose, two swept-back white wings either side, two round orange rocket nozzles at the back, pointing straight up, perfectly symmetrical",
+      "seed": 12,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/fighter.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "ship_pod",
+      "subject": "a chunky toy space racing pod seen from straight above as a flat lay map icon, only its top visible, no side view: a small rounded bright yellow pod in the middle with an empty clear glass canopy, two long grey engine pods on short arms either side of it, round glowing blue nozzles at the back, pointing straight up, perfectly symmetrical",
+      "seed": 14,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/pod.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "ship_saucer",
+      "subject": "a chunky toy flying saucer seen from straight above as a flat lay map icon, only its top visible, no side view: a round silver disc with a ring of small yellow lights all round its rim, a blue top in the middle and an empty clear glass dome in the centre, perfectly round and symmetrical",
+      "seed": 13,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/saucer.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "ship_cardboard",
+      "subject": "a chunky toy rocket made to look like a brown paper box, smooth matte clay toy, seen from straight above as a flat lay map icon, only its top visible, no side view: a long box-shaped light brown body with darker brown folded flap edges and pale strips of tape painted on, its open top showing an empty seat inside, a red cone nose at the front, a silver can-shaped engine at the back, pointing straight up, perfectly symmetrical",
+      "seed": 17,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/cardboard_rocket.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Second prompt: round 1 (seeds 11-14) came out photographic (real cardboard). Picked by the user 2026-10-08.",
+      "candidate_seeds": [
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "ship_taxi",
+      "subject": "a chunky toy space taxi seen from straight above as a flat lay map icon, only its top visible, no side view: a rounded bright yellow body with a black and white chequered stripe along both sides, an empty clear glass bubble roof in the middle, short stubby wings and two round rocket nozzles at the back, pointing straight up, perfectly symmetrical",
+      "seed": 13,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/space_taxi.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "ship_teacup",
+      "subject": "a chunky toy flying teacup spaceship, smooth matte clay toy, seen from straight above as a flat lay map icon, only its top visible, no side view: a round white teacup with pink polka dots and a small curled handle on one side, empty inside with no tea, only a small round red seat cushion in the bottom of the cup, standing on a round white saucer with four little silver rocket nozzles round its rim",
+      "seed": 18,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/teacup_saucer.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Second prompt: round 1 (seeds 11-14) came out full of realistic tea, no rockets. Picked by the user 2026-10-08.",
+      "candidate_seeds": [
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "ship_comet",
+      "subject": "a sleek toy space racer seen from straight above as a flat lay map icon, only its top visible, no side view: a long slim pointed purple body with gold stripes, an empty clear glass canopy, short swept delta wings, three round glowing blue nozzles at the back, pointing straight up, perfectly symmetrical",
+      "seed": 13,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/comet_racer.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 ship (DESIGN.md §23.4). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "space_asteroid",
+      "subject": "a lumpy grey space asteroid rock viewed from straight above, flat lay: a soft rounded grey boulder covered in little round craters, gentle highlights",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        160,
+        160
+      ],
+      "out": "art/props/space/asteroid.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "space_gumball",
+      "subject": "a big shiny round gumball sweet viewed from straight above, flat lay: a glossy bright green ball with a white shine highlight",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        112,
+        112
+      ],
+      "out": "art/props/space/gumball.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "space_moon_base",
+      "subject": "a little moon base viewed from straight above, flat lay: only the roofs visible, a round white dome with a ring of blue windows, two smaller white domes joined to it by short tubes, a round red and white landing pad",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        360,
+        360
+      ],
+      "out": "art/props/space/moon_base.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "space_ringed_planet",
+      "subject": "a giant cartoon ringed planet viewed from straight above, flat lay: a big round orange and cream striped planet with a wide flat pale golden ring all round it, the ring seen face-on as a circle",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        640,
+        640
+      ],
+      "out": "art/props/space/ringed_planet.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08 (seed 12): a three-quarter picture-book view, so it is never rotated, like the island's sailboat."
+    },
+    {
+      "id": "space_little_moon",
+      "subject": "a small round moon viewed from straight above, flat lay: a pale grey ball covered in round craters, soft shading",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        240,
+        240
+      ],
+      "out": "art/props/space/little_moon.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "space_station",
+      "subject": "a cartoon space station viewed from straight above, flat lay: a round white hub with a ring of blue windows, four short spokes out to a big white outer ring, two wide blue solar panel wings sticking out on each side",
+      "seed": 12,
+      "facing": null,
+      "box": [
+        520,
+        520
+      ],
+      "out": "art/props/space/station.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "space_tunnel",
+      "subject": "a straight space station tunnel viewed from straight above, flat lay: a long white ribbed metal tube lying horizontally with a row of small round blue windows along the middle and yellow and black stripes at both ends",
+      "seed": 11,
+      "facing": "right",
+      "box": [
+        960,
+        224
+      ],
+      "out": "art/props/space/tunnel.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "space_solar_panel",
+      "subject": "a satellite viewed from straight above, flat lay: two rectangular blue grid solar panels joined by a short silver bar with a small gold box in the middle",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        176,
+        176
+      ],
+      "out": "art/props/space/solar_panel.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "space_lollipop_planet",
+      "subject": "a giant swirly lollipop planet viewed from straight above, flat lay: a big round ball with a pink and white spiral swirl, glossy candy shine",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        600,
+        600
+      ],
+      "out": "art/props/space/lollipop_planet.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "space_comet",
+      "subject": "a cartoon comet viewed from straight above, flat lay: a round glowing pale yellow head on the right with a long sparkly orange and yellow tail streaming out to the left",
+      "seed": 12,
+      "facing": "up_right",
+      "box": [
+        320,
+        128
+      ],
+      "out": "art/props/space/comet.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 space-course prop (DESIGN.md §23.2). Picked by the user 2026-10-08 (seed 12). Drawn diagonally: head at the top right, tail to the bottom left, so it faces UP_RIGHT."
+    },
+    {
+      "id": "cup_comet",
+      "subject": "a big smiling cartoon shooting star with a sparkly golden tail, cheerful bright yellow and purple, simple flat game icon",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        200,
+        200
+      ],
+      "out": "art/ui/cups/cup_comet.png",
+      "_note": "Phase 22: the Comet Cup (space courses). Picked by the user 2026-10-08."
+    },
+    {
+      "id": "sticker_first_flight",
+      "subject": "a cartoon red and white rocket blasting off with a puff of white smoke and little yellow stars, front view, cheerful children's sticker",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/first_flight.png",
+      "_note": "Phase 22 sticker: First Flight (first space race). Picked by the user 2026-10-08.",
+      "post": [
+        "sticker"
+      ]
+    },
+    {
+      "id": "sticker_comet_cup",
+      "subject": "a shiny gold trophy cup with a smiling shooting star on its front, front view, cheerful children's sticker",
+      "seed": 13,
+      "facing": null,
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/comet_cup.png",
+      "_note": "Phase 22 sticker: win the Comet Cup. Picked by the user 2026-10-08.",
+      "post": [
+        "sticker"
+      ]
+    },
+    {
+      "id": "sticker_first_splash",
+      "subject": "a cartoon red speedboat leaping out of a big blue splash with water droplets, front view, cheerful children's sticker",
+      "seed": 11,
+      "facing": null,
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/first_splash.png",
+      "_note": "Phase 20 sticker (made in Phase 22): First Splash (first boat race). Picked by the user 2026-10-08.",
+      "post": [
+        "sticker"
+      ]
+    },
+    {
+      "id": "sticker_splash_cup",
+      "subject": "a shiny gold trophy cup with a smiling blue water splash on its front, front view, cheerful children's sticker",
+      "seed": 14,
+      "facing": null,
+      "box": [
+        384,
+        384
+      ],
+      "out": "art/ui/stickers/splash_cup.png",
+      "_note": "Phase 20 sticker (made in Phase 22): win the Splash Cup. Picked by the user 2026-10-08.",
+      "post": [
+        "sticker"
+      ]
+    },
+    {
+      "id": "driver_space_vicky",
+      "subject": "child astronaut figure",
+      "seed": 22,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/space/vicky.png",
+      "sheet_ground": "space_navy",
+      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, blond hair inside it, sitting on a bright red collar ring, small rounded shoulders in a bright red space suit either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          230,
+          57,
+          70
+        ],
+        "hat_kind": "space",
+        "body": [
+          184,
+          46,
+          56
+        ],
+        "hair": [
+          246,
+          214,
+          112
+        ],
+        "hair_style": "short"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_space_p2",
+      "subject": "child astronaut figure",
+      "seed": 25,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/space/p2.png",
+      "sheet_ground": "space_navy",
+      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, curly dark brown hair inside it, sitting on a purple collar ring, small rounded shoulders in a purple space suit either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          158,
+          89,
+          242
+        ],
+        "hat_kind": "space",
+        "body": [
+          126,
+          71,
+          194
+        ],
+        "hair": [
+          80,
+          50,
+          30
+        ],
+        "hair_style": "curls"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_space_blue",
+      "subject": "child astronaut figure",
+      "seed": 26,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/space/blue.png",
+      "sheet_ground": "space_navy",
+      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, short black hair inside it, sitting on a bright blue collar ring, small rounded shoulders in a bright blue space suit either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          58,
+          134,
+          255
+        ],
+        "hat_kind": "space",
+        "body": [
+          46,
+          107,
+          204
+        ],
+        "hair": [
+          40,
+          34,
+          32
+        ],
+        "hair_style": "short"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_space_yellow",
+      "subject": "child astronaut figure",
+      "seed": 27,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/space/yellow.png",
+      "sheet_ground": "space_navy",
+      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, dark brown hair with two little pigtails inside it, sitting on a sunny yellow collar ring, small rounded shoulders in a sunny yellow space suit either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          255,
+          210,
+          63
+        ],
+        "hat_kind": "space",
+        "body": [
+          204,
+          168,
+          50
+        ],
+        "hair": [
+          110,
+          66,
+          36
+        ],
+        "hair_style": "pigtails"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "driver_space_green",
+      "subject": "child astronaut figure",
+      "seed": 28,
+      "facing": "up",
+      "box": [
+        40,
+        40
+      ],
+      "out": "art/drivers/space/green.png",
+      "sheet_ground": "space_navy",
+      "_note": "Driver (DESIGN.md §22, §23.4): the space-helmet look, a Kontext edit of postprocess.driver_sketch (hat_kind 'space'). Faces UP: arms toward the top. Picked by the user 2026-10-08.",
+      "details": "seen exactly from straight above so only the top of the head shows, no face visible, a big round clear glass space helmet bubble with a shiny highlight, ginger hair with a little ponytail inside it, sitting on a bright green collar ring, small rounded shoulders in a bright green space suit either side, two short arms reaching forward, plain white background",
+      "sketch": {
+        "hat": [
+          46,
+          196,
+          107
+        ],
+        "hat_kind": "space",
+        "body": [
+          37,
+          157,
+          86
+        ],
+        "hair": [
+          214,
+          110,
+          48
+        ],
+        "hair_style": "ponytail"
+      },
+      "sketch_kind": "driver",
+      "candidate_seeds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "ship_surfer",
+      "subject": "a chunky toy space hover surfboard, smooth matte clay toy, seen from straight above as a flat lay map icon, only its top visible, no side view: a long rounded teal and white surfboard with a yellow lightning stripe down the middle, an empty standing spot with two round foot pads near the middle, two small silver rocket nozzles with orange flames at the back end, its pointed nose at the top, perfectly symmetrical",
+      "seed": 11,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/star_surfer.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 ship (DESIGN.md §23.4): Star Surfer, the slidiest; the driver stands on it. Replaced the Rocket Armchair on 2026-10-08 (the user: it did not fit in space). Picked by the user 2026-10-08.",
+      "candidate_seeds": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "id": "ship_freighter",
+      "subject": "a big chunky toy cargo spaceship, smooth matte clay toy, seen from straight above as a flat lay map icon, only its top visible, no side view: a long wide grey body with rows of stacked red, blue, yellow and green cargo containers on its flat back, a small cockpit with dark windows at the front, four round orange engine nozzles at the back, pointing straight up, perfectly symmetrical",
+      "seed": 16,
+      "facing": "left",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/ships/star_freighter.png",
+      "sheet_ground": "space_navy",
+      "_note": "Phase 22 ship (DESIGN.md §23.4): Star Freighter, big and heavy, no driver shown. Replaced the Space Whale on 2026-10-08 (the user: it did not fit in space). Picked by the user 2026-10-08 (seed 16). Faces LEFT as drawn: the green cockpit dome is the front, the engines on the right.",
+      "candidate_seeds": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
     }
   ],
   "variants": [
@@ -2443,6 +3010,96 @@
       ],
       "out": "art/ui/cards/boats/pirate.png",
       "_note": "Boat Dock card: the boat as designed."
+    },
+    {
+      "id": "card_ship_fighter",
+      "source": "ship_fighter",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/fighter.png",
+      "_note": "Hangar card: the ship as designed."
+    },
+    {
+      "id": "card_ship_pod",
+      "source": "ship_pod",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/pod.png",
+      "_note": "Hangar card: the ship as designed."
+    },
+    {
+      "id": "card_ship_saucer",
+      "source": "ship_saucer",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/saucer.png",
+      "_note": "Hangar card: the ship as designed."
+    },
+    {
+      "id": "card_ship_cardboard",
+      "source": "ship_cardboard",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/cardboard_rocket.png",
+      "_note": "Hangar card: the ship as designed."
+    },
+    {
+      "id": "card_ship_taxi",
+      "source": "ship_taxi",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/space_taxi.png",
+      "_note": "Hangar card: the ship as designed."
+    },
+    {
+      "id": "card_ship_teacup",
+      "source": "ship_teacup",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/teacup_saucer.png",
+      "_note": "Hangar card: the ship as designed."
+    },
+    {
+      "id": "card_ship_comet",
+      "source": "ship_comet",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/comet_racer.png",
+      "_note": "Hangar card: the ship as designed."
+    },
+    {
+      "id": "card_ship_surfer",
+      "source": "ship_surfer",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/star_surfer.png",
+      "_note": "Hangar card: the ship as designed."
+    },
+    {
+      "id": "card_ship_freighter",
+      "source": "ship_freighter",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/ships/star_freighter.png",
+      "_note": "Hangar card: the ship as designed."
     }
   ],
   "procedural": [
@@ -2488,7 +3145,7 @@
     }
   ],
   "paints": {
-    "_note": "Phase 10 paint shop: every car in five colours besides its own. Kontext recolours of each car's master; `reuse` points at an asset that already is that car in that colour (the opponents' recolours of the Starter car). Phase 20: `boats` does the same for the boats, into art/boats/paint/ and art/ui/cards/boats/paint/; yellow boats reuse themselves for yellow.",
+    "_note": "Phase 10 paint shop: every car in five colours besides its own. Kontext recolours of each car's master; `reuse` points at an asset that already is that car in that colour (the opponents' recolours of the Starter car). Phase 20: `boats` does the same for the boats, into art/boats/paint/ and art/ui/cards/boats/paint/; yellow boats reuse themselves for yellow. Phase 22: `ships` does the same for the spaceships, into art/ships/paint/ and art/ui/cards/ships/paint/; yellow ships reuse themselves.",
     "instruction": "Repaint the main body colour of this vehicle {colour}. Keep every other detail, decoration, wheel and window, the exact shape, the view from directly above and the plain white background exactly the same.",
     "seed": 11,
     "palette": {
@@ -2519,7 +3176,9 @@
       "starter_green": "car_green",
       "jetski_yellow": "boat_jetski",
       "duck_yellow": "boat_duck",
-      "banana_boat_yellow": "boat_banana"
+      "banana_boat_yellow": "boat_banana",
+      "pod_yellow": "ship_pod",
+      "space_taxi_yellow": "ship_taxi"
     },
     "seeds": {},
     "boats": {
@@ -2552,6 +3211,17 @@
         "formula_purple": 13,
         "formula_pink": 11
       }
+    },
+    "ships": {
+      "fighter": "ship_fighter",
+      "pod": "ship_pod",
+      "saucer": "ship_saucer",
+      "cardboard_rocket": "ship_cardboard",
+      "space_taxi": "ship_taxi",
+      "teacup_saucer": "ship_teacup",
+      "comet_racer": "ship_comet",
+      "star_surfer": "ship_surfer",
+      "star_freighter": "ship_freighter"
     }
   },
   "wheel_overrides": {

@@ -169,6 +169,30 @@
       "out": "art/music/race_lagoon.ogg",
       "seed": 101,
       "_note": "Phase 20 (DESIGN.md §20.6). Picked by the user by ear (2026-10-06)."
+    },
+    {
+      "id": "race_rings",
+      "use": "Ring Road (space)",
+      "prompt": "dreamy floating space racing music for a children's cartoon video game, shimmering synth pads, twinkling celesta arpeggios, warm bouncy synth bass, light electronic drums, major key, wondrous and gliding, instrumental, 120 BPM",
+      "seconds": 64.0,
+      "bpm": 120,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_rings.ogg",
+      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "seed": 101
+    },
+    {
+      "id": "race_nebula",
+      "use": "Nebula Station (space)",
+      "prompt": "bouncy cosmic adventure racing music for a children's cartoon video game, bubbly synth lead, sparkling vibraphone, funky electric bass, hand claps, upbeat electronic drums, major key, playful and colourful, instrumental, 128 BPM",
+      "seconds": 64.0,
+      "bpm": 128,
+      "bars": 16,
+      "intro_bars": 0,
+      "out": "art/music/race_nebula.ogg",
+      "_note": "Phase 22 space (DESIGN.md §23.6).",
+      "seed": 104
     }
   ]
 }
