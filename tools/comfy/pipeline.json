@@ -466,7 +466,8 @@
     "At 1536 px the board pulls in extra objects unless the lock is light (factor >= 4.5, weight <= 0.75).",
     "FLUX cannot make tileable ground ('a picture of a tile'); the style's ground is flat colour anyway, so it is procedural.",
     "Buildings: no prompt gets a straight-on top-down building out of FLUX-dev (always isometric). Kontext editing a flat block sketch does, and keeps the layout exactly.",
-    "Town vehicles and animals (Free Drive): 'seen from directly above, pointing straight up' still gives side views of trucks and front views of animals about half the time. Describe only what is visible from above ('only its roof visible: a long ribbed container...'), and record facing per pick: three of four vehicles faced DOWN."
+    "Town vehicles and animals (Free Drive): 'seen from directly above, pointing straight up' still gives side views of trucks and front views of animals about half the time. Describe only what is visible from above ('only its roof visible: a long ribbed container...'), and record facing per pick: three of four vehicles faced DOWN.",
+    "Kontext edits copy the finish of what they edit, until the instruction names real materials: 'wooden planks with visible nails, spoked wheels' turned a toy car photographic. Restyling that result ('restyle as a smooth glossy cartoon toy ... keep exactly the same layout') brings back the house look and keeps the shape (card_soapbox)."
   ],
   "buildings": {
     "_about": "Town buildings (Free Drive). FLUX draws every building isometric, however it is asked (docs/mockups/town/probes/01_view_search.png), and img2img from a drawing is either flat or isometric again. FLUX Kontext keeps the layout of an image it edits: it is given a flat block drawing in the street view (postprocess.building_sketch: roof from above, front wall facing straight down) and adds the clay detail. Uses the `variants` Kontext settings.",

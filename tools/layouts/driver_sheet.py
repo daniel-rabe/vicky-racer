@@ -14,7 +14,7 @@ ZOOM = 3
 SS = 4  # supersampling for the hole and glass shapes
 
 # Only the vehicles that show a driver (the closed roofs keep theirs hidden).
-CARS = ["kart", "bubble", "formula"]
+CARS = ["kart", "bubble", "formula", "soapbox"]
 BOATS = ["speedboat", "jetski", "duck", "swan", "tugboat", "pirate", "banana_boat"]
 TRAFFIC = {"bus": "bus", "fire_engine": "fire", "garbage_truck": "garbage"}
 KIDS = ["vicky", "blue", "yellow", "green", "p2"]

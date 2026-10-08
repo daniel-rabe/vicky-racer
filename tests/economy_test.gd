@@ -251,7 +251,7 @@ func _test_every_car_loads() -> void:
 	_wipe()
 	var m := _manager()
 	var cars := m.setups.values().filter(func(s: DriftSetup) -> bool: return s.kind == &"car")
-	_check(cars.size() == 12, "twelve cars in the garage (%d)" % cars.size())
+	_check(cars.size() == 13, "thirteen cars in the garage (%d)" % cars.size())
 	for id in GarageManager.SETUP_ORDER:
 		var setup: DriftSetup = m.setups[id]
 		_check(setup != null and setup.id == id and setup.card_art != null and setup.body != null,

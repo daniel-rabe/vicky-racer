@@ -9,7 +9,7 @@ extends Node
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
 ## Those that show a driver; the rest keep theirs hidden under the roof (docs/DESIGN.md §22.2).
-const SEATED: Array[String] = ["kart", "bubble", "formula", "speedboat", "jetski", "duck", "swan", "tugboat",
+const SEATED: Array[String] = ["kart", "bubble", "formula", "soapbox", "speedboat", "jetski", "duck", "swan", "tugboat",
 	"pirate", "banana_boat"]
 const TOWN_VEHICLES: Array[String] = ["bus", "fire_engine", "garbage_truck"]
 
@@ -28,7 +28,7 @@ func _ready() -> void:
 			var body := Paint.body(setup, colour)
 			if DriverSeats.seat_for(body).is_empty() == (String(setup.id) in SEATED):
 				wrong.append(body.resource_path)
-	_check(setups.size() == 21, "21 vehicles found (%d)" % setups.size())
+	_check(setups.size() == 22, "22 vehicles found (%d)" % setups.size())
 	_check(wrong.is_empty(), "open and glass vehicles have a seat in every paint, closed roofs none %s" % [wrong])
 	_check(DriverSeats.seat_for(load("res://art/town/vehicles/delivery_van.png")).is_empty(),
 		"the delivery van shows nobody (its windscreen is its face)")

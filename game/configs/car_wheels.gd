@@ -63,6 +63,11 @@ const BODIES := {
 	"paint/slider_pink.png": [Rect2i(25, 3, 27, 9), Rect2i(75, 3, 26, 9), Rect2i(25, 60, 27, 8), Rect2i(75, 61, 26, 8)],
 	"paint/slider_purple.png": [Rect2i(25, 3, 26, 9), Rect2i(75, 3, 25, 9), Rect2i(25, 61, 26, 8), Rect2i(75, 61, 25, 8)],
 	"paint/slider_yellow.png": [Rect2i(25, 3, 27, 9), Rect2i(75, 3, 26, 9), Rect2i(25, 60, 27, 9), Rect2i(75, 61, 26, 8)],
+	"paint/soapbox_blue.png": [Rect2i(20, 3, 27, 13), Rect2i(74, 3, 27, 13), Rect2i(20, 56, 27, 13), Rect2i(74, 56, 27, 13)],
+	"paint/soapbox_green.png": [Rect2i(20, 3, 27, 13), Rect2i(74, 3, 27, 13), Rect2i(20, 56, 27, 13), Rect2i(74, 56, 27, 13)],
+	"paint/soapbox_pink.png": [Rect2i(20, 3, 27, 13), Rect2i(74, 3, 27, 13), Rect2i(20, 56, 27, 13), Rect2i(74, 56, 27, 13)],
+	"paint/soapbox_purple.png": [Rect2i(20, 3, 27, 13), Rect2i(74, 3, 27, 13), Rect2i(20, 56, 27, 13), Rect2i(74, 56, 27, 13)],
+	"paint/soapbox_yellow.png": [Rect2i(20, 3, 27, 13), Rect2i(74, 3, 27, 13), Rect2i(20, 56, 27, 13), Rect2i(74, 56, 27, 13)],
 	"paint/starter_blue.png": [Rect2i(25, 3, 27, 9), Rect2i(78, 3, 24, 9), Rect2i(25, 60, 27, 9), Rect2i(78, 61, 24, 8)],
 	"paint/starter_green.png": [Rect2i(26, 3, 25, 10), Rect2i(77, 3, 25, 9), Rect2i(26, 60, 25, 9), Rect2i(77, 61, 25, 8)],
 	"paint/starter_pink.png": [Rect2i(25, 3, 26, 9), Rect2i(76, 3, 26, 9), Rect2i(25, 61, 26, 8), Rect2i(76, 61, 26, 8)],
@@ -78,6 +83,7 @@ const BODIES := {
 	"setups/police.png": [Rect2i(23, 3, 29, 9), Rect2i(77, 3, 26, 8), Rect2i(23, 60, 29, 9), Rect2i(77, 61, 26, 8)],
 	"setups/rocket.png": [Rect2i(51, 4, 18, 8), Rect2i(93, 3, 23, 9), Rect2i(51, 60, 18, 8), Rect2i(93, 61, 23, 8)],
 	"setups/slider.png": [Rect2i(25, 3, 27, 9), Rect2i(76, 3, 26, 8), Rect2i(25, 60, 27, 9), Rect2i(76, 61, 26, 8)],
+	"setups/soapbox.png": [Rect2i(20, 3, 27, 13), Rect2i(74, 3, 27, 13), Rect2i(20, 56, 27, 13), Rect2i(74, 56, 27, 13)],
 	"setups/starter.png": [Rect2i(29, 3, 21, 9), Rect2i(78, 3, 26, 9), Rect2i(29, 60, 21, 9), Rect2i(78, 61, 26, 8)],
 }
 

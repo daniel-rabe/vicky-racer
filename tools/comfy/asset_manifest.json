@@ -20,6 +20,28 @@
       "_note": "Chosen by the user as B2 in docs/mockups/bakeoff/car_choice/sheet.png. Faces DOWN: windscreen and round headlights at the bottom, amber tail lights at the top (first recorded as 'up', which made every car drive backwards)."
     },
     {
+      "id": "soapbox",
+      "subject": "a chunky toy soapbox cart seen from directly above, pointing straight up, perfectly symmetrical, a rounded open box painted warm honey yellow with an empty seat inside, four big round black wheels on short axles sticking out at the corners, a big red number 1 on the front",
+      "seed": 16,
+      "facing": "up",
+      "box": [
+        128,
+        72
+      ],
+      "out": "art/cars/setups/soapbox.png",
+      "candidate_seeds": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "_note": "Soapbox car (user's pick, seed 16): an original sprite in the house recipe (style-locked FLUX), not a Kontext edit: three rounds of Kontext edits of car_red never matched the game's matte clay look. Faces UP: the pointed nose is at the top, the rounded seat back at the bottom. Empty seat: the racer's driver is DriverRider's (DESIGN.md §22.2)."
+    },
+    {
       "id": "straw_ring",
       "subject": "a fat round ring of golden straw seen from above, a soft doughnut shape with a hole in the middle",
       "seed": 11,
@@ -2243,6 +2265,16 @@
       "_note": "In-race look of this setup: the same car as its garage card."
     },
     {
+      "id": "card_soapbox",
+      "source": "soapbox",
+      "box": [
+        312,
+        190
+      ],
+      "out": "art/ui/cards/soapbox.png",
+      "_note": "The Soapbox's garage card: the same cart as its race body, seat empty."
+    },
+    {
       "id": "body_grippy",
       "source": "card_grippy",
       "box": [
@@ -2478,7 +2510,8 @@
       "police": "card_police",
       "banana": "card_banana",
       "formula": "card_formula",
-      "dragon": "card_dragon"
+      "dragon": "card_dragon",
+      "soapbox": "soapbox"
     },
     "reuse": {
       "starter_blue": "car_blue",
@@ -2523,6 +2556,33 @@
   },
   "wheel_overrides": {
     "_note": "Hand fixes for tools/comfy/wheel_rects.py. The Bubble Car's tyres only peek out at its corners, too little to show a rolling tread.",
-    "*bubble*.png": "none"
+    "*bubble*.png": "none",
+    "*soapbox*.png": {
+      "_note": "The Soapbox's tyres have a light grey lit side that the darkness test misses, so the tread came out half as wide as the tyre.",
+      "rear_left": [
+        20,
+        3,
+        47,
+        16
+      ],
+      "front_left": [
+        74,
+        3,
+        101,
+        16
+      ],
+      "rear_right": [
+        20,
+        56,
+        47,
+        69
+      ],
+      "front_right": [
+        74,
+        56,
+        101,
+        69
+      ]
+    }
   }
 }

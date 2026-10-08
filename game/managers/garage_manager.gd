@@ -14,8 +14,8 @@ extends Node
 
 const SETUP_DIR := "res://game/configs/setups/"
 ## Display order in the garage, six to a page; prices rise left to right, top to bottom.
-const SETUP_ORDER: Array[StringName] = [&"starter", &"grippy", &"icecream", &"slider", &"rocket", &"kart",
-	&"monster", &"bubble", &"police", &"banana", &"formula", &"dragon"]
+const SETUP_ORDER: Array[StringName] = [&"starter", &"grippy", &"soapbox", &"icecream", &"slider",
+	&"rocket", &"kart", &"monster", &"bubble", &"police", &"banana", &"formula", &"dragon"]
 
 ## Track-select order. A track unlocks when the one before it has been finished — any place
 ## counts, so a child is never stuck behind a race they cannot win (docs/DESIGN.md §7.6).

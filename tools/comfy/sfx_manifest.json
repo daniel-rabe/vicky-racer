@@ -407,6 +407,32 @@
       "candidates": 8,
       "negative": "music, melody, speech, voice, talking, singing, crowd, distortion, clipping, low quality, muffled, waves, wind, bird",
       "_note": "Phase 21 (DESIGN.md §21.5): a dolphin leaping beside the boat."
+    },
+    {
+      "id": "rattle_loop",
+      "prompt": "steady continuous rattle and rumble of small hard wooden wheels rolling fast on a smooth road, a homemade wooden toy cart coasting, constant even clatter, no engine, no motor, close up, clean sound effect",
+      "negative": "engine, motor, music, melody, speech, voice, crowd, distortion, clipping, low quality, muffled",
+      "seconds": 6.0,
+      "kind": "loop",
+      "loop_seconds": 1.6,
+      "peak_db": -4.0,
+      "out": "art/sfx/rattle_loop.wav",
+      "seed": 107,
+      "candidates": 8,
+      "_note": "The Soapbox's 'engine' (DESIGN.md §4.2): it has none, so its loop is the wooden wheels, pitched by speed like the engine."
+    },
+    {
+      "id": "horn_soapbox",
+      "prompt": "a bicycle bell ringing twice, ding ding, a bright cheerful metal thumb bell, close up, clean sound effect",
+      "negative": "music, melody, speech, voice, crowd, car horn, distortion, clipping, low quality, muffled",
+      "seconds": 2.0,
+      "kind": "oneshot",
+      "max_seconds": 1.2,
+      "peak_db": -4.0,
+      "out": "art/sfx/horn_soapbox.wav",
+      "seed": 107,
+      "candidates": 8,
+      "_note": "The Soapbox's horn: a bicycle bell."
     }
   ],
   "synth": [

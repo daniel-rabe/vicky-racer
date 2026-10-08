@@ -8,7 +8,7 @@ extends RefCounted
 ## same picture, so "paint/kart_blue.png" seats its driver where "setups/kart.png" does.
 ## `pos` is the driver's head in texture pixels from the picture's centre (+X is the nose).
 ## `mode`:
-##   open  - drawn straight on top (boats, the kart, the formula)
+##   open  - drawn straight on top (boats, the kart, the formula, the soapbox)
 ##   glass - seen through glass (`window`, a Rect2 from the centre): the bubble car's dome,
 ##           the town trucks' windscreens
 ## `scale` multiplies the driver picture (40 px for a child, 44 px for a grown-up).
@@ -21,6 +21,7 @@ const SEATS := {
 	"kart": {"pos": Vector2(-19, 0), "mode": OPEN},
 	"bubble": {"pos": Vector2(0, 0), "mode": GLASS, "window": Rect2(-17, -17, 34, 34)},
 	"formula": {"pos": Vector2(-10, 0), "mode": OPEN, "scale": 0.85},
+	"soapbox": {"pos": Vector2(-6, 0), "mode": OPEN},
 	# Boats (128 x 72).
 	"speedboat": {"pos": Vector2(3, -6), "mode": OPEN},
 	"jetski": {"pos": Vector2(6, 0), "mode": OPEN},

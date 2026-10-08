@@ -149,12 +149,13 @@ A `DriftSetup` is a `Resource` of **multipliers over** `CarConfig`, never replac
 they multiply a sane base and the results are clamped, no setup can produce nonsense physics, and
 none is a strict upgrade — each is a different trade.
 
-Twelve cars, in garage order (prices rise left to right, two pages of six):
+Thirteen cars, in garage order (prices rise left to right, pages of six):
 
 | Car | Grip × | Handbrake grip × | Engine × | Top speed × | Steer × | Off road × | Bars G / S / S | Price | Extras |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | **Starter** | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 0.7 / 0.4 / 0.5 | owned | |
 | **Grippy** | 1.5 | 1.6 | 0.95 | 0.95 | 1.05 | 1.0 | 0.95 / 0.15 / 0.45 | 100 | |
+| **Soapbox** | 1.15 | 1.1 | 1.05 | 0.85 | 1.25 | 1.2 | 0.75 / 0.35 / 0.3 | 150 | open seat, like the kart; rattling wooden wheels instead of an engine, bicycle-bell horn |
 | **Ice-Cream Van** | 1.1 | 1.0 | 0.85 | 0.88 | 0.95 | 1.0 | 0.75 / 0.3 / 0.3 | 200 | horn plays a jingle |
 | **Slider** | 0.55 | 0.6 | 1.0 | 1.0 | 1.15 | 1.0 | 0.3 / 0.9 / 0.5 | 250 | |
 | **Rocket** | 0.9 | 1.0 | 1.25 | 1.2 | 0.8 | 1.0 | 0.55 / 0.45 / 0.9 | 250 | |
@@ -175,12 +176,14 @@ Monster Truck keeps ~90 % of its speed on grass where the Starter keeps 55 %, th
 Each car also brings its own **skid and smoke colour, engine pitch and horn** (`DriftSetup`'s
 "Look and sound" group); H / gamepad Y sounds the horn in a race — pure fun, no effect.
 
-The new cars are Kontext edits of the Starter car, like the Phase 5 setups, so all twelve share
+The Phase 10 cars are Kontext edits of the Starter car, like the Phase 5 setups, so they share
 one silhouette scale and the frozen look; candidates and picks are in
 [`mockups/candidates/`](mockups/candidates/) (`card_monster.png` … `card_dragon.png`). Two needed a
 second prompt: the first Monster Truck was red with knobbly tyres, too close to Grippy (now purple
 with green flames), and the first Bubble Car came out in perspective (now a round car with a
-central dome).
+central dome). The **Soapbox** (added 2026-10-07) is the exception: Kontext edits never matched the
+matte clay look (real wood came out photographic, restyles came out glossy plastic), so it is an original
+sprite in the house recipe, like `car_red`, with its seat left empty for the driver.
 
 **A setup also changes how the car looks:** in the race the player drives the car from its garage
 card — knobbly tyres for Grippy, light-blue swirls for Slider, boosters for Rocket, the go-kart, the
@@ -1740,8 +1743,8 @@ The driver follows the racer's colour, which the HUD, the names and the 2P marke
 A vehicle that shows its driver has one seat. All its paints share it, because a paint is a recolour of the same picture.
 
 - **Open seats:** the driver is drawn straight on top of the vehicle. These are the speedboat,
-  jet ski, duck, swan, banana boat, pirate deck and tugboat deck, and the kart and
-  formula.
+  jet ski, duck, swan, banana boat, pirate deck and tugboat deck, the kart, the
+  formula and the soapbox.
 - **Baked drivers:** the kart and formula already have a driver painted in. Their race bodies
   and paints are edited to show an empty seat; their garage cards keep the painted driver.
 - **Glass:** the bubble car's dome, and the windscreens of the bus, the fire engine and the garbage truck. The driver is
