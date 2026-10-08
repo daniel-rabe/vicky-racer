@@ -1984,6 +1984,65 @@
         27,
         28
       ]
+    },
+    {
+      "id": "paint_shop",
+      "subject": "paint shop",
+      "details": "a roof seen from above striped in rainbow colours with giant paint pots and a big paint brush lying on it, the cream front wall below with one wide open drive-in spray booth, colourful paint splashes on the wall, spray cans on a shelf",
+      "seed": null,
+      "facing": null,
+      "box": [
+        480,
+        430
+      ],
+      "out": "art/town/buildings/paint_shop.png",
+      "sketch": {
+        "width": 0.62,
+        "roof": 0.32,
+        "wall": 0.24,
+        "roof_colour": [
+          240,
+          120,
+          170
+        ],
+        "wall_colour": [
+          252,
+          232,
+          190
+        ],
+        "front": "garages",
+        "count": 1,
+        "door_colour": [
+          150,
+          200,
+          240
+        ]
+      },
+      "_note": "Free Drive town building: Kontext edit of a block sketch (pipeline.json buildings). Phase 23 (DESIGN.md §23): Gate B, not picked yet. A flat stand-in from tools/layouts/town_placeholders.py is in the game until then."
+    },
+    {
+      "id": "ice_cream_cone",
+      "subject": "an ice cream cone with two round scoops, pink strawberry and vanilla, with a cherry on top, a crisp waffle cone, lying flat, seen from directly above, flat lay",
+      "seed": null,
+      "facing": null,
+      "box": [
+        96,
+        96
+      ],
+      "out": "art/town/treats/ice_cream_cone.png",
+      "_note": "The ice cream parlour's treat, riding on the car's roof. Phase 23 (DESIGN.md §23): Gate B, not picked yet. A flat stand-in from tools/layouts/town_placeholders.py is in the game until then."
+    },
+    {
+      "id": "pizza",
+      "subject": "a whole round pizza with tomato, melted cheese and pepperoni slices seen from directly above, flat lay",
+      "seed": null,
+      "facing": null,
+      "box": [
+        96,
+        96
+      ],
+      "out": "art/town/treats/pizza.png",
+      "_note": "The pizza place's delivery, riding on the car's roof. Phase 23 (DESIGN.md §23): Gate B, not picked yet. A flat stand-in from tools/layouts/town_placeholders.py is in the game until then."
     }
   ],
   "variants": [

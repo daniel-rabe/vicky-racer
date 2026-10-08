@@ -53,6 +53,8 @@ const SURFACES := {
 	&"crater": {"speed_mult": 0.45, "grip_mult": 0.45},
 	# Free Drive's pond (town/town.gd): wade through slowly, with a splash.
 	&"water": {"speed_mult": 0.45, "grip_mult": 0.5},
+	# Free Drive's puddles when it rains (docs/DESIGN.md §23): full speed, slippery, a splash.
+	&"puddle": {"speed_mult": 1.0, "grip_mult": 0.5},
 	# Boat courses (docs/DESIGN.md §20.2). The channel is deep water at full speed; off it, each
 	# theme's shallows hold a boat back a little, and banks more (a hovercraft skims them all).
 	&"deep_water": {"speed_mult": 1.0, "grip_mult": 1.0},

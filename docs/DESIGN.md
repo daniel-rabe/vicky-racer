@@ -1787,3 +1787,70 @@ The art:
 - **Checking seats:** the seat sheet [`driver_sheet.png`](mockups/drivers/driver_sheet.png) is drawn by
   [`tools/layouts/driver_sheet.py`](../tools/layouts/driver_sheet.py) the way the rider draws, for
   tuning seats without running the game.
+
+## 23. Free Drive: more to do
+
+Asked for on 2026-10-08, picked from a list of ideas (1, 2, 5–12 and 14). The town gets things
+to play with and small jobs. None of them is required, none can be failed, and every one pays a
+few coins.
+
+### 23.1 Things to knock about
+
+- **Football** (idea 1): a pitch in the south-east park with two goals. The ball rolls and
+  bounces off the goal frames. A ball in a goal mouth pays 5 coins, with confetti and "GOAL!",
+  and is put back on the centre spot. Beach balls lie by the parasols on the beach.
+- **Traffic cones** (idea 2): stacks beyond each ramp and on the quay. They tumble over when hit
+  and stand up again 15 s later, once no car is near.
+- Cars do not collide with balls or cones. A ball or cone looks for a car touching it and is
+  kicked away, so a car never stops dead on one (`actors/town/kickable.gd`).
+
+### 23.2 Places that react
+
+- **Fountain** (idea 5): driving past splashes it up high and showers the car.
+- **Treats** (idea 6): the ice cream parlour and the candy shop put a treat on the roof for 30 s.
+- **Paint shop** (idea 7): a new building with a pad. Driving onto it gives the car its next
+  paint, in a puff of colour.
+- **Ramps** (idea 11): three paved ramps on the grass round the town. The car hops (it grows, its
+  shadow drops away) and lands over a line of coins.
+- **Rain** (idea 14): now and then a shower. The light dims, wipers sweep, puddles fill on the
+  roads (full speed but slippery, with a splash), and a rainbow shows after.
+
+### 23.3 Jobs
+
+- **Deliveries** (idea 8): the pizza place, the bakery and the flower shop put a parcel on the
+  roof. An arrow at the screen edge and a dot on the map show the house. Pulling up there pays 10.
+- **Lost puppy** (idea 9): the pet shop's puppy is somewhere in town. Finding it, it follows the
+  car home to the pet shop for 10.
+- **Fire engine** (idea 10): the fire station's pad swaps the car for the fire engine, with a
+  siren on the horn. Three bonfires burn by houses. The handbrake sprays water; a fire put out
+  pays 5 and another starts elsewhere. Back on the pad, the car again.
+- **School bus** (idea 12): the school's pad swaps the car for the bus. Dogs, cats and ducks wait
+  at four bus stops. Stopping beside one, riders from elsewhere get off and pay 3 each, then the
+  waiting animals get on. They show on the HUD.
+
+### 23.4 Art and sound (Gate B, open)
+
+Stand-ins until picked from seeds (`"seed": null` in the manifests):
+
+| Asset | Stand-in |
+| --- | --- |
+| `paint_shop` building | A placeholder from its block sketch (`tools/layouts/town_placeholders.py`) |
+| `ice_cream_cone`, `pizza` | Placeholders from the same script |
+| Football | The beach ball |
+| `rain_loop`, `cheer`, `water_spray`, `fire_out`, `bus_bell` | Silence, or an existing sound (chime, harbour bell) |
+
+### 23.5 Under the hood
+
+| Piece | File |
+| --- | --- |
+| Pitch, pads, bus stops, ramps, puddles as data and nodes | [`town/town_layout.gd`](../town/town_layout.gd), [`town/town.gd`](../town/town.gd) |
+| Balls and cones | [`actors/town/kickable.gd`](../actors/town/kickable.gd) |
+| Ramp hop | [`actors/town/car_hop.gd`](../actors/town/car_hop.gd) |
+| Treats, deliveries, puppy | [`actors/town/town_errands.gd`](../actors/town/town_errands.gd) |
+| Fires | [`actors/town/fire_duty.gd`](../actors/town/fire_duty.gd) |
+| Bus | [`actors/town/bus_route.gd`](../actors/town/bus_route.gd) |
+| Rain | [`actors/town/town_weather.gd`](../actors/town/town_weather.gd) |
+| Particles | [`actors/town/town_fx.gd`](../actors/town/town_fx.gd) |
+| Vehicle swaps, goal, fountain, pay | [`game/screens/town.gd`](../game/screens/town.gd) |
+| Pointer, passengers, map dots | [`ui/town/town_hud.gd`](../ui/town/town_hud.gd), [`ui/town/town_minimap.gd`](../ui/town/town_minimap.gd) |
+| Checks | [`tests/town_fun_test.gd`](../tests/town_fun_test.gd) |

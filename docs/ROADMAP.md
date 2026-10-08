@@ -355,6 +355,17 @@ The town becomes an island (asked for on 2026-10-06; it needs Phase 20's boats a
   - The HUD fades for the swap, shows the boat while sailing, and maps the coast.
   - `tests/island_test.gd` is new; the whole suite passes. 100 fps on land and at sea.
 
+## Phase 23 — Free Drive: more to do 🚧 in progress
+
+Asked for on 2026-10-08: ideas 1, 2, 5–12 and 14 from the Free Drive plan. DESIGN §23.
+
+- **Built (Gate C):** football and goals, beach balls, cones, fountain splash, treats on the
+  roof, the paint shop, deliveries, the lost puppy, the fire engine and bonfires, ramps, the
+  school bus with animal passengers, and rain with puddles, wipers and a rainbow.
+  `tests/town_fun_test.gd` is new.
+- **Open (Gate B):** the paint shop, ice cream and pizza pictures are placeholders; rain, cheer,
+  water spray, fire out and bus bell sounds are still to be picked from seeds.
+
 ---
 
 ## Ideas parked
@@ -363,7 +374,7 @@ Not planned, but worth keeping in mind:
 
 
 - **Track editor for the child** — place pieces on a grid and race on it. Delightful but large.
-- **Weather** — rain on any track (puddles = low-grip patches, wipers on the HUD).
+- **Weather on the race tracks** — rain in races too (Free Drive has it since Phase 23).
 - **Collectable coins on the track** — coins lying on the racing line, adding to the payout.
 - **Car customisation beyond paint** — stickers and spoilers on the car itself.
 - **Touch controls** — only if the game ever leaves the PC.

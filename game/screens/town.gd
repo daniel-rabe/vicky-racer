@@ -1,3 +1,4 @@
+class_name TownScreen
 extends Node2D
 ## Free Drive (docs/DESIGN.md §19): no race, no laps, no timer — the player drives their own
 ## car round a little town. Shops, a fire station, a school and a park line the streets;
@@ -12,6 +13,13 @@ extends Node2D
 ## into the mooring swaps back. At sea there are coins, a lighthouse, ramp islets, a slalom,
 ## a wreck, dolphins, gulls and sailboats.
 ##
+## More to do (§23): a football to kick into the goals, beach balls, cones to knock over,
+## the fountain splashing the car, jump ramps on the grass, treats and deliveries from the
+## shops (TownErrands), the pet shop's lost puppy, the paint shop's pad, the fire engine at
+## the fire station (FireDuty: put out the bonfires) and the school bus (BusRoute: take
+## animals from stop to stop), and now and then a shower of rain (TownWeather). The fire
+## engine and the bus are swapped to on their pads just as the boat is at the harbour.
+##
 ## Escape / Start pauses (RESUME / SETTINGS / GARAGE; the Boat Dock while sailing).
 ##
 ## Dev flags, after `--`:
@@ -23,6 +31,12 @@ extends Node2D
 ##   --start=wash  start the player on the car wash's pad (it is washed at once)
 ##   --start=harbour  start the player on the quay, next to the land pad
 ##   --start=sea   start the player sailing, in the boat, at the mooring
+##   --start=pitch / fountain / paint / ramp  start by the football pitch, the fountain, the
+##                 paint shop's pad, or at the foot of the first ramp's run-up
+##   --start=fire / bus  start in the fire engine / the school bus, on its pad
+##   --start=stop  start in the school bus, at the first bus stop
+##   --errand=pizza / puppy  start a delivery from the pizza place, or the lost puppy
+##   --rain        start a shower straight away
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
@@ -53,6 +67,26 @@ const SWAP_SOUND := "res://art/sfx/harbour_swap.wav"
 const SEA_VOICES := {"dolphin": "res://art/sfx/dolphin.wav", "seagull": "res://art/sfx/seagull.wav"}
 ## A pad swaps only a vehicle going slower than this, so racing across it does nothing.
 const SWAP_MAX_SPEED := 300.0
+const FIRE_ENGINE_ART := "res://art/town/vehicles/fire_engine.png"
+const BUS_ART := "res://art/town/vehicles/bus.png"
+const SIREN := "res://art/sfx/horn_police.wav"
+const SPLASH := "res://art/sfx/splash.wav"
+const WASH_SOUND := "res://art/sfx/car_wash.wav"
+const CHEER := "res://art/sfx/cheer.wav"
+const CHIME := "res://art/sfx/sparkle.wav"
+const BALL := preload("res://art/props/beach/beach_ball.png")
+const CONE := preload("res://art/props/town/traffic_cone.png")
+## The fire engine and the bus are a little slower than a car.
+const BIG_VEHICLE_SPEED := 0.8
+## Driving this near the fountain splashes the car, at most once every FOUNTAIN_REST s.
+const FOUNTAIN_REACH := 330.0
+const FOUNTAIN_REST := 4.0
+const GOAL_PAY := 5
+## Cones: a little stack beyond each ramp's landing, and one on the quay.
+const QUAY_CONES := Vector2(5080.0, 8470.0)
+const CONE_GAP := 64.0
+## Coins in the air beyond each ramp.
+const RAMP_COINS := 5
 const COINS := 36
 const COIN_VALUE := 2
 const COIN_GAP := 300.0
@@ -66,13 +100,27 @@ const START_AT := 0.35
 const START_CLEAR := 900.0
 
 var town: Town
-## The vehicle the player is driving now: the car, or the boat while sailing.
+## The vehicle the player is driving now: the car, the boat, the fire engine or the bus.
 var player: Car
 ## The player's car and boat. The one not being driven waits at the harbour; the boat is
-## made at the first swap.
+## made at the first swap. The fire engine and the bus are made the first time too; whichever
+## of them and the car is not being driven is put away out of sight (on its pad).
 var car: Car
 var boat: Boat
-var sailing := false
+var fire_engine: Car
+var bus: Car
+## &"car", &"boat", &"fire_engine" or &"bus".
+var riding := &"car"
+var sailing: bool:
+	get:
+		return riding == &"boat"
+## The things to do (§23).
+var errands: TownErrands
+var fire_duty: FireDuty
+var bus_route: BusRoute
+var weather: TownWeather
+var ball: Kickable
+var kickables: Array[Kickable] = []
 var traffic: Array[Car] = []
 var visited: Dictionary = {}  # place id -> true, this drive
 var _setup: DriftSetup
@@ -86,6 +134,9 @@ var _sea_life: SeaLife
 var _waves: AudioStreamPlayer
 var _bell: AudioStreamPlayer
 var _rng := RandomNumberGenerator.new()
+var _fountain_rest := 0.0
+var _goal_rest := 0.0
+var _voice: AudioStreamPlayer
 
 @onready var _world: Node2D = $World
 @onready var _cars: Node2D = $World/Cars
@@ -131,15 +182,26 @@ func _ready() -> void:
 	_spawn_traffic()
 	_spawn_walkers()
 	_spawn_coins()
+	_spawn_kickables()
 	_add_sky()
 	_add_sea_life()
 	_add_ambience()
+	_add_jobs()
 	town.place_reached.connect(_on_place_reached)
+	town.pad_reached.connect(_on_pad_reached)
+	EventSystem.CAR_surface_changed.connect(_on_surface_changed)
 	hud.setup(town, player, traffic, TownLayout.PLACE_NAMES.size())
 	EventSystem.PRO_state_requested.emit()  # the HUD's coin count
 	for arg in args:
 		if arg.begins_with("--start="):
 			_dev_start(arg.get_slice("=", 1))
+		elif arg.begins_with("--errand="):
+			if arg.ends_with("puppy"):
+				errands.start_puppy()
+			else:
+				errands.start_delivery("pizza_place")
+	if "--rain" in args:
+		weather.rain_now()
 	if "--overview" in args:
 		_show_overview()
 	if "--traffic-report" in args:
@@ -242,48 +304,135 @@ func _the_boat() -> Boat:
 	return boat
 
 
-# --- the harbour (§21.3) ----------------------------------------------------------------
+# --- swapping vehicles: the harbour (§21.3), the fire station and the school (§23) -------
 
-func _physics_process(_delta: float) -> void:
-	if _swapping or player == null or player.has_node(^"TrafficDriver"):
+func _physics_process(delta: float) -> void:
+	if player == null:
 		return
-	var pad := Island.MOORING if sailing else Island.LAND_PAD
-	var on_pad := pad.has_point(player.global_position)
-	if not on_pad and not pad.grow(60.0).has_point(player.global_position):
+	_check_fountain(delta)
+	_check_goal(delta)
+	hud.set_marks(errands.marks() + fire_duty.marks())
+	if _swapping or player.has_node(^"TrafficDriver"):
+		return
+	var near_a_pad := false
+	for pad: Array in _pads():
+		var rect: Rect2 = pad[0]
+		if pad[1] != riding or rect == Rect2():
+			continue
+		if rect.grow(60.0).has_point(player.global_position):
+			near_a_pad = true
+		if rect.has_point(player.global_position) and _pad_armed and player.velocity.length() < SWAP_MAX_SPEED:
+			_swap(pad[2])
+			return
+	if not near_a_pad:
 		_pad_armed = true
-	elif on_pad and _pad_armed and player.velocity.length() < SWAP_MAX_SPEED:
-		_swap()
+
+
+## Every pad that swaps the player: [where, driving what, into what].
+func _pads() -> Array:
+	return [[Island.LAND_PAD, &"car", &"boat"], [Island.MOORING, &"boat", &"car"],
+		[town.fire_pad, &"car", &"fire_engine"], [town.fire_pad, &"fire_engine", &"car"],
+		[town.bus_pad, &"car", &"bus"], [town.bus_pad, &"bus", &"car"]]
 
 
 ## The bell, a quick fade to white, and on the far side the other vehicle: the boat at the
-## mooring pointing out to sea, or the car on the land pad facing up the harbour road.
-func _swap() -> void:
+## mooring pointing out to sea, or the car on the land pad facing up the harbour road; the
+## fire engine or the bus on its pad facing the road, or the car back there.
+func _swap(to := &"") -> void:
 	_swapping = true
 	_pad_armed = false
 	_ring_bell()
 	await hud.fade(true)
-	_swap_now()
+	_swap_now(to)
 	await hud.fade(false)
 	_swapping = false
 
 
-func _swap_now() -> void:
+## Swap to `to` (&"": between the car and the boat, the other one).
+func _swap_now(to := &"") -> void:
+	if to == &"":
+		to = &"car" if sailing else &"boat"
 	var from := player
-	var to: Car = car if sailing else _the_boat()
+	var from_kind := riding
+	var next := _vehicle(to)
 	_park(from)
-	# The boat is tied up at the mooring, pointing out to sea, whether it is leaving or
-	# arriving; the car comes back on the land pad, facing up the harbour road.
-	_place(boat, Island.MOORING.get_center(), PI / 2.0)
-	if to == car:
-		_place(car, Island.LAND_PAD.get_center(), -PI / 2.0)
-	_drive(to)
-	sailing = to == boat
+	if &"boat" in [from_kind, to]:
+		# The boat is tied up at the mooring, pointing out to sea, whether it is leaving or
+		# arriving; the car comes back on the land pad, facing up the harbour road.
+		_place(boat, Island.MOORING.get_center(), PI / 2.0)
+		if to == &"car":
+			_place(car, Island.LAND_PAD.get_center(), -PI / 2.0)
+	else:
+		# The fire engine and the bus: whichever is left behind is put away, and the other
+		# comes out on the pad, facing the road.
+		var pad := town.fire_pad if &"fire_engine" in [from_kind, to] else town.bus_pad
+		_stow(from)
+		_unstow(next)
+		_place(next, pad.get_center(), PI / 2.0)
+	if from_kind == &"fire_engine":
+		fire_duty.stop()
+	elif from_kind == &"bus":
+		bus_route.stop()
+	_drive(next)
+	riding = to
+	if to == &"fire_engine":
+		fire_duty.start(next)
+	elif to == &"bus":
+		bus_route.start(next)
 	_pad_armed = false
 	_sea_life.player = player
-	hud.set_vehicle(player, sailing)
+	hud.set_vehicle(player, riding)
 	EventSystem.PRO_vehicle_kind_requested.emit(&"boat" if sailing else &"car")  # the pause menu's GARAGE
 	if _waves:
 		_waves.create_tween().tween_property(_waves, "volume_db", WAVES_DB.y if sailing else WAVES_DB.x, 1.0)
+
+
+func _vehicle(kind: StringName) -> Car:
+	match kind:
+		&"boat":
+			return _the_boat()
+		&"fire_engine":
+			if fire_engine == null:
+				fire_engine = _town_vehicle("PlayerFireEngine", load(FIRE_ENGINE_ART), load(SIREN))
+			return fire_engine
+		&"bus":
+			if bus == null:
+				bus = _town_vehicle("PlayerBus", load(BUS_ART), null)
+			return bus
+	return car
+
+
+## A big town vehicle for the player: Vicky behind its windscreen, a little slower than a car,
+## no drifting (the drift button is the fire engine's hose).
+func _town_vehicle(vehicle_name: String, picture: Texture2D, horn: AudioStream) -> Car:
+	var vehicle: Car = CAR_SCENE.instantiate()
+	vehicle.name = vehicle_name
+	var setup: DriftSetup = load(SETUP_DIR + "starter.tres").duplicate()
+	if horn:
+		setup.horn = horn
+	vehicle.setup = setup
+	vehicle.body_texture = picture
+	vehicle.driver_id = DriverLook.VICKY
+	_fit_body(vehicle, picture)
+	_cars.add_child(vehicle)
+	vehicle.config.max_speed *= BIG_VEHICLE_SPEED
+	vehicle.config.handbrake_lateral_grip = vehicle.config.lateral_grip
+	_stow(vehicle)
+	return vehicle
+
+
+## Out of sight and out of the way: not drawn, touching nothing, not a car to anyone.
+func _stow(vehicle: Car) -> void:
+	vehicle.visible = false
+	vehicle.collision_layer = 0
+	vehicle.collision_mask = 0
+	vehicle.remove_from_group(&"cars")
+
+
+func _unstow(vehicle: Car) -> void:
+	vehicle.visible = true
+	vehicle.add_to_group(&"cars")
+	vehicle.set_level(0)
 
 
 func _place(vehicle: Car, at: Vector2, angle: float) -> void:
@@ -431,10 +580,18 @@ func _spawn_coins() -> void:
 	for at in Island.sea_coins():
 		var coin := TownCoin.new()
 		coin.position = at
-		coin.set_meta(&"sea", true)
+		coin.set_meta(&"fixed", true)
 		coin.collected.connect(_on_coin_collected)
 		_coins.add_child(coin)
 		coin.collision_mask |= Car.LAYER_AIRBORNE
+	# Over each ramp's landing: a line of coins to catch in the air (§23).
+	for ramp: Dictionary in town.ramps:
+		for k in RAMP_COINS:
+			var coin := TownCoin.new()
+			coin.position = ramp["at"] + ramp["throw"] * (230.0 + 110.0 * k)
+			coin.set_meta(&"fixed", true)
+			coin.collected.connect(_on_coin_collected)
+			_coins.add_child(coin)
 
 
 ## Somewhere on a road, in a lane or between them, clear of the junctions and of the other
@@ -455,14 +612,21 @@ func _coin_spot() -> Vector2:
 
 func _on_coin_collected(coin: TownCoin) -> void:
 	coin.pop()
-	EventSystem.PRO_coins_found.emit(COIN_VALUE)
-	hud.coin_popped(coin.global_position)
+	pay(COIN_VALUE, coin.global_position)
 	get_tree().create_timer(COIN_RESPAWN, false).timeout.connect(func() -> void:
 		if is_instance_valid(coin):
-			coin.reappear(coin.position if coin.has_meta(&"sea") else _coin_spot()))
+			coin.reappear(coin.position if coin.has_meta(&"fixed") else _coin_spot()))
 
 
-func _on_place_reached(_place_id: String, display_name: String, picture: Texture2D) -> void:
+## Coins earned at `at`: banked at once, and a +N floats up from there.
+func pay(amount: int, at: Vector2) -> void:
+	EventSystem.PRO_coins_found.emit(amount)
+	hud.coin_popped(at, amount)
+
+
+func _on_place_reached(place_id: String, display_name: String, picture: Texture2D) -> void:
+	if player == car:
+		errands.on_place(place_id)
 	var first := not visited.has(display_name)
 	visited[display_name] = true
 	hud.show_place(display_name, picture, visited.size(), first)
@@ -470,6 +634,127 @@ func _on_place_reached(_place_id: String, display_name: String, picture: Texture
 		EventSystem.PRO_coins_found.emit(ALL_PLACES_BONUS)
 		hud.show_banner("YOU VISITED EVERY PLACE!  +%d" % ALL_PLACES_BONUS)
 
+
+
+# --- things to do (§23) -------------------------------------------------------------------
+
+## The football on the pitch, a beach ball by every parasol, and stacks of cones beyond the
+## ramps' landings and on the quay.
+func _spawn_kickables() -> void:
+	ball = _kickable(Kickable.Kind.BALL, BALL, 84.0, town.pitch.get_center())
+	ball.roam = town.pitch.size.length() * 0.5 + 300.0
+	for spot in town.beach_balls:
+		_kickable(Kickable.Kind.BALL, BALL, 70.0, spot).roam = 700.0
+	var stacks: Array[Array] = [[QUAY_CONES, Vector2.DOWN]]
+	for ramp: Dictionary in town.ramps:
+		stacks.append([ramp["at"] + ramp["throw"] * (TownLayout.RUNWAY_AFTER + 220.0), ramp["throw"]])
+	for stack in stacks:
+		# A little triangle, its point towards whoever comes: rows of 1, 2 and 3.
+		var facing: Vector2 = stack[1]
+		for row in 3:
+			for k in row + 1:
+				var across := Town.right_of(facing) * (k - row / 2.0) * CONE_GAP
+				_kickable(Kickable.Kind.CONE, CONE, 52.0, stack[0] + facing * row * CONE_GAP * 0.85 + across)
+
+
+func _kickable(kind: Kickable.Kind, picture: Texture2D, size: float, at: Vector2) -> Kickable:
+	var thing := Kickable.new()
+	thing.kind = kind
+	thing.picture = picture
+	thing.size = size
+	thing.home = at
+	_walkers.add_child(thing)
+	kickables.append(thing)
+	return thing
+
+
+## Into a goal: confetti, a cheer, coins, and the ball back on the centre spot.
+func _check_goal(delta: float) -> void:
+	_goal_rest = maxf(_goal_rest - delta, 0.0)
+	if _goal_rest > 0.0 or ball == null:
+		return
+	for goal in town.goals:
+		if goal.has_point(ball.global_position):
+			_goal_rest = 2.5
+			TownFx.confetti(_world, goal.get_center())
+			pay(GOAL_PAY, goal.get_center())
+			hud.show_banner("GOAL!")
+			_play(CHEER if ResourceLoader.exists(CHEER) else CHIME, -2.0)
+			get_tree().create_timer(1.2, false).timeout.connect(ball.stand_up)
+			return
+
+
+## Splashing past the fountain: it shoots up high, and drops fly all over the car.
+func _check_fountain(delta: float) -> void:
+	_fountain_rest = maxf(_fountain_rest - delta, 0.0)
+	if _fountain_rest > 0.0 or town.fountain_spray == null:
+		return
+	if player.global_position.distance_to(town.fountain_at) > FOUNTAIN_REACH or player.velocity.length() < 60.0:
+		return
+	_fountain_rest = FOUNTAIN_REST
+	var spray := town.fountain_spray
+	var tween := spray.create_tween()
+	tween.tween_property(spray, "initial_velocity_max", 300.0, 0.2)
+	tween.parallel().tween_property(spray, "scale_amount_max", 14.0, 0.2)
+	tween.tween_interval(1.4)
+	tween.tween_property(spray, "initial_velocity_max", 90.0, 1.0)
+	tween.parallel().tween_property(spray, "scale_amount_max", 8.0, 1.0)
+	TownFx.drops(_world, player.global_position, 36)
+	var body: CanvasItem = player.get_node(^"Body")
+	var shine := body.create_tween()
+	shine.tween_property(body, "self_modulate", Color(0.75, 0.9, 1.3), 0.12)
+	shine.tween_property(body, "self_modulate", Color.WHITE, 0.6)
+	_play(SPLASH, -4.0)
+
+
+## The paint shop's pad: the car comes out in its next colour, in a cloud of it.
+func _on_pad_reached(kind: StringName, vehicle: Car) -> void:
+	if kind != &"paint" or vehicle != car or _setup == null:
+		return
+	EventSystem.PRO_paint_requested.emit(_setup.id)
+	EventSystem.PRO_state_requested.emit()  # _on_state_changed takes the new paint
+	car.body_texture = Paint.body(_setup, _paint)
+	TownFx.paint_cloud(_world, car.global_position, Paint.SWATCHES.get(_paint, Color(1, 1, 1)))
+	_play(WASH_SOUND, -4.0)
+
+
+## Into a puddle: a splash.
+func _on_surface_changed(changed: Node, surface: StringName) -> void:
+	if changed == player and surface == &"puddle" and player.velocity.length() > 150.0:
+		TownFx.drops(_world, player.global_position, 18)
+		_play(SPLASH, -10.0)
+
+
+func _add_jobs() -> void:
+	errands = TownErrands.new()
+	errands.name = "Errands"
+	errands.screen = self
+	_world.add_child(errands)
+	fire_duty = FireDuty.new()
+	fire_duty.name = "FireDuty"
+	fire_duty.screen = self
+	_world.add_child(fire_duty)
+	bus_route = BusRoute.new()
+	bus_route.name = "BusRoute"
+	bus_route.screen = self
+	_world.add_child(bus_route)
+	weather = TownWeather.new()
+	weather.name = "Weather"
+	weather.town = town
+	add_child(weather)
+	move_child(weather, hud.get_index())  # its rain falls under the HUD
+	_voice = AudioStreamPlayer.new()
+	_voice.name = "Voice"
+	_voice.bus = &"SFX"
+	add_child(_voice)
+
+
+func _play(path: String, volume_db: float) -> void:
+	if not SoundManager.audible() or not ResourceLoader.exists(path):
+		return
+	_voice.stream = load(path)
+	_voice.volume_db = volume_db
+	_voice.play()
 
 
 ## Things in the sky: hot-air balloons drifting over, and now and then a flock of birds.
@@ -531,8 +816,29 @@ func _dev_start(where: String) -> void:
 		at = Vector2(Island.LAND_PAD.end.x + 260.0, Island.LAND_PAD.get_center().y)
 		player.rotation = PI  # facing the land pad
 	elif where == "sea":
-		_swap_now()
+		_swap_now(&"boat")
 		return
+	elif where in ["fire", "bus", "stop"]:
+		_swap_now(&"fire_engine" if where == "fire" else &"bus")
+		if where == "stop":
+			var stop: Dictionary = town.bus_stops[0]
+			player.global_position = stop["stop"] - stop["along"] * 500.0
+			player.rotation = stop["along"].angle()
+			player.reset_physics_interpolation()
+		player.get_node(^"ChaseCamera").snap_to_car()
+		return
+	elif where == "pitch":
+		at = town.pitch.get_center() + Vector2(-260, 60)
+	elif where == "fountain":
+		at = town.fountain_at + Vector2(-420, 0)
+		player.rotation = 0.0
+	elif where == "paint":
+		at = town.paint_pad.get_center() + Vector2(0, 260)
+		player.rotation = -PI / 2.0
+	elif where == "ramp":
+		var ramp: Dictionary = town.ramps[0]
+		at = ramp["at"] - ramp["throw"] * (TownLayout.RUNWAY_BEFORE - 80.0)
+		player.rotation = ramp["throw"].angle()
 	else:
 		at = Vector2(float(where.get_slice(",", 0)), float(where.get_slice(",", 1)))
 	player.global_position = at
