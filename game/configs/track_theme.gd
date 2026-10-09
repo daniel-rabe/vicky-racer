@@ -21,6 +21,9 @@ extends Resource
 @export var card_colour := Color(0.36, 0.73, 0.29)
 ## Played during the race (docs/DESIGN.md §13).
 @export var music: MusicPiece
+## What the sky may do in a race (docs/DESIGN.md §25): &"rain" (a shower, puddles on the road),
+## &"snow" (flakes falling), or nothing.
+@export var weather := &""
 
 @export_group("Water (boat courses)")
 ## A boat course (docs/DESIGN.md §20): `asphalt` is the channel's deep water and `kerb` its

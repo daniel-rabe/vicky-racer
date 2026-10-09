@@ -410,6 +410,17 @@ Asked for on 2026-10-08: ideas 1, 2, 5–12 and 14 from the Free Drive plan. DES
 - **Open (Gate B):** the paint shop, ice cream and pizza pictures are placeholders; rain, cheer,
   water spray, fire out and bus bell sounds are still to be picked from seeds.
 
+## Phase 24 — Weather on the race tracks ✅ done
+
+Asked for on 2026-10-08 ("add weather"). DESIGN §25.
+
+- **Built:** a shower in some races on Meadow Loop, Sunny Beach, Toy Town and Jungle Run, with
+  slippery puddles on the road, splashes, raindrop rings and a rainbow after; snow falling on
+  Snowy Peak. Free Drive's rain now runs on the same `Weather` node. Puddle checks in
+  `tests/track_test.gd`.
+- **Open (Gate B):** the rain sound (`rain_loop`), shared with Free Drive, still to be picked
+  from seeds.
+
 ---
 
 ## Ideas parked
@@ -418,7 +429,6 @@ Not planned, but worth keeping in mind:
 
 
 - **Track editor for the child** — place pieces on a grid and race on it. Delightful but large.
-- **Weather on the race tracks** — rain in races too (Free Drive has it since Phase 23).
 - **Collectable coins on the track** — coins lying on the racing line, adding to the payout.
 - **Car customisation beyond paint** — stickers and spoilers on the car itself.
 - **Touch controls** — only if the game ever leaves the PC.

@@ -19,4 +19,5 @@ kerb = ExtResource("4_kerb")
 wall_prop = ExtResource("5_wall")
 wall_spacing = 86.0
 card_colour = Color(0.31, 0.63, 0.24, 1)
+weather = &"rain"
 music = ExtResource("6_music")

@@ -174,8 +174,29 @@ func _test_every_track(id: StringName) -> void:
 		if t.distance_to_line(prop.global_position) < t.road_half_width + 40.0:
 			on_road += 1
 	_check(on_road == 0, "  no prop stands on the road (%d do)" % on_road)
+	if t.theme.weather == &"rain":
+		_test_puddles(t)
 	t.queue_free()
 	await get_tree().physics_frame
+
+
+## Rain (docs/DESIGN.md §25): puddles lie on the road, are just road while dry, and are
+## slippery puddles while wet.
+func _test_puddles(t: Track) -> void:
+	t.add_puddles(RaceWeather.PUDDLES)
+	_check(t.puddles.size() >= RaceWeather.PUDDLES - 2, "  %d puddles on the road" % t.puddles.size())
+	var dry := 0
+	var wet := 0
+	var off := 0
+	for p in t.puddles:
+		var at := Vector2(p.x, p.y)
+		off += int(t.distance_to_line(at) > t.road_half_width)
+		dry += int(t.surface_at(at) == &"puddle")
+	t.set_wet(1.0)
+	for p in t.puddles:
+		wet += int(t.surface_at(Vector2(p.x, p.y)) == &"puddle")
+	_check(off == 0 and dry == 0 and wet == t.puddles.size(),
+		"  dry they are road, wet they are puddles (%d off the road, %d dry, %d of %d wet)" % [off, dry, wet, t.puddles.size()])
 
 
 ## A car crossing a boost pad goes faster than its top speed for a moment.
