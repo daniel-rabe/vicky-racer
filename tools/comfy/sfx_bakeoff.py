@@ -56,7 +56,7 @@ ARMS = {
     "A": {"title": "Same model, fixed recipe", "checkpoint": "stable_audio_3_medium_base.safetensors",
           "steps": 50, "cfg": 4.5, "sampler": "euler", "scheduler": "simple"},
     "B": {"title": "Stable Audio 3 Small-SFX", "checkpoint": "small_sfx",  # resolved against ComfyUI's list
-          "steps": 8, "cfg": 1.0, "sampler": "euler", "scheduler": "simple"},
+          "steps": 8, "cfg": 1.0, "sampler": "lcm", "scheduler": "simple"},  # as ComfyUI's distilled template,
 }
 
 
