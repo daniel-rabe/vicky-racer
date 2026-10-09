@@ -399,7 +399,7 @@ The user chose these on 2026-10-07:
   - `tests/space_test.gd` and the whole suite.
   - A balance pass.
 
-## Phase 23 — Free Drive: more to do 🚧 in progress
+## Phase 23 — Free Drive: more to do ✅ done
 
 Asked for on 2026-10-08: ideas 1, 2, 5–12 and 14 from the Free Drive plan. DESIGN §23.
 
@@ -407,8 +407,9 @@ Asked for on 2026-10-08: ideas 1, 2, 5–12 and 14 from the Free Drive plan. DES
   roof, the paint shop, deliveries, the lost puppy, the fire engine and bonfires, ramps, the
   school bus with animal passengers, and rain with puddles, wipers and a rainbow.
   `tests/town_fun_test.gd` is new.
-- **Open (Gate B):** the paint shop, ice cream and pizza pictures are placeholders; rain, cheer,
-  water spray, fire out and bus bell sounds are still to be picked from seeds.
+- **Gate B: art and sound** (done 2026-10-09; DESIGN §23.4). Every seed was picked by the user:
+  the paint shop, ice cream and pizza pictures, and the rain, cheer, water spray, fire out and
+  bus bell sounds. The football stays the beach ball.
 
 ## Phase 24 — Weather on the race tracks ✅ done
 
@@ -418,8 +419,7 @@ Asked for on 2026-10-08 ("add weather"). DESIGN §25.
   slippery puddles on the road, splashes, raindrop rings and a rainbow after; snow falling on
   Snowy Peak. Free Drive's rain now runs on the same `Weather` node. Puddle checks in
   `tests/track_test.gd`.
-- **Open (Gate B):** the rain sound (`rain_loop`), shared with Free Drive, still to be picked
-  from seeds.
+- **Gate B:** the rain sound (`rain_loop`), shared with Free Drive, picked 2026-10-09 (seed 108).
 
 ---
 

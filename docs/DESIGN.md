@@ -1831,16 +1831,16 @@ few coins.
   at four bus stops. Stopping beside one, riders from elsewhere get off and pay 3 each, then the
   waiting animals get on. They show on the HUD.
 
-### 23.4 Art and sound (Gate B, open)
+### 23.4 Art and sound (Gate B, done 2026-10-09)
 
-Stand-ins until picked from seeds (`"seed": null` in the manifests):
+Every seed was picked by the user from numbered candidates:
 
-| Asset | Stand-in |
+| Asset | Seed |
 | --- | --- |
-| `paint_shop` building | A placeholder from its block sketch (`tools/layouts/town_placeholders.py`) |
-| `ice_cream_cone`, `pizza` | Placeholders from the same script |
-| Football | The beach ball |
-| `rain_loop`, `cheer`, `water_spray`, `fire_out`, `bus_bell` | Silence, or an existing sound (chime, harbour bell) |
+| `paint_shop` building | 11 |
+| `ice_cream_cone`, `pizza` | 12, 13 |
+| `rain_loop`, `cheer`, `water_spray`, `fire_out`, `bus_bell` | 108, 103, 107, 108, 107 |
+| Football | The beach ball, kept |
 
 ### 23.5 Under the hood
 
