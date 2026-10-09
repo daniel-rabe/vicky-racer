@@ -83,6 +83,8 @@ const ASPHALT := preload("res://art/tiles/asphalt.png")
 const KERB := preload("res://art/tiles/kerb.png")
 const CHEQUER := preload("res://art/tiles/finish_line.png")
 const ROAD_ICE := preload("res://art/tiles/snow/road_ice.png")
+## Swaying tufts, wind and daisies on grass (living_ground.gdshader).
+const LIVING_GROUND := preload("res://track/living_ground.tres")
 const OUTLINE_COLOUR := Color(0.106, 0.118, 0.137)
 const DASH_COLOUR := Color(0.925, 0.925, 0.882)
 const KERB_WIDTH := 38.0
@@ -158,6 +160,8 @@ const DECK_DRAW_MARGIN := 120.0  # the middle part of a span stands high enough 
 
 func _ready() -> void:
 	_build_road()
+	if theme == null or &"grass" in [theme.base_surface, theme.patch_surface]:
+		ground.material = LIVING_GROUND
 	if Engine.is_editor_hint():
 		racing_line.curve.changed.connect(_build_road.call_deferred)
 		return
