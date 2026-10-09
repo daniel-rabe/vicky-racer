@@ -156,3 +156,8 @@ tools/comfy/masters/driver_space_*
 !tools/comfy/masters/sfx/horn_teacup_104.flac
 # The space sounds' listening page (MP3 previews, rebuilt by tools/comfy/listen_space.py).
 docs/mockups/sfx/listen_space/
+
+# Sound bake-off 2026-10-09 (sfx_bakeoff.py): masters, CC0 drops and previews stay local.
+tools/comfy/masters/sfx_bakeoff/
+tools/comfy/masters/sfx_cc0/
+docs/mockups/sfx/bakeoff/
