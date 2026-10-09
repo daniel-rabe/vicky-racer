@@ -132,6 +132,8 @@ func _on_state_changed(state: Dictionary) -> void:
 	for entry: Dictionary in state.get("tracks", []):
 		if entry["config"].track_id == state.get("selected_track"):
 			config = entry["config"]
+	if state.get("selected_track") == CustomTrack.ID and state.get("custom_track"):
+		config = state["custom_track"]
 
 
 ## Rain or snow, if the track's sky has some today (RaceWeather). It falls under the HUD.

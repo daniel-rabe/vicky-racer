@@ -24,6 +24,7 @@ const SCREEN_MUSIC := {
 	&"results": MENU,
 	&"shelf": MENU,
 	&"join": MENU,
+	&"editor": MENU,
 	&"standings": STANDINGS,
 	&"podium": PODIUM,
 }

@@ -50,6 +50,9 @@ var race_mode: StringName = &"race"
 ## &"car", &"boat" or &"ship": which the screens are showing (the title's CARS / BOATS / SPACE).
 ## Not saved.
 var vehicle_kind: StringName = &"car"
+## The child's own track, when the next car race is on it (docs/DESIGN.md §26); else null.
+## Not saved: the track editor keeps the track's file.
+var custom_track: TrackConfig
 
 
 func _enter_tree() -> void:
@@ -58,6 +61,11 @@ func _enter_tree() -> void:
 	EventSystem.PRO_equip_requested.connect(equip)
 	EventSystem.PRO_paint_requested.connect(repaint)
 	EventSystem.PRO_track_select_requested.connect(select_track)
+	EventSystem.PRO_custom_race_requested.connect(func(config: TrackConfig) -> void:
+		custom_track = config
+		vehicle_kind = &"car"
+		race_mode = &"race"
+		_publish_state())
 	EventSystem.CUP_progress_changed.connect(func(progress: Dictionary) -> void:
 		profile.cup_progress = progress
 		profile.save_to(save_path))
@@ -174,10 +182,13 @@ func is_unlocked(track_id: StringName) -> bool:
 
 
 func selected_track() -> TrackConfig:
-	return tracks[_selected_id(vehicle_kind)]
+	var id := _selected_id(vehicle_kind)
+	return custom_track if id == CustomTrack.ID else tracks[id]
 
 
 func _selected_id(kind: StringName) -> StringName:
+	if custom_track and kind == &"car":
+		return CustomTrack.ID
 	match kind:
 		&"boat": return profile.selected_course
 		&"ship": return profile.selected_space
@@ -188,6 +199,7 @@ func _selected_id(kind: StringName) -> StringName:
 func select_track(track_id: StringName) -> void:
 	if not tracks.has(track_id):
 		return
+	custom_track = null
 	if not is_unlocked(track_id):
 		EventSystem.PRO_track_locked.emit(track_id)
 		return
@@ -231,7 +243,9 @@ func _on_race_finished(results: Array, track_id: StringName) -> void:
 	var players := results.filter(func(entry: Dictionary) -> bool: return entry.get("is_player", false))
 	if players.is_empty():
 		return
-	var first_finish := track_id not in profile.completed_tracks
+	# The child's own track pays for the place, but is no new track to finish and keeps no record.
+	var custom := track_id == CustomTrack.ID
+	var first_finish := not custom and track_id not in profile.completed_tracks
 	var breakdown := {}
 	var best := 0.0
 	for entry: Dictionary in players:
@@ -248,7 +262,7 @@ func _on_race_finished(results: Array, track_id: StringName) -> void:
 	profile.coins += amount
 	if first_finish:
 		profile.completed_tracks.append(track_id)
-	var new_best: bool = best > 0.0 and (not profile.best_laps.has(track_id) or best < float(profile.best_laps[track_id]))
+	var new_best: bool = not custom and best > 0.0 and (not profile.best_laps.has(track_id) or best < float(profile.best_laps[track_id]))
 	if new_best:
 		profile.best_laps[track_id] = best
 	last_race = {"results": results, "track_id": track_id, "breakdown": breakdown,
@@ -314,6 +328,7 @@ func _publish_state() -> void:
 		"equipped_ship": profile.equipped_ship,
 		"paint": profile.paint.duplicate(),
 		"selected_track": _selected_id(kind),
+		"custom_track": custom_track,
 		"cup_progress": profile.cup_progress.duplicate(true),
 		"trophies": profile.trophies.duplicate(),
 		"stickers": profile.stickers.duplicate(),
