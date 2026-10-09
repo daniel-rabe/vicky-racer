@@ -25,6 +25,7 @@ signal place_reached(place_id: String, display_name: String, picture: Texture2D)
 signal pad_reached(kind: StringName, car: Car)
 
 const GRASS := preload("res://art/tiles/grass.png")
+const LIVING_GROUND := preload("res://track/living_ground.tres")
 const ASPHALT := preload("res://art/tiles/asphalt.png")
 const PAVEMENT := preload("res://art/town/pavement.png")
 const ZEBRA := preload("res://art/town/zebra.png")
@@ -1060,6 +1061,8 @@ func _textured(points: PackedVector2Array, texture: Texture2D) -> Polygon2D:
 	poly.polygon = points
 	poly.texture = texture
 	poly.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	if texture == GRASS:
+		poly.material = LIVING_GROUND  # swaying tufts and daisies
 	return poly
 
 
