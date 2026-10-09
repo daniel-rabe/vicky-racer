@@ -16,6 +16,7 @@ extends Node2D
 ##   --autopilot[=pace]  the player's car drives itself (headless race tests, demos);
 ##                       pace < 1 makes it drive slower, to stand in for a struggling child
 ##   --overview    frame the whole track in one view, for checking the layout
+##   --rain, --snow, --dry  this race's weather (RaceWeather)
 
 const HUD_SCENE := preload("res://ui/hud/race_hud.tscn")
 const WAVES := preload("res://art/sfx/wave_ambience.wav")
@@ -114,6 +115,7 @@ func _ready() -> void:
 	manager.time_trial = time_trial
 	manager.race_over.connect(_on_race_over)
 	manager.start(track, config, racers, difficulty)
+	_add_weather()
 	if "--overview" in args:
 		_show_overview()
 
@@ -130,6 +132,20 @@ func _on_state_changed(state: Dictionary) -> void:
 	for entry: Dictionary in state.get("tracks", []):
 		if entry["config"].track_id == state.get("selected_track"):
 			config = entry["config"]
+
+
+## Rain or snow, if the track's sky has some today (RaceWeather). It falls under the HUD.
+func _add_weather() -> void:
+	var weather := RaceWeather.pick(track, time_trial)
+	if weather == null:
+		return
+	for r in racers:
+		if r["is_player"]:
+			weather.players.append(r["car"])
+	if not views.is_empty():
+		weather.world = views[0]
+	add_child(weather)
+	move_child(weather, hud.get_index())
 
 
 ## The ghosts on the track and the recorder on the player's car.

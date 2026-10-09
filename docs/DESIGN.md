@@ -1852,7 +1852,7 @@ Stand-ins until picked from seeds (`"seed": null` in the manifests):
 | Treats, deliveries, puppy | [`actors/town/town_errands.gd`](../actors/town/town_errands.gd) |
 | Fires | [`actors/town/fire_duty.gd`](../actors/town/fire_duty.gd) |
 | Bus | [`actors/town/bus_route.gd`](../actors/town/bus_route.gd) |
-| Rain | [`actors/town/town_weather.gd`](../actors/town/town_weather.gd) |
+| Rain | [`actors/town/town_weather.gd`](../actors/town/town_weather.gd), on [`Weather`](../actors/weather/weather.gd) (§25) |
 | Particles | [`actors/town/town_fx.gd`](../actors/town/town_fx.gd) |
 | Vehicle swaps, goal, fountain, pay | [`game/screens/town.gd`](../game/screens/town.gd) |
 | Pointer, passengers, map dots | [`ui/town/town_hud.gd`](../ui/town/town_hud.gd), [`ui/town/town_minimap.gd`](../ui/town/town_minimap.gd) |
@@ -2107,3 +2107,32 @@ passes.*
 
 The Comet Racer first won by 3.4 s; its power and top speed came down (×1.08, ×1.12) so the
 top ship is the best, not a runaway.
+
+---
+
+## 25. Weather on the race tracks
+
+*Built (Phase 24), 2026-10-09.*
+
+A track's theme says what its sky may do (`TrackTheme.weather`). Some races stay dry, so
+weather stays a surprise:
+
+| Theme | Weather | How often | What happens |
+| --- | --- | --- | --- |
+| Meadow, Beach, Toy Town, Jungle | `rain` | 4 races in 10 | A shower comes during lap 1 and lasts about a lap. The light dims, rain streaks down, and ~9 puddles fill on the road: full speed but slippery (`puddle`, grip ×0.5), with a splash and raindrop rings. A rainbow shows when it stops; the puddles dry up |
+| Snowy Peak | `snow` | 6 races in 10 | Snow falls all race long, just for looks (the track has ice already) |
+| Candy Lane, Moon Base, boats, space | none | | |
+
+- **Time trials stay dry**, so a ghost's lap is always fair to race against.
+- **Puddles lie in the same places** on a track every time (seeded by the track id), so a child
+  can learn them. None near the finish, on or under a bridge, or on ice.
+- **No wipers in a race:** they would cover the speed bar and the minimap.
+- **Two players:** the gloom goes into the shared world, so both halves darken.
+
+| Piece | File |
+| --- | --- |
+| The weather itself: showers, gloom, rain or snow, wipers, rainbow, wetness | [`actors/weather/weather.gd`](../actors/weather/weather.gd) |
+| A race's weather: which, how often, puddle ripples and splashes; dev flags `--rain`, `--snow`, `--dry` | [`actors/weather/race_weather.gd`](../actors/weather/race_weather.gd) |
+| Free Drive's rain, on the same node | [`actors/town/town_weather.gd`](../actors/town/town_weather.gd) |
+| Puddles on the road, `set_wet` | [`track/track.gd`](../track/track.gd) |
+| Checks | [`tests/track_test.gd`](../tests/track_test.gd) |

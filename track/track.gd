@@ -88,6 +88,9 @@ const LIVING_GROUND := preload("res://track/living_ground.tres")
 const OUTLINE_COLOUR := Color(0.106, 0.118, 0.137)
 const DASH_COLOUR := Color(0.925, 0.925, 0.882)
 const KERB_WIDTH := 38.0
+const PUDDLE_COLOUR := Color(0.36, 0.47, 0.62, 0.8)
+const PUDDLE_RIM := Color(0.2, 0.24, 0.3, 0.35)
+const PUDDLE_SHINE := Color(0.85, 0.92, 1.0, 0.45)
 ## A current of strength 1 carries a boat along at this many px/s (Boat.current).
 const CURRENT_SPEED := 260.0
 ## The pale lip along a channel's edge: wider than the water, see-through white.
@@ -140,6 +143,11 @@ var _last_index := {}  # car -> baked point it was nearest last frame
 ## car -> Vector3(branch index, px along it, px from it), for a racer on a branch this frame.
 var _on_branch := {}
 var _branch_at: Array[PackedFloat32Array] = []  # each branch's distance along it, per point
+## Rain on the road (docs/DESIGN.md §25): x, y, radius of each puddle, world px. Wet (it is
+## raining, or still drying) they are a surface: full speed, slippery, a splash.
+var puddles: Array[Vector3] = []
+var wet := false
+var _puddle_layer: CanvasGroup
 
 ## A car is searched for within this many baked points (20 px apart) either side of where it
 ## was; further than RELOCATE_DISTANCE from the line it was teleported, and a full search runs.
@@ -334,6 +342,10 @@ func surface_at(global_pos: Vector2, distance := -1.0, half_width := -1.0) -> St
 	if distance <= half_width + KERB_WIDTH - 8.0:
 		if _on_road_ice(global_pos):
 			return &"ice"
+		if wet:
+			for puddle in puddles:
+				if global_pos.distance_to(Vector2(puddle.x, puddle.y)) < puddle.z:
+					return &"puddle"
 		return theme.road_surface if theme else &"asphalt"
 	var base := theme.base_surface if theme else &"grass"
 	var patch := theme.patch_surface if theme else &"sand"
@@ -361,6 +373,81 @@ func _on_road_ice(global_pos: Vector2) -> bool:
 		if fposmod(at - span.x, 1.0) <= span.y:
 			return true
 	return false
+
+
+## Puddles along the road for the rain (RaceWeather), hidden until it is wet. The same track
+## always gets the same puddles, so a child can learn where they lie. None on a bridge, under
+## one, on ice or near the finish.
+func add_puddles(count: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(track_id)
+	var length := lap_length()
+	var decks: Array[PackedVector2Array] = []
+	for span in bridge_spans:
+		decks.append(_span_points(span))
+	_puddle_layer = CanvasGroup.new()  # fades as one picture, the rims never showing through
+	_puddle_layer.name = "Puddles"
+	_puddle_layer.modulate.a = 0.0
+	_add_road(_puddle_layer)
+	for i in count:
+		for attempt in 12:
+			var offset := (i + rng.randf_range(0.15, 0.85)) / count * length
+			var fraction := offset / length
+			if fraction < 0.06 or fraction > 0.96 or on_bridge(offset, 400.0):
+				continue
+			if _on_road_ice(line_point(offset)):
+				continue
+			var radius := rng.randf_range(70.0, 110.0)
+			var sideways := rng.randf_range(-1.0, 1.0) * (road_half_width - radius * 1.2)
+			var at := line_point(offset, sideways)
+			var local := road.to_local(at)
+			var clear := true
+			for deck in decks:
+				for p in deck:
+					if p.distance_to(local) < road_half_width + radius * 1.6 + 60.0:
+						clear = false
+						break
+			if not clear:
+				continue
+			puddles.append(Vector3(at.x, at.y, radius))
+			_puddle_layer.add_child(_puddle(local, radius, line_tangent(offset).angle(), rng))
+			break
+
+
+## A puddle: a dark rim, the water, and a pale sky reflection off to one side.
+func _puddle(at: Vector2, radius: float, angle: float, rng: RandomNumberGenerator) -> Node2D:
+	var puddle := Node2D.new()
+	puddle.position = at
+	puddle.rotation = angle
+	var stretch := rng.randf_range(1.3, 1.7)
+	var phase := rng.randf() * TAU
+	var shape := func(r: float) -> PackedVector2Array:
+		var points := PackedVector2Array()
+		for k in 32:
+			var a := TAU * k / 32.0
+			var wobble := 1.0 + 0.09 * sin(a * 3.0 + phase) + 0.05 * sin(a * 5.0 + phase * 2.0)
+			points.append(Vector2(cos(a) * stretch, sin(a)) * r * wobble)
+		return points
+	for layer in [[radius + 10.0, PUDDLE_RIM], [radius, PUDDLE_COLOUR]]:
+		var poly := Polygon2D.new()
+		poly.polygon = shape.call(layer[0])
+		poly.color = layer[1]
+		puddle.add_child(poly)
+	var shine := Polygon2D.new()
+	shine.polygon = shape.call(radius * 0.45)
+	shine.color = PUDDLE_SHINE
+	shine.position = Vector2(-radius * 0.35, -radius * 0.3)
+	shine.scale = Vector2(1.0, 0.5)
+	puddle.add_child(shine)
+	return puddle
+
+
+## How wet the road is, 0 (dry) to 1 (pouring): the puddles show, and are slippery while they
+## are more than a shine.
+func set_wet(amount: float) -> void:
+	if _puddle_layer:
+		_puddle_layer.modulate.a = amount
+	wet = amount > 0.35 and not puddles.is_empty()
 
 
 func distance_to_line(global_pos: Vector2) -> float:
