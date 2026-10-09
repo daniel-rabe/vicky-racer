@@ -421,6 +421,18 @@ Asked for on 2026-10-08 ("add weather"). DESIGN §25.
   `tests/track_test.gd`.
 - **Gate B:** the rain sound (`rain_loop`), shared with Free Drive, picked 2026-10-09 (seed 108).
 
+## Phase 25 — The track editor 🚧 in review
+
+Asked for on 2026-10-09 ("a map editor for custom maps, with file save/load for sharing").
+DESIGN §26.
+
+- **Built:** BUILD on PICK A RACE. Dots make the road (crossings become bridges), picture tools
+  for props, puddles and boost pads, the seven land themes, UNDO, RACE! on it. Tracks save
+  themselves; MY TRACKS opens, erases, shares (`.vrtrack` file, a download on the web) and reads
+  shared tracks in (also dropped on the window). `tests/editor_test.gd` is new.
+- **Open:** a play test with Vicky. Pictures for the drawn tool icons (road, eraser, undo) could
+  come from ComfyUI as seed variants if the drawn ones are not good enough.
+
 ---
 
 ## Ideas parked
@@ -428,7 +440,6 @@ Asked for on 2026-10-08 ("add weather"). DESIGN §25.
 Not planned, but worth keeping in mind:
 
 
-- **Track editor for the child** — place pieces on a grid and race on it. Delightful but large.
 - **Collectable coins on the track** — coins lying on the racing line, adding to the payout.
 - **Car customisation beyond paint** — stickers and spoilers on the car itself.
 - **Touch controls** — only if the game ever leaves the PC.

@@ -109,6 +109,19 @@ func _ready() -> void:
 
 
 func _build(data: Dictionary, id: StringName, out_path: String) -> Error:
+	make(data, id)
+	var packed := PackedScene.new()
+	var error := packed.pack(_root)
+	if error == OK:
+		DirAccess.make_dir_recursive_absolute(out_path.get_base_dir())
+		error = ResourceSaver.save(packed, out_path)
+	_root.free()
+	return error
+
+
+## The track for a layout's points data, as a node tree owned by its root (so it can be packed),
+## not yet in the scene tree. Also used at run time for the child's own tracks (CustomTrack).
+func make(data: Dictionary, id: StringName) -> Node2D:
 	var tile: float = data["tile_px"]
 	var map_tiles := Vector2i(data["map_tiles"][0], data["map_tiles"][1])
 	_root = Node2D.new()
@@ -145,14 +158,7 @@ func _build(data: Dictionary, id: StringName, out_path: String) -> Error:
 		_water(data, line.curve, tile)
 	if data.get("space", false):
 		_space(data, line.curve, tile)
-
-	var packed := PackedScene.new()
-	var error := packed.pack(_root)
-	if error == OK:
-		DirAccess.make_dir_recursive_absolute(out_path.get_base_dir())
-		error = ResourceSaver.save(packed, out_path)
-	_root.free()
-	return error
+	return _root
 
 
 func _add(node: Node) -> void:

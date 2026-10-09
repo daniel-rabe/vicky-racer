@@ -2136,3 +2136,59 @@ weather stays a surprise:
 | Free Drive's rain, on the same node | [`actors/town/town_weather.gd`](../actors/town/town_weather.gd) |
 | Puddles on the road, `set_wet` | [`track/track.gd`](../track/track.gd) |
 | Checks | [`tests/track_test.gd`](../tests/track_test.gd) |
+
+---
+
+## 26. The track editor: the child's own tracks
+
+*Built (Phase 25), 2026-10-09. Not yet reviewed in play.*
+
+**BUILD** on PICK A RACE (cars) opens the editor. The child builds a track and races it, and
+can share it as a file.
+
+- **The map is the real track,** rebuilt after every change by the same builder as the built-in
+  tracks, so what is built is what is raced. 48 × 30 tiles, a road 3 tiles wide.
+- **The road is a loop through dots.** A tap adds a dot, which joins the loop between the two
+  neighbours it lengthens the loop least, so a tap never ties a knot. Dragging a dot bends the
+  road (a grey preview while it moves). The chequered dot is the start; yellow arrows show the
+  way round. Four dots at least, forty at most. A new track starts as an oval, so there is
+  always something to race.
+- **Crossings become bridges by themselves:** the pass further from the finish goes over, 16
+  tiles long. The checkpoint goes half a lap on, off any crossing or bridge; the grid goes
+  behind the line, as on the built-in tracks.
+- **Tools, all pictures:** ROAD, ERASE, the theme's props (two to four), PUDDLE (the theme's
+  patch surface: sand, ice, mud...), BOOST and UNDO. A prop is refused on the road (a red
+  cross and a bump), and a prop the road is later moved over makes way. A boost pad lies
+  across the road nearest the tap. ERASE takes the nearest prop, pad, dot or puddle.
+- **Themes:** the seven land themes, as picture buttons. Changing theme keeps the props,
+  each becoming the new theme's prop in the same place of its list (a tree becomes a palm tree).
+- **The race:** Meadow Loop's three opponents, three laps. It pays for the place but no
+  first-finish bonus, and keeps no best lap or record (any shape could be raced). Results' GARAGE
+  becomes BUILD, back to the editor. RACE AGAIN races it again.
+- **No text hurdles:** tracks are named TRACK 1, TRACK 2... by themselves.
+
+### 26.1 Saving and sharing
+
+- **Saved after every change,** one file per track in `user://my_tracks/` beside the save, so
+  there is no SAVE button to forget. MY TRACKS shows them as cards (the road drawn on the
+  theme's colour), newest first, with NEW TRACK and an X that erases after a second tap.
+- **A track file (`.vrtrack`) is JSON:** the format and version, the name, the theme, the
+  dots, the props by kind, the puddles and the boost pads, all in tiles. Small (a few KB).
+- **SHARE THIS TRACK** writes the file where the grown-up chooses (the system's save dialog).
+  **GET A TRACK** reads one in as a new track. A file dropped on the game window is read in too.
+- **On the web** (the itch.io build) SHARE downloads the file from the browser and GET A TRACK
+  opens the browser's file picker; the tracks themselves stay in the browser's storage.
+- **A file from somebody else is never trusted:** only what is understood is kept, numbers are
+  clamped to the map and the limits (40 dots, 120 props, 24 puddles, 10 pads, 64 KB), unknown
+  themes become the meadow and props not in the theme are dropped. Anything that is not a track
+  is refused with THAT IS NOT A TRACK.
+
+| Piece | File |
+| --- | --- |
+| The file format, reading files safely, dots to points data, the race's config | [`track/custom/custom_track.gd`](../track/custom/custom_track.gd) |
+| The folder of tracks, names, sharing | [`track/custom/my_tracks.gd`](../track/custom/my_tracks.gd) |
+| The editor screen, MY TRACKS, share and get (desktop and web) | [`ui/editor/track_editor.gd`](../ui/editor/track_editor.gd) |
+| Building a track in memory (`make`), shared with the built-in tracks | [`track/build/build_track.gd`](../track/build/build_track.gd) |
+| The custom race: `PRO_custom_race_requested`, no records | [`game/managers/garage_manager.gd`](../game/managers/garage_manager.gd) |
+| Checks, and a whole race round a figure-of-eight | [`tests/editor_test.gd`](../tests/editor_test.gd) |
+| Pictures for review | [`tools/dev/editor_probe.tscn`](../tools/dev/editor_probe.tscn) |
