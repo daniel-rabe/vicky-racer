@@ -5,7 +5,8 @@ extends Node
 ## a race at night has the dark and every car's lights, also in the rain (one CanvasModulate,
 ## the weather's) and on the boats, but not in space; Free Drive at night lights the
 ## player's car, the traffic, the boat made at the harbour and every house's porch. With a
-## window and `--screenshots=<dir>`, also saves the race and the town. Exit code 0 = all passed.
+## window and `--screenshots=<dir>`, also saves the race and the town. N switches day and night
+## mid-race, mid-drive, paused and on a menu. Exit code 0 = all passed.
 
 const MAIN := preload("res://game/main.tscn")
 const SAVE := "user://night_test.cfg"
@@ -38,6 +39,7 @@ func _ready() -> void:
 	await _test_race(&"ship", &"space_01", false)
 	await _test_town()
 	await _test_day()
+	await _test_key()
 	_main.queue_free()
 	await get_tree().create_timer(0.5).timeout
 	_wipe()
@@ -156,6 +158,57 @@ func _test_day() -> void:
 	EventSystem.UI_screen_requested.emit(&"race")
 	await _frames(5)
 	_check(not _screen().has_node("Night"), "races are in the day again")
+
+
+func _test_key() -> void:
+	print("the N key")
+	var garage: GarageManager = _main.get_node("GarageManager")
+	EventSystem.PRO_vehicle_kind_requested.emit(&"car")
+	EventSystem.PRO_track_select_requested.emit(&"track_01")
+	EventSystem.UI_screen_requested.emit(&"race")
+	await _frames(5)
+	var race := _screen()
+	_check(not race.has_node("Night"), "the race starts in the day")
+	await _press_n()
+	_check(garage.night and race.has_node("Night"), "N mid-race: night at once")
+	await get_tree().create_timer(0.3).timeout
+	await _shot("key_race_moon")
+	_check(_all_lit(race) and _modulates(race).size() == 1, "the lights come on, one CanvasModulate")
+	get_tree().paused = true
+	await _press_n()
+	_check(not garage.night and not race.has_node("Night"), "N while paused: day again")
+	await _frames(2)
+	var weather: Weather = race.get_node_or_null("Weather")  # a shower keeps its own gloom
+	var dark := _modulates(race).filter(func(m: CanvasModulate) -> bool: return m.name == "NightDark")
+	_check(dark.is_empty() and (weather == null or weather.tint == Color.WHITE) and not _all_lit(race),
+		"the dark and the lights go")
+	get_tree().paused = false
+	EventSystem.UI_screen_requested.emit(&"garage")
+	await _frames(3)
+	await _press_n()
+	_check(garage.night, "N on a menu switches too")
+	EventSystem.UI_screen_requested.emit(&"town")
+	await _frames(5)
+	var town := _screen()
+	_check(town.night != null and town.get_node("World").has_node("PorchLights"), "so the town starts at night")
+	await _press_n()
+	await get_tree().create_timer(0.3).timeout
+	await _shot("key_town_sun")
+	_check(town.night == null and not town.get_node("World").has_node("PorchLights") and town.weather.tint == Color.WHITE,
+		"N mid-drive: the porch lamps go out and the town is light")
+	await _press_n()
+	await _frames(2)
+	_check(town.night != null and town.player.has_node("Body/Lights"), "and N again: night once more")
+	await _press_n()
+
+
+func _press_n() -> void:
+	for pressed in [true, false]:
+		var event := InputEventKey.new()
+		event.physical_keycode = KEY_N
+		event.pressed = pressed
+		Input.parse_input_event(event)
+		await _frames(2)
 
 
 func _all_lit(screen: Node) -> bool:
