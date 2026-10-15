@@ -2215,6 +2215,9 @@ it switches, and the race behind the menu goes dark (or light) at once, so a chi
 does. Every race and Free Drive after that are at night until it is pressed again. Like RACE /
 TIME TRIAL it is not saved: a new day starts in the day.
 
+- **A shortcut, N (or a gamepad's Back / Select),** switches day and night on any screen, in the
+  middle of a race or a drive and paused too: the world changes at once and a sun or a moon pops
+  up at the bottom for a moment (`game/night_key.gd`). Asked for on 2026-10-15.
 - **The dark:** the world goes a friendly deep blue (`Night.TINT`), still bright enough to see
   the road, the grass and the props. The HUD and the minimap stay as they are.
 - **Lights on everything that drives:** two warm headlight beams spreading out ahead, red tail
@@ -2235,4 +2238,5 @@ TIME TRIAL it is not saved: a new day starts in the day.
 | The sun / moon button, the attract race at night | [`ui/title/title_screen.gd`](../ui/title/title_screen.gd), [`ui/title/sky_icons.gd`](../ui/title/sky_icons.gd) |
 | `night` in the garage state (`PRO_night_requested`), not saved; dev flag `--night` | [`game/managers/garage_manager.gd`](../game/managers/garage_manager.gd), [`game/main.gd`](../game/main.gd) |
 | A race at night, a town at night with porch lamps (dev `--start=house`) | [`game/screens/race.gd`](../game/screens/race.gd), [`game/screens/town.gd`](../game/screens/town.gd) |
+| The N / Back shortcut and its sun / moon pop-up | [`game/night_key.gd`](../game/night_key.gd) |
 | Checks | [`tests/night_test.gd`](../tests/night_test.gd) |

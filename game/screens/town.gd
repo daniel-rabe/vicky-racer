@@ -165,7 +165,10 @@ func _on_state_changed(state: Dictionary) -> void:
 		if setup.id == equipped:
 			_setup = setup
 	_paint = state.get("paint", {}).get(equipped, Paint.ORIGINAL)
-	_night = state.get("night", false)
+	if state.get("night", false) != _night:
+		_night = state.get("night", false)
+		if weather:
+			_show_night()  # N switched it mid-drive
 	# And the equipped boat, for the harbour.
 	var boat_id: StringName = state.get("equipped_boat", DEFAULT_BOAT)
 	if _boat_setup == null or _boat_setup.id != boat_id:
@@ -749,12 +752,7 @@ func _add_jobs() -> void:
 	weather.town = town
 	add_child(weather)
 	move_child(weather, hud.get_index())  # its rain falls under the HUD
-	if _night:
-		night = Night.new()
-		night.name = "Night"
-		night.weather = weather
-		add_child(night)
-		_add_porch_lights()
+	_show_night()
 	_voice = AudioStreamPlayer.new()
 	_voice.name = "Voice"
 	_voice.bus = &"SFX"
@@ -769,7 +767,25 @@ func _play(path: String, volume_db: float) -> void:
 	_voice.play()
 
 
-## At night, a warm lamp by every house's front door (docs/DESIGN.md §27).
+## Night on or off as the garage says: when the town is built, and when N switches it. At
+## night the town is dark blue, everything that drives has its lights on (Night), and a warm
+## lamp glows by every house's front door (docs/DESIGN.md §27).
+func _show_night() -> void:
+	if _night and night == null:
+		night = Night.new()
+		night.name = "Night"
+		night.weather = weather
+		add_child(night)
+		_add_porch_lights()
+	elif not _night and night:
+		remove_child(night)
+		night.queue_free()
+		night = null
+		var lamps := _world.get_node(^"PorchLights")
+		_world.remove_child(lamps)
+		lamps.queue_free()
+
+
 func _add_porch_lights() -> void:
 	var lamps := Node2D.new()
 	lamps.name = "PorchLights"

@@ -2,7 +2,9 @@ extends Node
 ## The persistent shell: loaded once and never unloaded. Holds GarageManager, CupManager,
 ## StickerManager, PlayersManager, SettingsManager, SoundManager and MusicManager, which must survive screen
 ## changes, and the StickerPopup over every screen; swaps screens in and out of ScreenSlot
-## when anything emits EventSystem.UI_screen_requested.
+## when anything emits EventSystem.UI_screen_requested. N (or a gamepad's Back / Select)
+## switches day and night on any screen, with a sun or moon shown for a moment
+## (docs/DESIGN.md §27).
 ##
 ## Dev flags, after `--` on the command line:
 ##   --save=<path>           use another save file (keeps screenshots off the real profile)
@@ -19,6 +21,7 @@ extends Node
 ##   --screenshot=<path>     save a screenshot after --wait seconds (default 2.5) and quit
 ##   --no-interp             turn physics interpolation off (to measure what it fixes)
 ##   --physics-hz=<n>        run physics at n ticks per second instead of 60
+##   --night                 start at night
 
 const SCREENS := {
 	&"title": preload("res://ui/title/title_screen.tscn"),
@@ -81,6 +84,10 @@ func _ready() -> void:
 		EventSystem.PRO_track_select_requested.emit(StringName(_args["course"]))
 	if _args.has("race-mode"):
 		EventSystem.PRO_race_mode_requested.emit(StringName(_args["race-mode"]))
+	var night_key := NightKey.new()
+	night_key.name = "NightKey"
+	night_key.garage = garage_manager
+	add_child(night_key)
 	if _args.has("night"):
 		EventSystem.PRO_night_requested.emit(true)
 	if _args.has("fake-race"):

@@ -118,9 +118,8 @@ func _ready() -> void:
 	manager.time_trial = time_trial
 	manager.race_over.connect(_on_race_over)
 	manager.start(track, config, racers, difficulty)
-	var weather := _add_weather()
-	if _night and not (track.theme and track.theme.space):
-		_add_night(weather)
+	_add_weather()
+	_show_night()
 	if "--overview" in args:
 		_show_overview()
 
@@ -133,7 +132,10 @@ func _on_state_changed(state: Dictionary) -> void:
 	_paints = state.get("paint", {})
 	_player_paint = _paints.get(state["equipped"], Paint.ORIGINAL)
 	_race_mode = state.get("race_mode", &"race")
-	_night = state.get("night", false)
+	if state.get("night", false) != _night:
+		_night = state.get("night", false)
+		if is_node_ready():
+			_show_night()  # N switched it mid-race
 	_ghost_dir = state.get("ghost_dir", "")
 	for entry: Dictionary in state.get("tracks", []):
 		if entry["config"].track_id == state.get("selected_track"):
@@ -157,14 +159,22 @@ func _add_weather() -> RaceWeather:
 	return weather
 
 
-## The race at night: the world dark blue, every car's lights on (Night).
-func _add_night(weather: Weather) -> void:
-	var night := Night.new()
-	night.name = "Night"
-	night.weather = weather
-	if not views.is_empty():
-		night.world = views[0]
-	add_child(night)
+## Night on or off as the garage says: at the start, and when N switches it mid-race. The
+## world dark blue, every car's lights on (Night). Not in space: it is night there already.
+func _show_night() -> void:
+	if track.theme and track.theme.space:
+		return
+	var night: Night = get_node_or_null(^"Night")
+	if _night and night == null:
+		night = Night.new()
+		night.name = "Night"
+		night.weather = get_node_or_null(^"Weather")
+		if not views.is_empty():
+			night.world = views[0]
+		add_child(night)
+	elif not _night and night:
+		remove_child(night)
+		night.queue_free()
 
 
 ## The ghosts on the track and the recorder on the player's car.
