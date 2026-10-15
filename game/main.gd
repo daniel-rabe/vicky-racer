@@ -7,6 +7,7 @@ extends Node
 ## Dev flags, after `--` on the command line:
 ##   --save=<path>           use another save file (keeps screenshots off the real profile)
 ##   --settings=<path>       use another settings file, likewise
+##   --tracks-dir=<path>     keep the child's own tracks (MyTracks) in another folder, likewise
 ##   --screen=<name>         open this screen first
 ##   --dev-coins=<n>         set the coin balance after loading
 ##   --fake-race=<position>  pretend a race just finished in that position
@@ -33,6 +34,8 @@ const SCREENS := {
 	&"podium": preload("res://ui/cup/podium.tscn"),
 	&"shelf": preload("res://ui/shelf/shelf_screen.tscn"),
 	&"join": preload("res://ui/join/join_screen.tscn"),
+	# The child's own tracks (docs/DESIGN.md §26).
+	&"editor": preload("res://ui/editor/track_editor.tscn"),
 }
 const FIRST_SCREEN := &"title"
 ## The window's title. The project's own name stays "VickyRacer": it names the folder the
@@ -55,6 +58,8 @@ func _enter_tree() -> void:
 		$GarageManager.save_path = _args["save"]
 	if _args.has("settings"):
 		$SettingsManager.settings_path = _args["settings"]
+	if _args.has("tracks-dir"):
+		MyTracks.folder = _args["tracks-dir"]
 	EventSystem.UI_screen_requested.connect(show_screen)
 	if _args.has("no-interp"):
 		get_tree().physics_interpolation = false

@@ -399,7 +399,7 @@ The user chose these on 2026-10-07:
   - `tests/space_test.gd` and the whole suite.
   - A balance pass.
 
-## Phase 23 — Free Drive: more to do 🚧 in progress
+## Phase 23 — Free Drive: more to do ✅ done
 
 Asked for on 2026-10-08: ideas 1, 2, 5–12 and 14 from the Free Drive plan. DESIGN §23.
 
@@ -407,8 +407,9 @@ Asked for on 2026-10-08: ideas 1, 2, 5–12 and 14 from the Free Drive plan. DES
   roof, the paint shop, deliveries, the lost puppy, the fire engine and bonfires, ramps, the
   school bus with animal passengers, and rain with puddles, wipers and a rainbow.
   `tests/town_fun_test.gd` is new.
-- **Open (Gate B):** the paint shop, ice cream and pizza pictures are placeholders; rain, cheer,
-  water spray, fire out and bus bell sounds are still to be picked from seeds.
+- **Gate B: art and sound** (done 2026-10-09; DESIGN §23.4). Every seed was picked by the user:
+  the paint shop, ice cream and pizza pictures, and the rain, cheer, water spray, fire out and
+  bus bell sounds. The football stays the beach ball.
 
 ## Phase 24 — Weather on the race tracks ✅ done
 
@@ -418,8 +419,19 @@ Asked for on 2026-10-08 ("add weather"). DESIGN §25.
   slippery puddles on the road, splashes, raindrop rings and a rainbow after; snow falling on
   Snowy Peak. Free Drive's rain now runs on the same `Weather` node. Puddle checks in
   `tests/track_test.gd`.
-- **Open (Gate B):** the rain sound (`rain_loop`), shared with Free Drive, still to be picked
-  from seeds.
+- **Gate B:** the rain sound (`rain_loop`), shared with Free Drive, picked 2026-10-09 (seed 108).
+
+## Phase 25 — The track editor 🚧 in review
+
+Asked for on 2026-10-09 ("a map editor for custom maps, with file save/load for sharing").
+DESIGN §26.
+
+- **Built:** BUILD on PICK A RACE. Dots make the road (crossings become bridges), picture tools
+  for props, puddles and boost pads, the seven land themes, UNDO, RACE! on it. Tracks save
+  themselves; MY TRACKS opens, erases, shares (`.vrtrack` file, a download on the web) and reads
+  shared tracks in (also dropped on the window). `tests/editor_test.gd` is new.
+- **Open:** a play test with Vicky. Pictures for the drawn tool icons (road, eraser, undo) could
+  come from ComfyUI as seed variants if the drawn ones are not good enough.
 
 ---
 
@@ -428,7 +440,6 @@ Asked for on 2026-10-08 ("add weather"). DESIGN §25.
 Not planned, but worth keeping in mind:
 
 
-- **Track editor for the child** — place pieces on a grid and race on it. Delightful but large.
 - **Collectable coins on the track** — coins lying on the racing line, adding to the payout.
 - **Car customisation beyond paint** — stickers and spoilers on the car itself.
 - **Touch controls** — only if the game ever leaves the PC.

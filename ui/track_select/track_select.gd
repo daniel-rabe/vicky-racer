@@ -5,7 +5,7 @@ extends Control
 ## a track goes through EventSystem (PRO_track_select_requested), then straight to the race.
 ## Above the cards, RACE / TIME TRIAL switches what choosing a track means (docs/DESIGN.md
 ## §16): in a time trial the cards show each track's record, and the cups make way.
-## B / Escape goes back to the garage. In a two-player game (§15) there are no cups — they
+## BUILD (cars only) opens the track editor (§26). B / Escape goes back to the garage. In a two-player game (§15) there are no cups — they
 ## belong to the one player's progress — and B goes back to the join screen.
 
 const HINTS_KEYBOARD := "ENTER RACE    ESC BACK"
@@ -49,6 +49,8 @@ func _ready() -> void:
 	else:
 		_build_cups()
 		_build_tabs()
+	if _kind == &"car":
+		_build_editor_button()
 	_show_mode()
 
 
@@ -117,6 +119,21 @@ func _on_cup_chosen(cup: CupConfig) -> void:
 		EventSystem.CUP_continue_requested.emit()
 	else:
 		EventSystem.CUP_start_requested.emit(cup.id)
+
+
+## BUILD, beside the title: the track editor, for the child's own tracks (docs/DESIGN.md §26).
+func _build_editor_button() -> void:
+	var button := Button.new()
+	button.name = "Build"
+	button.text = "BUILD"
+	button.icon = preload("res://art/props/town/traffic_cone.png")
+	button.expand_icon = true
+	button.add_theme_constant_override("icon_max_width", 56)
+	button.theme_type_variation = &"NavButton"
+	button.position = Vector2(760, 52)
+	button.custom_minimum_size = Vector2(300, 84)
+	button.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"editor"))
+	add_child(button)
 
 
 ## RACE | TIME TRIAL, top right. Up from the cards reaches them; choosing one switches mode.

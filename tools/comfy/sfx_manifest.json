@@ -575,9 +575,9 @@
       "loop_seconds": 8.0,
       "peak_db": -10.0,
       "out": "art/sfx/rain_loop.wav",
-      "seed": null,
+      "seed": 108,
       "candidates": 8,
-      "_note": "Phase 23 (DESIGN.md §23): rain in town. Gate B, not picked yet; the rain is silent until then."
+      "_note": "Phase 23 (DESIGN.md §23): rain in town. Picked 108."
     },
     {
       "id": "cheer",
@@ -588,9 +588,9 @@
       "max_seconds": 1.6,
       "peak_db": -5.0,
       "out": "art/sfx/cheer.wav",
-      "seed": null,
+      "seed": 103,
       "candidates": 8,
-      "_note": "Phase 23 (DESIGN.md §23): a goal, a delivery, the puppy home. Gate B, not picked yet; the sparkle chime stands in."
+      "_note": "Phase 23 (DESIGN.md §23): a goal, a delivery, the puppy home. Picked 103."
     },
     {
       "id": "water_spray",
@@ -601,9 +601,9 @@
       "loop_seconds": 3.0,
       "peak_db": -8.0,
       "out": "art/sfx/water_spray.wav",
-      "seed": null,
+      "seed": 107,
       "candidates": 8,
-      "_note": "Phase 23 (DESIGN.md §23): the fire engine's hose. Gate B, not picked yet; silent until then."
+      "_note": "Phase 23 (DESIGN.md §23): the fire engine's hose. Picked 107."
     },
     {
       "id": "fire_out",
@@ -614,9 +614,9 @@
       "max_seconds": 1.2,
       "peak_db": -6.0,
       "out": "art/sfx/fire_out.wav",
-      "seed": null,
+      "seed": 108,
       "candidates": 8,
-      "_note": "Phase 23 (DESIGN.md §23): a fire put out. Gate B, not picked yet; the splash stands in."
+      "_note": "Phase 23 (DESIGN.md §23): a fire put out. Picked 108."
     },
     {
       "id": "bus_bell",
@@ -627,9 +627,9 @@
       "max_seconds": 1.0,
       "peak_db": -6.0,
       "out": "art/sfx/bus_bell.wav",
-      "seed": null,
+      "seed": 107,
       "candidates": 8,
-      "_note": "Phase 23 (DESIGN.md §23): passengers getting on and off. Gate B, not picked yet; the harbour bell stands in."
+      "_note": "Phase 23 (DESIGN.md §23): passengers getting on and off. Picked 107."
     }
   ],
   "synth": [

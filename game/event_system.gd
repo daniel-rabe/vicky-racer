@@ -53,6 +53,9 @@ signal PRO_race_mode_requested(mode: StringName)
 ## BOATS / SPACE).
 signal PRO_vehicle_kind_requested(kind: StringName)
 signal PRO_track_locked(track_id: StringName)
+## The next car race is on the child's own track (docs/DESIGN.md §26), built by the track
+## editor; picking a built-in track afterwards ends it.
+signal PRO_custom_race_requested(config: TrackConfig)
 signal PRO_coins_changed(total: int)
 signal PRO_coins_awarded(amount: int, breakdown: Dictionary)
 ## Coins picked up in Free Drive's town (docs/DESIGN.md §19): GarageManager banks them at once.
