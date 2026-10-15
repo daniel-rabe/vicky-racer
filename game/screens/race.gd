@@ -17,6 +17,7 @@ extends Node2D
 ##                       pace < 1 makes it drive slower, to stand in for a struggling child
 ##   --overview    frame the whole track in one view, for checking the layout
 ##   --rain, --snow, --dry  this race's weather (RaceWeather)
+##   --night       (to the game, before `--`'s screen flags) races at night: Night
 
 const HUD_SCENE := preload("res://ui/hud/race_hud.tscn")
 const WAVES := preload("res://art/sfx/wave_ambience.wav")
@@ -49,6 +50,8 @@ var recorder: GhostRecorder
 var own_ghost: GhostCar
 var developer_ghost: GhostCar
 var _race_mode: StringName = &"race"
+## At night (the title's moon button, docs/DESIGN.md §27). Not in space: it is night there.
+var _night := false
 var _ghost_dir := ""
 
 @onready var manager: RaceManager = $RaceManager
@@ -115,7 +118,9 @@ func _ready() -> void:
 	manager.time_trial = time_trial
 	manager.race_over.connect(_on_race_over)
 	manager.start(track, config, racers, difficulty)
-	_add_weather()
+	var weather := _add_weather()
+	if _night and not (track.theme and track.theme.space):
+		_add_night(weather)
 	if "--overview" in args:
 		_show_overview()
 
@@ -128,6 +133,7 @@ func _on_state_changed(state: Dictionary) -> void:
 	_paints = state.get("paint", {})
 	_player_paint = _paints.get(state["equipped"], Paint.ORIGINAL)
 	_race_mode = state.get("race_mode", &"race")
+	_night = state.get("night", false)
 	_ghost_dir = state.get("ghost_dir", "")
 	for entry: Dictionary in state.get("tracks", []):
 		if entry["config"].track_id == state.get("selected_track"):
@@ -137,10 +143,10 @@ func _on_state_changed(state: Dictionary) -> void:
 
 
 ## Rain or snow, if the track's sky has some today (RaceWeather). It falls under the HUD.
-func _add_weather() -> void:
+func _add_weather() -> RaceWeather:
 	var weather := RaceWeather.pick(track, time_trial)
 	if weather == null:
-		return
+		return null
 	for r in racers:
 		if r["is_player"]:
 			weather.players.append(r["car"])
@@ -148,6 +154,17 @@ func _add_weather() -> void:
 		weather.world = views[0]
 	add_child(weather)
 	move_child(weather, hud.get_index())
+	return weather
+
+
+## The race at night: the world dark blue, every car's lights on (Night).
+func _add_night(weather: Weather) -> void:
+	var night := Night.new()
+	night.name = "Night"
+	night.weather = weather
+	if not views.is_empty():
+		night.world = views[0]
+	add_child(night)
 
 
 ## The ghosts on the track and the recorder on the player's car.

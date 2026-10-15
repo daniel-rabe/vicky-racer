@@ -52,6 +52,8 @@ signal PRO_race_mode_requested(mode: StringName)
 ## &"car", &"boat" or &"ship": which the garage, PICK A RACE and the race show (the title's CARS /
 ## BOATS / SPACE).
 signal PRO_vehicle_kind_requested(kind: StringName)
+## Night (docs/DESIGN.md §27) on or off, for the races and Free Drive (the title's moon button).
+signal PRO_night_requested(on: bool)
 signal PRO_track_locked(track_id: StringName)
 ## The next car race is on the child's own track (docs/DESIGN.md §26), built by the track
 ## editor; picking a built-in track afterwards ends it.

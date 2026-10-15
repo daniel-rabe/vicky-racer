@@ -2192,3 +2192,37 @@ can share it as a file.
 | The custom race: `PRO_custom_race_requested`, no records | [`game/managers/garage_manager.gd`](../game/managers/garage_manager.gd) |
 | Checks, and a whole race round a figure-of-eight | [`tests/editor_test.gd`](../tests/editor_test.gd) |
 | Pictures for review | [`tools/dev/editor_probe.tscn`](../tools/dev/editor_probe.tscn) |
+
+---
+
+## 27. Night
+
+*Built (Phase 26), 2026-10-15. Asked for: "a night mode, which makes the map look darker and the
+cars have lights".*
+
+A round button under the trophy on the title shows the sun by day and the moon at night. Pressing
+it switches, and the race behind the menu goes dark (or light) at once, so a child sees what it
+does. Every race and Free Drive after that are at night until it is pressed again. Like RACE /
+TIME TRIAL it is not saved: a new day starts in the day.
+
+- **The dark:** the world goes a friendly deep blue (`Night.TINT`), still bright enough to see
+  the road, the grass and the props. The HUD and the minimap stay as they are.
+- **Lights on everything that drives:** two warm headlight beams spreading out ahead, red tail
+  lights that glow brighter on the brake, the lamps as little lenses on the corners, and a soft
+  light round the car itself so a child can always find theirs. The player, the opponents, the
+  boats, Free Drive's traffic, the fire engine, the bus and the boat at the harbour all have them.
+- **Free Drive:** a warm lamp glows by every house's front door.
+- **Nothing plays differently:** night is just how it looks. Time trials may be at night too.
+- **Weather at night:** a world has one CanvasModulate, the weather's, so the night darkens that
+  one (`Weather.tint`); a shower makes a dark night darker. Rain and snow still fall on top.
+- **Space is not darkened:** it is night there already.
+- **Two players:** the dark goes into the shared world, so both halves are at night.
+
+| Piece | File |
+| --- | --- |
+| The night itself: the dark, lights on every car as it arrives, off again when removed | [`actors/weather/night.gd`](../actors/weather/night.gd) |
+| A car's lights: beams, tail lights brighter on the brake, lenses, glow | [`actors/car/car_lights.gd`](../actors/car/car_lights.gd) |
+| The sun / moon button, the attract race at night | [`ui/title/title_screen.gd`](../ui/title/title_screen.gd), [`ui/title/sky_icons.gd`](../ui/title/sky_icons.gd) |
+| `night` in the garage state (`PRO_night_requested`), not saved; dev flag `--night` | [`game/managers/garage_manager.gd`](../game/managers/garage_manager.gd), [`game/main.gd`](../game/main.gd) |
+| A race at night, a town at night with porch lamps (dev `--start=house`) | [`game/screens/race.gd`](../game/screens/race.gd), [`game/screens/town.gd`](../game/screens/town.gd) |
+| Checks | [`tests/night_test.gd`](../tests/night_test.gd) |

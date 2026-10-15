@@ -81,6 +81,8 @@ func _ready() -> void:
 		EventSystem.PRO_track_select_requested.emit(StringName(_args["course"]))
 	if _args.has("race-mode"):
 		EventSystem.PRO_race_mode_requested.emit(StringName(_args["race-mode"]))
+	if _args.has("night"):
+		EventSystem.PRO_night_requested.emit(true)
 	if _args.has("fake-race"):
 		_fake_race_finish(int(_args["fake-race"]))
 	EventSystem.UI_screen_requested.emit(StringName(_args.get("screen", FIRST_SCREEN)))  # so the music hears it too
