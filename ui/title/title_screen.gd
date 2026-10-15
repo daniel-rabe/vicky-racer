@@ -1,7 +1,7 @@
 extends Node2D
 ## The title screen (docs/mockups/title_layout): the logo and PLAY / SETTINGS / QUIT over a
 ## live "attract mode" race, a trophy button beside PLAY for the shelf (docs/DESIGN.md §14)
-## TOWN for Free Drive (§19), and 2 PLAYERS for a split-screen game (§15) — the real Track 01 with four AI cars, the camera following
+## TOWN for Free Drive (§19), a sun / moon button under the trophy for night (§27), and 2 PLAYERS for a split-screen game (§15) — the real Track 01 with four AI cars, the camera following
 ## the red one. No HUD, no race rules, no car sounds: just something lively to look at.
 
 const TRACK := preload("res://game/configs/tracks/track_01.tres")
@@ -13,6 +13,9 @@ const BOATS_PICTURE := preload("res://art/boats/speedboat.png")
 const BOATS_COLOUR := Color(0.12, 0.64, 0.78)
 const SPACE_PICTURE := preload("res://art/ships/fighter.png")
 const SPACE_COLOUR := Color(0.24, 0.17, 0.47)
+## The day / night button: sky blue by day, deep blue at night.
+const DAY_COLOUR := Color(0.33, 0.68, 0.95)
+const NIGHT_COLOUR := Color(0.13, 0.15, 0.36)
 ## The picture row is this much wider than the menu, so three buttons fit side by side.
 const ROW_WIDTH := 600.0
 const HINTS_KEYBOARD := "ENTER  CHOOSE"
@@ -24,6 +27,8 @@ const LANES: Array[float] = [0.0, -70.0, 70.0, 0.0]
 const VIEW_OFFSET := Vector2(520, 40)
 
 var _cup := {}
+var _night := false
+var _sky_button: Button
 
 @onready var _world: Node2D = $World
 @onready var _play: Button = %Play
@@ -40,6 +45,10 @@ var _cup := {}
 
 func _enter_tree() -> void:
 	EventSystem.CUP_state_changed.connect(func(state: Dictionary) -> void: _cup = state)
+	EventSystem.PRO_state_changed.connect(func(state: Dictionary) -> void:
+		if state.get("night", false) != _night:
+			_night = state.get("night", false)
+			_show_sky())
 
 
 func _ready() -> void:
@@ -85,6 +94,8 @@ func _ready() -> void:
 	_play.grab_focus()
 	_add_continue_cup()
 	_add_version()
+	_add_sky_button()
+	EventSystem.PRO_state_requested.emit()
 	var bob := create_tween().set_loops().set_trans(Tween.TRANS_SINE)
 	bob.tween_property(_logo, "position:y", _logo.position.y - 6.0, 1.0)
 	bob.tween_property(_logo, "position:y", _logo.position.y + 6.0, 1.0)
@@ -152,6 +163,46 @@ func _add_version() -> void:
 	label.modulate.a = 0.7
 	label.position = Vector2(1760, 1036)
 	_menu.get_parent().add_child(label)
+
+
+## Day or night (docs/DESIGN.md §27), under the trophy: the sun by day, the moon at night.
+## Pressing it turns the race behind the menu to night (or day) at once, so the child sees
+## what it does; the races and Free Drive that follow are the same.
+func _add_sky_button() -> void:
+	_sky_button = Button.new()
+	_sky_button.name = "DayNight"
+	_sky_button.theme_type_variation = &"NavButton"
+	_sky_button.custom_minimum_size = Vector2(150, 150)
+	_sky_button.expand_icon = true
+	_sky_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_sky_button.add_theme_constant_override("icon_max_width", 110)
+	_sky_button.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_sky_button.offset_left = _shelf.offset_left
+	_sky_button.offset_right = _shelf.offset_right
+	_sky_button.offset_top = _shelf.offset_bottom + 24.0
+	_sky_button.offset_bottom = _sky_button.offset_top + 150.0
+	_shelf.get_parent().add_child(_sky_button)
+	_sky_button.pressed.connect(func() -> void: EventSystem.PRO_night_requested.emit(not _night))
+	_shelf.focus_neighbor_bottom = _shelf.get_path_to(_sky_button)
+	_sky_button.focus_neighbor_top = _sky_button.get_path_to(_shelf)
+	_sky_button.focus_neighbor_left = _sky_button.get_path_to(_town)
+	_town.focus_neighbor_right = _town.get_path_to(_sky_button)
+	_show_sky()
+
+
+func _show_sky() -> void:
+	if _sky_button == null:
+		return
+	_sky_button.icon = SkyIcons.moon() if _night else SkyIcons.sun()
+	_sky_button.add_theme_stylebox_override("normal", _tinted(_shelf.get_theme_stylebox("normal"),
+		NIGHT_COLOUR if _night else DAY_COLOUR))
+	var night := _world.get_node_or_null(^"Night")
+	if _night and night == null:
+		night = Night.new()
+		night.name = "Night"
+		_world.add_child(night)
+	elif not _night and night:
+		night.queue_free()
 
 
 ## A cup left half-way (even with the game closed) can be picked up from the title.

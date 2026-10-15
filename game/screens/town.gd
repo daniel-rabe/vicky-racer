@@ -43,6 +43,8 @@ const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
 const BOAT_DIR := "res://game/configs/boats/"
 const DEFAULT_BOAT := &"speedboat"
 const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
+## A porch lamp's glow at night (docs/DESIGN.md §27).
+const PORCH_GLOW := preload("res://actors/weather/porch_glow.tres")
 const PLAYER_INPUT := preload("res://actors/car/player_input.gd")
 const PLAYER_MARKER := preload("res://actors/car/player_marker.gd")
 const MUSIC := preload("res://game/configs/music/race_town.tres")
@@ -119,6 +121,9 @@ var errands: TownErrands
 var fire_duty: FireDuty
 var bus_route: BusRoute
 var weather: TownWeather
+## Free Drive at night (the title's moon button, docs/DESIGN.md §27).
+var night: Night
+var _night := false
 var ball: Kickable
 var kickables: Array[Kickable] = []
 var traffic: Array[Car] = []
@@ -160,6 +165,7 @@ func _on_state_changed(state: Dictionary) -> void:
 		if setup.id == equipped:
 			_setup = setup
 	_paint = state.get("paint", {}).get(equipped, Paint.ORIGINAL)
+	_night = state.get("night", false)
 	# And the equipped boat, for the harbour.
 	var boat_id: StringName = state.get("equipped_boat", DEFAULT_BOAT)
 	if _boat_setup == null or _boat_setup.id != boat_id:
@@ -743,6 +749,12 @@ func _add_jobs() -> void:
 	weather.town = town
 	add_child(weather)
 	move_child(weather, hud.get_index())  # its rain falls under the HUD
+	if _night:
+		night = Night.new()
+		night.name = "Night"
+		night.weather = weather
+		add_child(night)
+		_add_porch_lights()
 	_voice = AudioStreamPlayer.new()
 	_voice.name = "Voice"
 	_voice.bus = &"SFX"
@@ -755,6 +767,21 @@ func _play(path: String, volume_db: float) -> void:
 	_voice.stream = load(path)
 	_voice.volume_db = volume_db
 	_voice.play()
+
+
+## At night, a warm lamp by every house's front door (docs/DESIGN.md §27).
+func _add_porch_lights() -> void:
+	var lamps := Node2D.new()
+	lamps.name = "PorchLights"
+	_world.add_child(lamps)
+	for house in town.houses:
+		var lamp := PointLight2D.new()
+		lamp.texture = PORCH_GLOW
+		lamp.color = Color(1.0, 0.78, 0.42)
+		lamp.energy = 1.1
+		lamp.texture_scale = 5.0
+		lamp.position = house["door"] - Vector2(0, 40)
+		lamps.add_child(lamp)
 
 
 ## Things in the sky: hot-air balloons drifting over, and now and then a flock of birds.
@@ -827,6 +854,8 @@ func _dev_start(where: String) -> void:
 			player.reset_physics_interpolation()
 		player.get_node(^"ChaseCamera").snap_to_car()
 		return
+	elif where == "house":
+		at = town.houses[3]["door"] + Vector2(-300, 70)
 	elif where == "pitch":
 		at = town.pitch.get_center() + Vector2(-260, 60)
 	elif where == "fountain":

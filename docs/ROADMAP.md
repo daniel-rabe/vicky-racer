@@ -433,6 +433,19 @@ DESIGN §26.
 - **Open:** a play test with Vicky. Pictures for the drawn tool icons (road, eraser, undo) could
   come from ComfyUI as seed variants if the drawn ones are not good enough.
 
+## Phase 26 — Night 🚧 in review
+
+Asked for on 2026-10-15 ("a night mode, which makes the map look darker and the cars have
+lights"). DESIGN §27.
+
+- **Built:** a sun / moon button on the title. At night the world is deep blue and every car,
+  boat, bus and fire engine has headlight beams and red tail lights (brighter on the brake);
+  Free Drive's houses have porch lamps. Works with rain and snow and in two-player; space is
+  left as it is. `tests/night_test.gd` is new.
+- **Picked:** how dark, variant 2 "moonlight" (2026-10-15).
+- **Open:** the sun and moon are drawn in code; they could come from ComfyUI as seed variants
+  if wanted.
+
 ---
 
 ## Ideas parked

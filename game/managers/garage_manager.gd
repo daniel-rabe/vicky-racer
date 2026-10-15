@@ -50,6 +50,8 @@ var race_mode: StringName = &"race"
 ## &"car", &"boat" or &"ship": which the screens are showing (the title's CARS / BOATS / SPACE).
 ## Not saved.
 var vehicle_kind: StringName = &"car"
+## Races and Free Drive at night (the title's moon button, docs/DESIGN.md §27). Not saved.
+var night := false
 ## The child's own track, when the next car race is on it (docs/DESIGN.md §26); else null.
 ## Not saved: the track editor keeps the track's file.
 var custom_track: TrackConfig
@@ -83,6 +85,10 @@ func _enter_tree() -> void:
 	EventSystem.PRO_vehicle_kind_requested.connect(func(kind: StringName) -> void:
 		if kind in KINDS and kind != vehicle_kind:
 			vehicle_kind = kind
+			_publish_state())
+	EventSystem.PRO_night_requested.connect(func(on: bool) -> void:
+		if on != night:
+			night = on
 			_publish_state())
 	EventSystem.PRO_race_mode_requested.connect(func(mode: StringName) -> void:
 		if mode in [&"race", &"time_trial"]:
@@ -341,6 +347,7 @@ func _publish_state() -> void:
 		"best_laps": profile.best_laps.duplicate(),
 		"last_race": last_race,
 		"race_mode": race_mode,
+		"night": night,
 		"ghost_dir": ghost_dir(),
 		"trials": profile.trials.duplicate(true),
 	})

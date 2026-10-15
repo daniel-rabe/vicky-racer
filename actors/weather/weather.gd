@@ -30,6 +30,9 @@ var ground: Object
 var first_rain := Vector2(150.0, 240.0)
 var rain_seconds := Vector2(50.0, 70.0)
 var dry_seconds := Vector2(240.0, 420.0)
+## The light it all sits in: white by day, Night.TINT at night (docs/DESIGN.md §27). The world
+## has one CanvasModulate, this one, so the night darkens it rather than adding its own.
+var tint := Color.WHITE
 ## Where the gloom goes, if not here: the split screen's world, drawn in its own viewports.
 var world: Node
 ## Wipers sweep the bottom corners in the rain (not in a race, where the HUD is there).
@@ -63,7 +66,7 @@ func _ready() -> void:
 		_next = _rng.randf_range(first_rain.x, first_rain.y)
 	_gloom = CanvasModulate.new()
 	_gloom.name = "Gloom"
-	_gloom.color = Color.WHITE
+	_gloom.color = tint
 	(world if world else self).add_child(_gloom)
 	_layer = CanvasLayer.new()
 	_layer.name = "Weather"
@@ -111,7 +114,7 @@ func _process(delta: float) -> void:
 		wetness = move_toward(wetness, 1.0 if raining else 0.0, delta / (WET_IN if raining else DRY_OUT))
 		if ground:
 			ground.set_wet(wetness)
-	_gloom.color = Color.WHITE.lerp(SNOW_GLOOM if kind == &"snow" else GLOOM, intensity)
+	_gloom.color = tint * Color.WHITE.lerp(SNOW_GLOOM if kind == &"snow" else GLOOM, intensity)
 	_rain.emitting = intensity > 0.02
 	_rain.amount_ratio = clampf(intensity, 0.05, 1.0)
 	var size := _screen_size()
