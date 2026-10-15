@@ -1,11 +1,11 @@
-"""Stand-in pictures for the open world's two new buildings (docs/DESIGN.md §28): the garage and
-the trophy house. Drawn flat in the street view (roof above, front wall below), the size of a
+"""Stand-in pictures for the open world's new buildings (docs/DESIGN.md §28, §31): the garage, the
+trophy house, the stadium and the workshop. Drawn flat in the street view (roof above, front wall below), the size of a
 shop, so the town places them like the rest. They are placeholders until the Kontext versions
 are picked (the frozen recipe, building_sketch + details), as for every other building.
 
     python tools/layouts/world_buildings.py
 
-Writes art/town/buildings/garage.png and trophy_house.png.
+Writes art/town/buildings/garage.png, trophy_house.png, stadium.png and workshop.png.
 """
 
 from pathlib import Path
@@ -112,6 +112,58 @@ def trophy_house():
     finish(img, "trophy_house.png")
 
 
+def stadium():
+    w, h = 520, 440
+    img = Image.new("RGBA", (w * SS, h * SS), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    shaded(img, (8, 386, w - 8, h - 6), 18, (150, 156, 166, 255))  # the forecourt
+    rounded(d, (24, 200, w - 24, 404), 24, (232, 236, 244, 255))  # the front wall
+    for x in range(44, w - 44, 54):  # the stands' windows
+        rounded(d, (x, 222, x + 34, 252), 8, (90, 140, 210, 255))
+    d.pieslice([(w / 2 - 80) * SS, 290 * SS, (w / 2 + 80) * SS, 450 * SS], 180, 360, fill=(60, 64, 80, 255))  # the gate
+    rounded(d, (w / 2 - 80, 368, w / 2 + 80, 400), 4, (60, 64, 80, 255))
+    # From above: the ring of seats round a green pitch with white lines.
+    d.ellipse([18 * SS, 14 * SS, (w - 18) * SS, 222 * SS], fill=(214, 60, 70, 255))
+    d.ellipse([34 * SS, 28 * SS, (w - 34) * SS, 208 * SS], fill=(240, 240, 246, 255))
+    d.ellipse([60 * SS, 46 * SS, (w - 60) * SS, 190 * SS], fill=(72, 170, 80, 255))
+    d.ellipse([(w / 2 - 34) * SS, 84 * SS, (w / 2 + 34) * SS, 152 * SS], outline=(255, 255, 255, 255), width=4 * SS)
+    d.line([(w / 2) * SS, 48 * SS, (w / 2) * SS, 188 * SS], fill=(255, 255, 255, 255), width=4 * SS)
+    for x, colour in ((40, (255, 214, 63)), (w / 2, (60, 120, 230)), (w - 40, (46, 190, 100))):  # flags
+        d.line([x * SS, 4 * SS, x * SS, 60 * SS], fill=(60, 60, 70, 255), width=4 * SS)
+        d.polygon([(x * SS, 4 * SS), ((x + 40) * SS, 16 * SS), (x * SS, 28 * SS)], fill=colour + (255,))
+    finish(img, "stadium.png")
+
+
+def workshop():
+    w, h = 480, 430
+    img = Image.new("RGBA", (w * SS, h * SS), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    shaded(img, (8, 380, w - 8, h - 6), 18, (150, 156, 166, 255))
+    rounded(d, (30, 190, w - 30, 400), 20, (120, 170, 220, 255))  # the front wall
+    rounded(d, (130, 236, 350, 396), 14, (60, 64, 80, 255))  # the big open door
+    for x in (150, 230, 310):  # track pieces inside
+        rounded(d, (x - 20, 340, x + 20, 388), 8, (110, 116, 126, 255))
+        rounded(d, (x - 4, 346, x + 4, 382), 2, (255, 255, 255, 255))
+    shaded(img, (14, 20, w - 14, 214), 30, (70, 90, 130, 255))  # the roof
+    # A yellow crane across the roof, its hook hanging.
+    rounded(d, (60, 70, 420, 96), 6, (255, 196, 40, 255))
+    for x in range(70, 420, 30):
+        d.line([x * SS, 72 * SS, (x + 15) * SS, 94 * SS], fill=(200, 140, 20, 255), width=3 * SS)
+    rounded(d, (70, 60, 110, 180), 6, (255, 196, 40, 255))
+    d.line([360 * SS, 96 * SS, 360 * SS, 150 * SS], fill=(40, 40, 46, 255), width=4 * SS)
+    d.arc([346 * SS, 146 * SS, 374 * SS, 174 * SS], 0, 200, fill=(40, 40, 46, 255), width=5 * SS)
+    # A big gear.
+    cx, cy = 250, 150
+    for k in range(8):
+        import math
+        a = k * math.pi / 4
+        rounded(d, (cx + math.cos(a) * 40 - 10, cy + math.sin(a) * 40 - 10, cx + math.cos(a) * 40 + 10,
+                    cy + math.sin(a) * 40 + 10), 4, (210, 214, 224, 255))
+    d.ellipse([(cx - 38) * SS, (cy - 38) * SS, (cx + 38) * SS, (cy + 38) * SS], fill=(210, 214, 224, 255))
+    d.ellipse([(cx - 14) * SS, (cy - 14) * SS, (cx + 14) * SS, (cy + 14) * SS], fill=(70, 90, 130, 255))
+    finish(img, "workshop.png")
+
+
 def _star_points():
     import math
     return [(math.cos(-math.pi / 2 + k * math.pi / 5), math.sin(-math.pi / 2 + k * math.pi / 5)) for k in range(10)]
@@ -120,3 +172,5 @@ def _star_points():
 if __name__ == "__main__":
     garage()
     trophy_house()
+    stadium()
+    workshop()

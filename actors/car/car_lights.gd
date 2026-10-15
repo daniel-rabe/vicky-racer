@@ -32,6 +32,16 @@ static func fit(car: Node) -> void:
 	if not is_instance_valid(car) or not car is Car:
 		return
 	var body: Sprite2D = car.get_node_or_null(^"Body")
+	if body and car is Kid and not body.has_node(^"Lights"):
+		# Vicky on foot (§29): no lamps, just the soft light round him so he is easy to find.
+		var glow := PointLight2D.new()
+		glow.name = "Lights"
+		glow.texture = _glow_texture(0)
+		glow.texture_scale = 4.0
+		glow.color = GLOW_COLOUR
+		glow.energy = GLOW_ENERGY * 1.4
+		body.add_child(glow)
+		return
 	if body == null or body.texture == null or body.has_node(^"Lights"):
 		return
 	var lights := CarLights.new()

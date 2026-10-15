@@ -30,6 +30,9 @@ var _kind := &"car"
 @onready var _hints: Label = %Hints
 
 
+var _back_to: StringName = &""
+
+
 func _enter_tree() -> void:
 	EventSystem.PRO_state_changed.connect(_on_state_changed)
 	EventSystem.PRO_track_locked.connect(_on_locked)
@@ -55,6 +58,7 @@ func _ready() -> void:
 
 
 func _on_state_changed(state: Dictionary) -> void:
+	_back_to = state.get("back_to", &"")
 	_trials = state.get("trials", {})
 	_kind = state.get("vehicle_kind", &"car")
 	if not _two_player:
@@ -205,5 +209,6 @@ func _update_hints() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
-		EventSystem.UI_screen_requested.emit(&"join" if _two_player else &"garage")
+		# Opened by the stadium's door (§31): back to the town.
+		EventSystem.UI_screen_requested.emit(&"join" if _two_player else (_back_to if _back_to != &"" else &"garage"))
 		get_viewport().set_input_as_handled()

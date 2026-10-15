@@ -19,7 +19,9 @@ const OUTLINE := Color(0.055, 0.078, 0.11)
 const MAP_SIZE := Vector2(380, 300)
 ## The controls along the bottom, by what is being driven and the device used last.
 const HINTS := {
-	&"car": ["H  HORN     ESC  PAUSE", "Y  HORN     START  PAUSE"],
+	&"car": ["H  HORN     E  GET OUT     ESC  PAUSE", "Y  HORN / GET OUT     START  PAUSE"],
+	&"foot": ["ARROWS  WALK     SPACE  RUN     E  GET IN     H  WHISTLE     ESC  PAUSE",
+		"STICK  WALK     X  RUN     Y  GET IN / WHISTLE     START  PAUSE"],
 	&"boat": ["H  HORN     ESC  PAUSE", "Y  HORN     START  PAUSE"],
 	&"fire_engine": ["SPACE  WATER     H  SIREN     ESC  PAUSE", "X  WATER     Y  SIREN     START  PAUSE"],
 	&"bus": ["H  HORN     ESC  PAUSE", "Y  HORN     START  PAUSE"],
@@ -46,6 +48,10 @@ var _vehicle_icon: TextureRect
 var _fade: ColorRect
 var _kind := &"car"
 var _gamepad := false
+## The last controls used were a gamepad's (the bubbles show its buttons).
+var gamepad: bool:
+	get:
+		return _gamepad
 ## The arrow to a job's target, off screen (§23).
 var _pointer: Control
 var _pointer_picture: TextureRect
@@ -60,6 +66,8 @@ var _gate_slot: Control
 var _gate_go: Label
 var _gate_unlocked := true
 var gate_shown: Node
+## &"race", or &"time_trial" on a gate's stopwatch (§31).
+var gate_mode := &"race"
 
 
 func _ready() -> void:
@@ -167,7 +175,7 @@ func set_vehicle(player: Car, kind: StringName) -> void:
 	_kind = kind
 	_map.set_player(player, kind == &"boat")
 	_vehicle_icon.texture = player.body_texture
-	_vehicle_icon.visible = kind != &"car"
+	_vehicle_icon.visible = kind not in [&"car", &"foot"]
 	_hints.text = HINTS[_kind][1 if _gamepad else 0]
 
 
@@ -292,10 +300,12 @@ func _build_gate_card(root: Control) -> void:
 
 ## Pulled up on `gate`'s place: its track's card, and RACE! (or, while it is locked, the button
 ## that shows the way to the race that opens it).
-func show_gate(gate: Node, config: TrackConfig, unlocked: bool, best_lap: float, completed: bool, opened_by: String) -> void:
-	if gate_shown == gate:
+func show_gate(gate: Node, config: TrackConfig, unlocked: bool, best_lap: float, completed: bool, opened_by: String,
+		mode := &"race") -> void:
+	if gate_shown == gate and gate_mode == mode:
 		return
 	gate_shown = gate
+	gate_mode = mode
 	_gate_unlocked = unlocked
 	for child in _gate_slot.get_children():
 		child.queue_free()
@@ -324,7 +334,10 @@ func _show_gate_button() -> void:
 	if _gate_go == null:
 		return
 	var button := "Y" if _gamepad else "R"
-	_gate_go.text = "%s\nRACE!" % button if _gate_unlocked else "%s\nSHOW ME\nTHE WAY" % button
+	if not _gate_unlocked:
+		_gate_go.text = "%s\nSHOW ME\nTHE WAY" % button
+	else:
+		_gate_go.text = "%s\nTIME\nTRIAL!" % button if gate_mode == &"time_trial" else "%s\nRACE!" % button
 
 
 ## Fade the screen to white (`to_white`) or back. Await it: 0.18 s in, 0.25 s out.

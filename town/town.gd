@@ -88,7 +88,8 @@ const WASH_PAD_INTO_ROAD := 30.0
 const FIRE_PAD_COLOUR := Color(0.86, 0.25, 0.22, 0.9)
 const BUS_PAD_COLOUR := Color(0.98, 0.76, 0.18, 0.92)
 ## The open world's doors (§28): the garage's pad orange, the trophy house's gold.
-const DOOR_COLOURS := {&"garage": Color(0.96, 0.55, 0.16, 0.92), &"shelf": Color(1.0, 0.82, 0.25, 0.92)}
+const DOOR_COLOURS := {&"garage": Color(0.96, 0.55, 0.16, 0.92), &"shelf": Color(1.0, 0.82, 0.25, 0.92),
+	&"tracks": Color(0.86, 0.24, 0.28, 0.92), &"editor": Color(0.36, 0.56, 0.86, 0.92)}
 ## A car gate's paved start area round its grid (§28): this long along the way it faces, this wide.
 const GATE_AREA := Vector2(700.0, 470.0)
 const ROCKET_PAD_RADIUS := 170.0
@@ -127,6 +128,11 @@ var gates: Array[Dictionary] = []
 var doors: Array[Dictionary] = []
 ## The rocket pad: driving onto it opens the Hangar.
 var rocket_pad := Rect2()
+## The rocket on it, which lifts off with the car inside (§31).
+var rocket: Sprite2D
+## Driveways (§29): cars parked on the lawn beside a house, nose to the street, free to borrow.
+## Each {"at", "angle"}.
+var parking: Array[Dictionary] = []
 ## The football pitch, and its two goal mouths (the ball is in when its middle is inside one).
 var pitch := Rect2()
 var goals: Array[Rect2] = []
@@ -185,6 +191,7 @@ func _ready() -> void:
 	_build_harbour()
 	_build_sea()
 	_build_extras()
+	_plan_parking()
 
 
 func _physics_process(_delta: float) -> void:
@@ -1226,6 +1233,42 @@ func _football_pitch(lawn: Rect2) -> Rect2:
 
 
 ## After the rest: the bus stops, the ramps with their run-ups, and the puddles.
+## A driveway beside houses, on the lawn just above the pavement, where a parked car is clear of
+## the buildings, the trees, the pads and every other driveway.
+const PARKING_SPOTS := 6
+const PARKED_SIZE := Vector2(70.0, 120.0)  # a car facing the street, with a little room
+
+
+func _plan_parking() -> void:
+	var taken: Array[Rect2] = []
+	taken.append_array(footprints)
+	taken.append_array(_keep_clear)
+	for pad in [wash_pad, fire_pad, bus_pad, paint_pad, rocket_pad]:
+		taken.append(pad)
+	for door: Dictionary in doors:
+		taken.append(door["pad"])
+	var houses_left := houses.duplicate()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 29
+	while parking.size() < PARKING_SPOTS and not houses_left.is_empty():
+		var house: Dictionary = houses_left.pop_at(rng.randi() % houses_left.size())
+		var sprite: Sprite2D = house["sprite"]
+		var width: float = sprite.texture.get_width()
+		var y: float = house["door"].y - TownLayout.SIDEWALK * 0.5 - 10.0 - PARKED_SIZE.y * 0.5 - 6.0
+		for x in [sprite.position.x + width + PARKED_SIZE.x * 0.5 + 6.0, sprite.position.x - PARKED_SIZE.x * 0.5 - 6.0]:
+			var at := Vector2(x, y)
+			var box := Rect2(at - PARKED_SIZE / 2.0, PARKED_SIZE)
+			if surface_at(at) != &"grass" or taken.any(func(r: Rect2) -> bool: return r.intersects(box.grow(20.0))):
+				continue
+			if tree_spots.any(func(t: Vector2) -> bool: return box.grow(TREE_TRUNK + 30.0).has_point(t)):
+				continue
+			if parking.any(func(p: Dictionary) -> bool: return p["at"].distance_to(at) < 1200.0):
+				continue
+			parking.append({"at": at, "angle": PI / 2.0})
+			taken.append(box)
+			break
+
+
 func _build_extras() -> void:
 	for stop in bus_stops:
 		_bus_shelter(stop)
@@ -1284,7 +1327,7 @@ func _rocket_pad() -> void:
 		_ground.add_child(_flat(band, Color(0.98, 0.8, 0.15) if k % 2 == 0 else Color(0.12, 0.12, 0.14)))
 	_ground.add_child(_disc(at, ROCKET_PAD_RADIUS - 34.0, Color(0.62, 0.64, 0.68)))
 	_ground.add_child(_disc(at, 70.0, Color(0.5, 0.52, 0.56)))
-	var rocket := _sprite(ROCKET, at, 230.0, -PI / 2.0)
+	rocket = _sprite(ROCKET, at, 230.0, -PI / 2.0)
 	rocket.z_index = TREE_Z
 
 
@@ -1356,6 +1399,6 @@ func _ramp(ramp: Dictionary) -> void:
 	picture.texture = RAMP
 	area.add_child(picture)
 	area.body_entered.connect(func(body: Node2D) -> void:
-		if body is Car and not body is Boat and body.velocity.dot(throw) > 150.0:
+		if body is Car and not body is Boat and not body is Kid and body.velocity.dot(throw) > 150.0:
 			CarHop.launch(body))
 	_things.add_child(area)

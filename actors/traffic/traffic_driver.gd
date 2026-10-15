@@ -258,12 +258,13 @@ func _clear_road_speed(delta: float) -> float:
 				continue
 			if along < nearest:
 				nearest = along
-				player_in_way = other.has_node(^"PlayerInput")
+				# The player, or a car the player left parked in the road (§29): wait, then go round.
+				player_in_way = other.has_node(^"PlayerInput") or other.is_in_group(&"parked")
 				_blocker = other
 	if player_in_way and nearest < STOP_GAP + 120.0:
 		_blocked_by_player += delta
 		_honk_timer -= delta
-		if _blocked_by_player > HONK_AFTER and _honk_timer <= 0.0:
+		if _blocked_by_player > HONK_AFTER and _honk_timer <= 0.0 and _blocker.has_node(^"PlayerInput"):
 			_honk_timer = HONK_EVERY
 			EventSystem.CAR_horn.emit(car)
 	else:
@@ -297,7 +298,7 @@ func _update_overtake(delta: float) -> void:
 		var gone := not is_instance_valid(_passing) 			or (_passing.global_position - car.global_position).dot(forward) < -170.0
 		if gone or _in_junction or to_line < 260.0 or _oncoming_within(450.0):
 			_passing = null
-	elif _blocker and _blocker.has_node(^"PlayerInput") and _blocked_by_player > OVERTAKE_AFTER 			and not _in_junction and to_line > OVERTAKE_ROOM and not _oncoming_within(OVERTAKE_CLEAR):
+	elif _blocker and (_blocker.has_node(^"PlayerInput") or _blocker.is_in_group(&"parked")) and _blocked_by_player > OVERTAKE_AFTER 			and not _in_junction and to_line > OVERTAKE_ROOM and not _oncoming_within(OVERTAKE_CLEAR):
 		_passing = _blocker
 	_shift = move_toward(_shift, OVERTAKE_SHIFT if _passing else 0.0, SHIFT_RATE * delta)
 

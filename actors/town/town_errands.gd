@@ -38,6 +38,8 @@ const HEEL := 140.0
 ## What rides on the roof: this big, this far behind the car's middle.
 const ROOF_SIZE := 52.0
 const ROOF_AT := Vector2(-20, 0)
+## On foot (§29) he carries it in front of him.
+const HOLD_AT := Vector2(26, 0)
 const MARKER_HEIGHT := 150.0
 
 ## The town screen (game/screens/town.gd): the player, the town, the HUD, paying.
@@ -144,13 +146,13 @@ func _physics_process(delta: float) -> void:
 	_rest = maxf(_rest - delta, 0.0)
 	_bob_load(delta)
 	_bob_marker()
-	var car: Car = screen.car
-	var driving: bool = screen.player == car and car != null
+	var car: Car = screen.player
+	var driving: bool = screen.riding in [&"car", &"foot"]  # on foot too (§29)
 	if errand == &"delivery" and driving and _arrived(car, target):
 		_deliver()
 	elif errand == &"puppy":
 		_walk_puppy(car, driving, delta)
-	if errand != &"":
+	if errand != &"" and not screen.street_race.running:  # a street race's rings first (§30)
 		screen.hud.point_at(target, _pointer_picture)
 
 
@@ -160,7 +162,7 @@ func _arrived(car: Car, at: Vector2) -> bool:
 
 ## The parcel hops from the roof to the door; the house bounces and says thank you.
 func _deliver() -> void:
-	var from: Vector2 = _load.global_position if _load else screen.car.global_position
+	var from: Vector2 = _load.global_position if _load else screen.player.global_position
 	_drop_load()
 	var parcel := Sprite2D.new()
 	parcel.texture = _picture
@@ -264,7 +266,7 @@ func _hiding_spot(away_from: Vector2) -> Vector2:
 
 func _door_of(place_id: String) -> Vector2:
 	var best := Vector2.INF
-	var car_at: Vector2 = screen.car.global_position if screen.car else Vector2.ZERO
+	var car_at: Vector2 = screen.player.global_position if screen.player else Vector2.ZERO
 	for place: Dictionary in screen.town.places:
 		if place["id"] == place_id and place["door"].distance_to(car_at) < best.distance_to(car_at):
 			best = place["door"]
@@ -275,17 +277,25 @@ func _door_of(place_id: String) -> Vector2:
 
 func _put_on_roof(picture: Texture2D, seconds: float) -> void:
 	_drop_load()
-	var car: Car = screen.car
+	var car: Car = screen.player if screen.riding in [&"car", &"foot"] else screen.car
 	_load = Sprite2D.new()
 	_load.name = "RoofLoad"
 	_load.texture = picture
-	_load.position = ROOF_AT
+	_load.position = HOLD_AT if car is Kid else ROOF_AT
 	_load.z_index = 3
 	_load.scale = Vector2.ZERO
 	car.get_node(^"Body").add_child(_load)
 	_load_time = seconds
 	var size := Vector2.ONE * ROOF_SIZE / maxf(picture.get_width(), picture.get_height())
 	_load.create_tween().tween_property(_load, "scale", size, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Getting in or out of a car (§29): what was on the roof goes into his hands, and back.
+func carry(by: Car) -> void:
+	if _load == null or not is_instance_valid(_load) or by == null:
+		return
+	_load.reparent(by.get_node(^"Body"), false)
+	_load.position = HOLD_AT if by is Kid else ROOF_AT
 
 
 func _bob_load(delta: float) -> void:

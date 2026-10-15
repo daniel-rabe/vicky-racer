@@ -29,6 +29,17 @@ extends Node2D
 ## carries on where the child left off. The pause menu's MAP shows the whole island (WorldMap):
 ## choosing a place there points the way to it.
 ##
+## Out of the car (§29): stopped, E / Y lets Vicky climb out (Kid) and walk, the car left parked
+## where it stood. Walking up to it (or to one of the cars parked in the driveways, free to
+## borrow) and pressing E / Y again gets in. On foot, the horn is a whistle: the car comes and
+## parks by the kerb nearby. Traffic stops for him and drives round him; dogs and cats he walks
+## up to are petted and trot along for a while; the shops' treats and parcels go in his hands.
+##
+## Street races (§30): a checkered line across the road starts each of the town's own races
+## (StreetRace). Pulled up on it, the route's card shows, and R / Y races the three racers round
+## glowing rings in the streets while the traffic waits. Pop-up challenges (TownChallenges):
+## every ramp jump is measured, and drifting in the zone on the quay earns stars.
+##
 ## Escape / Start pauses (RESUME / MAP / SETTINGS / GARAGE; the Boat Dock while sailing).
 ##
 ## Dev flags, after `--`:
@@ -47,9 +58,14 @@ extends Node2D
 ##   --errand=pizza / puppy  start a delivery from the pizza place, or the lost puppy
 ##   --rain        start a shower straight away
 ##   --start=gate  start on the first race gate's place (its card shows); gate4 the fifth
-##   --start=garage / trophies / rocket  start just below the garage's or the trophy house's pad,
+##   --start=garage / trophies / stadium / workshop / rocket  start just below that building's pad,
 ##                 or beside the rocket pad
+##   --start=watch  start on the first car gate's stopwatch (TIME TRIAL); watch3 the fourth
 ##   --map         open the pause menu's map straight away
+##   --start=foot  start on foot, beside the car; --start=driveway on foot by the first driveway car
+##   --start=street  start on the first street race's start line (its card shows); street1, street2
+##   --street-race  and start that race straight away
+##   --start=drift  start by the drift zone on the quay
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
@@ -118,10 +134,21 @@ const SAVE_EVERY := 10.0
 ## Within this of a place chosen on the map, the way is found: the arrow goes.
 const PIN_REACH := 450.0
 const WORLD_MAP := preload("res://ui/town/world_map.gd")
-const GARAGE_ART := preload("res://art/town/buildings/garage.png")
-const TROPHY_ART := preload("res://art/town/buildings/trophy_house.png")
 const HARBOUR_ART := preload("res://art/town/buildings/harbour.png")
 const ROCKET_ART := preload("res://art/ships/cardboard_rocket.png")
+## On foot (§29).
+const KID_INPUT := preload("res://actors/kid/kid_input.gd")
+const KID_ZOOM := 1.25
+## Slower than this, the car can be left.
+const GET_OUT_SPEED := 60.0
+## This near a parked car, he can get in.
+const HOP_REACH := 150.0
+## Further off than this, a whistle brings the car.
+const WHISTLE_AWAY := 900.0
+const WHISTLE := "res://art/sfx/comet_chime.wav"
+const DOOR := "res://art/sfx/wall_bump.wav"
+const BEEP := "res://art/sfx/countdown_beep.wav"
+const LIFT_OFF := "res://art/sfx/comet_whoosh.wav"
 
 var town: Town
 ## The vehicle the player is driving now: the car, the boat, the fire engine or the bus.
@@ -133,7 +160,7 @@ var car: Car
 var boat: Boat
 var fire_engine: Car
 var bus: Car
-## &"car", &"boat", &"fire_engine" or &"bus".
+## &"car", &"boat", &"fire_engine", &"bus" or &"foot".
 var riding := &"car"
 var sailing: bool:
 	get:
@@ -175,6 +202,17 @@ var _leaving := false
 var _save_in := SAVE_EVERY
 var _map: WorldMap
 var _map_layer: CanvasLayer
+## On foot (§29): Vicky himself, the parked cars he can get into (his own, left where he got
+## out, and the driveway cars), the bubble over the one he can get into now, and the cars a
+## child can borrow.
+var kid: Kid
+var hop_ins: Array[Car] = []
+var _prompt: HopPrompt
+var _stopped := 0.0
+var _car_setups: Array = []
+## The town's own races (§30).
+var street_race: StreetRace
+var challenges: TownChallenges
 
 @onready var _world: Node2D = $World
 @onready var _cars: Node2D = $World/Cars
@@ -190,6 +228,9 @@ func _enter_tree() -> void:
 	EventSystem.CAR_washed.connect(func(car: Node) -> void:
 		if car == player:
 			hud.bubbles())
+	EventSystem.CAR_horn.connect(func(by: Node) -> void:
+		if by == kid and riding == &"foot":
+			_whistle())
 
 
 func _on_state_changed(state: Dictionary) -> void:
@@ -199,6 +240,7 @@ func _on_state_changed(state: Dictionary) -> void:
 		if setup.id == equipped:
 			_setup = setup
 	_paint = state.get("paint", {}).get(equipped, Paint.ORIGINAL)
+	_car_setups = state.get("car_setups", state["setups"])
 	if state.get("night", false) != _night:
 		_night = state.get("night", false)
 		if weather:
@@ -228,6 +270,7 @@ func _ready() -> void:
 	EventSystem.UI_music_requested.emit(MUSIC)
 	var args := OS.get_cmdline_user_args()
 	EventSystem.PRO_home_requested.emit(&"town")
+	EventSystem.PRO_back_to_requested.emit(&"")  # the track select's usual way back, until a door says
 	_spawn_player("--autodrive" in args)
 	var dev_start := Array(args).any(func(a: String) -> bool: return a.begins_with("--start="))
 	if not dev_start and "--autodrive" not in args:
@@ -242,6 +285,20 @@ func _ready() -> void:
 	_add_jobs()
 	_add_gates()
 	_add_map()
+	_add_driveway_cars()
+	street_race = StreetRace.new()
+	street_race.name = "StreetRace"
+	street_race.screen = self
+	_world.add_child(street_race)
+	_world.move_child(street_race, _cars.get_index())  # the lines and rings under the cars
+	challenges = TownChallenges.new()
+	challenges.name = "Challenges"
+	challenges.screen = self
+	_world.add_child(challenges)
+	_world.move_child(challenges, _cars.get_index())
+	_prompt = HopPrompt.new()
+	_prompt.name = "HopPrompt"
+	_world.add_child(_prompt)
 	town.place_reached.connect(_on_place_reached)
 	town.pad_reached.connect(_on_pad_reached)
 	EventSystem.CAR_surface_changed.connect(_on_surface_changed)
@@ -267,6 +324,11 @@ func _ready() -> void:
 	if "--map" in args:
 		$PauseMenu.pause()
 		_open_map()
+	if "--street-race" in args:
+		var nearest: Array = street_race.starts.duplicate()
+		nearest.sort_custom(func(x: Dictionary, y: Dictionary) -> bool:
+			return x["at"].distance_to(player.global_position) < y["at"].distance_to(player.global_position))
+		street_race.start(nearest[0]["route"])
 
 
 func _report_traffic() -> void:
@@ -320,11 +382,13 @@ func _drive(vehicle: Car, autodrive := false) -> void:
 	var input := Node.new()
 	input.name = "PlayerInput"
 	if not autodrive:
-		input.set_script(PLAYER_INPUT)
+		input.set_script(KID_INPUT if vehicle is Kid else PLAYER_INPUT)
 	vehicle.add_child(input)
 	var rig := Node2D.new()
 	rig.name = "ChaseCamera"
 	rig.set_script(CAMERA_SCRIPT)
+	if vehicle is Kid:
+		rig.zoom_level = KID_ZOOM  # closer in on foot
 	var camera := Camera2D.new()
 	camera.name = "Camera"
 	camera.process_callback = Camera2D.CAMERA2D_PROCESS_PHYSICS
@@ -393,14 +457,19 @@ func _add_gates() -> void:
 ## no card.
 func _check_gates() -> void:
 	for gate in gates:
-		if gate.kind == riding and gate.is_on_slot(player.global_position):
-			if hud.gate_shown != gate:
-				var entry: Dictionary = _world_tracks.get(gate.config.track_id, {})
-				hud.show_gate(gate, gate.config, gate.unlocked, entry.get("best_lap", 0.0), entry.get("completed", false),
-					_opened_by(gate).config.display_name if _opened_by(gate) else "")
-				if gate.unlocked:
-					gate.cheer()
-			return
+		if gate.kind != riding:
+			continue
+		var mode := &"race" if gate.is_on_slot(player.global_position) else \
+			(&"time_trial" if gate.is_on_stopwatch(player.global_position) else &"")
+		if mode == &"":
+			continue
+		if hud.gate_shown != gate or hud.gate_mode != mode:
+			var entry: Dictionary = _world_tracks.get(gate.config.track_id, {})
+			hud.show_gate(gate, gate.config, gate.unlocked, entry.get("best_lap", 0.0), entry.get("completed", false),
+				_opened_by(gate).config.display_name if _opened_by(gate) else "", mode)
+			if gate.unlocked and mode == &"race":
+				gate.cheer()
+		return
 	hud.hide_gate()
 
 
@@ -414,7 +483,23 @@ func _opened_by(gate: RaceGate) -> RaceGate:
 ## Y / R or Enter on a gate's card: the race (or, locked, the way to the race that opens it).
 func _unhandled_input(event: InputEvent) -> void:
 	var gate := hud.gate_shown as RaceGate
-	if gate == null or _leaving:
+	if _leaving or _swapping:
+		return
+	if not street_race.shown.is_empty() and not street_race.running:
+		var go: bool = event is InputEventKey and event.pressed and not event.echo \
+			and (event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER)
+		if go or event.is_action_pressed("race_start"):
+			get_viewport().set_input_as_handled()
+			street_race.start(street_race.shown["route"])
+			return
+	if gate == null:
+		if event.is_action_pressed(&"get_in_out") and not event.is_echo():
+			if riding == &"foot" and _hop_in_near():
+				get_viewport().set_input_as_handled()
+				get_in(_hop_in_near())
+			elif riding == &"car" and can_get_out():
+				get_viewport().set_input_as_handled()
+				get_out()
 		return
 	var enter: bool = event is InputEventKey and event.pressed and not event.echo \
 		and (event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER)
@@ -422,7 +507,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	get_viewport().set_input_as_handled()
 	if gate.unlocked:
-		_start_race(gate)
+		_start_race(gate, hud.gate_mode)
 	else:
 		var opener := _opened_by(gate)
 		if opener:
@@ -430,12 +515,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 ## Off to the race on `gate`'s track: the spot saved on its place, so DRIVE ON comes back here.
-func _start_race(gate: RaceGate) -> void:
+func _start_race(gate: RaceGate, mode := &"race") -> void:
 	_leaving = true
-	save_spot(gate.slot, gate.slot_angle())
+	if mode == &"time_trial":
+		save_spot(gate.stopwatch, gate.slot_angle())
+	else:
+		save_spot(gate.slot, gate.slot_angle())
 	EventSystem.PRO_vehicle_kind_requested.emit(gate.kind)
 	EventSystem.PRO_track_select_requested.emit(gate.config.track_id)
-	EventSystem.PRO_race_mode_requested.emit(&"race")
+	EventSystem.PRO_race_mode_requested.emit(mode)
 	await hud.fade(true)
 	EventSystem.UI_screen_requested.emit(&"race")
 
@@ -457,8 +545,53 @@ func _go_inside(screen: StringName, pad: Rect2, kind: StringName, angle: float) 
 	_leaving = true
 	save_spot(pad.get_center(), angle)
 	EventSystem.PRO_vehicle_kind_requested.emit(kind)
+	if screen in [&"tracks", &"editor"]:
+		EventSystem.PRO_back_to_requested.emit(&"town")  # the stadium, the workshop: BACK comes out here
+	if kind == &"ship":
+		await _launch()
 	await hud.fade(true)
 	EventSystem.UI_screen_requested.emit(screen)
+
+
+## The rocket pad (§31): the car rolls into the rocket, 3, 2, 1, and the rocket lifts off in a
+## roar of flame, up and away off the top of the screen, before the Hangar opens.
+func _launch() -> void:
+	var rocket := town.rocket
+	if rocket == null:
+		return
+	player.frozen = true
+	var into := player.create_tween()
+	into.tween_property(player, "global_position", rocket.global_position, 0.4).set_trans(Tween.TRANS_QUAD)
+	into.parallel().tween_property(player, "modulate:a", 0.0, 0.4)
+	for n in ["3", "2", "1"]:
+		hud.show_banner(n)
+		_play(BEEP, -8.0)
+		await get_tree().create_timer(0.55).timeout
+	hud.show_banner("LIFT OFF!")
+	_play(LIFT_OFF, -2.0)
+	var flame := CPUParticles2D.new()
+	flame.name = "Flame"
+	flame.position = Vector2(-rocket.texture.get_width() * 0.45, 0)  # its tail: the rocket points up (-X is down)
+	flame.amount = 60
+	flame.lifetime = 0.6
+	flame.direction = Vector2.LEFT
+	flame.spread = 18.0
+	flame.initial_velocity_min = 300.0
+	flame.initial_velocity_max = 520.0
+	flame.scale_amount_min = 8.0
+	flame.scale_amount_max = 16.0
+	flame.color_ramp = Gradient.new()
+	flame.color_ramp.set_color(0, Color(1, 0.95, 0.5))
+	flame.color_ramp.set_color(1, Color(1, 0.3, 0.1, 0.0))
+	flame.show_behind_parent = true
+	flame.scale = Vector2.ONE / rocket.scale  # in pixels on screen, whatever size the picture is
+	rocket.add_child(flame)
+	var up := rocket.create_tween()
+	up.tween_interval(0.35)
+	up.tween_property(rocket, "global_position", rocket.global_position + Vector2(0, -1500), 1.5) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	up.parallel().tween_property(rocket, "scale", rocket.scale * 1.5, 1.5)
+	await up.finished
 
 
 ## Save where the child is (or `at`, facing `angle`), and in what: the car or the boat. In the
@@ -473,6 +606,9 @@ func save_spot(at := Vector2.INF, angle := 0.0) -> void:
 			&"bus":
 				at = town.bus_pad.get_center()
 				angle = PI / 2.0
+			&"foot":  # the car, where he left it
+				at = car.global_position
+				angle = car.rotation
 			_:
 				at = player.global_position
 				angle = player.rotation
@@ -487,6 +623,7 @@ func save_spot(at := Vector2.INF, angle := 0.0) -> void:
 func _on_screen_requested(_screen: StringName) -> void:
 	if not _leaving and is_inside_tree() and is_instance_valid(player):
 		_leaving = true
+		street_race.abandon()
 		save_spot()
 
 
@@ -529,7 +666,7 @@ func set_pin(at: Vector2, picture: Texture2D) -> void:
 
 
 func _follow_pin() -> void:
-	if _pin.is_empty():
+	if _pin.is_empty() or street_race.running:
 		return
 	if player.global_position.distance_to(_pin["at"]) < PIN_REACH:
 		_pin = {}
@@ -588,11 +725,244 @@ func map_places() -> Array:
 		out.append({"at": gate.slot, "name": gate.config.display_name.to_upper(), "done": entry.get("completed", false),
 			"locked": not gate.unlocked, "picture": gate.racers[0].body_texture if not gate.racers.is_empty() else null})
 	for door: Dictionary in town.doors:
-		out.append({"at": door["pad"].get_center(), "name": "GARAGE" if door["screen"] == &"garage" else "TROPHIES",
-			"picture": GARAGE_ART if door["screen"] == &"garage" else TROPHY_ART})
+		out.append({"at": door["pad"].get_center(), "name": TownLayout.DOOR_NAMES[door["id"]],
+			"picture": load(Town.BUILDING_ART % door["id"])})
 	out.append({"at": town.rocket_pad.get_center(), "name": "ROCKET", "picture": ROCKET_ART})
 	out.append({"at": Island.LAND_PAD.get_center(), "name": "HARBOUR", "picture": HARBOUR_ART})
+	if riding == &"foot":
+		out.append({"at": car.global_position, "name": "MY CAR", "picture": car.body_texture})
 	return out
+
+
+# --- on foot (§29): out of the car, into it or another, the whistle --------------------
+
+## Stopped in a car (not on a pad or a gate's place): he may get out.
+func can_get_out() -> bool:
+	return riding == &"car" and not street_race.running and player.velocity.length() < GET_OUT_SPEED \
+		and not CarHop.airborne(player) \
+		and _spot_beside(player) != Vector2.INF
+
+
+## Out of the car: it stays parked where it stood, its seat empty, and Vicky stands beside it
+## (on the driver's side if there is room there, else the other side, else behind).
+func get_out() -> void:
+	var from := player
+	var at := _spot_beside(from)
+	if at == Vector2.INF:
+		return
+	_park(from)
+	from.driver_id = &""
+	from.add_to_group(&"parked")
+	if from not in hop_ins:
+		hop_ins.append(from)
+	if kid == null:
+		kid = Kid.make()
+		_cars.add_child(kid)
+	else:
+		_unstow(kid)
+	kid.add_to_group(&"walkers")  # traffic waits for him crossing, as for the ducks
+	_place(kid, at, (at - from.global_position).angle())
+	_drive(kid)
+	riding = &"foot"
+	_changed_vehicle()
+	_play(DOOR, -14.0)
+
+
+## Into `vehicle` (his own car, or a driveway car to borrow: then it is the car for now, and his
+## own waits parked where he left it, to come back to or whistle for).
+func get_in(vehicle: Car) -> void:
+	if vehicle == null or riding != &"foot":
+		return
+	_park(kid)
+	_stow(kid)
+	kid.remove_from_group(&"walkers")
+	vehicle.remove_from_group(&"parked")
+	hop_ins.erase(vehicle)
+	if vehicle.has_meta(&"sign"):
+		var sign: Node2D = vehicle.get_meta(&"sign")
+		vehicle.remove_meta(&"sign")
+		sign.create_tween().tween_property(sign, "scale", Vector2.ZERO, 0.3).finished.connect(sign.queue_free)
+		TownFx.hearts(_world, vehicle.global_position, 5)
+	vehicle.driver_id = DriverLook.VICKY
+	car = vehicle
+	_drive(vehicle)
+	riding = &"car"
+	_changed_vehicle()
+	_play(DOOR, -14.0)
+
+
+## After getting in or out: everything that follows the player follows the new one.
+func _changed_vehicle() -> void:
+	_pad_armed = false
+	_stopped = 0.0
+	_sea_life.player = player
+	for gate in gates:
+		gate.watch = player
+	hud.set_vehicle(player, riding)
+	errands.carry(player)
+
+
+## The parked car he is near enough to get into, nearest first; null if none.
+func _hop_in_near() -> Car:
+	var best: Car = null
+	for vehicle in hop_ins:
+		if is_instance_valid(vehicle) and vehicle.global_position.distance_to(kid.global_position) < HOP_REACH \
+				and (best == null or vehicle.global_position.distance_to(kid.global_position) < best.global_position.distance_to(kid.global_position)):
+			best = vehicle
+	return best
+
+
+## Somewhere to stand beside `vehicle`: its left (the driver's door), its right, behind it.
+func _spot_beside(vehicle: Car) -> Vector2:
+	var forward := Vector2.RIGHT.rotated(vehicle.rotation)
+	for offset in [forward.orthogonal() * 70.0, -forward.orthogonal() * 70.0, -forward * 110.0]:
+		var at: Vector2 = vehicle.global_position + offset
+		if town.surface_at(at) in [&"water", &"lagoon_water", &"deep_water", &"sandbank"]:
+			continue
+		if town.footprints.any(func(r: Rect2) -> bool: return r.grow(24.0).has_point(at)):
+			continue
+		return at
+	return Vector2.INF
+
+
+## The bubble over what E / Y would do now: over a car he can get into, or, stopped in a car
+## for a moment, by its door.
+func _update_prompt(delta: float) -> void:
+	var gamepad: bool = hud.gamepad
+	if riding == &"foot":
+		var near := _hop_in_near()
+		_prompt.show_at(near, gamepad, false)
+	elif riding == &"car" and hud.gate_shown == null and street_race.shown.is_empty():
+		_stopped = _stopped + delta if can_get_out() else 0.0
+		_prompt.show_at(player if _stopped > 0.8 else null, gamepad, true)
+	else:
+		_prompt.show_at(null, gamepad, false)
+
+
+## On foot, the horn is a whistle. Far from the car, it comes: gone in a puff, and parked by the
+## kerb of the nearest road, facing along it. Near it, the car toots back.
+func _whistle() -> void:
+	_play(WHISTLE, -6.0)
+	if car.global_position.distance_to(kid.global_position) < WHISTLE_AWAY:
+		EventSystem.CAR_horn.emit(car)
+		return
+	var best := Vector2.INF
+	var along := Vector2.RIGHT
+	for road: Array in town.roads:
+		for pair in [[road[0], road[1]], [road[1], road[0]]]:
+			var lane := town.lane_points(pair[0], pair[1])
+			var heading := town.heading(pair[0], pair[1])
+			for i in range(2, lane.size() - 2):  # not in a junction
+				var kerb: Vector2 = lane[i] + Town.right_of(heading) * (TownLayout.ROAD_HALF - Town.LANE + 40.0)
+				if kerb.distance_to(kid.global_position) < best.distance_to(kid.global_position):
+					best = kerb
+					along = heading
+	if best == Vector2.INF:
+		return
+	TownFx.confetti(_world, car.global_position)
+	_place(car, best, along.angle())
+	TownFx.confetti(_world, best)
+	EventSystem.CAR_horn.emit(car)
+
+
+## Cars parked in the driveways (Town.parking), a different one in each, in a paint of its own,
+## nobody at the wheel and a sign with a key: free to borrow.
+func _add_driveway_cars() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 2029
+	var choices := _car_setups.filter(func(setup: DriftSetup) -> bool: return _setup == null or setup.id != _setup.id)
+	if choices.is_empty():
+		return
+	for i in town.parking.size():
+		var spot: Dictionary = town.parking[i]
+		var setup: DriftSetup = choices[(i * 5 + rng.randi() % 3) % choices.size()]
+		var paint: StringName = Paint.COLOURS[rng.randi() % Paint.COLOURS.size()]
+		var parked: Car = CAR_SCENE.instantiate()
+		parked.name = "Driveway%d" % i
+		parked.setup = setup
+		parked.body_texture = Paint.body(setup, paint)
+		parked.driver_id = &""
+		_cars.add_child(parked)
+		_place(parked, spot["at"], spot["angle"])
+		parked.frozen = true
+		parked.get_node(^"Audio").process_mode = Node.PROCESS_MODE_DISABLED
+		parked.add_to_group(&"parked")
+		hop_ins.append(parked)
+		var sign := KeySign.new()
+		sign.name = "KeySign%d" % i
+		sign.position = spot["at"] + Vector2(70, -40)
+		_world.add_child(sign)
+		parked.set_meta(&"sign", sign)
+
+
+## A little round sign on a post with a key on it: this car is free to borrow.
+class KeySign extends Node2D:
+	var _time := randf() * TAU
+
+	func _process(delta: float) -> void:
+		_time += delta
+		queue_redraw()
+
+	func _draw() -> void:
+		var top := Vector2(0, -60 + sin(_time * 2.5) * 4.0)
+		draw_line(Vector2.ZERO, top, Color(0.45, 0.32, 0.2), 7.0)
+		draw_circle(top, 30.0, Color(0.055, 0.078, 0.11))
+		draw_circle(top, 26.0, Color(0.18, 0.77, 0.42))
+		# The key: a ring and a blade with two teeth.
+		var gold := Color(1, 0.86, 0.3)
+		draw_arc(top + Vector2(-8, 0), 8.0, 0.0, TAU, 16, gold, 5.0, true)
+		draw_line(top + Vector2(0, 0), top + Vector2(16, 0), gold, 5.0)
+		draw_line(top + Vector2(12, 0), top + Vector2(12, 7), gold, 4.0)
+		draw_line(top + Vector2(17, 0), top + Vector2(17, 7), gold, 4.0)
+
+
+## The bubble over what E / Y does: a white bubble with the button in it, bobbing, over the car
+## to get into, or beside the car to get out of with a little arrow pointing out.
+class HopPrompt extends Node2D:
+	var _over: Node2D
+	var _gamepad := false
+	var _out := false
+	var _time := 0.0
+
+	func _ready() -> void:
+		z_index = 6
+		visible = false
+
+	func show_at(over: Node2D, gamepad: bool, out: bool) -> void:
+		if over != _over or gamepad != _gamepad or out != _out:
+			_over = over
+			_gamepad = gamepad
+			_out = out
+			visible = over != null
+			scale = Vector2(0.4, 0.4)
+			if visible:
+				create_tween().tween_property(self, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	func _process(delta: float) -> void:
+		_time += delta
+		if _over and is_instance_valid(_over):
+			global_position = _over.global_position + Vector2(80, -90 + sin(_time * 4.0) * 6.0)
+			queue_redraw()
+
+	func _draw() -> void:
+		var ink := Color(0.055, 0.078, 0.11)
+		draw_colored_polygon(PackedVector2Array([Vector2(-14, 24), Vector2(14, 24), Vector2(0, 46)]), Color.WHITE)
+		draw_circle(Vector2.ZERO, 36.0, ink)
+		draw_circle(Vector2.ZERO, 31.0, Color.WHITE)
+		var key := "Y" if _gamepad else "E"
+		var font := ThemeDB.fallback_font
+		var size := font.get_string_size(key, HORIZONTAL_ALIGNMENT_CENTER, -1, 36)
+		draw_circle(Vector2.ZERO, 22.0, Color(1, 0.824, 0.247) if _gamepad else Color(0.9, 0.92, 0.95))
+		draw_string(font, Vector2(-size.x / 2.0, 13.0), key, HORIZONTAL_ALIGNMENT_CENTER, -1, 36, ink)
+		# Getting out: a little arrow out of the bubble; getting in: one into it.
+		var y := 0.0
+		var x := 48.0
+		var tip := Vector2(x + 18.0, y) if _out else Vector2(x - 6.0, y)
+		var back := Vector2(x - 6.0, y) if _out else Vector2(x + 18.0, y)
+		draw_line(back, tip, ink, 6.0)
+		var d := (tip - back).normalized()
+		draw_line(tip, tip - d * 10.0 + d.orthogonal() * 8.0, ink, 6.0)
+		draw_line(tip, tip - d * 10.0 - d.orthogonal() * 8.0, ink, 6.0)
 
 
 # --- swapping vehicles: the harbour (§21.3), the fire station and the school (§23) -------
@@ -603,7 +973,8 @@ func _physics_process(delta: float) -> void:
 	_check_fountain(delta)
 	_check_goal(delta)
 	_follow_pin()
-	hud.set_marks(errands.marks() + fire_duty.marks() + ([[_pin["at"], Color.WHITE]] if not _pin.is_empty() else []))
+	hud.set_marks(errands.marks() + fire_duty.marks() + street_race.marks()
+		+ ([[_pin["at"], Color.WHITE]] if not _pin.is_empty() else []))
 	_save_in -= delta
 	if _save_in <= 0.0 and not _leaving:
 		_save_in = SAVE_EVERY
@@ -611,9 +982,15 @@ func _physics_process(delta: float) -> void:
 	if _swapping or _leaving or player.has_node(^"TrafficDriver"):
 		hud.hide_gate()
 		return
+	if street_race.running:
+		hud.hide_gate()
+		_prompt.show_at(null, false, false)
+		return
+	street_race.check(player, riding)
 	_check_gates()
 	var near_a_pad := false
-	if riding == &"car":
+	_update_prompt(delta)
+	if riding in [&"car", &"foot"]:
 		for door: Array in _doors():
 			var rect: Rect2 = door[0]
 			if rect.grow(60.0).has_point(player.global_position):
@@ -933,7 +1310,7 @@ func pay(amount: int, at: Vector2) -> void:
 
 
 func _on_place_reached(place_id: String, display_name: String, picture: Texture2D) -> void:
-	if player == car:
+	if riding in [&"car", &"foot"]:  # the shops serve him on foot too (§29)
 		errands.on_place(place_id)
 	var first := not visited.has(display_name)
 	visited[display_name] = true
@@ -1160,6 +1537,25 @@ func _dev_start(where: String) -> void:
 	elif where == "sea":
 		_swap_now(&"boat")
 		return
+	elif where == "foot":
+		get_out()
+		return
+	elif where == "drift":
+		at = TownChallenges.DRIFT_ZONE.position + Vector2(TownChallenges.DRIFT_ZONE.size.x - 90.0, TownChallenges.DRIFT_ZONE.size.y / 2.0)
+		player.rotation = PI
+	elif where.begins_with("street"):
+		var start: Dictionary = street_race.starts[clampi(int(where.substr(6)), 0, street_race.starts.size() - 1)]
+		at = start["at"] - Vector2.RIGHT.rotated(start["angle"]) * 60.0
+		player.rotation = start["angle"]
+	elif where == "driveway":
+		var parked: Car = hop_ins[0]
+		_place(car, parked.global_position + Vector2(0, 520), -PI / 2.0)
+		get_out()
+		kid.global_position = parked.global_position + Vector2(0, 150)
+		kid.rotation = -PI / 2.0
+		kid.reset_physics_interpolation()
+		kid.get_node(^"ChaseCamera").snap_to_car()
+		return
 	elif where in ["fire", "bus", "stop"]:
 		_swap_now(&"fire_engine" if where == "fire" else &"bus")
 		if where == "stop":
@@ -1169,16 +1565,20 @@ func _dev_start(where: String) -> void:
 			player.reset_physics_interpolation()
 		player.get_node(^"ChaseCamera").snap_to_car()
 		return
+	elif where.begins_with("watch"):
+		var gate := gates[clampi(int(where.substr(5)), 0, gates.size() - 1)]
+		at = gate.stopwatch + Vector2.RIGHT.rotated(gate.global_rotation) * 40.0
+		player.rotation = gate.slot_angle()
 	elif where.begins_with("gate"):
 		var gate := gates[clampi(int(where.substr(4)), 0, gates.size() - 1)]
 		if gate.kind == &"boat":
 			_swap_now(&"boat")
 		at = gate.slot
 		player.rotation = gate.slot_angle()
-	elif where == "garage" or where == "trophies":
-		var door: Dictionary = town.doors.filter(func(d: Dictionary) -> bool:
-			return d["screen"] == (&"garage" if where == "garage" else &"shelf"))[0]
-		at = door["pad"].get_center() + Vector2(0, 420)
+	elif where in ["garage", "trophies", "stadium", "workshop"]:
+		var id: String = {"garage": "garage", "trophies": "trophy_house", "stadium": "stadium", "workshop": "workshop"}[where]
+		var door: Dictionary = town.doors.filter(func(d: Dictionary) -> bool: return d["id"] == id)[0]
+		at = door["pad"].get_center() + Vector2(0, 280)
 		player.rotation = -PI / 2.0
 	elif where == "rocket":
 		at = town.rocket_pad.get_center() + Vector2(420, 0)

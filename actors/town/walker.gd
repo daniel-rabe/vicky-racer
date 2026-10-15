@@ -10,6 +10,12 @@ extends Node2D
 ##
 ## It has a voice (quack, woof, meow): it calls out as it hops, when a horn toots near it,
 ## and — a duck — as she sets off across the road.
+##
+## Vicky on foot (Kid, §29) walking up to it pets it: hearts, a happy woof or meow, a jump, and a
+## dog or cat trots along after him for a while before going back to its walk. It never hops
+## away from him.
+
+signal petted(walker: Walker)
 
 ## Its route, world positions. `loop`: round and round; otherwise there and back.
 var route := PackedVector2Array()
@@ -31,6 +37,12 @@ const HEAR_HORN := 520.0
 const CLEAR_DISTANCE := 520.0
 ## Any vehicle this near the crossing's line is on it (a bus is 208 px long).
 const ON_CROSSING := 160.0
+## Petting (§29): this near, a pet; then it follows this long, this far behind, and wants
+## another pet only after a rest.
+const PET_REACH := 80.0
+const FOLLOW_SECONDS := 9.0
+const HEEL := 75.0
+const PET_REST := 12.0
 
 var _target := 1
 var _step := 1
@@ -44,6 +56,10 @@ var _young: Array[Sprite2D] = []
 var _voice: AudioStreamPlayer2D
 var _jump: Tween
 var _jump_scale := 1.0
+## Following Vicky after a pet, and for how much longer.
+var friend: Node2D
+var _friend_time := 0.0
+var _pet_rest := 0.0
 
 
 func _enter_tree() -> void:
@@ -86,8 +102,11 @@ func _physics_process(delta: float) -> void:
 	if route.size() < 2:
 		return
 	_dodge_cars()
+	_check_pet(delta)
 	var moving := false
-	if _wait > 0.0:
+	if friend:
+		moving = _trot_after_friend(delta)
+	elif _wait > 0.0:
 		_wait -= delta
 		if _wait <= 0.0 and not loop and not _road_clear():
 			_wait = 0.5  # look both ways: off again once nothing is coming
@@ -170,6 +189,8 @@ func _dodge_cars() -> void:
 	if _hop_tween and _hop_tween.is_running():
 		return
 	for car: Car in get_tree().get_nodes_in_group(&"cars"):
+		if car is Kid:
+			continue  # a friend, not a car
 		var rel := global_position + _hop_offset - car.global_position
 		if rel.length() > FLEE_RADIUS or car.velocity.length() < FLEE_SPEED:
 			continue
@@ -204,3 +225,38 @@ func _call_out() -> void:
 	if _voice and is_inside_tree() and not _voice.playing:
 		_voice.pitch_scale = randf_range(0.92, 1.12)
 		_voice.play()
+
+
+## Vicky on foot near: a pet. A dog or a cat then follows him; a duck only quacks and jumps.
+func _check_pet(delta: float) -> void:
+	_pet_rest = maxf(_pet_rest - delta, 0.0)
+	if _pet_rest > 0.0:
+		return
+	for kid: Node in get_tree().get_nodes_in_group(&"kid"):
+		if not kid.visible or (kid as Node2D).global_position.distance_to(global_position) > PET_REACH:
+			continue
+		_pet_rest = PET_REST
+		_call_out()
+		_bounce()
+		TownFx.hearts(get_parent(), global_position + Vector2(0, -30), 4)
+		if loop:
+			friend = kid
+			_friend_time = FOLLOW_SECONDS
+		petted.emit(self)
+		return
+
+
+## Trotting along behind Vicky, keeping a little way off; back to its walk when the time is up
+## or he has gone (into a car). Returns whether it moved.
+func _trot_after_friend(delta: float) -> bool:
+	_friend_time -= delta
+	if _friend_time <= 0.0 or not is_instance_valid(friend) or not friend.visible:
+		friend = null
+		return false
+	var to_friend := friend.global_position - global_position
+	if to_friend.length() <= HEEL:
+		return false
+	var step := minf(maxf(speed * 4.0, 300.0) * delta, to_friend.length() - HEEL)
+	global_position += to_friend.normalized() * step
+	rotation = lerp_angle(rotation, to_friend.angle(), 1.0 - exp(-10.0 * delta))
+	return true

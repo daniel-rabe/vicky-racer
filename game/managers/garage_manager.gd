@@ -57,6 +57,8 @@ var night := false
 var custom_track: TrackConfig
 ## Where BACK leads (docs/DESIGN.md §28): &"town" in the open world, &"title" otherwise. Not saved.
 var home: StringName = &"title"
+## Where the track select and the editor go back to (§31): &"" (their usual way) or &"town".
+var back_to: StringName = &""
 
 
 func _enter_tree() -> void:
@@ -95,6 +97,10 @@ func _enter_tree() -> void:
 	EventSystem.PRO_home_requested.connect(func(screen: StringName) -> void:
 		if screen in [&"title", &"town"] and screen != home:
 			home = screen
+			_publish_state())
+	EventSystem.PRO_back_to_requested.connect(func(screen: StringName) -> void:
+		if screen != back_to:
+			back_to = screen
 			_publish_state())
 	EventSystem.PRO_world_spot_saved.connect(func(spot: Dictionary) -> void:
 		profile.world = spot.duplicate()
@@ -355,6 +361,7 @@ func _publish_state() -> void:
 		# Every track of every kind, for the open world's race gates (§28).
 		"world_tracks": _track_entries(&"car") + _track_entries(&"boat") + _track_entries(&"ship"),
 		"home": home,
+		"back_to": back_to,
 		"world": profile.world.duplicate(),
 		"car_setups": SETUP_ORDER.map(func(id: StringName) -> DriftSetup: return setups[id]),
 		"best_laps": profile.best_laps.duplicate(),

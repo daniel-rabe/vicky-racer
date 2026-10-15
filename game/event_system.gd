@@ -66,6 +66,10 @@ signal PRO_coins_found(amount: int)
 ## the open world (PLAY), &"title" otherwise (2 PLAYERS). The garage's BACK, the results' DRIVE ON,
 ## the shelf's BACK and the race's pause menu follow it.
 signal PRO_home_requested(screen: StringName)
+## Where the track select and the track editor go back to (§31): &"town" when a building in the
+## open world opened them (the stadium, the workshop), &"" for the usual way (the garage, the
+## track select). The town clears it each time it opens.
+signal PRO_back_to_requested(screen: StringName)
 ## The world's last spot (§28): {"x", "y", "angle", "riding"}, kept in the save so PLAY carries on
 ## where the child left off. {} forgets it.
 signal PRO_world_spot_saved(spot: Dictionary)

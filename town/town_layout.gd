@@ -28,7 +28,7 @@ const REMOVED_ROADS := [["v", 3, 1]]
 const BLOCKS := {
 	Vector2i(0, 0): {"bottom": ["garage", "house_blue"], "top": ["house_green"], "trees": 3, "flowers": 2},
 	Vector2i(1, 0): {"bottom": ["candy_shop", "ice_cream_shop"], "top": ["house_blue", "house_red"], "trees": 2, "flowers": 2},
-	Vector2i(2, 0): {"bottom": ["school"], "playground": true, "trees": 3, "flowers": 1},
+	Vector2i(2, 0): {"bottom": ["school", "workshop"], "playground": true, "trees": 3, "flowers": 1},
 	Vector2i(3, 0): {"bottom": ["toy_shop", "bakery"], "top": ["house_green", "house_blue"], "trees": 2, "flowers": 2},
 	Vector2i(4, 0): {"bottom": ["trophy_house", "house_red"], "top": ["house_blue"], "trees": 3, "flowers": 2},
 	Vector2i(0, 1): {"bottom": ["pet_shop", "flower_shop"], "top": ["house_red", "house_green"], "trees": 2, "flowers": 2},
@@ -37,7 +37,7 @@ const BLOCKS := {
 	Vector2i(4, 1): {"bottom": ["police_station"], "top": ["house_red"], "trees": 3, "flowers": 2},
 	Vector2i(0, 2): {"bottom": ["house_blue", "house_green"], "top": ["house_red"], "trees": 3, "flowers": 2},
 	Vector2i(1, 2): {"bottom": ["pizza_place", "candy_shop"], "top": ["house_green", "house_blue"], "trees": 2, "flowers": 2},
-	Vector2i(2, 2): {"bottom": ["car_wash"], "top": ["house_green", "house_red"], "trees": 2, "flowers": 1},
+	Vector2i(2, 2): {"bottom": ["car_wash", "stadium"], "top": ["house_green", "house_red"], "trees": 2, "flowers": 1},
 	Vector2i(3, 2): {"bottom": ["bakery", "flower_shop"], "top": ["house_red", "house_green"], "trees": 2, "flowers": 2},
 	Vector2i(4, 2): {"bottom": ["ice_cream_shop", "pet_shop"], "top": ["house_blue"], "trees": 2, "flowers": 2},
 	Vector2i(0, 3): {"pond": true, "trees": 6, "flowers": 1},
@@ -105,8 +105,12 @@ const GATES := [
 ## races (§24).
 const ROCKET_PAD := Vector2(400.0, 2000.0)
 ## Buildings with something inside (§28): their pads open a screen instead of showing a sign.
-## The garage (the cars) and the trophy house (the shelf and the stickers).
-const DOORS := {"garage": &"garage", "trophy_house": &"shelf"}
+## The garage (the cars) and the trophy house (the shelf and the stickers); the stadium (the
+## races, the cups and the time trials: the track select) and the workshop (the track editor),
+## §31.
+const DOORS := {"garage": &"garage", "trophy_house": &"shelf", "stadium": &"tracks", "workshop": &"editor"}
+## What the map calls them.
+const DOOR_NAMES := {"garage": "GARAGE", "trophy_house": "TROPHIES", "stadium": "STADIUM", "workshop": "WORKSHOP"}
 
 
 static func junction(cell: Vector2i) -> Vector2:

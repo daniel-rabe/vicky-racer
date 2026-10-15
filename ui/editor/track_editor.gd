@@ -68,7 +68,16 @@ var _gallery_grid: GridContainer
 var _file_dialog: FileDialog
 
 
+## Opened by the workshop's door in the open world (§31), BACK goes back to the town.
+var _back_to: StringName = &""
+
+
+func _enter_tree() -> void:
+	EventSystem.PRO_state_changed.connect(func(state: Dictionary) -> void: _back_to = state.get("back_to", &""))
+
+
 func _ready() -> void:
+	EventSystem.PRO_state_requested.emit()
 	var map_px := Vector2(CustomTrack.MAP_TILES) * CustomTrack.TILE_PX
 	_scale = minf(MAP_RECT.size.x / map_px.x, MAP_RECT.size.y / map_px.y)
 	_offset = (MAP_RECT.size - map_px * _scale) / 2.0
@@ -618,7 +627,7 @@ func _race() -> void:
 
 
 func _go_back() -> void:
-	EventSystem.UI_screen_requested.emit(&"tracks")
+	EventSystem.UI_screen_requested.emit(_back_to if _back_to != &"" else &"tracks")  # the workshop (§31)
 
 
 func _play(stream: AudioStream, volume_db := 0.0) -> void:

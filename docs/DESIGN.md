@@ -2335,3 +2335,135 @@ Escape** goes back to the pause menu.
 
 Dev flags for the town: `--start=gate` (or `gate4`, the fifth; a boat gate starts in the boat),
 `--start=garage`, `trophies`, `rocket`, and `--map` to open the map at once.
+
+## 29. Out of the car
+
+*(Phase 28, from the open-world plan's ideas 19, 20, 23, 24 and 28.)* A kind child's GTA: in the
+open world Vicky can climb out of the car, walk about, pet the animals, borrow other cars and
+whistle for his own.
+
+### 29.1 Getting out and in
+
+- Stopped (under 60 px/s, not in the air), **E / Y** gets him out. A bubble with the button
+  shows by the car after a moment's standstill, with an arrow pointing out. He stands beside the
+  car, on the driver's side if there is room, else the other side, else behind; never in water
+  or inside a building. The car stays parked where it stood, its seat empty.
+- On foot he walks with the arrows, WASD, the stick or the d-pad, in any direction, and runs
+  with the drift button held (SPACE / X): 260 and 430 px/s. The camera comes in closer (1.25).
+- Near a parked car (150 px), the bubble shows over it with an arrow pointing in, and **E / Y**
+  gets in. Only the plain car can be left: not the boat, the fire engine or the bus.
+- The horn on foot is a **whistle**: far from the car (900 px), it vanishes in a puff and parks by
+  the kerb of the nearest road, facing along it; near, it toots back.
+
+### 29.2 Cars to borrow
+
+Five or six cars stand in driveways beside houses, on the lawn with their noses to the street,
+each a different car from the garage in a paint of its own, nobody at the wheel and a green
+sign with a gold key: free to try. Getting in one, the sign comes down with hearts and it is the
+car for now (it drives as that car does). His own waits parked where he left it, and the
+borrowed one stays wherever he leaves it. The whistle brings whichever car he drove last.
+
+### 29.3 The town and Vicky on foot
+
+He is a `Car` to the rest of the town (`Kid`, built in code), so everything that looks for the
+player finds him: coins, the shops' doors, the garage's, trophy house's and rocket's pads,
+the minimap and the gates' racers tooting. He cannot drift, boost or jump a ramp.
+
+- **Traffic** stops for him in the road and toots if he stays there, then drives round him; a car
+  he left parked in the road is driven round too. He can never be run over.
+- **Animals**: walking up to a dog or a cat pets it (hearts, a woof or meow, a jump) and it trots
+  along after him for nine seconds; a duck quacks and jumps. They never hop away from him.
+- **Shops**: a treat goes in his hands, and the deliveries and the lost puppy work on foot.
+  Getting in, what he carries goes on the roof, and back into his hands when he gets out.
+- At night a soft light round him keeps him easy to find.
+- The saved spot on foot is the car's, so PLAY carries on in the car where he left it. The MAP
+  shows MY CAR while he is on foot.
+
+| What | Where |
+| --- | --- |
+| Vicky on foot and his picture | [`actors/kid/kid.gd`](../actors/kid/kid.gd), [`actors/kid/kid_input.gd`](../actors/kid/kid_input.gd) |
+| Getting in and out, the bubble, the whistle, the driveway cars | [`game/screens/town.gd`](../game/screens/town.gd) |
+| The driveways | `Town.parking` in [`town/town.gd`](../town/town.gd) |
+| Petting | [`actors/town/walker.gd`](../actors/town/walker.gd) |
+| Checks | [`tests/foot_test.gd`](../tests/foot_test.gd) |
+
+Dev flags for the town: `--start=foot` (out beside the car), `--start=driveway` (on foot by a
+driveway car). The walking picture is drawn in code; a ComfyUI walk cycle can replace it.
+
+## 30. Street races and pop-up challenges
+
+*(Phase 29, from the open-world plan's ideas 15 and 16.)* The Need-for-Speed part of the open
+world: races through the town's own streets, and little challenges that just happen while
+driving about.
+
+### 30.1 Street races
+
+- Three routes round the town's roads (`StreetRace.ROUTES`): **ROUND THE PARK** (two laps of the
+  big park), **ZIG ZAG** (down and across the south-west), **THE BIG LOOP** (the ring road round the
+  whole town). Each starts at a checkered line across the road with a flag either side.
+- Pulling up on the line (slower than 320 px/s) shows a card on the left: the route drawn on a
+  little map of the streets, its name, and R / Y RACE! (Enter too).
+- Starting: the player and BLUE, YELLOW and GREEN line up on a grid behind the line, each racer
+  in a different car and paint. The traffic pulls in and waits, faded and out of the way
+  (nothing to bump into). 3, 2, 1, GO with the race's beeps.
+- A glowing yellow ring at every junction on the route, the next ones faint white; the arrow at
+  the screen's edge points to the next ring and the minimap marks it. The last ring is the
+  start line. The place and the rings passed show at the top.
+- The racers drive the route with a `RouteDriver` each (look ahead, slow for corners), easing
+  off when far ahead of the player and pushing when far behind.
+- **Can't be lost:** no clock; finishing pays 15, 10, 6 or 4 coins for 1st to 4th, with
+  confetti and the fanfare. Then the racers drive off and fade, and the traffic goes again.
+  Getting out, the gates, the doors and the pads wait until the race is over. Leaving the town
+  mid-race ends it.
+
+### 30.2 Pop-up challenges
+
+- **Ramp jump:** every hop off a jump ramp is measured, takeoff to landing, 40 px to the metre:
+  "JUMP! 12 m". A longer one than the drive's best so far: "LONGEST JUMP! 16 m +3".
+- **Drift zone:** a dashed yellow square with pale stars on the harbour's quay. Drifting inside
+  it earns a star every 0.4 s (each pops up over the car, chiming a little higher), up to 20;
+  driving out pays a coin a star: "DRIFT STARS 7 +7".
+
+| What | Where |
+| --- | --- |
+| The routes, start lines, rings, card, countdown and place | [`actors/town/street_race.gd`](../actors/town/street_race.gd) |
+| The racers' driving | [`actors/town/route_driver.gd`](../actors/town/route_driver.gd) |
+| Ramp jump and drift zone | [`actors/town/town_challenges.gd`](../actors/town/town_challenges.gd) |
+| Checks | [`tests/street_test.gd`](../tests/street_test.gd) |
+
+Dev flags for the town: `--start=street` (or `street1`, `street2`) on a start line, with
+`--street-race` to start it at once; `--start=drift` by the drift zone. Not built yet from idea
+16: beat the balloon, follow the duck family.
+
+## 31. Landmarks: the stadium, the workshop, the rocket and the stopwatches
+
+*(Phase 30, from the open-world plan's ideas 12, 13, 14 and 17.)* Everything the menus used to
+reach now has a place in the world to drive to.
+
+- **The stadium** (next to the car wash, south of the park): its red pad opens the track select,
+  with every track, the cups and the TIME TRIAL tab. BACK comes out in the town, on the pad.
+- **The workshop** (next to the school, a yellow crane on its roof): its blue pad opens the
+  track editor. BACK comes out in the town; racing a home-made track and DRIVE ON still go back
+  to the editor.
+- **The rocket pad** lifts off: the car rolls into the rocket, 3, 2, 1, LIFT OFF! and the rocket
+  roars up and away off the top of the screen in a jet of flame, then the Hangar opens.
+- **A stopwatch at every car gate**, on a post behind its sign with a glowing ring under it
+  (its hand going round; grey with a padlock while the gate is locked). Pulling up in the ring
+  shows the track's card with TIME TRIAL!, and R / Y starts a time trial on that track with the
+  ghosts; DRIVE ON comes back to the stopwatch.
+- The map shows the stadium and the workshop with the garage and the trophy house.
+
+How BACK knows: a door that opens the track select or the editor sends `PRO_back_to_requested
+(&"town")`, kept in the garage state as `back_to`; the town clears it each time it opens, so the
+garage's RACE! and the track select's BUILD go back the usual way.
+
+| What | Where |
+| --- | --- |
+| Stand-in pictures | `tools/layouts/world_buildings.py` (stadium, workshop) |
+| The doors, the launch, the stopwatch cards | [`game/screens/town.gd`](../game/screens/town.gd), [`town/town_layout.gd`](../town/town_layout.gd) |
+| The stopwatch | `RaceGate.StopwatchSign` in [`actors/town/race_gate.gd`](../actors/town/race_gate.gd) |
+| Checks | [`tests/landmarks_test.gd`](../tests/landmarks_test.gd) |
+
+Dev flags for the town: `--start=stadium`, `workshop`, `watch` (or `watch3`, the fourth car
+gate's stopwatch). Not built yet: a cup's flag on the stadium roof once won, and gates for the
+child's own tracks in a "my tracks" car park by the workshop.

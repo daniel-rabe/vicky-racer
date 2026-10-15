@@ -35,6 +35,9 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 22 | Space: racing among the stars | A third racing game with spaceships, asteroids and comets | L |
 | 23 | Free Drive: more to do | Things to play with and small jobs in the town | M |
 | 27 | The open world is the game | PLAY drives into the town; races start at gates on the map | L |
+| 28 | Out of the car | Walk about, pet the animals, borrow any parked car | L |
+| 29 | Street races and pop-up challenges | Need-for-Speed races through the town's own streets | M |
+| 30 | Landmarks: stadium, workshop, rocket, stopwatches | Every menu has a place in the world to drive to | M |
 
 ---
 
@@ -467,6 +470,45 @@ Speed"). Planned in the open-world plan (43 numbered ideas, phases 27–32); Dan
 - **Next phases from the plan:** 28 getting out of the car (19, 20, 23, 24, 28), 29 street races
   and pop-up challenges (15, 16), 30 rocket launch, stadium, stopwatch, workshop (12, 13, 14, 17),
   31 pick-and-mix fun, 32 new districts (7, 8).
+
+---
+
+## Phase 28 — Out of the car ✅ done
+
+Ideas 19, 20, 23, 24 and 28 from the open-world plan. DESIGN §29.
+
+- **Built:** stopped, E / Y gets Vicky out and he walks (and runs) about the town, the car left
+  parked; E / Y by a car gets in. Driveway cars with a key sign are free to borrow. The horn on
+  foot is a whistle that brings the car. Traffic stops for him and drives round; dogs and cats are
+  petted and follow him; shops' treats go in his hands. `tests/foot_test.gd` is new.
+- **Open:** the walking Vicky is drawn in code; a ComfyUI walk cycle as seed variants. Owners
+  waving from the pavement, bread for the ducks, and walking into a shop for a shop picture are
+  left for later.
+
+---
+
+## Phase 29 — Street races and pop-up challenges ✅ done
+
+Ideas 15 and 16 from the open-world plan. DESIGN §30.
+
+- **Built:** three street races (ROUND THE PARK, ZIG ZAG, THE BIG LOOP) started from checkered
+  lines across the road: three racers, glowing rings at the junctions, the traffic waiting,
+  coins for every place. Ramp jumps are measured in metres, and a drift zone on the quay earns
+  stars. `tests/street_test.gd` is new.
+- **Open:** beat the balloon and follow the duck family (idea 16); best places and jumps are not
+  saved yet.
+
+---
+
+## Phase 30 — Landmarks: stadium, workshop, rocket, stopwatches ✅ done
+
+Ideas 12, 13, 14 and 17 from the open-world plan. DESIGN §31.
+
+- **Built:** a stadium whose pad opens the track select (cups, time trials), a workshop whose pad
+  opens the track editor, the rocket lifting off before the Hangar, and a stopwatch at every car
+  gate for a time trial on its track. `tests/landmarks_test.gd` is new.
+- **Open:** stadium and workshop pictures are code-drawn stand-ins (Kontext seed variants to
+  pick); cup flags on the stadium roof; gates for the child's own tracks.
 
 ---
 

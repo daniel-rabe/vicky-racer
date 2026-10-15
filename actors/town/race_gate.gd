@@ -11,6 +11,9 @@ extends Node2D
 ## the day it opens), but its place and its sign are grey, with a padlock.
 ##
 ## The gate's own frame faces +X: the grid's front is to the right, across it is Y.
+##
+## A car gate also has a big stopwatch on a post behind its sign (§31): pulling up on the glowing
+## ring under it shows the track's card with TIME TRIAL, for a time trial with the ghosts.
 
 ## The four grid places, front first, two by two and staggered (the race's own order, so the
 ## player's place is TrackConfig.player_slot).
@@ -22,6 +25,8 @@ const ARCH_HALF := 250.0
 const PILLAR_RADIUS := 44.0
 const SIGN_AT := Vector2(-430, 0)
 const SIGN_SIZE := Vector2(300, 230)
+## The stopwatch's ring, behind the sign (car gates).
+const STOPWATCH_AT := Vector2(-760, 0)
 ## The child's place glows this big; inside REACH of it counts as on it.
 const RING_RADIUS := 105.0
 const REACH := 150.0
@@ -40,6 +45,8 @@ var kind := &"car"
 var unlocked := true
 ## Where the child goes, in world space; set in _ready.
 var slot := Vector2.ZERO
+## Where the stopwatch's ring is, in world space; Vector2.INF on a boat gate.
+var stopwatch := Vector2.INF
 ## The player's vehicle, for the toots (the screen keeps it current).
 var watch: Node2D
 var racers: Array[Car] = []
@@ -61,6 +68,13 @@ func _ready() -> void:
 	_add_ring(spread)
 	_add_arch()
 	_add_sign()
+	if kind == &"car":
+		stopwatch = to_global(STOPWATCH_AT)
+		var watch_sign := StopwatchSign.new()
+		watch_sign.name = "Stopwatch"
+		watch_sign.position = STOPWATCH_AT
+		watch_sign.gate = self
+		add_child(watch_sign)
 	_horn = AudioStreamPlayer2D.new()
 	_horn.name = "Horn"
 	_horn.bus = &"SFX"
@@ -89,6 +103,11 @@ func _slot(index: int, spread: float) -> Vector2:
 ## Is `pos` on the child's place?
 func is_on_slot(pos: Vector2) -> bool:
 	return pos.distance_to(slot) < REACH
+
+
+## Is `pos` on the stopwatch's ring (a car gate)?
+func is_on_stopwatch(pos: Vector2) -> bool:
+	return stopwatch != Vector2.INF and pos.distance_to(stopwatch) < REACH
 
 
 ## Where a vehicle stands on the child's place, facing the start line.
@@ -310,6 +329,41 @@ class TrackSign extends Node2D:
 
 
 ## A padlock: a grey hoop over a gold body with a keyhole.
+## The time trial's stopwatch: a glowing ring on the grass and a big stopwatch on a post beside
+## it, its hand going round. Grey with a padlock while the gate is locked.
+class StopwatchSign extends Node2D:
+	var gate: RaceGate
+	var _time := 0.0
+
+	func _process(delta: float) -> void:
+		_time += delta
+		queue_redraw()
+
+	func _draw() -> void:
+		var lit := gate.unlocked
+		var ring_colour := YELLOW if lit else GREY
+		var pulse := 1.0 + (0.05 * sin(_time * 4.0) if lit else 0.0)
+		draw_circle(Vector2.ZERO, RING_RADIUS * pulse, Color(ring_colour, 0.22))
+		draw_arc(Vector2.ZERO, RING_RADIUS * pulse, 0.0, TAU, 40, ring_colour, 10.0, true)
+		# The stopwatch stands upright on screen, whichever way the gate faces.
+		draw_set_transform(Vector2.ZERO, -gate.global_rotation)
+		var face := Vector2(0, -RING_RADIUS - 90.0)
+		draw_line(face + Vector2(0, 60), face + Vector2(0, 120), DARK, 10.0)
+		draw_rect(Rect2(face + Vector2(-14, -84), Vector2(28, 22)), DARK)
+		draw_circle(face, 66.0, DARK)
+		draw_circle(face, 58.0, Color.WHITE if lit else Color(0.85, 0.87, 0.9))
+		for k in 12:
+			var a := TAU * k / 12.0
+			draw_line(face + Vector2.from_angle(a) * 46.0, face + Vector2.from_angle(a) * 54.0, DARK, 4.0)
+		var hand := -PI / 2.0 + (_time * 2.0 if lit else 0.6)
+		draw_line(face, face + Vector2.from_angle(hand) * 44.0, Color(0.9, 0.22, 0.27), 6.0, true)
+		draw_circle(face, 7.0, DARK)
+		if not lit:
+			draw_set_transform(face + Vector2(34, 34), -gate.global_rotation, Vector2.ONE * 0.5)
+			Padlock.draw_on(self)
+		draw_set_transform(Vector2.ZERO)
+
+
 class Padlock extends Node2D:
 	func _draw() -> void:
 		Padlock.draw_on(self)
