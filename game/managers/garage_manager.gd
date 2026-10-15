@@ -105,6 +105,13 @@ func _enter_tree() -> void:
 	EventSystem.PRO_world_spot_saved.connect(func(spot: Dictionary) -> void:
 		profile.world = spot.duplicate()
 		profile.save_to(save_path))
+	EventSystem.PRO_golden_star_found.connect(func(index: int) -> void:
+		if index not in profile.golden_stars:
+			profile.golden_stars.append(index)
+			profile.save_to(save_path))
+	EventSystem.PRO_jobs_saved.connect(func(jobs: Dictionary) -> void:
+		profile.jobs = jobs.duplicate(true)
+		profile.save_to(save_path))
 	EventSystem.PRO_race_mode_requested.connect(func(mode: StringName) -> void:
 		if mode in [&"race", &"time_trial"]:
 			race_mode = mode
@@ -363,6 +370,8 @@ func _publish_state() -> void:
 		"home": home,
 		"back_to": back_to,
 		"world": profile.world.duplicate(),
+		"golden_stars": profile.golden_stars.duplicate(),
+		"jobs": profile.jobs.duplicate(true),
 		"car_setups": SETUP_ORDER.map(func(id: StringName) -> DriftSetup: return setups[id]),
 		"best_laps": profile.best_laps.duplicate(),
 		"last_race": last_race,

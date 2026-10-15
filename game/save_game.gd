@@ -57,6 +57,10 @@ var trials := {}
 ## Where the child left the open world (docs/DESIGN.md §28): {"x", "y", "angle", "riding"}
 ## ({} = never played there: start by the candy shop). Optional in the file.
 var world := {}
+## Golden stars found in the open world (docs/DESIGN.md §32), by index. Optional in the file.
+var golden_stars: Array[int] = []
+## The jobs board's day and how far each of its jobs has got (§32). Optional in the file.
+var jobs := {}
 
 
 static func fresh(starting_coins := 0) -> SaveGame:
@@ -113,6 +117,12 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 			if colour in Paint.COLOURS and colour != Paint.ORIGINAL:
 				profile.paint[StringName(id)] = colour
 	profile.world = _world_spot(file.get_value("world", "spot", {}))
+	for i in file.get_value("world", "golden_stars", []):
+		if int(i) >= 0 and int(i) not in profile.golden_stars:
+			profile.golden_stars.append(int(i))
+	var jobs: Variant = file.get_value("world", "jobs", {})
+	if jobs is Dictionary and jobs.get("day") is String and jobs.get("progress") is Dictionary:
+		profile.jobs = {"day": jobs["day"], "progress": jobs["progress"]}
 	var version := int(file.get_value("profile", "schema_version", SCHEMA_VERSION))
 	if file.has_section("best_laps") and version >= TRACKS_REBUILT_VERSION:
 		for track in file.get_section_keys("best_laps"):
@@ -148,6 +158,10 @@ func save_to(path := DEFAULT_PATH) -> Error:
 		file.set_value("time_trial", String(track), trials[track])
 	if not world.is_empty():
 		file.set_value("world", "spot", world)
+	if not golden_stars.is_empty():
+		file.set_value("world", "golden_stars", PackedInt32Array(golden_stars))
+	if not jobs.is_empty():
+		file.set_value("world", "jobs", jobs)
 	return file.save(path)
 
 

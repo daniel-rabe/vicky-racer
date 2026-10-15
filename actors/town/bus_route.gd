@@ -69,6 +69,7 @@ func stop() -> void:
 		for rider in riding:
 			_hop_off(rider["picture"], bus.global_position, bus.global_position + Vector2(0, -140))
 		screen.pay(PAY * riding.size(), bus.global_position)
+		screen.job(&"bus", riding.size())
 	riding.clear()
 	active = false
 	_show_riders()
@@ -115,6 +116,7 @@ func _open_doors(i: int) -> void:
 		_hop_off(rider["picture"], bus.global_position, kerb + along * (k * 70.0 - 120.0) + stop["side"] * 20.0)
 	if not leaving.is_empty():
 		screen.pay(PAY * leaving.size(), kerb)
+		screen.job(&"bus", leaving.size())
 		TownFx.hearts(screen.get_node(^"World"), kerb, 4 + leaving.size())
 	var boarding: Array = _waiting[i]
 	while not boarding.is_empty() and riding.size() < MAX_RIDING:

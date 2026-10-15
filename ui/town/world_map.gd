@@ -22,6 +22,9 @@ var selected := 0
 var _name: Label
 var _hints: Label
 var _time := 0.0
+## Golden stars found so far and how many there are (§32), shown over the map's top left.
+var stars := Vector2i(0, 0)
+var _stars: Label
 
 
 func _ready() -> void:
@@ -55,6 +58,16 @@ func _ready() -> void:
 	_hints.offset_top = 96.0
 	_hints.offset_bottom = 136.0
 	add_child(_hints)
+	_stars = Label.new()
+	_stars.name = "Stars"
+	_stars.add_theme_font_size_override("font_size", 40)
+	_stars.add_theme_color_override("font_color", RING)
+	_stars.add_theme_color_override("font_outline_color", Color(0.055, 0.078, 0.11))
+	_stars.add_theme_constant_override("outline_size", 12)
+	_stars.offset_left = 70.0
+	_stars.offset_top = -62.0
+	_stars.offset_bottom = -6.0
+	add_child(_stars)
 
 
 ## Open on `places`, the one nearest the player chosen first.
@@ -69,6 +82,7 @@ func open(town: Town, player: Car, traffic: Array[Car], with_places: Array) -> v
 			nearest = distance
 			selected = i
 	_show_name()
+	_stars.text = "%d / %d" % [stars.x, stars.y] if stars.y > 0 else ""
 	visible = true
 
 
@@ -162,6 +176,8 @@ func _draw() -> void:
 			_draw_place(places[i], false)
 	if not places.is_empty():
 		_draw_place(places[selected], true)
+	if stars.y > 0:
+		JobsBoard.JobIcon.draw_picture(self, null, Rect2(Vector2(10, -60), Vector2(52, 52)))
 
 
 func _draw_place(place: Dictionary, chosen_one: bool) -> void:

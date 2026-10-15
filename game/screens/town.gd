@@ -39,6 +39,8 @@ extends Node2D
 ## (StreetRace). Pulled up on it, the route's card shows, and R / Y races the three racers round
 ## glowing rings in the streets while the traffic waits. Pop-up challenges (TownChallenges):
 ## every ramp jump is measured, and drifting in the zone on the quay earns stars.
+## Pick-and-mix fun (§32): golden stars to find (GoldenStars), the jobs board in the park
+## (JobsBoard), rides on the playgrounds on foot (PlaygroundRides), fireworks at night (Fireworks).
 ##
 ## Escape / Start pauses (RESUME / MAP / SETTINGS / GARAGE; the Boat Dock while sailing).
 ##
@@ -66,6 +68,10 @@ extends Node2D
 ##   --start=street  start on the first street race's start line (its card shows); street1, street2
 ##   --street-race  and start that race straight away
 ##   --start=drift  start by the drift zone on the quay
+##   --start=board  start by the jobs board in the park; --jobs=coins,pet,star picks today's jobs
+##   --start=playground  start on foot by the park's playground; --start=ride straight down a slide
+##   --start=star  start by the first golden star (the end of the pier)
+##   --fireworks   fireworks over the player wherever, day or night
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
@@ -131,6 +137,8 @@ const START_AT := 0.35
 const START_CLEAR := 900.0
 ## The world's spot is saved this often while driving (and on leaving), s.
 const SAVE_EVERY := 10.0
+## The jobs board stands in the park, this far from the fountain (§32).
+const JOBS_BOARD_AT := Vector2(0, 420)
 ## Within this of a place chosen on the map, the way is found: the arrow goes.
 const PIN_REACH := 450.0
 const WORLD_MAP := preload("res://ui/town/world_map.gd")
@@ -197,6 +205,7 @@ var _voice: AudioStreamPlayer
 var gates: Array[RaceGate] = []
 var _world_tracks := {}
 var _world_spot := {}
+var _jobs_saved := {}
 var _pin := {}
 var _leaving := false
 var _save_in := SAVE_EVERY
@@ -213,6 +222,11 @@ var _car_setups: Array = []
 ## The town's own races (§30).
 var street_race: StreetRace
 var challenges: TownChallenges
+## Pick-and-mix fun (§32): golden stars, the jobs board, the playgrounds, fireworks.
+var stars: GoldenStars
+var jobs: JobsBoard
+var rides: PlaygroundRides
+var fireworks: Fireworks
 
 @onready var _world: Node2D = $World
 @onready var _cars: Node2D = $World/Cars
@@ -251,6 +265,7 @@ func _on_state_changed(state: Dictionary) -> void:
 		_boat_setup = load(BOAT_DIR + String(boat_id) + ".tres")
 	_boat_paint = state.get("paint", {}).get(boat_id, Paint.ORIGINAL)
 	_world_spot = state.get("world", {})
+	_jobs_saved = state.get("jobs", {})
 	for entry: Dictionary in state.get("world_tracks", []):
 		_world_tracks[entry["config"].track_id] = entry
 	for gate in gates:
@@ -296,6 +311,7 @@ func _ready() -> void:
 	challenges.screen = self
 	_world.add_child(challenges)
 	_world.move_child(challenges, _cars.get_index())
+	_add_fun(args)
 	_prompt = HopPrompt.new()
 	_prompt.name = "HopPrompt"
 	_world.add_child(_prompt)
@@ -329,6 +345,51 @@ func _ready() -> void:
 		nearest.sort_custom(func(x: Dictionary, y: Dictionary) -> bool:
 			return x["at"].distance_to(player.global_position) < y["at"].distance_to(player.global_position))
 		street_race.start(nearest[0]["route"])
+
+
+## The pick-and-mix fun (§32): golden stars hidden round the island, the jobs board in the
+## park, rides on the playgrounds, fireworks over the harbour at night.
+func _add_fun(args: PackedStringArray) -> void:
+	stars = GoldenStars.new()
+	stars.name = "GoldenStars"
+	stars.screen = self
+	_world.add_child(stars)
+	jobs = JobsBoard.new()
+	jobs.name = "JobsBoard"
+	jobs.screen = self
+	jobs.position = town.fountain_at + JOBS_BOARD_AT
+	_world.add_child(jobs)
+	_world.move_child(jobs, _cars.get_index())
+	var forced: Array = []
+	for arg in args:
+		if arg.begins_with("--jobs="):
+			forced = Array(arg.get_slice("=", 1).split(",")).map(func(k: String) -> StringName: return StringName(k))
+	jobs.begin(Time.get_date_string_from_system(), _jobs_saved, forced)
+	rides = PlaygroundRides.new()
+	rides.name = "PlaygroundRides"
+	rides.screen = self
+	_world.add_child(rides)
+	fireworks = Fireworks.new()
+	fireworks.name = "Fireworks"
+	fireworks.screen = self
+	fireworks.always = "--fireworks" in args
+	add_child(fireworks)
+	move_child(fireworks, hud.get_index())
+	for walker in _walkers.get_children():
+		if walker is Walker:
+			walker.petted.connect(func(_w: Walker) -> void: job(&"pet"))
+	EventSystem.CAR_washed.connect(func(washed: Node) -> void:
+		if washed == player:
+			job(&"wash"))
+	EventSystem.CAR_landed.connect(func(landed: Node) -> void:
+		if landed == player and not landed is Boat:
+			job(&"jump"))
+
+
+## Something on the jobs board happened (§32).
+func job(kind: StringName, count := 1) -> void:
+	if jobs:
+		jobs.progress(kind, count)
 
 
 func _report_traffic() -> void:
@@ -713,6 +774,7 @@ func _add_map() -> void:
 
 func _open_map() -> void:
 	_map_layer.visible = true
+	_map.stars = Vector2i(stars.found.size(), stars.spots.size())
 	_map.open(town, player, traffic, map_places())
 
 
@@ -1298,6 +1360,7 @@ func _coin_spot() -> Vector2:
 func _on_coin_collected(coin: TownCoin) -> void:
 	coin.pop()
 	pay(COIN_VALUE, coin.global_position)
+	job(&"coins")
 	get_tree().create_timer(COIN_RESPAWN, false).timeout.connect(func() -> void:
 		if is_instance_valid(coin):
 			coin.reappear(coin.position if coin.has_meta(&"fixed") else _coin_spot()))
@@ -1537,6 +1600,23 @@ func _dev_start(where: String) -> void:
 	elif where == "sea":
 		_swap_now(&"boat")
 		return
+	elif where == "board":
+		at = jobs.position + Vector2(0, 330)
+		player.rotation = -PI / 2.0
+	elif where in ["playground", "ride"]:
+		var ground: Rect2 = town.playgrounds[0]
+		_place(car, Vector2(ground.position.x - 300.0, ground.end.y + 150.0), 0.0)
+		get_out()
+		kid.global_position = rides.rides[2]["entry"] + Vector2(-110, 0)
+		kid.rotation = 0.0
+		kid.reset_physics_interpolation()
+		kid.get_node(^"ChaseCamera").snap_to_car()
+		if where == "ride":
+			rides.play(rides.rides[1])
+		return
+	elif where == "star":
+		at = stars.spots[0] + Vector2(0, 260)
+		player.rotation = -PI / 2.0
 	elif where == "foot":
 		get_out()
 		return

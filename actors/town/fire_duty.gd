@@ -112,6 +112,7 @@ func _put_out(fire: Dictionary) -> void:
 	tween.tween_property(node, "modulate:a", 0.0, 0.4)
 	tween.tween_callback(node.queue_free)
 	screen.pay(PAY, fire["at"])
+	screen.job(&"fire")
 	_play(OUT_SOUND if ResourceLoader.exists(OUT_SOUND) else SPLASH, -4.0, 1.3, fire["at"])
 	get_tree().create_timer(RESPAWN, false).timeout.connect(func() -> void:
 		if active and fires.size() < FIRES:

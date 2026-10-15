@@ -109,6 +109,9 @@ var lawns: Array[Rect2] = []  # each block's grass
 var ponds: Array[Vector3] = []  # x, y, radius
 ## Building footprints, so trees and walkers keep clear of them.
 var footprints: Array[Rect2] = []
+## Everything solid on the land, as boxes and circles (x, y, radius): buildings, crates, props.
+var solid_boxes: Array[Rect2] = []
+var solid_circles: Array[Vector3] = []
 ## Every named place: {id, name, door (Vector2), picture}.
 var places: Array[Dictionary] = []
 ## The car wash's pad, where a car is washed (Rect2() if the town has none).
@@ -140,6 +143,8 @@ var goals: Array[Rect2] = []
 var beach_balls: Array[Vector2] = []
 ## The park's fountain: where it is, and its spray (it shoots higher when a car splashes by).
 var fountain_at := Vector2.ZERO
+## The playgrounds (the park's and the school's): where each picture lies (§32).
+var playgrounds: Array[Rect2] = []
 var fountain_spray: CPUParticles2D
 var flower_beds: Array[Sprite2D] = []
 var tree_spots: Array[Vector2] = []
@@ -418,6 +423,7 @@ func _build_blocks() -> void:
 			var spot := Vector2(lawn.get_center().x, lawn.position.y + lawn.size.y * 0.42) if spec.has("bottom") \
 				else lawn.get_center()
 			placed.append(_prop(PLAYGROUND, spot, Vector2(300, 220)))
+			playgrounds.append(placed[-1])
 		_scatter_trees(lawn, spec.get("trees", 0), placed)
 		_scatter_flowers(lawn, spec.get("flowers", 0), placed)
 
@@ -608,6 +614,7 @@ func _park(lawn: Rect2) -> Array[Rect2]:
 	_things.add_child(fountain_spray)
 	out.append(_pond(centre + Vector2(lawn.size.x * 0.3, 0), 280.0))
 	out.append(_prop(PLAYGROUND, centre - Vector2(lawn.size.x * 0.3, 0), Vector2(320, 240)))
+	playgrounds.append(out[-1])
 	for angle in [PI * 0.25, PI * 0.75, PI * 1.25, PI * 1.75]:
 		var spot := centre + Vector2.from_angle(angle) * 260.0
 		out.append(_prop(FLOWER_BED, spot, Vector2(110, 110), 0.0))
@@ -1076,6 +1083,7 @@ func _outline_rect(rect: Rect2, radius: float, colour: Color, width: float) -> v
 
 
 func _add_box(rect: Rect2) -> void:
+	solid_boxes.append(rect)
 	var shape := CollisionShape2D.new()
 	var box := RectangleShape2D.new()
 	box.size = rect.size
@@ -1085,6 +1093,7 @@ func _add_box(rect: Rect2) -> void:
 
 
 func _add_circle(centre: Vector2, radius: float) -> void:
+	solid_circles.append(Vector3(centre.x, centre.y, radius))
 	var shape := CollisionShape2D.new()
 	var circle := CircleShape2D.new()
 	circle.radius = radius

@@ -60,6 +60,9 @@ var _pointer_target := Vector2.INF
 var _corners: Array[Control] = []
 ## The bus's passengers.
 var _passengers: HBoxContainer
+## Today's jobs (§32), under the coins.
+var _jobs: PanelContainer
+var _job_row: HBoxContainer
 ## A race gate's card (§28), and the gate it is for (null: none shown).
 var _gate_panel: PanelContainer
 var _gate_slot: Control
@@ -129,9 +132,17 @@ func _ready() -> void:
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_banner.modulate.a = 0.0
 	root.add_child(_banner)
+	_jobs = _panel(root, Vector2(0, 0), Vector2(32, 132), Vector2(260, 92))
+	_jobs.pivot_offset = Vector2(130, 46)
+	_jobs.visible = false
+	_corners.append(_jobs)
+	_job_row = HBoxContainer.new()
+	_job_row.add_theme_constant_override("separation", 14)
+	_job_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	_jobs.add_child(_job_row)
 	_passengers = HBoxContainer.new()
 	_passengers.add_theme_constant_override("separation", 6)
-	_passengers.position = Vector2(40, 138)
+	_passengers.position = Vector2(40, 238)
 	root.add_child(_passengers)
 	_pointer = _make_pointer()
 	root.add_child(_pointer)
@@ -201,6 +212,31 @@ func show_passengers(pictures: Array[Texture2D]) -> void:
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.custom_minimum_size = Vector2(44, 44)
 		_passengers.add_child(icon)
+
+
+## Today's jobs board (§32): a picture each, dots to go or a tick. `pulse`: a little bounce,
+## when he comes by the board.
+func show_jobs(jobs: Array[Dictionary], pulse := false) -> void:
+	if _job_row == null:
+		return
+	_jobs.visible = not jobs.is_empty()
+	while _job_row.get_child_count() < jobs.size():
+		var icon := JobsBoard.JobIcon.new()
+		icon.custom_minimum_size = Vector2(68, 70)
+		_job_row.add_child(icon)
+	for i in _job_row.get_child_count():
+		var icon: JobsBoard.JobIcon = _job_row.get_child(i)
+		icon.visible = i < jobs.size()
+		if icon.visible:
+			var done_before: bool = not icon.job.is_empty() and icon.job["have"] >= icon.job["need"]
+			icon.job = jobs[i].duplicate()
+			icon.queue_redraw()
+			if not done_before and icon.job["have"] >= icon.job["need"]:
+				pulse = true
+	if pulse:
+		var tween := _jobs.create_tween()
+		tween.tween_property(_jobs, "scale", Vector2(1.15, 1.15), 0.1)
+		tween.tween_property(_jobs, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _process(_delta: float) -> void:

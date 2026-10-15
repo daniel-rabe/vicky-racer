@@ -73,6 +73,10 @@ signal PRO_back_to_requested(screen: StringName)
 ## The world's last spot (§28): {"x", "y", "angle", "riding"}, kept in the save so PLAY carries on
 ## where the child left off. {} forgets it.
 signal PRO_world_spot_saved(spot: Dictionary)
+## A golden star found in the open world (§32), by its index in GoldenStars.plan; kept for good.
+signal PRO_golden_star_found(index: int)
+## The jobs board's day (§32): {"day": "YYYY-MM-DD", "progress": {job kind: count}}.
+signal PRO_jobs_saved(jobs: Dictionary)
 signal PRO_setup_purchased(setup_id: StringName)
 signal PRO_setup_equipped(setup_id: StringName)
 signal PRO_setup_painted(setup_id: StringName, colour: StringName)

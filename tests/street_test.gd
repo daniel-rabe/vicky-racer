@@ -146,6 +146,7 @@ func _test_race(town: TownScreen) -> void:
 
 func _test_jump(town: TownScreen) -> void:
 	print("ramp jumps")
+	town.jobs.begin("test", {}, [&"pet", &"wash", &"fire"])  # no jump job today, whatever the date
 	_put(town.car, Vector2(3000, 2560))
 	EventSystem.CAR_jumped.emit(town.car)
 	_put(town.car, Vector2(3480, 2560))

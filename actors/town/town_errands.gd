@@ -179,6 +179,7 @@ func _deliver() -> void:
 	_bounce(_house["sprite"])
 	TownFx.hearts(screen.get_node(^"World"), door + Vector2(0, -TownLayout.SIDEWALK))
 	screen.pay(DELIVERY_PAY, door)
+	screen.job(&"delivery")
 	_play(CHEER if ResourceLoader.exists(CHEER) else CHIME, -4.0)
 	_finish()
 
@@ -224,6 +225,7 @@ func _puppy_home() -> void:
 	tween.tween_callback(puppy.queue_free)
 	TownFx.hearts(screen.get_node(^"World"), _shop_door + Vector2(0, -TownLayout.SIDEWALK), 8)
 	screen.pay(PUPPY_PAY, _shop_door)
+	screen.job(&"puppy")
 	_play(WOOF, -2.0)
 	_finish()
 

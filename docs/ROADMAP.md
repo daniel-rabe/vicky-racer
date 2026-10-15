@@ -38,6 +38,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 28 | Out of the car | Walk about, pet the animals, borrow any parked car | L |
 | 29 | Street races and pop-up challenges | Need-for-Speed races through the town's own streets | M |
 | 30 | Landmarks: stadium, workshop, rocket, stopwatches | Every menu has a place in the world to drive to | M |
+| 31 | Pick-and-mix fun | Golden stars, a jobs board, playground rides, fireworks at night | M |
 
 ---
 
@@ -509,6 +510,18 @@ Ideas 12, 13, 14 and 17 from the open-world plan. DESIGN §31.
   gate for a time trial on its track. `tests/landmarks_test.gd` is new.
 - **Open:** stadium and workshop pictures are code-drawn stand-ins (Kontext seed variants to
   pick); cup flags on the stadium roof; gates for the child's own tracks.
+
+---
+
+## Phase 31 — Pick-and-mix fun ✅ done
+
+Ideas 29, 31, 25 and 36 from the open-world plan. DESIGN §32.
+
+- **Built:** 50 golden stars round the island (saved, counted on the map), a jobs board with
+  three picture jobs a day (saved for the day), rides on the playgrounds on foot, and fireworks
+  over the harbour at night. `tests/fun_test.gd` is new.
+- **Open:** a real firework sound; more of the plan's ideas for later rounds (bikes and scooters,
+  the ice cream van, the tow truck, the parade, photo spots, the treasure map).
 
 ---
 

@@ -2467,3 +2467,43 @@ garage's RACE! and the track select's BUILD go back the usual way.
 Dev flags for the town: `--start=stadium`, `workshop`, `watch` (or `watch3`, the fourth car
 gate's stopwatch). Not built yet: a cup's flag on the stadium roof once won, and gates for the
 child's own tracks in a "my tracks" car park by the workshop.
+
+## 32. Pick-and-mix fun: golden stars, the jobs board, the playground, fireworks
+*(Phase 31, from the open-world plan's ideas 29, 31, 25 and 36.)* More to find and do round
+the island, all drawn in code, nothing to fail.
+
+- **Golden stars** (`GoldenStars`): 50 big shiny stars hidden round the island: one on most
+  lawns, out on the beach and the grass round town, at the end of the pier, high over every jump
+  ramp's landing (only a good jump reaches it), and at sea by the lighthouse, the wreck, the
+  dolphins, the slalom and beyond the ramp islets. Driving, sailing or walking into one finds it:
+  3 coins and GOLDEN STAR 12 / 50. All 50 pay 50 more. Found stars stay found (the save's
+  `[world] golden_stars`), and the pause map shows the count. Where they go is worked out from
+  the town with a fixed seed (`GoldenStars.plan`), clear of every solid box and circle the town
+  builds (`Town.solid_boxes`, `solid_circles`), so it is the same island every time.
+- **The jobs board** (`JobsBoard`): a wooden board below the park's fountain with today's three
+  jobs as pinned pictures, and the same three on the HUD under the coins. Jobs: a delivery, the
+  lost puppy, 2 fires, 3 bus passengers, the car wash, 10 coins, petting 2 animals, 2 ramp
+  jumps, a golden star. Dots count down what is left (a number for the coins); a tick when done.
+  Each job pays 5, all three pay 20 more with confetti. The PC's date picks the day's jobs (the
+  same all day); progress is saved for the rest of the day (`[world] jobs`).
+- **The playgrounds** (`PlaygroundRides`): the park's and the school's each have four rides:
+  two slides, a swing and a see-saw. On foot, walking up to one from its side puts Vicky on it:
+  up the ladder and WHEE down, three swings, BOING on the see-saw. He steps off where he got on
+  and can go again once he has walked away. The playgrounds stay solid for cars.
+- **Fireworks** (`Fireworks`): at night, on the harbour's quay or pier or sailing by the
+  lighthouse, rockets whoosh up and burst into rings of sparks in the paint colours for as long
+  as he stays. A CanvasLayer that follows the camera, so the night's tint leaves them bright.
+  The bursts use the bump and sparkle sounds; a real firework sound can come later.
+
+| What | Where |
+| --- | --- |
+| Golden stars | [`actors/town/golden_stars.gd`](../actors/town/golden_stars.gd) |
+| Jobs board, HUD icons | [`actors/town/jobs_board.gd`](../actors/town/jobs_board.gd), `TownHUD.show_jobs` |
+| Playground rides | [`actors/town/playground_rides.gd`](../actors/town/playground_rides.gd) |
+| Fireworks | [`actors/town/fireworks.gd`](../actors/town/fireworks.gd) |
+| Saving | `SaveGame.golden_stars`, `SaveGame.jobs`; `PRO_golden_star_found`, `PRO_jobs_saved` |
+| Checks | [`tests/fun_test.gd`](../tests/fun_test.gd) |
+
+Dev flags for the town: `--start=board` (with `--jobs=coins,pet,star` to pick the day's jobs),
+`--start=playground`, `--start=ride` (straight down a slide), `--start=star`, `--fireworks`
+(a show anywhere, day or night).

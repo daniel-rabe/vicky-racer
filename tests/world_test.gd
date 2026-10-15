@@ -213,7 +213,7 @@ func _test_doors() -> void:
 		_put(town, door["pad"].get_center() + Vector2(0, 500))
 		await _frames(3)
 	_put(town, town.town.rocket_pad.get_center())
-	var hangar := await _wait_for("GarageScreen")
+	var hangar := await _wait_for("GarageScreen", 8.0)  # after the lift-off (§31)
 	_check(hangar.name == "GarageScreen" and _manager.vehicle_kind == &"ship", "the rocket pad opens the Hangar")
 	await _press(&"ui_cancel")
 	town = await _wait_for("Town")
