@@ -64,12 +64,18 @@ def graph(recipe: dict, sound: dict, seed: int) -> dict:
     }
 
 
-def master_path(sound_id: str, seed: int) -> Path:
-    return MASTERS / f"{sound_id}_{seed}.flac"
+def master_path(sound_id: str, seed: int, tag: str | None = None) -> Path:
+    return MASTERS / (f"{sound_id}_{tag}_{seed}.flac" if tag else f"{sound_id}_{seed}.flac")
+
+
+def sound_recipe(recipe: dict, sound: dict) -> dict:
+    """The shared recipe with the sound's own `recipe` overrides (e.g. the Small-SFX model) on top."""
+    return {**recipe, **sound.get("recipe", {})}
 
 
 def render(client: ComfyClient, recipe: dict, sound: dict, seed: int) -> Path:
-    path = master_path(sound["id"], seed)
+    path = master_path(sound["id"], seed, sound.get("master_tag"))
+    recipe = sound_recipe(recipe, sound)
     if path.exists():
         return path
     entry = client.wait(client.queue(graph(recipe, sound, seed)))
@@ -84,6 +90,17 @@ def render(client: ComfyClient, recipe: dict, sound: dict, seed: int) -> Path:
 
 def to_mono(data: np.ndarray) -> np.ndarray:
     return data.mean(axis=1) if data.ndim > 1 else data
+
+
+def to_mono_louder(data: np.ndarray) -> np.ndarray:
+    """Average only when left and right agree. Averaging unrelated channels comb-filters (a hollow,
+    metallic sound: town_ambience lost 4 dB that way), so then keep the louder side instead."""
+    if data.ndim == 1:
+        return data
+    left, right = data[:, 0], data[:, 1]
+    if np.corrcoef(left, right)[0, 1] > 0.9:
+        return data.mean(axis=1)
+    return left if np.mean(left ** 2) >= np.mean(right ** 2) else right
 
 
 def envelope(x: np.ndarray, window: int = 441) -> np.ndarray:
@@ -184,7 +201,7 @@ def spectrogram(x: np.ndarray, w: int = 640, h: int = 180) -> Image.Image:
 def review_sheet(sound: dict, seeds: list[int]) -> Path:
     tiles = []
     for seed in seeds:
-        data, _ = sf.read(master_path(sound["id"], seed))
+        data, _ = sf.read(master_path(sound["id"], seed, sound.get("master_tag")))
         tiles.append((seed, spectrogram(to_mono(data))))
     sheet = Image.new("RGB", (660, 40 + len(tiles) * 254), (40, 40, 44))
     draw = ImageDraw.Draw(sheet)
@@ -243,13 +260,13 @@ def cmd_build(args) -> None:
             write_wav(x, sound["out"])
             print(f"{sound['id']}: {sound['out']} ({len(x) / RATE:.2f}s, derived from {sound['source']})")
             continue
-        path = master_path(sound["id"], sound["seed"])
+        path = master_path(sound["id"], sound["seed"], sound.get("master_tag"))
         if not path.exists():
             client = client or ComfyClient()
             render(client, recipe, sound, sound["seed"])
         data, rate = sf.read(path)
         assert rate == RATE, f"{path.name}: expected {RATE} Hz, got {rate}"
-        x = to_mono(data)
+        x = to_mono_louder(data) if sound.get("mono") == "louder" else to_mono(data)
         x = loop(x, sound) if sound["kind"] == "loop" else oneshot(x, sound)
         write_wav(x, sound["out"])
         print(f"{sound['id']}: {sound['out']} ({len(x) / RATE:.2f}s)")
