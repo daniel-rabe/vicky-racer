@@ -13,13 +13,24 @@
   "sounds": [
     {
       "id": "engine_loop",
-      "prompt": "steady continuous hum of a small cartoon toy race car engine at medium revs, constant even pitch, smooth purr, no revving, no gear changes, close up, clean, sound effect",
+      "prompt": "steady idle hum of a small electric toy car motor and a tiny petrol go-kart engine at constant medium revs, even pitch, close microphone field recording, natural, realistic",
       "seconds": 6.0,
       "kind": "loop",
       "loop_seconds": 1.6,
       "peak_db": -3.0,
       "out": "art/sfx/engine_loop.wav",
-      "seed": 102
+      "seed": 101,
+      "negative": "music, melody, musical notes, tonal, ringing, metallic, bell, chime, synthesizer, electronic, beep, speech, voice, singing, distortion, clipping, low quality",
+      "recipe": {
+        "steps": 8,
+        "cfg": 1.0,
+        "sampler": "lcm",
+        "scheduler": "simple",
+        "checkpoint": "stable_audio_3_small_sfx.safetensors"
+      },
+      "master_tag": "small",
+      "mono": "louder",
+      "_note": "Re-made 2026-10-09 in the less-metallic bake-off (sfx_bakeoff.py), Daniel's pick by ear on 2026-10-15: Stable Audio 3 Small-SFX, a recording-style prompt, and the louder channel instead of an L/R average. Replaces medium_base seed 102, whose impacts and hum rang at fixed pitches."
     },
     {
       "id": "skid_loop",
@@ -33,13 +44,24 @@
     },
     {
       "id": "wall_bump",
-      "prompt": "one single dull soft thump of a small toy car hitting a rubber tyre wall, a single impact with no bouncing and no repeats, short, muffled, cartoon sound effect",
+      "prompt": "a single soft dull thud of a small plastic toy car bumping into a rubber tyre, one short impact, close microphone foley recording, natural, realistic, no ringing",
       "seconds": 2.0,
       "kind": "oneshot",
       "max_seconds": 0.45,
       "peak_db": -2.0,
       "out": "art/sfx/wall_bump.wav",
-      "seed": 102
+      "seed": 102,
+      "negative": "music, melody, musical notes, tonal, ringing, metallic, bell, chime, synthesizer, electronic, beep, speech, voice, singing, distortion, clipping, low quality",
+      "recipe": {
+        "steps": 8,
+        "cfg": 1.0,
+        "sampler": "lcm",
+        "scheduler": "simple",
+        "checkpoint": "stable_audio_3_small_sfx.safetensors"
+      },
+      "master_tag": "small",
+      "mono": "louder",
+      "_note": "Re-made 2026-10-09 in the less-metallic bake-off (sfx_bakeoff.py), Daniel's pick by ear on 2026-10-15: Stable Audio 3 Small-SFX, a recording-style prompt, and the louder channel instead of an L/R average. Replaces medium_base seed 102, whose impacts and hum rang at fixed pitches."
     },
     {
       "id": "coin",
@@ -180,15 +202,24 @@
     },
     {
       "id": "town_ambience",
-      "prompt": "gentle sunny morning in a quiet small town park, soft birdsong and chirping sparrows, light breeze in the trees, calm, continuous, no cars, no people, field recording",
-      "negative": "music, melody, speech, voice, talking, singing, crowd, traffic, engine, distortion, clipping, low quality, muffled",
+      "prompt": "quiet small town park on a sunny morning, birdsong and sparrows chirping, light breeze in the leaves, calm and continuous, no cars, no people, natural field recording, stereo",
+      "negative": "music, melody, musical notes, tonal, ringing, metallic, bell, chime, synthesizer, electronic, beep, speech, voice, singing, distortion, clipping, low quality",
       "seconds": 12.0,
       "kind": "loop",
       "loop_seconds": 8.0,
       "peak_db": -8.0,
       "out": "art/sfx/town_ambience.wav",
-      "seed": 103,
-      "_note": "Free Drive: birdsong under the town, looped quietly. Picked from the spectrogram: a steady breeze with birdsong spread evenly."
+      "seed": 104,
+      "_note": "Re-made 2026-10-09 in the less-metallic bake-off (sfx_bakeoff.py), Daniel's pick by ear on 2026-10-15: Stable Audio 3 Small-SFX, a recording-style prompt, and the louder channel instead of an L/R average. Replaces medium_base seed 103, whose impacts and hum rang at fixed pitches.",
+      "recipe": {
+        "steps": 8,
+        "cfg": 1.0,
+        "sampler": "lcm",
+        "scheduler": "simple",
+        "checkpoint": "stable_audio_3_small_sfx.safetensors"
+      },
+      "master_tag": "small",
+      "mono": "louder"
     },
     {
       "id": "car_wash",

@@ -827,6 +827,16 @@ python tools/comfy/generate_sfx.py pick coin 104              # pin a seed
 python tools/comfy/generate_sfx.py build                      # write art/sfx/*.wav
 ```
 
+**Less metallic (2026-10-15).** The medium model is a music model: its impacts and hums rang at
+fixed, note-like pitches (the old wall bump 25 dB above its surroundings at 2.4 kHz), and averaging
+unrelated stereo channels into mono comb-filtered wide sounds (town ambience lost 4 dB). A bake-off
+([`sfx_bakeoff.py`](../tools/comfy/sfx_bakeoff.py): the old recipe fixed, Small-SFX, CC0 recordings)
+was picked by ear: **wall_bump**, **engine_loop** and **town_ambience** are now Small-SFX (lcm, 8 steps,
+cfg 1) with recording-style prompts. A sound's own `recipe` in the manifest overrides the shared one,
+`master_tag` keeps its masters apart from the old picks, and `"mono": "louder"` keeps the louder
+channel when left and right disagree. Only paid-game-safe models were considered: MMAudio, TangoFlux
+and ThinkSound are non-commercial, and HunyuanVideo-Foley's licence excludes the EU.
+
 ## 12. Cups
 
 A **cup** is three races in a row with points, standings and a trophy at the end.

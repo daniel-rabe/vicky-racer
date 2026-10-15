@@ -134,7 +134,7 @@ def cmd_listen(_args) -> None:
     for sid in PROMPTS:
         sound = sounds[sid]
         rows = []
-        data, _ = sf.read(gs.master_path(sid, sound["seed"]))
+        data, _ = sf.read(gs.master_path(sid, sound["seed"], sound.get("master_tag")))
         rows.append(("NOW", f"in the game today (seed {sound['seed']}, old mono step)",
                      write_mp3(f"{sid}_now.mp3", cut(gs.to_mono(data), sound))))
         n = 1
