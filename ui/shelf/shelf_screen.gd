@@ -226,8 +226,8 @@ func _label(text: String, font_size: int, colour: Color, outline := 10) -> Label
 	return label
 
 
-func _go_back() -> void:
-	EventSystem.UI_screen_requested.emit(&"title")
+func _go_back() -> void:  # the title, or the town in the open world (docs/DESIGN.md §28)
+	EventSystem.UI_screen_requested.emit(_state.get("home", &"title"))
 
 
 func _unhandled_input(event: InputEvent) -> void:

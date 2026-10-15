@@ -60,7 +60,8 @@ balance pass) — and the document describes the game as it is. Mockups referenc
 | Paint the focused car (garage) | C | X |
 | Turn the garage page | Q / E | LB / RB |
 
-Escape and B also go back from the garage to the title. In a race, Escape pauses instead of
+Escape and B also go back from the garage to the title (to the town, once the child plays in the
+open world: §28). In a race, Escape pauses instead of
 leaving: one wrong button must never throw away a race (§10).
 
 Both keyboard layouts are always live, so two hands can find the controls without being taught.
@@ -1154,7 +1155,8 @@ Ideas parked for later are listed in
 
 ## 19. Free Drive: the town
 
-**TOWN** on the title screen opens Free Drive: no race, no laps, no timer, nobody to beat. The
+**TOWN** on the title screen opened Free Drive (since §28, PLAY does, and the town is where the
+races are started too): no race, no laps, no timer, nobody to beat. The
 child drives their own car (the one equipped in the garage, in its paint) round a little town
 — and the town gets on with its day around them.
 
@@ -2240,3 +2242,96 @@ TIME TRIAL it is not saved: a new day starts in the day.
 | A race at night, a town at night with porch lamps (dev `--start=house`) | [`game/screens/race.gd`](../game/screens/race.gd), [`game/screens/town.gd`](../game/screens/town.gd) |
 | The N / Back shortcut and its sun / moon pop-up | [`game/night_key.gd`](../game/night_key.gd) |
 | Checks | [`tests/night_test.gd`](../tests/night_test.gd) |
+
+## 28. The open world is the game
+
+*Built (Phase 27), 2026-10-15. Asked for: "the driving on the open map and doing stuff there should
+become the main point of the game, races should be started by driving to checkpoints, like in Need
+for Speed games". Picked from the open-world plan: ideas 1–5, 9, 10 and 11.*
+
+PLAY on the title drives straight into the town (§19, §21), and everything else is a place to
+drive to. The races are not picked from a menu any more: each track has a **race gate** on the
+map, where its three racers wait for the child. The garage and the trophy shelf are buildings,
+and the Hangar is a rocket pad. The town remembers where the child left the car (or the boat).
+
+- **The title:** PLAY (with the red car on it), 2 PLAYERS, SETTINGS, QUIT, the trophy and the
+  sun / moon. CARS / BOATS / SPACE and TOWN are gone; 2 PLAYERS still goes to the join screen and
+  PICK A RACE, in cars.
+- **Home:** once PLAY is pressed, the town is home (`GarageManager.home`, `PRO_home_requested`,
+  not saved). The garage's BACK, the shelf's BACK, the results' GARAGE (now **DRIVE ON**) and the
+  race's pause menu (GARAGE becomes **TOWN**) all lead back to the town. From the title's
+  2 PLAYERS, home is the title, as before.
+
+### 28.1 Race gates
+
+A start grid on the grass between the ring road and the beach, one per car track, going round the
+island clockwise from the start; the four boat courses' grids float out at sea
+(`TownLayout.GATES`).
+
+| Piece | What it is |
+| --- | --- |
+| Paving | A rounded asphalt area with a kerb (car gates), 700 × 470 px |
+| Grid | Four places two by two, staggered, with white boxes, and a chequered start line |
+| Arch | An inflatable arch over the start line: a chequered banner between two fat pillars in the track's card colour (orange buoys at sea), drawn above the cars |
+| Racers | The track's three opponents in their paints, with their drivers, held still and quiet (Car, `frozen`) |
+| The child's place | The track's `player_slot`, a yellow ring that breathes. Grey with a padlock while locked |
+| Sign | Behind the grid, upright: the track's shape (its racing line) in its colour, and its name |
+
+- **Driving onto the place** (in the right vehicle: the car for a car gate, the boat at sea) shows
+  the track's card on the left of the screen, the same card as on PICK A RACE (best lap or NEW!),
+  with **R / Y RACE!**. The three racers bounce and toot hello.
+- **R, Y or Enter** saves the place, sets the vehicle kind and the track, fades and starts the race
+  (a race, never a time trial). After it, **DRIVE ON** comes back to the place, so RACE! again is
+  one button away.
+- **Nearby,** now and then a racer bounces and toots its own horn ("race me!").
+- **Locked gates** open as before: finishing the gate before it (§7.6). The card says LOCKED,
+  FINISH …; its button is **SHOW ME THE WAY**, which points the arrow to the gate that opens it.
+- Time trials, cups and the track editor are behind the garage's RACE! (PICK A RACE), as before.
+
+### 28.2 Doors
+
+| Place | Where | Opens |
+| --- | --- | --- |
+| **Garage** | In place of a house in the top-left block, its door on the road behind the start | The garage (cars); RACE! there leads on to PICK A RACE |
+| **Trophy house** | In place of a house in the top-right block | The trophy shelf and the sticker book |
+| **Rocket pad** | On the grass west of town: a round pad with hazard stripes and the cardboard rocket | The Hangar (spaceships), and from it the space races. The full rocket launch is a later idea (12) |
+
+A door's pad works like the harbour's: drive on slowly (under 300 px/s). Coming back, the car
+stands on the pad facing out, and the pad does nothing until it has been left. The Boat Dock is
+the pause menu's GARAGE while sailing, as before.
+
+The garage's and the trophy house's pictures are **stand-ins**, drawn by
+[`tools/layouts/world_buildings.py`](../tools/layouts/world_buildings.py), until Kontext versions
+are picked like every other building (§19.2).
+
+### 28.3 The world remembers
+
+Where the child is and in what (the car or the boat) is saved: every 10 s, on leaving for any
+screen, and when the window closes (`SaveGame.world`, the `[world]` section; optional in the file,
+so no new schema version). PLAY starts there. In the fire engine or the bus, the car is saved at
+their pad. Not saved: jobs in progress (a delivery, the puppy), and night, which is not saved
+anywhere (§27).
+
+### 28.4 The map
+
+The pause menu's **MAP** (under RESUME) shows the whole island and its sea over the paused game,
+with a round picture for every race gate (a tick once finished, a padlock while locked), the
+garage, the trophy house, the rocket and the harbour. The arrows move from picture to picture and
+its name shows underneath. **A / Enter** chooses it: the game goes on, and an arrow at the edge of
+the screen with the place's picture shows the way, with a white dot on the corner map, until the
+child gets there. A job's own arrow (a delivery, the puppy) comes first while it lasts. **B /
+Escape** goes back to the pause menu.
+
+| Piece | File |
+| --- | --- |
+| Gates, the rocket pad, which buildings are doors | [`town/town_layout.gd`](../town/town_layout.gd) |
+| The gates' paving, the doors' pads, the rocket pad, their surfaces | [`town/town.gd`](../town/town.gd) |
+| A gate: grid, arch, sign, ring, the waiting racers and their toots | [`actors/town/race_gate.gd`](../actors/town/race_gate.gd) |
+| The gate's card, starting a race, doors, the saved spot, the way to a place | [`game/screens/town.gd`](../game/screens/town.gd), [`ui/town/town_hud.gd`](../ui/town/town_hud.gd) |
+| The map | [`ui/town/world_map.gd`](../ui/town/world_map.gd), the pause menu's MAP in [`ui/pause/pause_menu.gd`](../ui/pause/pause_menu.gd) |
+| Home and the saved spot (`PRO_home_requested`, `PRO_world_spot_saved`, `world_tracks` in the state) | [`game/managers/garage_manager.gd`](../game/managers/garage_manager.gd), [`game/save_game.gd`](../game/save_game.gd) |
+| PLAY into the town; BACK / DRIVE ON / TOWN | [`ui/title/title_screen.gd`](../ui/title/title_screen.gd), the garage, shelf, results and pause menu |
+| Checks | [`tests/world_test.gd`](../tests/world_test.gd) |
+
+Dev flags for the town: `--start=gate` (or `gate4`, the fifth; a boat gate starts in the boat),
+`--start=garage`, `trophies`, `rocket`, and `--map` to open the map at once.

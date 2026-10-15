@@ -34,6 +34,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 21 | The island: harbour and ocean in Free Drive | Take the boat out from the town, round the island | M |
 | 22 | Space: racing among the stars | A third racing game with spaceships, asteroids and comets | L |
 | 23 | Free Drive: more to do | Things to play with and small jobs in the town | M |
+| 27 | The open world is the game | PLAY drives into the town; races start at gates on the map | L |
 
 ---
 
@@ -447,6 +448,25 @@ lights"). DESIGN §27.
 - **Picked:** how dark, variant 2 "moonlight" (2026-10-15).
 - **Open:** the sun and moon are drawn in code; they could come from ComfyUI as seed variants
   if wanted.
+
+## Phase 27 — The open world is the game ✅ done
+
+Asked for on 2026-10-15 ("the driving on the open map and doing stuff there should become the
+main point of the game, races should be started by driving to checkpoints, like in Need for
+Speed"). Planned in the open-world plan (43 numbered ideas, phases 27–32); Daniel picked
+"phase 27": ideas 1–5, 9, 10, 11. DESIGN §28.
+
+- **Built:** PLAY drives straight into the town. A race gate for every car track on the grass
+  round the town and every boat course at sea, with its three racers waiting and tooting; the
+  track's card and R / Y RACE! on its place; DRIVE ON comes back to it. The garage and a new
+  trophy house are buildings with pads, and a rocket pad opens the Hangar. The world remembers
+  where the car or boat was. The pause menu has MAP: the whole island, choose a place and an arrow
+  shows the way. `tests/world_test.gd` is new.
+- **Open:** the garage and trophy house pictures are code-drawn stand-ins; Kontext seed variants
+  to pick from. A play test with Vicky.
+- **Next phases from the plan:** 28 getting out of the car (19, 20, 23, 24, 28), 29 street races
+  and pop-up challenges (15, 16), 30 rocket launch, stadium, stopwatch, workshop (12, 13, 14, 17),
+  31 pick-and-mix fun, 32 new districts (7, 8).
 
 ---
 

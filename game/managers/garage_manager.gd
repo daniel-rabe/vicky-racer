@@ -55,6 +55,8 @@ var night := false
 ## The child's own track, when the next car race is on it (docs/DESIGN.md §26); else null.
 ## Not saved: the track editor keeps the track's file.
 var custom_track: TrackConfig
+## Where BACK leads (docs/DESIGN.md §28): &"town" in the open world, &"title" otherwise. Not saved.
+var home: StringName = &"title"
 
 
 func _enter_tree() -> void:
@@ -90,6 +92,13 @@ func _enter_tree() -> void:
 		if on != night:
 			night = on
 			_publish_state())
+	EventSystem.PRO_home_requested.connect(func(screen: StringName) -> void:
+		if screen in [&"title", &"town"] and screen != home:
+			home = screen
+			_publish_state())
+	EventSystem.PRO_world_spot_saved.connect(func(spot: Dictionary) -> void:
+		profile.world = spot.duplicate()
+		profile.save_to(save_path))
 	EventSystem.PRO_race_mode_requested.connect(func(mode: StringName) -> void:
 		if mode in [&"race", &"time_trial"]:
 			race_mode = mode
@@ -343,6 +352,10 @@ func _publish_state() -> void:
 		"setups": _setup_order(kind).map(func(id: StringName) -> DriftSetup: return setups[id]),
 		# The cars' own lists whatever is on show (stickers: every car, every track).
 		"car_tracks": _track_entries(&"car"),
+		# Every track of every kind, for the open world's race gates (§28).
+		"world_tracks": _track_entries(&"car") + _track_entries(&"boat") + _track_entries(&"ship"),
+		"home": home,
+		"world": profile.world.duplicate(),
 		"car_setups": SETUP_ORDER.map(func(id: StringName) -> DriftSetup: return setups[id]),
 		"best_laps": profile.best_laps.duplicate(),
 		"last_race": last_race,

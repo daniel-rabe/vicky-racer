@@ -62,6 +62,13 @@ signal PRO_coins_changed(total: int)
 signal PRO_coins_awarded(amount: int, breakdown: Dictionary)
 ## Coins picked up in Free Drive's town (docs/DESIGN.md §19): GarageManager banks them at once.
 signal PRO_coins_found(amount: int)
+## Where the next screens go back to (docs/DESIGN.md §28): &"town" once the child is playing in
+## the open world (PLAY), &"title" otherwise (2 PLAYERS). The garage's BACK, the results' DRIVE ON,
+## the shelf's BACK and the race's pause menu follow it.
+signal PRO_home_requested(screen: StringName)
+## The world's last spot (§28): {"x", "y", "angle", "riding"}, kept in the save so PLAY carries on
+## where the child left off. {} forgets it.
+signal PRO_world_spot_saved(spot: Dictionary)
 signal PRO_setup_purchased(setup_id: StringName)
 signal PRO_setup_equipped(setup_id: StringName)
 signal PRO_setup_painted(setup_id: StringName, colour: StringName)

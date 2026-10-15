@@ -26,11 +26,11 @@ const REMOVED_ROADS := [["v", 3, 1]]
 ## pond / playground: one each in the middle of a block. football: a pitch with two goals
 ## (docs/DESIGN.md §23). trees / flowers: trees and flower beds, scattered where there is room.
 const BLOCKS := {
-	Vector2i(0, 0): {"bottom": ["house_red", "house_blue"], "top": ["house_green"], "trees": 3, "flowers": 2},
+	Vector2i(0, 0): {"bottom": ["garage", "house_blue"], "top": ["house_green"], "trees": 3, "flowers": 2},
 	Vector2i(1, 0): {"bottom": ["candy_shop", "ice_cream_shop"], "top": ["house_blue", "house_red"], "trees": 2, "flowers": 2},
 	Vector2i(2, 0): {"bottom": ["school"], "playground": true, "trees": 3, "flowers": 1},
 	Vector2i(3, 0): {"bottom": ["toy_shop", "bakery"], "top": ["house_green", "house_blue"], "trees": 2, "flowers": 2},
-	Vector2i(4, 0): {"bottom": ["house_green", "house_red"], "top": ["house_blue"], "trees": 3, "flowers": 2},
+	Vector2i(4, 0): {"bottom": ["trophy_house", "house_red"], "top": ["house_blue"], "trees": 3, "flowers": 2},
 	Vector2i(0, 1): {"bottom": ["pet_shop", "flower_shop"], "top": ["house_red", "house_green"], "trees": 2, "flowers": 2},
 	Vector2i(1, 1): {"bottom": ["fire_station"], "top": ["house_blue", "house_green"], "trees": 2, "flowers": 1},
 	Vector2i(2, 1): {"park": true, "flowers": 1},
@@ -83,6 +83,30 @@ const RAMPS := [[Vector2(3600.0, 450.0), Vector2.RIGHT], [Vector2(450.0, 4300.0)
 const RUNWAY_BEFORE := 800.0
 const RUNWAY_AFTER := 900.0
 const RUNWAY_WIDTH := 240.0
+
+## The open world is the game (docs/DESIGN.md §28). Race gates: a start grid for every track,
+## where the track's three racers wait for the child. [track id, the grid's centre, the way it
+## faces]. Car gates stand on the grass between the ring road and the beach, going round the
+## island clockwise from the player's start; boat gates float out at sea.
+const GATES := [
+	[&"track_01", Vector2(1900.0, 400.0), Vector2.RIGHT],
+	[&"track_02", Vector2(7300.0, 400.0), Vector2.RIGHT],
+	[&"track_03", Vector2(9530.0, 1900.0), Vector2.DOWN],
+	[&"track_04", Vector2(9530.0, 6000.0), Vector2.DOWN],
+	[&"track_05", Vector2(7500.0, 7930.0), Vector2.LEFT],
+	[&"track_06", Vector2(2400.0, 7930.0), Vector2.LEFT],
+	[&"track_07", Vector2(400.0, 6200.0), Vector2.UP],
+	[&"boat_01", Vector2(2300.0, 9750.0), Vector2.LEFT],
+	[&"boat_02", Vector2(7600.0, 9750.0), Vector2.RIGHT],
+	[&"boat_03", Vector2(11450.0, 2200.0), Vector2.UP],
+	[&"boat_04", Vector2(-1500.0, 4900.0), Vector2.DOWN],
+]
+## The rocket pad, on the grass west of town: driving onto it opens the Hangar, for the space
+## races (§24).
+const ROCKET_PAD := Vector2(400.0, 2000.0)
+## Buildings with something inside (§28): their pads open a screen instead of showing a sign.
+## The garage (the cars) and the trophy house (the shelf and the stickers).
+const DOORS := {"garage": &"garage", "trophy_house": &"shelf"}
 
 
 static func junction(cell: Vector2i) -> Vector2:

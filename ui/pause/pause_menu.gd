@@ -9,6 +9,11 @@ extends CanvasLayer
 
 ## Free Drive has nothing to restart: its menu has no RESTART.
 @export var can_restart := true
+## The open world (docs/DESIGN.md §28) has a MAP, under RESUME: the whole island, to find a race
+## and have the way shown. The screen opens it (map_requested) and calls back_from_map().
+@export var can_map := false
+
+signal map_requested
 
 @onready var _menu: Control = %Menu
 @onready var _resume: Button = %Resume
@@ -22,6 +27,14 @@ extends CanvasLayer
 
 var _confirmed_action: Callable
 var _asked_from: Button  # focus returns here when SURE? is answered NO
+var _map_button: Button
+## Where leaving a race goes (§28): the garage, or straight back to the town once the child plays
+## in the open world.
+var _home: StringName = &"title"
+
+
+func _enter_tree() -> void:
+	EventSystem.PRO_state_changed.connect(func(state: Dictionary) -> void: _home = state.get("home", &"title"))
 
 
 func _ready() -> void:
@@ -30,7 +43,14 @@ func _ready() -> void:
 	_restart.visible = can_restart
 	_resume.pressed.connect(resume)
 	_restart.pressed.connect(_ask.bind(_leave_to.bind(&"race"), _restart))
-	_garage.pressed.connect(_ask.bind(_leave_to.bind(&"garage"), _garage))
+	EventSystem.PRO_state_requested.emit()
+	var leave_to := &"garage"
+	if can_restart and _home == &"town":
+		_garage.text = "TOWN"
+		leave_to = &"town"
+	_garage.pressed.connect(_ask.bind(_leave_to.bind(leave_to), _garage))
+	if can_map:
+		enable_map()
 	_settings_button.pressed.connect(func() -> void:
 		_menu.visible = false
 		_settings.open())
@@ -39,6 +59,29 @@ func _ready() -> void:
 		_settings_button.grab_focus())
 	_no.pressed.connect(_close_confirm)
 	_yes.pressed.connect(func() -> void: _confirmed_action.call())
+
+
+## MAP under RESUME (once).
+func enable_map() -> void:
+	can_map = true
+	if _map_button:
+		return
+	_map_button = Button.new()
+	_map_button.name = "Map"
+	_map_button.text = "MAP"
+	_map_button.custom_minimum_size = Vector2(400, 90)
+	_map_button.theme_type_variation = &"NavButton"
+	_resume.get_parent().add_child(_map_button)
+	_resume.get_parent().move_child(_map_button, _resume.get_index() + 1)
+	_map_button.pressed.connect(func() -> void:
+		_menu.visible = false
+		map_requested.emit())
+
+
+## The map was closed without choosing a way: the menu again, MAP focused.
+func back_from_map() -> void:
+	_menu.visible = true
+	_map_button.grab_focus()
 
 
 func _notification(what: int) -> void:

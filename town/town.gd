@@ -15,6 +15,10 @@ extends Node2D
 ## and the school's pads (the fire engine and the school bus), bus stops, jump ramps on paved
 ## run-ups, and puddles that show on the roads when it rains.
 ##
+## The open world (§28) adds the race gates' paved start grids on the grass round the town
+## (gates; the gates themselves, with their racers, are RaceGate), the doors of the garage and the
+## trophy house (doors), and the rocket pad on the west side.
+##
 ## It is also the traffic's map. Junctions are grid cells (Vector2i); lane_points() and
 ## turn_points() give the line a car follows along a road and through a junction, on the
 ## right-hand side, and a car asks to reserve a junction before it drives into it, so two
@@ -52,6 +56,7 @@ const LIGHTHOUSE := preload("res://art/town/island/lighthouse.png")
 const SAILBOAT := preload("res://art/town/island/sailboat.png")
 const MOORING_POST := preload("res://art/town/island/mooring_post.png")
 const FIRE_ENGINE := preload("res://art/town/vehicles/fire_engine.png")
+const ROCKET := preload("res://art/ships/cardboard_rocket.png")
 const BUS := preload("res://art/town/vehicles/bus.png")
 const FOAM := Color(1, 1, 1, 0.8)
 const PAD_COLOUR := Color(0.24, 0.59, 0.86, 0.92)
@@ -82,6 +87,11 @@ const WASH_COLOUR := Color(0.55, 0.82, 0.96, 0.9)
 const WASH_PAD_INTO_ROAD := 30.0
 const FIRE_PAD_COLOUR := Color(0.86, 0.25, 0.22, 0.9)
 const BUS_PAD_COLOUR := Color(0.98, 0.76, 0.18, 0.92)
+## The open world's doors (§28): the garage's pad orange, the trophy house's gold.
+const DOOR_COLOURS := {&"garage": Color(0.96, 0.55, 0.16, 0.92), &"shelf": Color(1.0, 0.82, 0.25, 0.92)}
+## A car gate's paved start area round its grid (§28): this long along the way it faces, this wide.
+const GATE_AREA := Vector2(700.0, 470.0)
+const ROCKET_PAD_RADIUS := 170.0
 ## The football pitch (§23): its size, and the goal mouths at each end.
 const PITCH_SIZE := Vector2(1000.0, 700.0)
 const GOAL_MOUTH := 280.0
@@ -111,6 +121,12 @@ var houses: Array[Dictionary] = []
 var fire_pad := Rect2()
 var bus_pad := Rect2()
 var paint_pad := Rect2()
+## The open world (§28). Race gates: {"track_id", "at", "facing", "kind" (&"car" or &"boat"),
+## "area" (a car gate's paving, else Rect2())}. Doors: {"screen" (&"garage" or &"shelf"), "pad"}.
+var gates: Array[Dictionary] = []
+var doors: Array[Dictionary] = []
+## The rocket pad: driving onto it opens the Hangar.
+var rocket_pad := Rect2()
 ## The football pitch, and its two goal mouths (the ball is in when its middle is inside one).
 var pitch := Rect2()
 var goals: Array[Rect2] = []
@@ -206,6 +222,11 @@ func surface_at(pos: Vector2) -> StringName:
 	for ramp in ramps:
 		if ramp["runway"].has_point(pos):
 			return &"asphalt"
+	for gate in gates:
+		if gate["area"].has_point(pos):
+			return &"asphalt"
+	if rocket_pad.has_point(pos):
+		return &"asphalt"
 	if not streets_rect().has_point(pos):
 		return _coast_surface(pos)
 	if wet:
@@ -458,6 +479,11 @@ func _building(id: String, picture: Texture2D, rect: Rect2, on_street: bool, on_
 		_ghost(BUS, bus_pad.get_center(), PI / 2.0)
 	elif on_street and id == "paint_shop":
 		_paint_pad(solid, rect)
+	elif on_street and TownLayout.DOORS.has(id):
+		var screen: StringName = TownLayout.DOORS[id]
+		var pad := _front_pad(solid, rect, DOOR_COLOURS[screen])
+		_arrows_in(pad)
+		doors.append({"screen": screen, "pad": pad, "id": id})
 
 
 ## The car wash's pad: a wet blue strip with soap bubbles and arrows pointing in, from the
@@ -466,7 +492,6 @@ func _building(id: String, picture: Texture2D, rect: Rect2, on_street: bool, on_
 ## a car keeping to its lane passes by.
 func _wash_pad(solid: Rect2, rect: Rect2) -> void:
 	var pad := _front_pad(solid, rect, WASH_COLOUR, false)
-	var width := pad.size.x
 	wash_pad = pad
 	for i in 18:
 		var bubble := Polygon2D.new()
@@ -479,17 +504,7 @@ func _wash_pad(solid: Rect2, rect: Rect2) -> void:
 		bubble.polygon = ring
 		bubble.color = Color(1, 1, 1, 0.75)
 		_ground.add_child(bubble)
-	for side in [-1.0, 1.0]:
-		var arrow := Line2D.new()
-		var x: float = pad.get_center().x + side * width * 0.22
-		var tip := pad.position.y + pad.size.y * 0.35
-		arrow.points = PackedVector2Array([Vector2(x - 26.0, tip + 30.0), Vector2(x, tip), Vector2(x + 26.0, tip + 30.0)])
-		arrow.width = 12.0
-		arrow.default_color = Color(1, 1, 1, 0.9)
-		arrow.joint_mode = Line2D.LINE_JOINT_ROUND
-		arrow.begin_cap_mode = Line2D.LINE_CAP_ROUND
-		arrow.end_cap_mode = Line2D.LINE_CAP_ROUND
-		_ground.add_child(arrow)
+	_arrows_in(pad)
 	var area := Area2D.new()
 	area.name = "WashPad"
 	area.position = pad.get_center()
@@ -504,6 +519,21 @@ func _wash_pad(solid: Rect2, rect: Rect2) -> void:
 	area.body_entered.connect(func(body: Node2D) -> void:
 		if body is Car and body.has_node(^"PlayerInput"):
 			EventSystem.CAR_washed.emit(body))
+
+
+## Two white arrows on a pad in front of a building, pointing in at its door.
+func _arrows_in(pad: Rect2) -> void:
+	for side in [-1.0, 1.0]:
+		var arrow := Line2D.new()
+		var x: float = pad.get_center().x + side * pad.size.x * 0.22
+		var tip := pad.position.y + pad.size.y * 0.35
+		arrow.points = PackedVector2Array([Vector2(x - 26.0, tip + 30.0), Vector2(x, tip), Vector2(x + 26.0, tip + 30.0)])
+		arrow.width = 12.0
+		arrow.default_color = Color(1, 1, 1, 0.9)
+		arrow.joint_mode = Line2D.LINE_JOINT_ROUND
+		arrow.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		arrow.end_cap_mode = Line2D.LINE_CAP_ROUND
+		_ground.add_child(arrow)
 
 
 ## A pad in front of a building, as the car wash's: from its front wall across the pavement
@@ -1120,6 +1150,17 @@ func _plan_extras() -> void:
 		ramps.append({"at": at, "throw": throw, "runway": runway})
 		_keep_clear.append(runway.grow(40.0))
 		_keep_clear.append(Rect2(end - Vector2(260, 260), Vector2(520, 520)))  # the cones beyond it
+	for entry: Array in TownLayout.GATES:
+		var id: StringName = entry[0]
+		var at: Vector2 = entry[1]
+		var facing: Vector2 = entry[2]
+		var kind := &"boat" if String(id).begins_with("boat") else &"car"
+		var area := _box_along(at, facing, GATE_AREA.x, GATE_AREA.y) if kind == &"car" else Rect2()
+		gates.append({"track_id": id, "at": at, "facing": facing, "kind": kind, "area": area})
+		if kind == &"car":
+			_keep_clear.append(area.grow(80.0))
+	rocket_pad = Rect2(TownLayout.ROCKET_PAD - Vector2.ONE * ROCKET_PAD_RADIUS, Vector2.ONE * ROCKET_PAD_RADIUS * 2.0)
+	_keep_clear.append(rocket_pad.grow(120.0))
 
 
 ## A rectangle round `centre`, `length` along `along` and `depth` across it.
@@ -1190,6 +1231,10 @@ func _build_extras() -> void:
 		_bus_shelter(stop)
 	for ramp in ramps:
 		_ramp(ramp)
+	for gate in gates:
+		if gate["kind"] == &"car":
+			_gate_paving(gate["area"])
+	_rocket_pad()
 	_puddle_layer = Node2D.new()
 	_puddle_layer.name = "Puddles"
 	_puddle_layer.modulate.a = 0.0
@@ -1213,6 +1258,34 @@ func _build_extras() -> void:
 		shine.scale = Vector2.ONE * 0.5
 		shine.position = at * 0.5 + Vector2(-12, -10)
 		_puddle_layer.add_child(shine)
+
+
+## A car gate's start area (§28): asphalt with a kerb, on the grass. The grid, the arch and the
+## racers waiting on it are the gate's own (RaceGate).
+func _gate_paving(area: Rect2) -> void:
+	_ground.add_child(_flat(_rect_points(area.grow(8.0), 44.0), KERB_COLOUR))
+	_ground.add_child(_textured(_rect_points(area, 40.0), ASPHALT))
+
+
+## The rocket pad (§28): a round concrete pad with yellow and black hazard stripes round its
+## edge and the cardboard rocket standing on it, nose to the sky. Driving onto it opens the
+## Hangar (the screen's pads).
+func _rocket_pad() -> void:
+	var at := rocket_pad.get_center()
+	_ground.add_child(_disc(at, ROCKET_PAD_RADIUS + 10.0, KERB_COLOUR))
+	for k in 16:
+		var a0 := TAU * k / 16.0
+		var a1 := TAU * (k + 1) / 16.0
+		var band := PackedVector2Array()
+		for step in 5:
+			band.append(at + Vector2.from_angle(lerpf(a0, a1, step / 4.0)) * ROCKET_PAD_RADIUS)
+		for step in 5:
+			band.append(at + Vector2.from_angle(lerpf(a1, a0, step / 4.0)) * (ROCKET_PAD_RADIUS - 34.0))
+		_ground.add_child(_flat(band, Color(0.98, 0.8, 0.15) if k % 2 == 0 else Color(0.12, 0.12, 0.14)))
+	_ground.add_child(_disc(at, ROCKET_PAD_RADIUS - 34.0, Color(0.62, 0.64, 0.68)))
+	_ground.add_child(_disc(at, 70.0, Color(0.5, 0.52, 0.56)))
+	var rocket := _sprite(ROCKET, at, 230.0, -PI / 2.0)
+	rocket.z_index = TREE_Z
 
 
 ## How wet the roads are, 0 (dry) to 1 (pouring): the puddles show, and are slippery while

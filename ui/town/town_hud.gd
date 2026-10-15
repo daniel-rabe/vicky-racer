@@ -8,6 +8,9 @@ extends CanvasLayer
 ## For the things to do (§23): an arrow at the screen's edge pointing to where a job is
 ## going (with its picture), the bus's passengers in a row under the coins, the controls of
 ## whatever the player is driving, and the map's marks.
+##
+## The open world (§28): pulling up on a race gate's glowing place shows its track's card (the
+## one PICK A RACE shows) at the bottom, with the button that starts the race.
 
 const THEME := preload("res://ui/theme/vicky_theme.tres")
 const COIN := preload("res://art/ui/coin.png")
@@ -24,6 +27,7 @@ const HINTS := {
 ## The pointer keeps this far inside the screen's edge, and hides when its target is on screen
 ## this far in.
 const POINTER_MARGIN := 110.0
+const GATE_SCALE := 0.75
 
 var _coins: Label
 var _sign: PanelContainer
@@ -50,6 +54,12 @@ var _pointer_target := Vector2.INF
 var _corners: Array[Control] = []
 ## The bus's passengers.
 var _passengers: HBoxContainer
+## A race gate's card (§28), and the gate it is for (null: none shown).
+var _gate_panel: PanelContainer
+var _gate_slot: Control
+var _gate_go: Label
+var _gate_unlocked := true
+var gate_shown: Node
 
 
 func _ready() -> void:
@@ -117,6 +127,7 @@ func _ready() -> void:
 	root.add_child(_passengers)
 	_pointer = _make_pointer()
 	root.add_child(_pointer)
+	_build_gate_card(root)
 	_hints = _label(22, Color.WHITE)
 	_hints.text = HINTS[_kind][0]
 	_hints.anchor_top = 1.0
@@ -141,6 +152,7 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey:
 		_gamepad = false
 	_hints.text = HINTS[_kind][1 if _gamepad else 0]
+	_show_gate_button()
 
 
 func setup(town: Town, player: Car, traffic: Array[Car], places_total: int) -> void:
@@ -256,6 +268,63 @@ func _make_pointer() -> Control:
 	rim.default_color = OUTLINE
 	arrow.add_child(rim)
 	return pointer
+
+
+## The race gate's card, on the left, clear of the car in the middle: the track's card beside
+## RACE! and its button. Drawn at GATE_SCALE.
+func _build_gate_card(root: Control) -> void:
+	_gate_panel = _panel(root, Vector2(0, 0.5), Vector2(32, -170), Vector2(780, 440))
+	_gate_panel.name = "GateCard"
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 28)
+	_gate_panel.add_child(row)
+	_gate_slot = Control.new()
+	_gate_slot.custom_minimum_size = TrackCard.SIZE
+	_gate_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(_gate_slot)
+	_gate_go = _label(44, YELLOW)
+	_gate_go.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_gate_go.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(_gate_go)
+	_gate_panel.pivot_offset = Vector2(0, 0)
+	_gate_panel.visible = false
+
+
+## Pulled up on `gate`'s place: its track's card, and RACE! (or, while it is locked, the button
+## that shows the way to the race that opens it).
+func show_gate(gate: Node, config: TrackConfig, unlocked: bool, best_lap: float, completed: bool, opened_by: String) -> void:
+	if gate_shown == gate:
+		return
+	gate_shown = gate
+	_gate_unlocked = unlocked
+	for child in _gate_slot.get_children():
+		child.queue_free()
+	var card := TrackCard.new()
+	card.setup(config, unlocked, best_lap, completed, opened_by)
+	card.focus_mode = Control.FOCUS_NONE
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_gate_slot.add_child(card)
+	_show_gate_button()
+	_gate_panel.visible = true
+	_gate_panel.scale = Vector2.ONE * GATE_SCALE * 0.6
+	_gate_panel.modulate.a = 0.0
+	var tween := _gate_panel.create_tween()
+	tween.tween_property(_gate_panel, "modulate:a", 1.0, 0.12)
+	tween.parallel().tween_property(_gate_panel, "scale", Vector2.ONE * GATE_SCALE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+func hide_gate() -> void:
+	if gate_shown == null:
+		return
+	gate_shown = null
+	_gate_panel.visible = false
+
+
+func _show_gate_button() -> void:
+	if _gate_go == null:
+		return
+	var button := "Y" if _gamepad else "R"
+	_gate_go.text = "%s\nRACE!" % button if _gate_unlocked else "%s\nSHOW ME\nTHE WAY" % button
 
 
 ## Fade the screen to white (`to_white`) or back. Await it: 0.18 s in, 0.25 s out.

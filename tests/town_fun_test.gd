@@ -65,7 +65,8 @@ func _layout() -> void:
 	for pad: Rect2 in [town.fire_pad, town.bus_pad, town.paint_pad]:
 		_check(pad.has_area() and town.surface_at(Vector2(pad.get_center().x, pad.end.y - 20.0)) == &"asphalt",
 			"a pad reaches the street (%s)" % pad)
-	_check(town.houses.size() >= 8, "deliveries have houses to go to (%d)" % town.houses.size())
+	# Seven since the garage and the trophy house took two houses' places (docs/DESIGN.md §28).
+	_check(town.houses.size() >= 7, "deliveries have houses to go to (%d)" % town.houses.size())
 	for stop: Dictionary in town.bus_stops:
 		_check(_on_road(town, stop["stop"]) and town.surface_at(stop["kerb"]) == &"asphalt"
 			and town.surface_at(stop["shelter"]) == &"grass", "a bus stop is in the lane, its shelter on the grass (%s)" % stop["stop"])

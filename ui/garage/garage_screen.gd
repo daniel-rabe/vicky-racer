@@ -249,6 +249,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("race_start"):
 		_start_race()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_cancel"):
-		EventSystem.UI_screen_requested.emit(&"title")
+	elif event.is_action_pressed("ui_cancel"):  # back to the town in the open world (§28)
+		EventSystem.UI_screen_requested.emit(_state.get("home", &"title"))
 		get_viewport().set_input_as_handled()

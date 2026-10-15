@@ -27,6 +27,8 @@ const COIN := preload("res://art/sfx/coin.wav")
 var _state := {}
 var _in_cup := false  # a cup race: the next stop is the standings, not another race
 var _custom := false  # the child's own track (docs/DESIGN.md §26): GARAGE becomes BUILD
+## The open world (§28): GARAGE becomes DRIVE ON, back to the town.
+var _home := &"garage"
 
 
 func _enter_tree() -> void:
@@ -40,7 +42,7 @@ func _ready() -> void:
 		button.disabled = true
 		button.focus_mode = Control.FOCUS_NONE
 	_garage.pressed.connect(func() -> void:  # after the child's own track, back to building it
-		EventSystem.UI_screen_requested.emit(&"editor" if _custom else &"garage"))
+		EventSystem.UI_screen_requested.emit(&"editor" if _custom else _home))
 	_again.pressed.connect(func() -> void:  # a time trial races again in the same mode
 		EventSystem.UI_screen_requested.emit(&"standings" if _in_cup else &"race"))
 	EventSystem.CUP_state_requested.emit()
@@ -48,8 +50,11 @@ func _ready() -> void:
 		_again.text = "STANDINGS"
 	EventSystem.PRO_state_requested.emit()
 	_custom = _state.get("selected_track") == CustomTrack.ID
+	_home = &"town" if _state.get("home") == &"town" else &"garage"
 	if _custom:
 		_garage.text = "BUILD"
+	elif _home == &"town":
+		_garage.text = "DRIVE ON"  # back to the gate in the open world (docs/DESIGN.md §28)
 	var race: Dictionary = _state.get("last_race", {})
 	if race.is_empty():
 		_headline.text = "NO RACE YET"

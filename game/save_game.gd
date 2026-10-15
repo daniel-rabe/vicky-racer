@@ -54,6 +54,9 @@ var stickers: Array[StringName] = []
 ## set it, "cars": {setup id: that car's best}}. The record's ghost lives in its own file
 ## (GarageManager.ghost_path). Optional in the file.
 var trials := {}
+## Where the child left the open world (docs/DESIGN.md §28): {"x", "y", "angle", "riding"}
+## ({} = never played there: start by the candy shop). Optional in the file.
+var world := {}
 
 
 static func fresh(starting_coins := 0) -> SaveGame:
@@ -109,6 +112,7 @@ static func load_from(path := DEFAULT_PATH, starting_coins := 0) -> SaveGame:
 			var colour := StringName(str(file.get_value("paint", id, "")))
 			if colour in Paint.COLOURS and colour != Paint.ORIGINAL:
 				profile.paint[StringName(id)] = colour
+	profile.world = _world_spot(file.get_value("world", "spot", {}))
 	var version := int(file.get_value("profile", "schema_version", SCHEMA_VERSION))
 	if file.has_section("best_laps") and version >= TRACKS_REBUILT_VERSION:
 		for track in file.get_section_keys("best_laps"):
@@ -142,6 +146,8 @@ func save_to(path := DEFAULT_PATH) -> Error:
 		file.set_value("stickers", "earned", PackedStringArray(stickers))
 	for track in trials:
 		file.set_value("time_trial", String(track), trials[track])
+	if not world.is_empty():
+		file.set_value("world", "spot", world)
 	return file.save(path)
 
 
@@ -166,6 +172,16 @@ static func _trial(value: Variant) -> Dictionary:
 			if float(raw[id]) > 0.0:
 				cars[StringName(str(id))] = float(raw[id])
 	return {"best": float(value["best"]), "setup": StringName(str(value.get("setup", ""))), "cars": cars}
+
+
+## The open world's spot, cleaned: {} unless it has a position and a vehicle the world knows.
+static func _world_spot(value: Variant) -> Dictionary:
+	if not value is Dictionary or not value.has("x") or not value.has("y"):
+		return {}
+	var riding := StringName(str(value.get("riding", "car")))
+	if riding not in [&"car", &"boat"]:
+		return {}
+	return {"x": float(value["x"]), "y": float(value["y"]), "angle": float(value.get("angle", 0.0)), "riding": riding}
 
 
 static func _keep_unreadable(path: String) -> void:

@@ -1,23 +1,19 @@
 extends Node2D
-## The title screen (docs/mockups/title_layout): the logo and PLAY / SETTINGS / QUIT over a
-## live "attract mode" race, a trophy button beside PLAY for the shelf (docs/DESIGN.md §14)
-## TOWN for Free Drive (§19), a sun / moon button under the trophy for night (§27), and 2 PLAYERS for a split-screen game (§15) — the real Track 01 with four AI cars, the camera following
-## the red one. No HUD, no race rules, no car sounds: just something lively to look at.
+## The title screen (docs/mockups/title_layout): the logo and PLAY / 2 PLAYERS / SETTINGS / QUIT
+## over a live "attract mode" race, a trophy button beside PLAY for the shelf (docs/DESIGN.md §14)
+## and a sun / moon button under it for night (§27). PLAY drives straight into the open world
+## (§28), where the races, the garage and the shelf are places to drive to; 2 PLAYERS starts a
+## split-screen game (§15). The race behind is the real Track 01 with four AI cars, the camera
+## following the red one. No HUD, no race rules, no car sounds: just something lively to look at.
 
 const TRACK := preload("res://game/configs/tracks/track_01.tres")
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const CAMERA_SCRIPT := preload("res://actors/car/chase_camera.gd")
 const RED := preload("res://game/configs/setups/starter.tres")
 const CARS_PICTURE := preload("res://art/cars/car_red.png")
-const BOATS_PICTURE := preload("res://art/boats/speedboat.png")
-const BOATS_COLOUR := Color(0.12, 0.64, 0.78)
-const SPACE_PICTURE := preload("res://art/ships/fighter.png")
-const SPACE_COLOUR := Color(0.24, 0.17, 0.47)
 ## The day / night button: sky blue by day, deep blue at night.
 const DAY_COLOUR := Color(0.33, 0.68, 0.95)
 const NIGHT_COLOUR := Color(0.13, 0.15, 0.36)
-## The picture row is this much wider than the menu, so three buttons fit side by side.
-const ROW_WIDTH := 600.0
 const HINTS_KEYBOARD := "ENTER  CHOOSE"
 const HINTS_GAMEPAD := "A  CHOOSE"
 ## Skills and lanes for the four attract-mode cars, red first.
@@ -53,31 +49,24 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_build_attract_mode()
-	# PLAY is three picture buttons (docs/DESIGN.md §20.5, §24.5): CARS, BOATS and SPACE.
-	var row := _split_play()
-	var boats: Button = row[0]
-	var space: Button = row[1]
-	for pair in [[_play, &"car"], [boats, &"boat"], [space, &"ship"]]:
-		var kind: StringName = pair[1]
-		(pair[0] as Button).pressed.connect(func() -> void:
-			EventSystem.PRO_vehicle_kind_requested.emit(kind)
-			EventSystem.UI_screen_requested.emit(&"garage"))
+	EventSystem.PRO_home_requested.emit(&"title")
+	# PLAY: into the open world (docs/DESIGN.md §28), in the car. The races, the garage and the
+	# Boat Dock and Hangar are all places there now.
+	_play.icon = CARS_PICTURE
+	_play.expand_icon = true
+	_play.add_theme_constant_override("icon_max_width", 110)
+	_play.pressed.connect(func() -> void:
+		EventSystem.PRO_vehicle_kind_requested.emit(&"car")
+		EventSystem.UI_screen_requested.emit(&"town"))
+	_town.visible = false  # TOWN was Free Drive; PLAY is the town now
 	_shelf.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"shelf"))
-	# Free Drive: no race, just the town to drive round (docs/DESIGN.md §19).
-	_town.pressed.connect(func() -> void: EventSystem.UI_screen_requested.emit(&"town"))
 	_two_players.pressed.connect(func() -> void:
+		EventSystem.PRO_vehicle_kind_requested.emit(&"car")
 		EventSystem.PLY_two_player_requested.emit()
 		EventSystem.UI_screen_requested.emit(&"join"))
-	# Along the row, then the shelf button beside the menu: right of SPACE goes to it, left comes back.
-	_play.focus_neighbor_right = _play.get_path_to(boats)
-	boats.focus_neighbor_left = boats.get_path_to(_play)
-	boats.focus_neighbor_right = boats.get_path_to(space)
-	space.focus_neighbor_left = space.get_path_to(boats)
-	space.focus_neighbor_right = space.get_path_to(_shelf)
-	for button: Button in [boats, space]:
-		button.focus_neighbor_bottom = button.get_path_to(_town)
-	_shelf.focus_neighbor_left = _shelf.get_path_to(space)
-	_shelf.focus_neighbor_bottom = _shelf.get_path_to(_town)
+	_play.focus_neighbor_right = _play.get_path_to(_shelf)
+	_shelf.focus_neighbor_left = _shelf.get_path_to(_play)
+	_shelf.focus_neighbor_bottom = _shelf.get_path_to(_two_players)
 	_settings_button.pressed.connect(func() -> void:
 		_menu.visible = false
 		_shelf.visible = false
@@ -99,49 +88,6 @@ func _ready() -> void:
 	var bob := create_tween().set_loops().set_trans(Tween.TRANS_SINE)
 	bob.tween_property(_logo, "position:y", _logo.position.y - 6.0, 1.0)
 	bob.tween_property(_logo, "position:y", _logo.position.y + 6.0, 1.0)
-
-
-## PLAY becomes CARS, and BOATS and SPACE stand beside it in the same row: three picture
-## buttons, each with its vehicle above the word. The row is wider than the menu, not taller;
-## the menu's other buttons keep their width, and the shelf button moves out beside the row.
-## Returns [BOATS, SPACE].
-func _split_play() -> Array[Button]:
-	var row := HBoxContainer.new()
-	row.name = "PlayRow"
-	row.add_theme_constant_override("separation", 12)
-	row.custom_minimum_size = Vector2(ROW_WIDTH, 0)
-	_menu.add_child(row)
-	_menu.move_child(row, _play.get_index())
-	_play.reparent(row)
-	for button in _menu.get_children():
-		if button is Control and button != row:
-			(button as Control).size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var shift := (ROW_WIDTH - _menu.size.x) / 2.0
-	_shelf.offset_left += shift
-	_shelf.offset_right += shift
-	var boats := Button.new()
-	boats.name = "Boats"
-	row.add_child(boats)
-	var space := Button.new()
-	space.name = "Space"
-	row.add_child(space)
-	var pictures := {_play: [CARS_PICTURE, "CARS"], boats: [BOATS_PICTURE, "BOATS"], space: [SPACE_PICTURE, "SPACE"]}
-	for button: Button in pictures:
-		button.text = pictures[button][1]
-		button.custom_minimum_size = Vector2(190, 124)
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.theme_type_variation = &"RaceButton"
-		button.add_theme_font_size_override("font_size", 30)
-		button.icon = pictures[button][0]
-		button.expand_icon = true
-		button.add_theme_constant_override("icon_max_width", 96)
-		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-	for pair in [[boats, BOATS_COLOUR], [space, SPACE_COLOUR]]:
-		var colour: Color = pair[1]
-		(pair[0] as Button).add_theme_stylebox_override("normal", _tinted(_play.get_theme_stylebox("normal"), colour))
-		(pair[0] as Button).add_theme_stylebox_override("hover", _tinted(_play.get_theme_stylebox("hover"), colour.lightened(0.1)))
-	return [boats, space]
 
 
 static func _tinted(box: StyleBox, colour: Color) -> StyleBox:
@@ -185,8 +131,8 @@ func _add_sky_button() -> void:
 	_sky_button.pressed.connect(func() -> void: EventSystem.PRO_night_requested.emit(not _night))
 	_shelf.focus_neighbor_bottom = _shelf.get_path_to(_sky_button)
 	_sky_button.focus_neighbor_top = _sky_button.get_path_to(_shelf)
-	_sky_button.focus_neighbor_left = _sky_button.get_path_to(_town)
-	_town.focus_neighbor_right = _town.get_path_to(_sky_button)
+	_sky_button.focus_neighbor_left = _sky_button.get_path_to(_two_players)
+	_two_players.focus_neighbor_right = _two_players.get_path_to(_sky_button)
 	_show_sky()
 
 
