@@ -19,7 +19,8 @@ extends Node2D
 ## (gates; the gates themselves, with their racers, are RaceGate), the doors of the garage and the
 ## trophy house (doors), and the rocket pad on the west side.
 ## Over bridges from the ring road lie the districts: the snowy hill (§33, SnowIsland), candy
-## land (§34, CandyIsland), the jungle (§35, JungleIsland) and toy town (§36, ToyIsland).
+## land (§34, CandyIsland), the jungle (§35, JungleIsland), toy town (§36, ToyIsland) and Sunny
+## Beach (§37, BeachIsland).
 ##
 ## It is also the traffic's map. Junctions are grid cells (Vector2i); lane_points() and
 ## turn_points() give the line a car follows along a road and through a junction, on the
@@ -94,6 +95,11 @@ const MAT_COLOURS: Array[Color] = [Color(0.98, 0.72, 0.72), Color(0.7, 0.85, 1.0
 const BLOCK_COLOURS: Array[Color] = [Color(0.92, 0.27, 0.3), Color(0.25, 0.55, 0.95), Color(0.98, 0.75, 0.15),
 	Color(0.3, 0.75, 0.35), Color(0.65, 0.4, 0.9)]
 const RAIL_COLOUR := Color(0.55, 0.36, 0.2)
+## Sunny Beach (§37).
+const BEACH_KERB := preload("res://art/tiles/beach/kerb.png")
+const HUT_COLOURS: Array[Color] = [Color(0.25, 0.55, 0.95), Color(0.92, 0.3, 0.35), Color(0.3, 0.72, 0.45),
+	Color(0.98, 0.72, 0.15), Color(0.6, 0.4, 0.88)]
+const TOWEL_COLOURS: Array[Color] = [Color(0.95, 0.4, 0.45), Color(0.3, 0.65, 0.95), Color(1.0, 0.82, 0.25), Color(0.45, 0.8, 0.5)]
 const PARAPET := Color(0.62, 0.64, 0.7)
 const FOAM := Color(1, 1, 1, 0.8)
 const PAD_COLOUR := Color(0.24, 0.59, 0.86, 0.92)
@@ -170,6 +176,10 @@ var doors: Array[Dictionary] = []
 var rocket_pad := Rect2()
 ## Toy town's train (§36), going round its track.
 var train: ToyTrain
+## Sunny Beach (§37): its surf, its sandcastles and its crabs.
+var surf: BeachSurf
+var castles: Array[SandCastle] = []
+var crabs: Array[BeachCrab] = []
 ## The rocket on it, which lifts off with the car inside (§31).
 var rocket: Sprite2D
 ## Driveways (§29): cars parked on the lawn beside a house, nose to the street, free to borrow.
@@ -238,6 +248,7 @@ func _ready() -> void:
 	_build_candy()
 	_build_jungle()
 	_build_toys()
+	_build_beach()
 	_build_extras()
 	_plan_parking()
 
@@ -259,7 +270,7 @@ func world_rect() -> Rect2:
 
 ## The island and all its sea: the camera's limits.
 func map_rect() -> Rect2:
-	return Island.map_rect().merge(SnowIsland.map_rect()).merge(CandyIsland.map_rect()).merge(JungleIsland.map_rect()).merge(ToyIsland.map_rect())
+	return Island.map_rect().merge(SnowIsland.map_rect()).merge(CandyIsland.map_rect()).merge(JungleIsland.map_rect()).merge(ToyIsland.map_rect()).merge(BeachIsland.map_rect())
 
 
 ## Everything inside the outer ring road's pavement: where the town is.
@@ -304,9 +315,11 @@ func _coast_surface(pos: Vector2) -> StringName:
 		return JungleIsland.surface(pos)
 	if ToyIsland.contains(pos):
 		return ToyIsland.surface(pos)
+	if BeachIsland.contains(pos):
+		return BeachIsland.surface(pos)
 	if Island.QUAY.has_point(pos) or _drive_rect().has_point(pos) or SnowIsland.bridge_rect().has_point(pos) \
 			or CandyIsland.bridge_rect().has_point(pos) or JungleIsland.bridge_rect().has_point(pos) \
-			or ToyIsland.bridge_rect().has_point(pos):
+			or ToyIsland.bridge_rect().has_point(pos) or BeachIsland.bridge_rect().has_point(pos):
 		return &"asphalt"
 	if Geometry2D.is_point_in_polygon(pos, _grass_line):
 		return &"grass"
@@ -831,6 +844,7 @@ func _build_coast_ground() -> void:
 	_build_candy_ground()
 	_build_jungle_ground()
 	_build_toy_ground()
+	_build_beach_ground()
 
 
 ## Palms where the grass meets the sand, parasols and beach balls along the beach, a few
@@ -859,12 +873,12 @@ func _build_coast() -> void:
 			continue
 		_tree(spot, _rng.randf_range(0.8, 1.1))
 	# Boats stop all round the island; cars too, except where the bridges to the districts
-	# (§33–§36) leave it, and their rails keep them on the deck (boats sail under).
+	# (§33–§37) leave it, and their rails keep them on the deck (boats sail under).
 	_wall_line(_wall(Car.LAYER_LAND_EDGE, "Shore"), Island.shoreline())
 	var shore := _wall(Car.LAYER_SEA_EDGE, "ShoreForCars")
 	var main := _gaps(Island.shoreline())
 	var districts: Array[Array] = [_gaps(SnowIsland.outline(0.0)), _gaps(CandyIsland.outline(0.0)), _gaps(JungleIsland.outline(0.0)),
-		_gaps(ToyIsland.outline(0.0))]
+		_gaps(ToyIsland.outline(0.0)), _gaps(BeachIsland.outline(0.0))]
 	for run in main:
 		_wall_open(shore, run)
 	for far in districts:
@@ -1014,9 +1028,9 @@ func _build_snow_ground() -> void:
 	_bridge_road(SnowIsland.bridge_rect(), SnowIsland.shore_x())
 
 
-## A road out over the water to a district (§33–§36): kerbs and asphalt from the ring road,
+## A road out over the water to a district (§33–§37): kerbs and asphalt from the ring road,
 ## a dashed line down the middle, and over the water the bridge's stone parapets (up to
-## `shore`, the x (a road going east) or y (going north) where it comes ashore) and the
+## `shore`, the x (a road going east or west) or y (north or south) where it comes ashore) and the
 ## shadows of its piers.
 func _bridge_road(road: Rect2, shore: float) -> void:
 	# Worked out along the road (from the town outwards) and across it, then turned to the way
@@ -1056,10 +1070,10 @@ func _bridge_road(road: Rect2, shore: float) -> void:
 			post += 350.0
 
 
-## Which way a bridge's road goes out from the town: east, north or south.
+## Which way a bridge's road goes out from the town: east, west, north or south.
 static func _bridge_way(road: Rect2) -> Vector2:
 	if road.size.x > road.size.y:
-		return Vector2.RIGHT
+		return Vector2.RIGHT if road.get_center().x > TownLayout.world_size().x / 2.0 else Vector2.LEFT
 	return Vector2.UP if road.get_center().y < TownLayout.world_size().y / 2.0 else Vector2.DOWN
 
 
@@ -1676,6 +1690,183 @@ func _build_toys() -> void:
 		balls += 1
 
 
+## Sunny Beach's ground (§37): pale water and foam round it, sand all over, wet sand where the
+## surf comes up on its west side (the waves themselves are BeachSurf), the road over the bridge,
+## and the boardwalk of planks round the island with blue and white kerbs.
+func _build_beach_ground() -> void:
+	for k in 3:
+		var band := _textured(BeachIsland.outline(BeachIsland.SHALLOWS * (1.0 - 0.3 * k)), SHALLOWS)
+		band.color = Color(1, 1, 1, 0.25)
+		_ground.add_child(band)
+	var foam := Line2D.new()
+	foam.points = BeachIsland.outline(18.0)
+	foam.closed = true
+	foam.width = 26.0
+	foam.default_color = FOAM
+	_ground.add_child(foam)
+	_ground.add_child(_textured(BeachIsland.outline(0.0), BEACH))
+	var wet := PackedVector2Array()
+	var steps := 60
+	for k in steps + 1:
+		var a := PI - BeachIsland.SURF_ARC + 2.0 * BeachIsland.SURF_ARC * k / steps
+		wet.append(BeachIsland.shore_point(a, -20.0 - BeachIsland.SURF_DEPTH * BeachIsland.surf_taper(a)))
+	for k in range(steps, -1, -1):
+		wet.append(BeachIsland.shore_point(PI - BeachIsland.SURF_ARC + 2.0 * BeachIsland.SURF_ARC * k / steps, 0.0))
+	_ground.add_child(_textured(wet, WET_SAND))
+	surf = BeachSurf.new()
+	surf.name = "Surf"
+	_ground.add_child(surf)
+	_bridge_road(BeachIsland.bridge_rect(), BeachIsland.shore_x())
+	var walk := Line2D.new()
+	walk.points = BeachIsland.walk_line()
+	walk.closed = true
+	walk.width = BeachIsland.WALK_HALF * 2.0
+	walk.joint_mode = Line2D.LINE_JOINT_ROUND
+	walk.texture = PLANKS
+	walk.texture_mode = Line2D.LINE_TEXTURE_TILE
+	walk.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_ground.add_child(walk)
+	for offset in [-BeachIsland.WALK_HALF, BeachIsland.WALK_HALF]:
+		var kerb := Line2D.new()
+		kerb.points = BeachIsland.walk_line(offset)
+		kerb.closed = true
+		kerb.width = 24.0
+		kerb.texture = BEACH_KERB
+		kerb.texture_mode = Line2D.LINE_TEXTURE_TILE
+		kerb.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		_ground.add_child(kerb)
+
+
+## Sunny Beach's things (§37): beach huts round the outside of the boardwalk facing it, the
+## lifeguard's tower above the surf, palms by the sea, parasols with towels, sandcastles, crabs,
+## and beach balls (the screen puts them there). Their own random numbers, so the rest of the
+## town stays where it was.
+func _build_beach() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3737
+	var placed: Array[Vector2] = []
+	var keep_off: Array[Rect2] = [BeachIsland.bridge_rect().grow(160.0)]
+	for gate in gates:
+		if gate["track_id"] == BeachIsland.SUNNY_BEACH:
+			keep_off.append(gate["area"].grow(200.0))
+			keep_off.append(Rect2(gate["at"] - Vector2(1100, 260), Vector2(560, 520)))  # its stopwatch
+	# Huts along the north and south of the boardwalk, outside it, their doors towards it.
+	var half := BeachIsland.WALK_HALF_SIZE
+	var hut_k := 0
+	for side in [-1.0, 1.0]:
+		for k in 5:
+			var x := (k - 2) * 360.0
+			var at := BeachIsland.CENTRE + Vector2(x, side * (half.y + BeachIsland.WALK_HALF + 120.0))
+			if keep_off.any(func(r: Rect2) -> bool: return r.grow(100.0).has_point(at)):
+				continue
+			var hut := BeachHut.new()
+			hut.colour = HUT_COLOURS[hut_k % HUT_COLOURS.size()]
+			hut.position = at
+			hut.rotation = 0.0 if side > 0.0 else PI  # the door's edge towards the boardwalk
+			hut.z_index = TREE_Z
+			_things.add_child(hut)
+			_add_box(Rect2(at - BeachHut.SIZE / 2.0 + Vector2(8, 8), BeachHut.SIZE - Vector2(16, 16)))
+			placed.append(at)
+			hut_k += 1
+	# The lifeguard's tower, up the beach from the surf.
+	var tower_at := BeachIsland.shore_point(PI + 0.25, -BeachIsland.SURF_DEPTH - 220.0)
+	var tower := LifeguardTower.new()
+	tower.position = tower_at
+	tower.z_index = TREE_Z
+	_things.add_child(tower)
+	_add_box(Rect2(tower_at - Vector2(66, 66), Vector2(132, 132)))
+	placed.append(tower_at)
+	# Palms round the island, back from the sea and off the surf, the walk and the bridge.
+	var palms := BeachIsland.outline(-200.0)
+	for i in range(0, palms.size(), 7):
+		var at := palms[i]
+		if BeachIsland.up_the_beach(at) != INF or BeachIsland.bridge_rect().grow(250.0).has_point(at):
+			continue
+		var palm := _sprite(PALM, at, 220.0 * rng.randf_range(0.85, 1.1), rng.randf() * TAU)
+		palm.z_index = TREE_Z
+		_add_circle(at, TREE_TRUNK)
+		placed.append(at)
+	var clear := func(spot: Vector2, room: float) -> bool:
+		if not BeachIsland.contains(spot) or BeachIsland.on_walk(spot):
+			return false
+		if absf(ToyIsland.rounded_distance(spot, half, BeachIsland.WALK_CORNER, BeachIsland.CENTRE)) < BeachIsland.WALK_HALF + room:
+			return false
+		if not Geometry2D.is_point_in_polygon(spot, BeachIsland.outline(-room - 60.0)):
+			return false
+		var up := BeachIsland.up_the_beach(spot)
+		if up != INF and up < BeachIsland.SURF_DEPTH + room:
+			return false
+		if placed.any(func(p: Vector2) -> bool: return p.distance_to(spot) < room + 170.0):
+			return false
+		return not keep_off.any(func(r: Rect2) -> bool: return r.grow(room).has_point(spot))
+	var random_spot := func() -> Vector2:
+		return BeachIsland.CENTRE + Vector2(rng.randf_range(-1.0, 1.0), rng.randf_range(-1.0, 1.0)) * BeachIsland.RADII
+	# Parasols, each with a towel beside it.
+	var made := 0
+	for i in 2000:
+		if made >= 10:
+			break
+		var spot: Vector2 = random_spot.call()
+		if not clear.call(spot, 120.0):
+			continue
+		placed.append(spot)
+		var towel := _flat(_rect_points(Rect2(-45, -80, 90, 160)), TOWEL_COLOURS[made % TOWEL_COLOURS.size()])
+		towel.position = spot + Vector2(110, 30)
+		towel.rotation = rng.randf_range(-0.4, 0.4)
+		_ground.add_child(towel)
+		for k in 3:
+			var stripe := _flat(_rect_points(Rect2(-45, -50 + k * 45.0, 90, 14)), Color(1, 1, 1, 0.75))
+			stripe.position = towel.position
+			stripe.rotation = towel.rotation
+			_ground.add_child(stripe)
+		var parasol := _sprite(PARASOL, spot, 190.0, rng.randf() * TAU)
+		parasol.z_index = TREE_Z
+		made += 1
+	# Sandcastles: knocked flat by a car, they build themselves up again.
+	made = 0
+	for i in 3000:
+		if made >= BeachIsland.CASTLES:
+			break
+		var spot: Vector2 = random_spot.call()
+		if not clear.call(spot, 110.0):
+			continue
+		placed.append(spot)
+		var castle := SandCastle.new()
+		castle.name = "SandCastle%d" % made
+		castle.position = spot
+		castle.flag = HUT_COLOURS[made % HUT_COLOURS.size()]
+		_things.add_child(castle)
+		castles.append(castle)
+		made += 1
+	# Crabs, near the sea: on the sand between the waterline and the boardwalk.
+	made = 0
+	for i in 3000:
+		if made >= BeachIsland.CRABS:
+			break
+		var a := rng.randf() * TAU
+		var spot := BeachIsland.shore_point(a, -rng.randf_range(250.0, 450.0))
+		if BeachIsland.up_the_beach(spot) != INF or not clear.call(spot, 60.0):
+			continue
+		placed.append(spot)
+		var crab := BeachCrab.new()
+		crab.name = "Crab%d" % made
+		crab.home = spot
+		crab.z_index = 1
+		_things.add_child(crab)
+		crabs.append(crab)
+		made += 1
+	made = 0
+	for i in 2000:
+		if made >= 5:
+			break
+		var spot: Vector2 = random_spot.call()
+		if not clear.call(spot, 140.0):
+			continue
+		placed.append(spot)
+		beach_balls.append(spot)  # a ball to kick about: the screen puts it there
+		made += 1
+
+
 ## Out at sea (§21.5): the lighthouse's islet, the ramp islets, the slalom, the wreck, and
 ## the outer limit's ring of buoys and rocks.
 func _build_sea() -> void:
@@ -1899,10 +2090,11 @@ static func _end_on(runs: Array, road: Rect2, side: int) -> Vector2:
 	return Vector2.INF
 
 
-## The roads out over the water to the districts (§33–§36), each from the ring road to the
+## The roads out over the water to the districts (§33–§37), each from the ring road to the
 ## district's own roads.
 static func _bridges() -> Array[Rect2]:
-	return [SnowIsland.bridge_rect(), CandyIsland.bridge_rect(), JungleIsland.bridge_rect(), ToyIsland.bridge_rect()]
+	return [SnowIsland.bridge_rect(), CandyIsland.bridge_rect(), JungleIsland.bridge_rect(), ToyIsland.bridge_rect(),
+		BeachIsland.bridge_rect()]
 
 
 static func _under_bridge(p: Vector2) -> bool:
@@ -2042,6 +2234,7 @@ func _plan_extras() -> void:
 	_keep_clear.append(CandyIsland.bridge_rect().grow(150.0))
 	_keep_clear.append(JungleIsland.bridge_rect().grow(150.0))
 	_keep_clear.append(ToyIsland.bridge_rect().grow(150.0))
+	_keep_clear.append(BeachIsland.bridge_rect().grow(150.0))
 
 
 ## A rectangle round `centre`, `length` along `along` and `depth` across it.

@@ -81,15 +81,15 @@ static func on_road(pos: Vector2) -> bool:
 	return absf(rounded_distance(pos, ROAD_HALF_SIZE, ROAD_CORNER)) < ROAD_HALF
 
 
-## How far `pos` is outside (negative: inside) the rounded rectangle round CENTRE with these
-## half sizes and corners: its middle line is 0.
-static func rounded_distance(pos: Vector2, half_size: Vector2, corner: float) -> float:
-	var q := (pos - CENTRE).abs() - (half_size - Vector2.ONE * corner)
+## How far `pos` is outside (negative: inside) the rounded rectangle round `centre` with these
+## half sizes and corners: its middle line is 0. (Sunny Beach's boardwalk is one too.)
+static func rounded_distance(pos: Vector2, half_size: Vector2, corner: float, centre := CENTRE) -> float:
+	var q := (pos - centre).abs() - (half_size - Vector2.ONE * corner)
 	return Vector2(maxf(q.x, 0.0), maxf(q.y, 0.0)).length() + minf(maxf(q.x, q.y), 0.0) - corner
 
 
-## A rounded rectangle round CENTRE as a closed line, clockwise on screen from the top middle.
-static func rounded_line(half_size: Vector2, corner: float, offset := 0.0) -> PackedVector2Array:
+## A rounded rectangle round `centre` as a closed line, clockwise on screen from the top middle.
+static func rounded_line(half_size: Vector2, corner: float, offset := 0.0, centre := CENTRE) -> PackedVector2Array:
 	var out := PackedVector2Array()
 	var inner := half_size - Vector2.ONE * corner
 	var r := corner + offset
@@ -99,7 +99,7 @@ static func rounded_line(half_size: Vector2, corner: float, offset := 0.0) -> Pa
 		var start := -PI / 2.0 + c * PI / 2.0
 		for k in 13:
 			var a := start + PI / 2.0 * k / 12.0
-			out.append(CENTRE + inner * quarter + Vector2.from_angle(a) * r)
+			out.append(centre + inner * quarter + Vector2.from_angle(a) * r)
 	return out
 
 

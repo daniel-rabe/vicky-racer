@@ -43,6 +43,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 33 | Candy land | The second district: Candy Lane with jelly pads, a chocolate lake, Candy Lane's gate | L |
 | 34 | The jungle | The third district: a jungle trail, mud that makes cars muddy, a temple, Jungle Run's gate | L |
 | 35 | Toy town | The fourth district: a play mat, a toy road, a toy train, letter blocks, Toy Town's gate | L |
+| 36 | Sunny Beach | The fifth district: a boardwalk, surf that pushes cars, sandcastles to knock down, crabs, Sunny Beach's gate | L |
 
 ---
 
@@ -576,6 +577,18 @@ Idea 7 from the open-world plan, the fourth district; Daniel picked toy town. DE
   balls, confetti, the Toy Town gate moved onto it, five more golden stars (70). The bridges'
   walls work for a bridge going south too. `tests/toy_test.gd` is new.
 - **Open:** the other districts (beach, ring road); idea 8's gentle unlocks.
+
+## Phase 36 — Sunny Beach ✅ done
+
+Idea 7 from the open-world plan, the fifth district; Daniel picked the beach. DESIGN §37.
+
+- **Built:** a sandy island west of town over a bridge from the ring road's north-west corner:
+  a boardwalk round it with beach huts, surf whose waves push cars back up the beach,
+  sandcastles to knock down (they build themselves up again), crabs that scuttle off and hide,
+  parasols and towels, palms, beach balls, a lifeguard's tower, the Sunny Beach gate moved onto
+  it, five more golden stars (75). The bridges work for a bridge going west too.
+  `tests/beach_test.gd` is new.
+- **Open:** the ring road district; idea 8's gentle unlocks.
 
 ---
 

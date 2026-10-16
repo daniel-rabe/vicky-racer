@@ -97,6 +97,7 @@ func _fit() -> void:
 	area = area.merge(Rect2(CandyIsland.CENTRE - CandyIsland.RADII, CandyIsland.RADII * 2.0))  # candy land (§34)
 	area = area.merge(Rect2(JungleIsland.CENTRE - JungleIsland.RADII, JungleIsland.RADII * 2.0))  # the jungle (§35)
 	area = area.merge(Rect2(ToyIsland.CENTRE - ToyIsland.RADII, ToyIsland.RADII * 2.0))  # toy town (§36)
+	area = area.merge(Rect2(BeachIsland.CENTRE - BeachIsland.RADII, BeachIsland.RADII * 2.0))  # Sunny Beach (§37)
 	area = area.grow(500.0)
 	var room := size - Vector2(PADDING, PADDING) * 2.0
 	_scale = minf(room.x / area.size.x, room.y / area.size.y)
@@ -110,6 +111,7 @@ func _fit() -> void:
 	_candy = _mapped(CandyIsland.outline(0.0))
 	_jungle = _mapped(JungleIsland.outline(0.0))
 	_toys = _mapped(ToyIsland.outline(0.0))
+	_beach = _mapped(BeachIsland.outline(0.0))
 
 
 func _process(delta: float) -> void:

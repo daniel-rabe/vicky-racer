@@ -45,6 +45,8 @@ extends Node2D
 ## Candy land (§34): a candy island over a bridge south-east of town (CandyIsland, CandyLand).
 ## The jungle (§35): a jungle island over a bridge north of town (JungleIsland, JungleWoods).
 ## Toy town (§36): a play-mat island over a bridge south of town (ToyIsland, ToyTown, ToyTrain).
+## Sunny Beach (§37): a sandy island over a bridge west of town (BeachIsland, SunnyBeach,
+## BeachSurf, SandCastle, BeachCrab).
 ##
 ## Escape / Start pauses (RESUME / MAP / SETTINGS / GARAGE; the Boat Dock while sailing).
 ##
@@ -84,6 +86,8 @@ extends Node2D
 ##                 before the temple
 ##   --start=toy   start on the bridge, about to reach toy town; --start=train beside the toy
 ##                 train's track
+##   --start=beach  start on the bridge, about to reach Sunny Beach; --start=surf up the beach
+##                 from the surf; --start=castle just before a sandcastle
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
@@ -247,6 +251,8 @@ var candy_land: CandyLand
 var jungle: JungleWoods
 ## Toy town (§36): its confetti and its banners.
 var toy_town: ToyTown
+## Sunny Beach (§37): the waves' push and its banners.
+var sunny_beach: SunnyBeach
 
 @onready var _world: Node2D = $World
 @onready var _cars: Node2D = $World/Cars
@@ -415,6 +421,11 @@ func _add_fun(args: PackedStringArray) -> void:
 	toy_town.screen = self
 	add_child(toy_town)
 	move_child(toy_town, hud.get_index())
+	sunny_beach = SunnyBeach.new()
+	sunny_beach.name = "SunnyBeach"
+	sunny_beach.screen = self
+	add_child(sunny_beach)
+	move_child(sunny_beach, hud.get_index())
 	for walker in _walkers.get_children():
 		if walker is Walker:
 			walker.petted.connect(func(_w: Walker) -> void: job(&"pet"))
@@ -819,8 +830,8 @@ func _open_map() -> void:
 
 
 ## What the map shows (WorldMap.places): every race gate, the garage, the trophy house, the
-## rocket pad, the harbour, and the districts: the snowy hill, candy land, the jungle temple
-## and toy town.
+## rocket pad, the harbour, and the districts: the snowy hill, candy land, the jungle temple,
+## toy town and Sunny Beach.
 func map_places() -> Array:
 	var out := []
 	for gate in gates:
@@ -836,6 +847,7 @@ func map_places() -> Array:
 	out.append({"at": CandyIsland.LAKE, "name": "CANDY LAND", "picture": Town.LOLLIPOP})
 	out.append({"at": JungleIsland.courtyard().get_center(), "name": "JUNGLE TEMPLE", "picture": Town.JUNGLE_TREE})
 	out.append({"at": ToyIsland.CENTRE + Vector2(0, ToyIsland.ROAD_HALF_SIZE.y), "name": "TOY TOWN", "picture": Town.TOY_HOUSE})
+	out.append({"at": BeachIsland.CENTRE + Vector2(0, -BeachIsland.WALK_HALF_SIZE.y), "name": "SUNNY BEACH", "picture": Town.PARASOL})
 	if riding == &"foot":
 		out.append({"at": car.global_position, "name": "MY CAR", "picture": car.body_texture})
 	return out
@@ -1681,6 +1693,16 @@ func _dev_start(where: String) -> void:
 	elif where == "toy":
 		at = Vector2(ToyIsland.BRIDGE_X + 70.0, ToyIsland.shore_y() - 500.0)
 		player.rotation = PI / 2.0
+	elif where == "beach":
+		at = Vector2(BeachIsland.shore_x() + 500.0, BeachIsland.BRIDGE_Y - 70.0)
+		player.rotation = PI
+	elif where == "surf":
+		at = BeachIsland.shore_point(PI, -BeachIsland.SURF_DEPTH - 150.0)
+		player.rotation = PI
+	elif where == "castle":
+		var castle: SandCastle = town.castles[0]
+		at = castle.position + Vector2(-420.0, 0.0)
+		player.rotation = 0.0
 	elif where == "train":
 		at = ToyIsland.CENTRE + Vector2(-ToyIsland.RAILS_HALF_SIZE.x + 200.0, -ToyIsland.RAILS_HALF_SIZE.y - 220.0)
 		player.rotation = 0.0

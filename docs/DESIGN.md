@@ -2662,3 +2662,40 @@ picture.
 Dev flags for the town: `--start=toy` (on the bridge, nearly there), `--start=train` (beside
 the toy train's track), `--start=gate3` (the Toy Town gate).
 
+## 37. Sunny Beach: the fifth district
+*(Phase 36, the open-world plan's idea 7; Daniel picked the beach after toy town.)* A sandy
+island west of the town, reached by driving west off the ring road's north-west corner along a
+road that becomes a bridge over the sea (the first bridge going west).
+
+- **The island** (`BeachIsland`, data like `SnowIsland`): sand all over (the `beach` surface),
+  about 5,400 × 4,000 px, with wet sand where the surf comes up on its west side.
+- **The boardwalk**: the bridge's road runs on to a boardwalk of planks round the island with
+  Sunny Beach's blue and white kerbs (firm as a road), and striped beach huts along it (solid).
+- **The surf** (`BeachSurf`): every few seconds a wave rolls up the west beach and runs back.
+  A wave coming in pushes every car it catches back up the beach (`SunnyBeach`); the first one
+  each drive says SPLASH!
+- **Sandcastles** (`SandCastle`): a car (or Vicky on foot) running into one knocks it flat in a
+  puff of sand (the first each drive says OOPS!); it builds itself up again a while later, once
+  nobody is near. They never stop a car.
+- **Crabs** (`BeachCrab`) shuffle sideways by the sea; when someone comes near they scuttle off,
+  dig in with only their eyes showing, and walk home again later.
+- Parasols with towels, palms, beach balls to kick about, the lifeguard's tower above the surf;
+  the **Sunny Beach race gate** moved here from the grass north of the town (its stopwatch
+  too); five more golden stars (75 in all, the earlier 70 keep their numbers). SUNNY BEACH on
+  the big map, and the minimap switches to the island while out there.
+- First visit each drive: SUNNY BEACH across the screen.
+
+Built from the town's beach art (sand, wet sand, planks, palms, parasols, beach balls) and Sunny
+Beach's kerb; the huts, the tower, the sandcastles, the crabs and the waves are drawn in code.
+
+| What | Where |
+| --- | --- |
+| Where everything is | [`town/beach_island.gd`](../town/beach_island.gd) |
+| Ground, boardwalk, huts, tower, parasols | `Town._build_beach_ground`, `Town._build_beach` in [`town/town.gd`](../town/town.gd), [`town/beach_hut.gd`](../town/beach_hut.gd), [`town/lifeguard_tower.gd`](../town/lifeguard_tower.gd) |
+| Waves, sandcastles, crabs, the signs | [`actors/town/beach_surf.gd`](../actors/town/beach_surf.gd), [`actors/town/sand_castle.gd`](../actors/town/sand_castle.gd), [`actors/town/beach_crab.gd`](../actors/town/beach_crab.gd), [`actors/town/sunny_beach.gd`](../actors/town/sunny_beach.gd) |
+| Checks | [`tests/beach_test.gd`](../tests/beach_test.gd) |
+
+Dev flags for the town: `--start=beach` (on the bridge, nearly there), `--start=surf` (up the
+beach from the surf), `--start=castle` (just before a sandcastle), `--start=gate1` (the Sunny
+Beach gate).
+

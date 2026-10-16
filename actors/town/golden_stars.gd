@@ -8,10 +8,10 @@ extends Node2D
 ## finding them all pays ALL_PAY. The pause map shows the count. Where they are is worked out
 ## from the town itself with a fixed seed, so it is the same island every time.
 
-const COUNT := 70
+const COUNT := 75
 ## The first ISLAND_COUNT are round the town's island; then five each on the snowy hill (§33), in
-## candy land (§34), in the jungle (§35) and in toy town (§36), each five added after the last so
-## the earlier ones keep their numbers in old saves.
+## candy land (§34), in the jungle (§35), in toy town (§36) and on Sunny Beach (§37), each five
+## added after the last so the earlier ones keep their numbers in old saves.
 const ISLAND_COUNT := 50
 const PAY := 3
 const ALL_PAY := 50
@@ -26,11 +26,11 @@ const SIZE := 46.0
 const GOLD := Color(1.0, 0.8, 0.18)
 const GOLD_EDGE := Color(0.72, 0.45, 0.05)
 const CHIME := "res://art/sfx/sticker.wav"
-## Where the Candy Lane, Jungle Run and Toy Town gates' paving was before they moved to candy
-## land (§34), the jungle (§35) and toy town (§36): still kept clear, so the island's stars stay
-## where they were and keep their numbers in old saves.
+## Where the Candy Lane, Jungle Run, Toy Town and Sunny Beach gates' paving was before they moved
+## to candy land (§34), the jungle (§35), toy town (§36) and Sunny Beach (§37): still kept clear,
+## so the island's stars stay where they were and keep their numbers in old saves.
 const OLD_GATE_AREAS: Array[Rect2] = [Rect2(2050.0, 7695.0, 700.0, 470.0), Rect2(7150.0, 7695.0, 700.0, 470.0),
-	Rect2(9295.0, 5650.0, 470.0, 700.0)]
+	Rect2(9295.0, 5650.0, 470.0, 700.0), Rect2(6950.0, 165.0, 700.0, 470.0)]
 
 ## The town screen (TownScreen): the player, the HUD, paying.
 var screen: Node
@@ -194,6 +194,18 @@ static func plan(town: Town) -> Array[Vector2]:
 			if _clear(town, at, out, 300.0):
 				out.append(at)
 				break
+	# Sunny Beach: up the beach from the surf, by the lifeguard's tower, on the north and south
+	# sand, inside the boardwalk, and halfway over the bridge.
+	var beach := BeachIsland.CENTRE
+	for spot: Vector2 in [BeachIsland.shore_point(PI - 0.3, -BeachIsland.SURF_DEPTH - 150.0),
+			beach + Vector2(-600, -450), beach + Vector2(500, BeachIsland.RADII.y - 330.0),
+			beach + Vector2(-300, -BeachIsland.RADII.y + 330.0),
+			Vector2((Island.world().position.x + BeachIsland.shore_x()) / 2.0, BeachIsland.BRIDGE_Y)]:
+		for k in 9:
+			var at := spot + (Vector2.from_angle(k * TAU / 8.0) * 140.0 if k > 0 else Vector2.ZERO)
+			if _clear(town, at, out, 300.0):
+				out.append(at)
+				break
 	return out
 
 
@@ -209,6 +221,9 @@ static func _clear(town: Town, spot: Vector2, taken: Array[Vector2], gap: float)
 			return false
 	for tree in town.tree_spots:
 		if tree.distance_to(spot) < CLEAR + 40.0:
+			return false
+	for castle in town.castles:  # Sunny Beach's sandcastles (§37)
+		if castle.position.distance_to(spot) < SandCastle.RADIUS + CLEAR:
 			return false
 	for pond in town.ponds:
 		if spot.distance_to(Vector2(pond.x, pond.y)) < pond.z + CLEAR:

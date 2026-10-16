@@ -88,11 +88,11 @@ const RUNWAY_WIDTH := 240.0
 ## where the track's three racers wait for the child. [track id, the grid's centre, the way it
 ## faces]. Car gates stand on the grass between the ring road and the beach (Snowy Peak's on the
 ## snowy hill, §33; Candy Lane's in candy land, §34; Jungle Run's in the jungle, §35; Toy
-## Town's in toy town, §36), going round the island clockwise from the player's start; boat
-## gates float out at sea.
+## Town's in toy town, §36; Sunny Beach's on Sunny Beach, §37), going round the island clockwise
+## from the player's start; boat gates float out at sea.
 const GATES := [
 	[&"track_01", Vector2(1900.0, 400.0), Vector2.RIGHT],
-	[&"track_02", Vector2(7300.0, 400.0), Vector2.RIGHT],
+	[&"track_02", Vector2(-5950.0, 960.0), Vector2.RIGHT],  # on Sunny Beach (§37): BeachIsland.GATE
 	[&"track_03", Vector2(14600.0, 1500.0), Vector2.RIGHT],  # on the snowy hill (§33): SnowIsland.GATE
 	[&"track_04", Vector2(1110.0, 13400.0), Vector2.RIGHT],  # in toy town (§36): ToyIsland.GATE
 	[&"track_05", Vector2(8700.0, -5700.0), Vector2.RIGHT],  # in the jungle (§35): JungleIsland.GATE
