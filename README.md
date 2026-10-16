@@ -58,14 +58,6 @@ Press **PLAY** and you're straight in the car in town. There are no menus to get
 
 Every menu works with a gamepad alone.
 
-## Installation
-
-Play it right here in the browser, or download it for Windows, Linux or macOS. There's nothing to install. Progress saves automatically.
-
-- **Windows (64-bit):** run **VickyRacer.exe**.
-- **Linux (64-bit):** run **VickyRacer.x86_64**.
-- **macOS (Intel and Apple silicon):** the app isn't notarised, so the first time macOS will refuse to open it. Go to System Settings > Privacy & Security and click **Open Anyway**.
-
 ## How it was made
 
 Built in Godot 4.7. The art, sound effects and music were generated locally with AI tools (ComfyUI and Stable Audio), then picked and polished by hand.
