@@ -27,6 +27,11 @@ var _origin := Vector2.ZERO
 var _sand := PackedVector2Array()
 var _grass := PackedVector2Array()
 var _islets: Array[PackedVector2Array] = []
+## The snowy hill (§33), and whether the map is showing it (the player is out over there).
+var _snow := PackedVector2Array()
+var _on_snow := false
+const SNOW := Color(0.95, 0.97, 1.0)
+const ICE := Color(0.7, 0.85, 0.97)
 
 
 func _ready() -> void:
@@ -52,7 +57,10 @@ func _notification(what: int) -> void:
 
 
 func _fit() -> void:
+	_on_snow = _out_on_snow()
 	var area := Island.map_rect().grow(-600.0) if _sailing else _town.streets_rect().grow(400.0)
+	if _on_snow and not _sailing:
+		area = Rect2(SnowIsland.CENTRE - SnowIsland.RADII, SnowIsland.RADII * 2.0).grow(300.0)
 	var room := size - Vector2(PADDING, PADDING) * 2.0
 	_scale = minf(room.x / area.size.x, room.y / area.size.y)
 	_origin = Vector2(PADDING, PADDING) + (room - area.size * _scale) / 2.0 - area.position * _scale
@@ -61,9 +69,16 @@ func _fit() -> void:
 	_islets.clear()
 	for islet in _town.islets:
 		_islets.append(_mapped(islet))
+	_snow = _mapped(SnowIsland.outline(0.0))
+
+
+func _out_on_snow() -> bool:
+	return is_instance_valid(_player) and _player.global_position.x > SnowIsland.shore_x() - 1200.0
 
 
 func _process(_delta: float) -> void:
+	if _town and _out_on_snow() != _on_snow:
+		_fit()
 	queue_redraw()
 
 
@@ -86,6 +101,17 @@ func _draw() -> void:
 	draw_colored_polygon(_grass, LAWN)
 	for islet in _islets:
 		draw_colored_polygon(islet, SAND)
+	draw_colored_polygon(_snow, SNOW)
+	var hill := _map(SnowIsland.HILL)
+	draw_circle(hill, SnowIsland.HILL_RADIUS * _scale, Color(0.86, 0.9, 0.98))
+	draw_circle(hill, SnowIsland.HILL_RADIUS * _scale * 0.4, Color.WHITE)
+	draw_line(_map(SnowIsland.SLED_FROM), _map(SnowIsland.SLED_TO), ICE, SnowIsland.SLED_HALF * 2.0 * _scale)
+	var lake := SnowIsland.LAKE_RADII * _scale
+	draw_set_transform(_map(SnowIsland.LAKE), 0.0, Vector2(1.0, lake.y / lake.x))
+	draw_circle(Vector2.ZERO, lake.x, ICE)
+	draw_set_transform(Vector2.ZERO)
+	var bridge := SnowIsland.bridge_rect()
+	draw_rect(Rect2(_map(bridge.position), bridge.size * _scale), STREET)
 	var streets := _town.streets_rect()
 	draw_rect(Rect2(_map(streets.position), streets.size * _scale), STREET)
 	for lawn in _town.lawns:

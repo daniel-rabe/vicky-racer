@@ -147,9 +147,9 @@ func _test_stopwatch() -> void:
 	var cars := town.gates.filter(func(g: RaceGate) -> bool: return g.kind == &"car")
 	var dry := 0
 	for g: RaceGate in cars:
-		if town.town.surface_at(g.stopwatch) in [&"grass", &"beach"] and not town.town.streets_rect().grow(-200.0).has_point(g.stopwatch):
+		if town.town.surface_at(g.stopwatch) in [&"grass", &"beach", &"snow"] and not town.town.streets_rect().grow(-200.0).has_point(g.stopwatch):
 			dry += 1
-	_check(dry == cars.size(), "every car gate has a stopwatch on the grass (%d of %d)" % [dry, cars.size()])
+	_check(dry == cars.size(), "every car gate has a stopwatch on dry land (%d of %d)" % [dry, cars.size()])
 	_put(town.player, gate.stopwatch, gate.slot_angle())
 	await _frames(3)
 	_check(town.hud.gate_shown == gate and town.hud.gate_mode == &"time_trial", "pulling up on it shows the card with TIME TRIAL")

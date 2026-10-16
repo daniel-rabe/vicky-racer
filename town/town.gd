@@ -58,6 +58,14 @@ const MOORING_POST := preload("res://art/town/island/mooring_post.png")
 const FIRE_ENGINE := preload("res://art/town/vehicles/fire_engine.png")
 const ROCKET := preload("res://art/ships/cardboard_rocket.png")
 const BUS := preload("res://art/town/vehicles/bus.png")
+## The snowy hill (§33).
+const SNOW := preload("res://art/tiles/snow.png")
+const ICE := preload("res://art/tiles/ice.png")
+const ROAD_ICE := preload("res://art/tiles/snow/road_ice.png")
+const PINE := preload("res://art/props/snow/pine_tree.png")
+const SNOWMAN := preload("res://art/props/snow/snowman.png")
+const ICE_RIM_COLOUR := Color(0.78, 0.88, 0.97)
+const PARAPET := Color(0.62, 0.64, 0.7)
 const FOAM := Color(1, 1, 1, 0.8)
 const PAD_COLOUR := Color(0.24, 0.59, 0.86, 0.92)
 ## The ramp's trigger, as on a boat course (track/build/build_track.gd).
@@ -195,6 +203,7 @@ func _ready() -> void:
 	_build_coast()
 	_build_harbour()
 	_build_sea()
+	_build_snow()
 	_build_extras()
 	_plan_parking()
 
@@ -216,7 +225,7 @@ func world_rect() -> Rect2:
 
 ## The island and all its sea: the camera's limits.
 func map_rect() -> Rect2:
-	return Island.map_rect()
+	return Island.map_rect().merge(SnowIsland.map_rect())
 
 
 ## Everything inside the outer ring road's pavement: where the town is.
@@ -253,7 +262,9 @@ func surface_at(pos: Vector2) -> StringName:
 
 ## Outside the streets: the harbour's paving, the grass, the beach, the sea.
 func _coast_surface(pos: Vector2) -> StringName:
-	if Island.QUAY.has_point(pos) or _drive_rect().has_point(pos):
+	if SnowIsland.contains(pos):
+		return SnowIsland.surface(pos)
+	if Island.QUAY.has_point(pos) or _drive_rect().has_point(pos) or SnowIsland.bridge_rect().has_point(pos):
 		return &"asphalt"
 	if Geometry2D.is_point_in_polygon(pos, _grass_line):
 		return &"grass"
@@ -774,6 +785,7 @@ func _build_coast_ground() -> void:
 	_ground.add_child(_textured(_water_line, WET_SAND))
 	_ground.add_child(_textured(Island.outline(-Island.WET), BEACH))
 	_ground.add_child(_textured(_grass_line, GRASS))
+	_build_snow_ground()
 
 
 ## Palms where the grass meets the sand, parasols and beach balls along the beach, a few
@@ -782,13 +794,13 @@ func _build_coast_ground() -> void:
 func _build_coast() -> void:
 	var palms := Island.outline(-Island.BEACH - 60.0)
 	for i in range(0, palms.size(), 9):
-		if not _near_harbour(palms[i], 300.0):
+		if not _near_harbour(palms[i], 300.0) and not SnowIsland.bridge_rect().grow(200.0).has_point(palms[i]):
 			var palm := _sprite(PALM, palms[i], 220.0 * _rng.randf_range(0.85, 1.1), _rng.randf() * TAU)
 			palm.z_index = TREE_Z
 			_add_circle(palms[i], TREE_TRUNK)
 	var sand := Island.outline(-Island.BEACH * 0.45)
 	for i in range(5, sand.size(), 37):
-		if not _near_harbour(sand[i], 500.0):
+		if not _near_harbour(sand[i], 500.0) and not SnowIsland.bridge_rect().grow(300.0).has_point(sand[i]):
 			_sprite(PARASOL, sand[i], 190.0)
 			beach_balls.append(sand[i] + Vector2(150, 60))  # a ball to kick about (§23): the screen puts it there
 	# A few round trees on the grass between the ring road and the beach.
@@ -801,7 +813,16 @@ func _build_coast() -> void:
 		if _keep_clear.any(func(r: Rect2) -> bool: return r.grow(120.0).has_point(spot)):
 			continue
 		_tree(spot, _rng.randf_range(0.8, 1.1))
-	_wall_line(_wall(Car.LAYER_SEA_EDGE | Car.LAYER_LAND_EDGE, "Shore"), Island.shoreline())
+	# Boats stop all round the island; cars too, except where the bridge to the snowy hill
+	# leaves it (§33), and its rails keep them on the deck (boats sail under).
+	_wall_line(_wall(Car.LAYER_LAND_EDGE, "Shore"), Island.shoreline())
+	var shore := _wall(Car.LAYER_SEA_EDGE, "ShoreForCars")
+	var main := _gap(Island.shoreline(), true)
+	var snow := _gap(SnowIsland.outline(0.0), false)
+	_wall_open(shore, main)
+	_wall_open(shore, snow)
+	_wall_open(shore, PackedVector2Array([main[main.size() - 1], snow[0]]))  # the north rail
+	_wall_open(shore, PackedVector2Array([main[0], snow[snow.size() - 1]]))  # the south rail
 
 
 ## The harbour (§21.2): a road down from the ring road to a stone quay, the harbour master's
@@ -895,6 +916,165 @@ func _build_harbour() -> void:
 	_add_circle(Vector2(5840, 8860), 50.0)
 
 
+## The snowy hill's ground (§33), over the sea: its shallows and foam, an icy rim, the snow,
+## the frozen lake, the hill shaded lighter towards its top, the sledging run's ice; and the
+## road out to it from the ring road, over the bridge.
+func _build_snow_ground() -> void:
+	for k in 3:
+		var band := _textured(SnowIsland.outline(SnowIsland.SHALLOWS * (1.0 - 0.3 * k)), SHALLOWS)
+		band.color = Color(1, 1, 1, 0.25)
+		_ground.add_child(band)
+	var foam := Line2D.new()
+	foam.points = SnowIsland.outline(18.0)
+	foam.closed = true
+	foam.width = 26.0
+	foam.default_color = FOAM
+	_ground.add_child(foam)
+	_ground.add_child(_flat(SnowIsland.outline(0.0), ICE_RIM_COLOUR))
+	_ground.add_child(_textured(SnowIsland.outline(-SnowIsland.ICE_RIM), SNOW))
+	# The hill: a soft shadow down its south-east side, then rings ever lighter to the top,
+	# each nudged towards the light in the north-west.
+	var hill := SnowIsland.HILL
+	var radius := SnowIsland.HILL_RADIUS
+	_ground.add_child(_disc_fine(hill + Vector2(60, 80), radius * 1.02, Color(0.55, 0.62, 0.8, 0.28)))
+	for k in 7:
+		var t := float(k) / 7.0
+		_ground.add_child(_disc_fine(hill - Vector2(1, 1) * 40.0 * t, radius * (1.0 - t * 0.92),
+			Color(0.9, 0.93, 1.0).lerp(Color.WHITE, t) * Color(1, 1, 1, 0.55)))
+	# The lake: a bank of snow, then the ice.
+	var lake := PackedVector2Array()
+	var bank := PackedVector2Array()
+	for k in 48:
+		var a := TAU * k / 48.0
+		lake.append(SnowIsland.LAKE + Vector2(cos(a), sin(a)) * SnowIsland.LAKE_RADII)
+		bank.append(SnowIsland.LAKE + Vector2(cos(a), sin(a)) * (SnowIsland.LAKE_RADII + Vector2(40, 40)))
+	_ground.add_child(_flat(bank, Color(0.97, 0.98, 1.0)))
+	_ground.add_child(_textured(lake, ICE))
+	# The sledging run: a lane of ice from near the top down the hill.
+	var along := (SnowIsland.SLED_TO - SnowIsland.SLED_FROM).normalized()
+	var across := along.orthogonal() * SnowIsland.SLED_HALF
+	var lane := PackedVector2Array([SnowIsland.SLED_FROM + across, SnowIsland.SLED_TO + across,
+		SnowIsland.SLED_TO - across, SnowIsland.SLED_FROM - across])
+	_ground.add_child(_textured(lane, ROAD_ICE))
+	# The road: kerbs and asphalt from the ring road to the snow, a dashed line down the
+	# middle, and over the water the bridge's stone parapets and the shadows of its piers.
+	var road := SnowIsland.bridge_rect()
+	var water_from := TownLayout.world_size().x + Island.COAST - 120.0
+	var x := water_from + 200.0
+	while x < road.end.x - 300.0:
+		_ground.add_child(_flat(_rect_points(Rect2(x - 70.0, road.position.y - 40.0, 140.0, road.size.y + 80.0)), Color(0.1, 0.2, 0.35, 0.35)))
+		x += 700.0
+	_ground.add_child(_flat(_rect_points(road.grow_individual(0, 7, 0, 7)), KERB_COLOUR))
+	_ground.add_child(_textured(_rect_points(road), ASPHALT))
+	var dash := Line2D.new()
+	dash.points = PackedVector2Array([Vector2(road.position.x + 60.0, SnowIsland.BRIDGE_Y), Vector2(road.end.x - 60.0, SnowIsland.BRIDGE_Y)])
+	dash.width = 10.0
+	dash.texture = _dash_texture()
+	dash.texture_mode = Line2D.LINE_TEXTURE_TILE
+	dash.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_ground.add_child(dash)
+	for side in [-1.0, 1.0]:
+		var edge: float = SnowIsland.BRIDGE_Y + side * (SnowIsland.BRIDGE_HALF + 4.0)
+		_ground.add_child(_flat(_rect_points(Rect2(water_from, edge - 14.0, SnowIsland.shore_x() - water_from, 28.0)), PARAPET))
+		var post := water_from
+		while post < SnowIsland.shore_x():
+			_ground.add_child(_flat(_rect_points(Rect2(post - 18.0, edge - 20.0, 36.0, 40.0)), PARAPET.darkened(0.25)))
+			post += 350.0
+
+
+## A finer disc than _disc, for the big hill's rings.
+func _disc_fine(at: Vector2, radius: float, colour: Color) -> Polygon2D:
+	var points := PackedVector2Array()
+	for k in 72:
+		points.append(at + Vector2.from_angle(TAU * k / 72.0) * radius)
+	return _flat(points, colour)
+
+
+## The snowy hill's things (§33): pine woods round the edge, snowmen, the sledging run's flags,
+## and a flag on the top of the hill.
+func _build_snow() -> void:
+	var keep_off: Array[Rect2] = [Rect2(SnowIsland.HILL - Vector2.ONE * 150.0, Vector2.ONE * 300.0)]
+	for gate in gates:
+		if gate["track_id"] == SnowIsland.SNOWY_PEAK:
+			keep_off.append(gate["area"].grow(260.0))
+			keep_off.append(Rect2(gate["at"] - Vector2(1100, 260), Vector2(560, 520)))  # its stopwatch
+	var clear := func(spot: Vector2, gap: float) -> bool:
+		if not Geometry2D.is_point_in_polygon(spot, SnowIsland.outline(-SnowIsland.ICE_RIM - 120.0)):
+			return false
+		if SnowIsland.surface(spot) == &"ice" or SnowIsland.bridge_rect().grow(gap).has_point(spot):
+			return false
+		if (spot - SnowIsland.LAKE).length() < SnowIsland.LAKE_RADII.x + gap:
+			return false
+		if Geometry2D.get_closest_point_to_segment(spot, SnowIsland.SLED_FROM, SnowIsland.SLED_TO).distance_to(spot) < SnowIsland.SLED_HALF + gap:
+			return false
+		return not keep_off.any(func(r: Rect2) -> bool: return r.grow(gap).has_point(spot))
+	# Pine woods: clumps near the shore and a few on the hill's lower slopes.
+	var placed: Array[Vector2] = []
+	for i in 600:
+		if placed.size() >= 70:
+			break
+		var a := _rng.randf() * TAU
+		var reach := _rng.randf_range(0.55, 0.92)
+		var spot := SnowIsland.CENTRE + Vector2(cos(a), sin(a)) * SnowIsland.RADII * reach
+		if not clear.call(spot, 80.0) or placed.any(func(p: Vector2) -> bool: return p.distance_to(spot) < 210.0):
+			continue
+		if spot.distance_to(SnowIsland.HILL) < SnowIsland.HILL_RADIUS * 0.6:
+			continue
+		placed.append(spot)
+		var pine := _sprite(PINE, spot, 230.0 * _rng.randf_range(0.8, 1.15), _rng.randf() * TAU)
+		pine.z_index = TREE_Z
+		_add_circle(spot, TREE_TRUNK)
+	# Snowmen, here and there on the flat.
+	var snowmen := 0
+	for i in 300:
+		if snowmen >= 9:
+			break
+		var spot := SnowIsland.CENTRE + Vector2(_rng.randf_range(-0.8, 0.8), _rng.randf_range(-0.75, 0.75)) * SnowIsland.RADII
+		if not clear.call(spot, 140.0) or placed.any(func(p: Vector2) -> bool: return p.distance_to(spot) < 260.0):
+			continue
+		if spot.distance_to(SnowIsland.HILL) < SnowIsland.HILL_RADIUS + 100.0:
+			continue
+		placed.append(spot)
+		var man := _sprite(SNOWMAN, spot, 130.0, _rng.randf_range(-0.3, 0.3))
+		man.z_index = TREE_Z
+		_add_circle(spot, 34.0)
+		snowmen += 1
+	# Flags down both sides of the sledging run, red and blue.
+	var along := (SnowIsland.SLED_TO - SnowIsland.SLED_FROM).normalized()
+	var length := SnowIsland.SLED_FROM.distance_to(SnowIsland.SLED_TO)
+	var k := 0
+	var d := 120.0
+	while d < length:
+		for side in [-1.0, 1.0]:
+			var at: Vector2 = SnowIsland.SLED_FROM + along * d + along.orthogonal() * side * (SnowIsland.SLED_HALF + 30.0)
+			_things.add_child(_flag(at, Color(0.9, 0.22, 0.27) if k % 2 == 0 else Color(0.23, 0.53, 1.0), 60.0))
+		k += 1
+		d += 230.0
+	# The top of the hill: a cairn of snow and a big flag.
+	_things.add_child(_disc(SnowIsland.HILL, 70.0, Color(0.85, 0.88, 0.95)))
+	var top := _flag(SnowIsland.HILL, Color(0.9, 0.22, 0.27), 150.0)
+	top.z_index = TREE_Z
+	_things.add_child(top)
+	_add_circle(SnowIsland.HILL, 40.0)
+
+
+## A flag on a pole, seen from above and a little from the side: the pole's dot and a
+## triangle of cloth blowing east.
+func _flag(at: Vector2, colour: Color, size: float) -> Node2D:
+	var flag := Node2D.new()
+	flag.position = at
+	var pole := Line2D.new()
+	pole.points = PackedVector2Array([Vector2.ZERO, Vector2(0, -size)])
+	pole.width = size * 0.08
+	pole.default_color = Color(0.3, 0.3, 0.34)
+	flag.add_child(pole)
+	var cloth := Polygon2D.new()
+	cloth.polygon = PackedVector2Array([Vector2(0, -size), Vector2(size * 0.7, -size * 0.82), Vector2(0, -size * 0.62)])
+	cloth.color = colour
+	flag.add_child(cloth)
+	return flag
+
+
 ## Out at sea (§21.5): the lighthouse's islet, the ramp islets, the slalom, the wreck, and
 ## the outer limit's ring of buoys and rocks.
 func _build_sea() -> void:
@@ -947,7 +1127,10 @@ func _build_sea() -> void:
 	for i in range(7, limit.size(), 60):
 		for k in 3:
 			_sprite(ROCK, limit[i] + Vector2(_rng.randf_range(-120, 120), _rng.randf_range(-120, 120)), 150.0, _rng.randf() * TAU)
-	_wall_line(_wall(Car.LAYER_WORLD, "OuterLimit"), limit)
+	# The bridge to the snowy hill crosses the outer limit: a gap for cars, closed to boats.
+	var outer := _gap(limit, true)
+	_wall_open(_wall(Car.LAYER_WORLD, "OuterLimit"), outer)
+	_wall_open(_wall(Car.LAYER_LAND_EDGE, "OuterLimitUnderBridge"), PackedVector2Array([outer[outer.size() - 1], outer[0]]))
 
 
 ## An islet: pale water round it, sand, rocks and palms; solid to a boat.
@@ -1046,6 +1229,44 @@ func _wall(layers: int, wall_name: String) -> StaticBody2D:
 	body.collision_mask = 0
 	add_child(body)
 	return body
+
+
+## An open line as a wall: a segment between each point and the next, the ends left open.
+func _wall_open(body: StaticBody2D, points: PackedVector2Array) -> void:
+	for i in points.size() - 1:
+		var piece := CollisionShape2D.new()
+		var segment := SegmentShape2D.new()
+		segment.a = points[i]
+		segment.b = points[i + 1]
+		piece.shape = segment
+		body.add_child(piece)
+
+
+## A closed line round the main island (`east`: cut on its east side) or the snowy hill (cut
+## on its west side) opened where the bridge's road crosses it, as a line from one side of
+## the road round to the other. It starts on the road's south edge and ends on its north one.
+static func _gap(loop: PackedVector2Array, east: bool) -> PackedVector2Array:
+	var half := SnowIsland.BRIDGE_HALF
+	var y := SnowIsland.BRIDGE_Y
+	var cut := func(p: Vector2) -> bool:
+		return absf(p.y - y) < half and (p.x > TownLayout.world_size().x if east else p.x < SnowIsland.CENTRE.x)
+	var first := -1
+	for i in loop.size():
+		if cut.call(loop[i]) and not cut.call(loop[(i + 1) % loop.size()]):
+			first = (i + 1) % loop.size()  # the first point past the cut
+	var out := PackedVector2Array()
+	var k := first
+	while not cut.call(loop[k]):
+		out.append(loop[k])
+		k = (k + 1) % loop.size()
+	# Square the ends onto the road's edges, so the rails meet them.
+	var start := out[0]
+	var end := out[out.size() - 1]
+	var start_y := y + half if start.y > y else y - half
+	var end_y := y + half if end.y > y else y - half
+	out.insert(0, Vector2(start.x, start_y))
+	out.append(Vector2(end.x, end_y))
+	return out
 
 
 ## A closed line as a wall: solid along its edges only, so it holds things on either side.
@@ -1177,6 +1398,7 @@ func _plan_extras() -> void:
 			_keep_clear.append(area.grow(80.0))
 	rocket_pad = Rect2(TownLayout.ROCKET_PAD - Vector2.ONE * ROCKET_PAD_RADIUS, Vector2.ONE * ROCKET_PAD_RADIUS * 2.0)
 	_keep_clear.append(rocket_pad.grow(120.0))
+	_keep_clear.append(SnowIsland.bridge_rect().grow(150.0))
 
 
 ## A rectangle round `centre`, `length` along `along` and `depth` across it.

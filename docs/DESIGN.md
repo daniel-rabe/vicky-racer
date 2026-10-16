@@ -2507,3 +2507,40 @@ the island, all drawn in code, nothing to fail.
 Dev flags for the town: `--start=board` (with `--jobs=coins,pet,star` to pick the day's jobs),
 `--start=playground`, `--start=ride` (straight down a slide), `--start=star`, `--fireworks`
 (a show anywhere, day or night).
+
+## 33. The snowy hill: the first district
+*(Phase 32, the open-world plan's ideas 7 and 8, one district at a time; Daniel picked the snowy
+hill first.)* A snow island east of the town, reached by driving east off the ring road (from
+the junction by the trophy house) along a road that becomes a long bridge over the sea.
+
+- **The bridge**: asphalt with a dashed middle line, stone parapets and the shadows of its
+  piers. Its rails keep cars (and Vicky on foot) on the deck; boats sail under it, and the outer
+  limit's buoys still keep them in where the bridge crosses it. Walls: the town's shore is two
+  walls now, one for boats all the way round, one for cars with a gap where the road leaves; the
+  same for the outer limit (`Town._gap`, `Town._wall_open`).
+- **The island** (`SnowIsland`, data like `Island`): snow ground with an icy rim and shallows,
+  about 5,800 × 4,800 px. Snow falls while the player is out there and stops back over the
+  bridge (`SnowHill`, reusing `Weather.make_snow`).
+- **The hill** in the middle, shaded lighter towards its flag at the top. It pulls every car
+  downhill (strongest halfway down): slow going up, fast coming down, and a car left on it rolls
+  off. Vicky on foot just plods up. Reaching the flag says TOP OF THE HILL!
+- **The sledging run**: a lane of ice from near the top down the hill's south-west side,
+  between red and blue flags. **The frozen lake**: ice to slide and drift on.
+- Pine woods and snowmen (solid), the **Snowy Peak race gate** moved here from the grass north
+  of the town (its stopwatch too), five more golden stars (55 in all; the island's 50 keep their
+  numbers), SNOWY HILL on the big map, and the minimap switches to the island while out there.
+  The Pirate Cove boat gate moved a little north, clear of the bridge.
+- First visit each drive: SNOWY HILL across the screen.
+
+Built from the Snowy Peak track's own art (snow and ice tiles, pine trees, snowmen); new
+pictures for it (a ski hut, sledges) can come as ComfyUI seed variants.
+
+| What | Where |
+| --- | --- |
+| Where everything is | [`town/snow_island.gd`](../town/snow_island.gd) |
+| Ground, bridge, walls, pines, flags | `Town._build_snow_ground`, `Town._build_snow` in [`town/town.gd`](../town/town.gd) |
+| Snowfall, the slope, the signs | [`actors/town/snow_hill.gd`](../actors/town/snow_hill.gd) |
+| Checks | [`tests/snow_test.gd`](../tests/snow_test.gd) |
+
+Dev flags for the town: `--start=snow` (on the bridge, nearly there), `--start=hill` (on its
+slope), `--start=gate2` (the Snowy Peak gate).

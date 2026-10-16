@@ -41,6 +41,7 @@ func _ready() -> void:
 	screen = TOWN_SCENE.instantiate()
 	add_child(screen)
 	await _frames(5)
+	screen.jobs.clear()  # no jobs board today: the payouts below are counted exactly, whatever the date
 	await _layout()
 	await _football()
 	await _cones()

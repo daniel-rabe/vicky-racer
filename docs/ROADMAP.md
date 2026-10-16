@@ -39,6 +39,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 29 | Street races and pop-up challenges | Need-for-Speed races through the town's own streets | M |
 | 30 | Landmarks: stadium, workshop, rocket, stopwatches | Every menu has a place in the world to drive to | M |
 | 31 | Pick-and-mix fun | Golden stars, a jobs board, playground rides, fireworks at night | M |
+| 32 | The snowy hill | The first district: a snow island over a bridge, a hill, ice, Snowy Peak | L |
 
 ---
 
@@ -522,6 +523,18 @@ Ideas 29, 31, 25 and 36 from the open-world plan. DESIGN §32.
   over the harbour at night. `tests/fun_test.gd` is new.
 - **Open:** a real firework sound; more of the plan's ideas for later rounds (bikes and scooters,
   the ice cream van, the tow truck, the parade, photo spots, the treasure map).
+
+---
+
+## Phase 32 — The snowy hill ✅ done
+
+Ideas 7 and 8 from the open-world plan, the first district. DESIGN §33.
+
+- **Built:** a snow island east of town over a long bridge: the hill that pulls cars downhill,
+  a sledging run and a frozen lake of ice, pine woods and snowmen, snowfall out there, the Snowy
+  Peak gate moved onto it, five more golden stars. `tests/snow_test.gd` is new.
+- **Open:** the other districts (beach, jungle corner, candy quarter, toy district, ring road);
+  ComfyUI pictures for the snowy hill (a ski hut, sledges); idea 8's gentle unlocks.
 
 ---
 

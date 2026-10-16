@@ -41,6 +41,7 @@ extends Node2D
 ## every ramp jump is measured, and drifting in the zone on the quay earns stars.
 ## Pick-and-mix fun (§32): golden stars to find (GoldenStars), the jobs board in the park
 ## (JobsBoard), rides on the playgrounds on foot (PlaygroundRides), fireworks at night (Fireworks).
+## The snowy hill (§33): a snow island over a bridge east of town (SnowIsland, SnowHill).
 ##
 ## Escape / Start pauses (RESUME / MAP / SETTINGS / GARAGE; the Boat Dock while sailing).
 ##
@@ -72,6 +73,7 @@ extends Node2D
 ##   --start=playground  start on foot by the park's playground; --start=ride straight down a slide
 ##   --start=star  start by the first golden star (the end of the pier)
 ##   --fireworks   fireworks over the player wherever, day or night
+##   --start=snow  start on the bridge, about to reach the snowy hill; --start=hill on its slope
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
@@ -227,6 +229,8 @@ var stars: GoldenStars
 var jobs: JobsBoard
 var rides: PlaygroundRides
 var fireworks: Fireworks
+## The snowy hill (§33): its snowfall and its slope.
+var snow_hill: SnowHill
 
 @onready var _world: Node2D = $World
 @onready var _cars: Node2D = $World/Cars
@@ -375,6 +379,11 @@ func _add_fun(args: PackedStringArray) -> void:
 	fireworks.always = "--fireworks" in args
 	add_child(fireworks)
 	move_child(fireworks, hud.get_index())
+	snow_hill = SnowHill.new()
+	snow_hill.name = "SnowHill"
+	snow_hill.screen = self
+	add_child(snow_hill)
+	move_child(snow_hill, hud.get_index())
 	for walker in _walkers.get_children():
 		if walker is Walker:
 			walker.petted.connect(func(_w: Walker) -> void: job(&"pet"))
@@ -779,7 +788,7 @@ func _open_map() -> void:
 
 
 ## What the map shows (WorldMap.places): every race gate, the garage, the trophy house, the
-## rocket pad and the harbour.
+## rocket pad, the harbour and the snowy hill.
 func map_places() -> Array:
 	var out := []
 	for gate in gates:
@@ -791,6 +800,7 @@ func map_places() -> Array:
 			"picture": load(Town.BUILDING_ART % door["id"])})
 	out.append({"at": town.rocket_pad.get_center(), "name": "ROCKET", "picture": ROCKET_ART})
 	out.append({"at": Island.LAND_PAD.get_center(), "name": "HARBOUR", "picture": HARBOUR_ART})
+	out.append({"at": SnowIsland.HILL, "name": "SNOWY HILL", "picture": Town.SNOWMAN})
 	if riding == &"foot":
 		out.append({"at": car.global_position, "name": "MY CAR", "picture": car.body_texture})
 	return out
@@ -1614,6 +1624,12 @@ func _dev_start(where: String) -> void:
 		if where == "ride":
 			rides.play(rides.rides[1])
 		return
+	elif where == "snow":
+		at = Vector2(SnowIsland.shore_x() - 500.0, SnowIsland.BRIDGE_Y + 70.0)
+		player.rotation = 0.0
+	elif where == "hill":
+		at = SnowIsland.HILL + Vector2(-300, 700)
+		player.rotation = -PI / 2.0
 	elif where == "star":
 		at = stars.spots[0] + Vector2(0, 260)
 		player.rotation = -PI / 2.0

@@ -8,7 +8,10 @@ extends Node2D
 ## finding them all pays ALL_PAY. The pause map shows the count. Where they are is worked out
 ## from the town itself with a fixed seed, so it is the same island every time.
 
-const COUNT := 50
+const COUNT := 55
+## The first ISLAND_COUNT are round the town's island; the rest on the snowy hill (§33), added
+## after them so the island's keep their numbers in old saves.
+const ISLAND_COUNT := 50
 const PAY := 3
 const ALL_PAY := 50
 const SEED := 2031
@@ -128,7 +131,7 @@ static func plan(town: Town) -> Array[Vector2]:
 	# The rest on the beach and the grass round the town, spread out.
 	var world := town.world_rect()
 	var tries := 0
-	while out.size() < COUNT and tries < 20000:
+	while out.size() < ISLAND_COUNT and tries < 20000:
 		tries += 1
 		var spot := Vector2(rng.randf_range(world.position.x, world.end.x), rng.randf_range(world.position.y, world.end.y))
 		if town.streets_rect().grow(-100.0).has_point(spot):
@@ -136,7 +139,19 @@ static func plan(town: Town) -> Array[Vector2]:
 		if town.surface_at(spot) not in [&"beach", &"grass"] or not _clear(town, spot, out, GAP):
 			continue
 		out.append(spot)
-	out.resize(mini(out.size(), COUNT))
+	out.resize(mini(out.size(), ISLAND_COUNT))
+	# The snowy hill: just below the flag on top, out on the frozen lake, at the foot of the
+	# sledging run, on the far east shore, and halfway over the bridge. Nudged round a little
+	# if a pine or a snowman stands there.
+	var sled := (SnowIsland.SLED_TO - SnowIsland.SLED_FROM).normalized()
+	for spot: Vector2 in [SnowIsland.HILL + Vector2(0, 240), SnowIsland.LAKE, SnowIsland.SLED_TO + sled * 160.0,
+			SnowIsland.CENTRE + Vector2(SnowIsland.RADII.x - 450.0, 0),
+			Vector2((Island.world().end.x + SnowIsland.shore_x()) / 2.0, SnowIsland.BRIDGE_Y)]:
+		for k in 9:
+			var at := spot + (Vector2.from_angle(k * TAU / 8.0) * 140.0 if k > 0 else Vector2.ZERO)
+			if _clear(town, at, out, 300.0):
+				out.append(at)
+				break
 	return out
 
 

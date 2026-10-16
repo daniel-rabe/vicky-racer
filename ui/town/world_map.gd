@@ -22,7 +22,7 @@ var selected := 0
 var _name: Label
 var _hints: Label
 var _time := 0.0
-## Golden stars found so far and how many there are (§32), shown over the map's top left.
+## Golden stars found so far and how many there are (§32), shown in the map's top left corner.
 var stars := Vector2i(0, 0)
 var _stars: Label
 
@@ -64,9 +64,9 @@ func _ready() -> void:
 	_stars.add_theme_color_override("font_color", RING)
 	_stars.add_theme_color_override("font_outline_color", Color(0.055, 0.078, 0.11))
 	_stars.add_theme_constant_override("outline_size", 12)
-	_stars.offset_left = 70.0
-	_stars.offset_top = -62.0
-	_stars.offset_bottom = -6.0
+	_stars.offset_left = 78.0
+	_stars.offset_top = 14.0
+	_stars.offset_bottom = 70.0
 	add_child(_stars)
 
 
@@ -93,6 +93,7 @@ func _fit() -> void:
 		area = area.expand(p)
 	for place: Dictionary in places:
 		area = area.expand(place["at"])
+	area = area.merge(Rect2(SnowIsland.CENTRE - SnowIsland.RADII, SnowIsland.RADII * 2.0))  # the snowy hill (§33)
 	area = area.grow(500.0)
 	var room := size - Vector2(PADDING, PADDING) * 2.0
 	_scale = minf(room.x / area.size.x, room.y / area.size.y)
@@ -102,6 +103,7 @@ func _fit() -> void:
 	_islets.clear()
 	for islet in _town.islets:
 		_islets.append(_mapped(islet))
+	_snow = _mapped(SnowIsland.outline(0.0))
 
 
 func _process(delta: float) -> void:
@@ -177,7 +179,7 @@ func _draw() -> void:
 	if not places.is_empty():
 		_draw_place(places[selected], true)
 	if stars.y > 0:
-		JobsBoard.JobIcon.draw_picture(self, null, Rect2(Vector2(10, -60), Vector2(52, 52)))
+		JobsBoard.JobIcon.draw_picture(self, null, Rect2(Vector2(18, 16), Vector2(52, 52)))
 
 
 func _draw_place(place: Dictionary, chosen_one: bool) -> void:

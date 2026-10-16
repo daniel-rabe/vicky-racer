@@ -71,7 +71,7 @@ func _ready() -> void:
 	_layer = CanvasLayer.new()
 	_layer.name = "Weather"
 	add_child(_layer)
-	_rain = _make_snow() if kind == &"snow" else _make_rain()
+	_rain = make_snow() if kind == &"snow" else _make_rain()
 	_layer.add_child(_rain)
 	_rain.emitting = intensity > 0.02  # already falling (a race that starts in the snow)
 	if kind == &"snow":
@@ -177,7 +177,7 @@ func _make_rain() -> GPUParticles2D:
 
 
 ## Soft round flakes of different sizes, falling slowly, a little this way and that.
-func _make_snow() -> GPUParticles2D:
+static func make_snow() -> GPUParticles2D:
 	var image := Image.create(24, 24, false, Image.FORMAT_RGBA8)
 	for y in 24:
 		for x in 24:

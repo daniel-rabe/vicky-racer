@@ -83,6 +83,12 @@ static func pick(for_day: String) -> Array:
 	return out
 
 
+## No jobs at all (the tests that count coins exactly, whatever the date).
+func clear() -> void:
+	today.clear()
+	_show()
+
+
 func all_done() -> bool:
 	return today.all(func(job: Dictionary) -> bool: return job["have"] >= job["need"])
 

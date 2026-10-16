@@ -86,19 +86,20 @@ const RUNWAY_WIDTH := 240.0
 
 ## The open world is the game (docs/DESIGN.md §28). Race gates: a start grid for every track,
 ## where the track's three racers wait for the child. [track id, the grid's centre, the way it
-## faces]. Car gates stand on the grass between the ring road and the beach, going round the
-## island clockwise from the player's start; boat gates float out at sea.
+## faces]. Car gates stand on the grass between the ring road and the beach (Snowy Peak's on the
+## snowy hill, §33), going round the island clockwise from the player's start; boat gates float
+## out at sea.
 const GATES := [
 	[&"track_01", Vector2(1900.0, 400.0), Vector2.RIGHT],
 	[&"track_02", Vector2(7300.0, 400.0), Vector2.RIGHT],
-	[&"track_03", Vector2(9530.0, 1900.0), Vector2.DOWN],
+	[&"track_03", Vector2(14600.0, 1500.0), Vector2.RIGHT],  # on the snowy hill (§33): SnowIsland.GATE
 	[&"track_04", Vector2(9530.0, 6000.0), Vector2.DOWN],
 	[&"track_05", Vector2(7500.0, 7930.0), Vector2.LEFT],
 	[&"track_06", Vector2(2400.0, 7930.0), Vector2.LEFT],
 	[&"track_07", Vector2(400.0, 6200.0), Vector2.UP],
 	[&"boat_01", Vector2(2300.0, 9750.0), Vector2.LEFT],
 	[&"boat_02", Vector2(7600.0, 9750.0), Vector2.RIGHT],
-	[&"boat_03", Vector2(11450.0, 2200.0), Vector2.UP],
+	[&"boat_03", Vector2(11450.0, 1600.0), Vector2.UP],  # clear of the snowy hill's bridge
 	[&"boat_04", Vector2(-1500.0, 4900.0), Vector2.DOWN],
 ]
 ## The rocket pad, on the grass west of town: driving onto it opens the Hangar, for the space
