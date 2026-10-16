@@ -2552,8 +2552,9 @@ along a road that becomes a bridge over the sea, like the snowy hill's.
 
 - **The bridge**: as the snowy hill's (`Town._bridge_road`). The town's shore and the outer
   limit now have a gap for each bridge (`Town._gaps` cuts a closed line wherever a bridge's road
-  crosses it; `Town._bridges` lists them). Boats sail under it, and the outer limit still keeps
-  them in. The buoys and rocks of the outer limit stay off the decks.
+  crosses it; `Town._bridges` lists them, as the roads' rectangles). Boats sail under it, and
+  the outer limit still keeps them in. The buoys and rocks of the outer limit stay off the
+  decks.
 - **The island** (`CandyIsland`, data like `SnowIsland`): pink icing (the `candy` surface, soft
   and slow like sand) with a white icing rim and shallows, about 5,000 × 3,500 px. Sprinkles in
   every colour fall while the player is out there and stop back over the bridge
@@ -2585,3 +2586,42 @@ lollipops, cupcakes, donuts, gumdrops); the jelly pads and candy canes are drawn
 
 Dev flags for the town: `--start=candy` (on the bridge, nearly there), `--start=jelly` (on
 Candy Lane before the first jelly pad), `--start=gate5` (the Candy Lane gate).
+
+## 35. The jungle: the third district
+*(Phase 34, the open-world plan's idea 7; Daniel picked the jungle after candy land.)* A jungle
+island north of the town, reached by driving north off the ring road's north-east corner along
+a road that becomes a bridge over the sea (the first bridge going north: `Town._bridge_road`
+and the walls work for either way).
+
+- **The island** (`JungleIsland`, data like `SnowIsland`): a strip of sand by the sea, then
+  the jungle floor (the `jungle` surface, like grass), about 5,600 × 4,400 px. Leaves drift down
+  while the player is out there and stop back over the bridge (`JungleWoods.make_leaves`).
+- **The jungle trail**: the bridge's road runs on to a winding road round the island, asphalt
+  with the Jungle Run track's orange kerbs and a dashed middle line.
+- **Mud pools** on the trail (the `mud` surface, slow and slippery). A car that splashes
+  through one comes out muddy (`CarMud`: brown splodges round the edges of its body, more with
+  every pool) and stays muddy until it goes through the car wash in town. The first time each
+  drive the banner says MUDDY! TRY THE CAR WASH.
+- **The temple** at the top of the trail: a courtyard of big stone slabs that the trail runs
+  through, between two rows of mossy pillars, and a stepped pyramid behind it with stairs up to
+  a dark doorway (solid). Driving in says JUNGLE TEMPLE!
+- Thick jungle trees, boulders (solid) and flowers; the **Jungle Run race gate** moved here
+  from the grass south of the town (its stopwatch too); five more golden stars (65 in all, the
+  earlier 60 keep their numbers): on the temple's courtyard, past a mud pool, deep in the trees,
+  on the north-east, and on the bridge. JUNGLE TEMPLE on the big map, and the minimap switches to
+  the island while out there.
+- First visit each drive: JUNGLE across the screen.
+
+Built from the Jungle Run track's own art (the jungle and mud tiles, the kerb, jungle trees,
+boulders, flowers); the temple, the pillars and the mud on a car are drawn in code.
+
+| What | Where |
+| --- | --- |
+| Where everything is | [`town/jungle_island.gd`](../town/jungle_island.gd) |
+| Ground, trail, mud, temple, trees | `Town._build_jungle_ground`, `Town._build_jungle` in [`town/town.gd`](../town/town.gd) |
+| Leaves, the mud, the signs | [`actors/town/jungle_woods.gd`](../actors/town/jungle_woods.gd), [`actors/town/car_mud.gd`](../actors/town/car_mud.gd) |
+| Checks | [`tests/jungle_test.gd`](../tests/jungle_test.gd) |
+
+Dev flags for the town: `--start=jungle` (on the bridge, nearly there), `--start=mud` (on the
+trail before the first mud pool; `muddy` already muddy), `--start=temple` (before the temple),
+`--start=gate4` (the Jungle Run gate).
