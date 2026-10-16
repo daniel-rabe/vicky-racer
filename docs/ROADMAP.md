@@ -40,6 +40,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 30 | Landmarks: stadium, workshop, rocket, stopwatches | Every menu has a place in the world to drive to | M |
 | 31 | Pick-and-mix fun | Golden stars, a jobs board, playground rides, fireworks at night | M |
 | 32 | The snowy hill | The first district: a snow island over a bridge, a hill, ice, Snowy Peak | L |
+| 33 | Candy land | The second district: Candy Lane with jelly pads, a chocolate lake, Candy Lane's gate | L |
 
 ---
 
@@ -535,6 +536,19 @@ Ideas 7 and 8 from the open-world plan, the first district. DESIGN §33.
   Peak gate moved onto it, five more golden stars. `tests/snow_test.gd` is new.
 - **Open:** the other districts (beach, jungle corner, candy quarter, toy district, ring road);
   ComfyUI pictures for the snowy hill (a ski hut, sledges); idea 8's gentle unlocks.
+
+---
+
+## Phase 33 — Candy land ✅ done
+
+Idea 7 from the open-world plan, the second district; Daniel picked candy. DESIGN §34.
+
+- **Built:** a candy island south-east of town over a bridge from the ring road's corner: Candy
+  Lane, a road round it with jelly pads that bounce a car into the air, a chocolate lake,
+  lollipop trees, giant cupcakes, donuts and gumdrops, sprinkles falling out there, the Candy
+  Lane gate moved onto it, five more golden stars (60). `tests/candy_test.gd` is new.
+- **Open:** the other districts (beach, jungle corner, toy district, ring road); idea 8's gentle
+  unlocks.
 
 ---
 

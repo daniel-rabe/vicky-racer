@@ -262,7 +262,7 @@ func _test_map() -> void:
 	map_button.pressed.emit()
 	await get_tree().process_frame
 	var map: WorldMap = town._map
-	_check(map.visible and map.places.size() == town.gates.size() + 7, "the map shows every gate, the four buildings, the rocket, the harbour and the snowy hill (%d)" % map.places.size())
+	_check(map.visible and map.places.size() == town.gates.size() + 8, "the map shows every gate, the four buildings, the rocket, the harbour, the snowy hill and candy land (%d)" % map.places.size())
 	var before := map.selected
 	await _press(&"ui_right")
 	_check(map.selected != before, "the arrows move from place to place")

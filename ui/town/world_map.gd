@@ -94,6 +94,7 @@ func _fit() -> void:
 	for place: Dictionary in places:
 		area = area.expand(place["at"])
 	area = area.merge(Rect2(SnowIsland.CENTRE - SnowIsland.RADII, SnowIsland.RADII * 2.0))  # the snowy hill (§33)
+	area = area.merge(Rect2(CandyIsland.CENTRE - CandyIsland.RADII, CandyIsland.RADII * 2.0))  # candy land (§34)
 	area = area.grow(500.0)
 	var room := size - Vector2(PADDING, PADDING) * 2.0
 	_scale = minf(room.x / area.size.x, room.y / area.size.y)
@@ -104,6 +105,7 @@ func _fit() -> void:
 	for islet in _town.islets:
 		_islets.append(_mapped(islet))
 	_snow = _mapped(SnowIsland.outline(0.0))
+	_candy = _mapped(CandyIsland.outline(0.0))
 
 
 func _process(delta: float) -> void:

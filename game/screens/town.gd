@@ -42,6 +42,7 @@ extends Node2D
 ## Pick-and-mix fun (§32): golden stars to find (GoldenStars), the jobs board in the park
 ## (JobsBoard), rides on the playgrounds on foot (PlaygroundRides), fireworks at night (Fireworks).
 ## The snowy hill (§33): a snow island over a bridge east of town (SnowIsland, SnowHill).
+## Candy land (§34): a candy island over a bridge south-east of town (CandyIsland, CandyLand).
 ##
 ## Escape / Start pauses (RESUME / MAP / SETTINGS / GARAGE; the Boat Dock while sailing).
 ##
@@ -74,6 +75,8 @@ extends Node2D
 ##   --start=star  start by the first golden star (the end of the pier)
 ##   --fireworks   fireworks over the player wherever, day or night
 ##   --start=snow  start on the bridge, about to reach the snowy hill; --start=hill on its slope
+##   --start=candy  start on the bridge, about to reach candy land; --start=jelly on Candy Lane,
+##                 just before its first jelly pad
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
@@ -231,6 +234,8 @@ var rides: PlaygroundRides
 var fireworks: Fireworks
 ## The snowy hill (§33): its snowfall and its slope.
 var snow_hill: SnowHill
+## Candy land (§34): its sprinkles and banners.
+var candy_land: CandyLand
 
 @onready var _world: Node2D = $World
 @onready var _cars: Node2D = $World/Cars
@@ -384,6 +389,11 @@ func _add_fun(args: PackedStringArray) -> void:
 	snow_hill.screen = self
 	add_child(snow_hill)
 	move_child(snow_hill, hud.get_index())
+	candy_land = CandyLand.new()
+	candy_land.name = "CandyLand"
+	candy_land.screen = self
+	add_child(candy_land)
+	move_child(candy_land, hud.get_index())
 	for walker in _walkers.get_children():
 		if walker is Walker:
 			walker.petted.connect(func(_w: Walker) -> void: job(&"pet"))
@@ -788,7 +798,7 @@ func _open_map() -> void:
 
 
 ## What the map shows (WorldMap.places): every race gate, the garage, the trophy house, the
-## rocket pad, the harbour and the snowy hill.
+## rocket pad, the harbour, the snowy hill and candy land.
 func map_places() -> Array:
 	var out := []
 	for gate in gates:
@@ -801,6 +811,7 @@ func map_places() -> Array:
 	out.append({"at": town.rocket_pad.get_center(), "name": "ROCKET", "picture": ROCKET_ART})
 	out.append({"at": Island.LAND_PAD.get_center(), "name": "HARBOUR", "picture": HARBOUR_ART})
 	out.append({"at": SnowIsland.HILL, "name": "SNOWY HILL", "picture": Town.SNOWMAN})
+	out.append({"at": CandyIsland.LAKE, "name": "CANDY LAND", "picture": Town.LOLLIPOP})
 	if riding == &"foot":
 		out.append({"at": car.global_position, "name": "MY CAR", "picture": car.body_texture})
 	return out
@@ -1630,6 +1641,13 @@ func _dev_start(where: String) -> void:
 	elif where == "hill":
 		at = SnowIsland.HILL + Vector2(-300, 700)
 		player.rotation = -PI / 2.0
+	elif where == "candy":
+		at = Vector2(CandyIsland.shore_x() - 500.0, CandyIsland.BRIDGE_Y + 70.0)
+		player.rotation = 0.0
+	elif where == "jelly":
+		var a: float = CandyIsland.JELLY_ANGLES[0]
+		at = CandyIsland.lane_at(a) - CandyIsland.lane_along(a) * 500.0
+		player.rotation = CandyIsland.lane_along(a).angle()
 	elif where == "star":
 		at = stars.spots[0] + Vector2(0, 260)
 		player.rotation = -PI / 2.0

@@ -8,9 +8,10 @@ extends Node2D
 ## finding them all pays ALL_PAY. The pause map shows the count. Where they are is worked out
 ## from the town itself with a fixed seed, so it is the same island every time.
 
-const COUNT := 55
-## The first ISLAND_COUNT are round the town's island; the rest on the snowy hill (§33), added
-## after them so the island's keep their numbers in old saves.
+const COUNT := 60
+## The first ISLAND_COUNT are round the town's island; then five on the snowy hill (§33) and five
+## in candy land (§34), each added after the last so the earlier ones keep their numbers in old
+## saves.
 const ISLAND_COUNT := 50
 const PAY := 3
 const ALL_PAY := 50
@@ -25,6 +26,9 @@ const SIZE := 46.0
 const GOLD := Color(1.0, 0.8, 0.18)
 const GOLD_EDGE := Color(0.72, 0.45, 0.05)
 const CHIME := "res://art/sfx/sticker.wav"
+## Where the Candy Lane gate's paving was before it moved to candy land (§34): still kept clear,
+## so the island's stars stay where they were and keep their numbers in old saves.
+const OLD_GATE_AREAS: Array[Rect2] = [Rect2(2050.0, 7695.0, 700.0, 470.0)]
 
 ## The town screen (TownScreen): the player, the HUD, paying.
 var screen: Node
@@ -152,6 +156,18 @@ static func plan(town: Town) -> Array[Vector2]:
 			if _clear(town, at, out, 300.0):
 				out.append(at)
 				break
+	# Candy land: in the middle of the chocolate lake, just past a jelly pad (a bounce carries a
+	# car over it), on the far east shore, by the candy canes, and halfway over the bridge.
+	var jelly: float = CandyIsland.JELLY_ANGLES[1]
+	for spot: Vector2 in [CandyIsland.LAKE, CandyIsland.lane_at(jelly) + CandyIsland.lane_along(jelly) * 260.0,
+			CandyIsland.CENTRE + Vector2(CandyIsland.RADII.x - 420.0, 0),
+			Vector2(CandyIsland.CENTRE.x - CandyIsland.LANE_RADII.x - 450.0, CandyIsland.BRIDGE_Y),
+			Vector2((Island.world().end.x + CandyIsland.shore_x()) / 2.0, CandyIsland.BRIDGE_Y)]:
+		for k in 9:
+			var at := spot + (Vector2.from_angle(k * TAU / 8.0) * 140.0 if k > 0 else Vector2.ZERO)
+			if _clear(town, at, out, 300.0):
+				out.append(at)
+				break
 	return out
 
 
@@ -173,6 +189,9 @@ static func _clear(town: Town, spot: Vector2, taken: Array[Vector2], gap: float)
 			return false
 	for gate in town.gates:
 		if gate["area"].grow(CLEAR).has_point(spot):
+			return false
+	for area in OLD_GATE_AREAS:
+		if area.grow(CLEAR).has_point(spot):
 			return false
 	for rect in town.playgrounds:
 		if rect.grow(CLEAR).has_point(spot):

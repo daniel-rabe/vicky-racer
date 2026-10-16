@@ -18,6 +18,8 @@ extends Node2D
 ## The open world (§28) adds the race gates' paved start grids on the grass round the town
 ## (gates; the gates themselves, with their racers, are RaceGate), the doors of the garage and the
 ## trophy house (doors), and the rocket pad on the west side.
+## Over bridges from the ring road lie the districts: the snowy hill (§33, SnowIsland) and
+## candy land (§34, CandyIsland).
 ##
 ## It is also the traffic's map. Junctions are grid cells (Vector2i); lane_points() and
 ## turn_points() give the line a car follows along a road and through a junction, on the
@@ -65,6 +67,16 @@ const ROAD_ICE := preload("res://art/tiles/snow/road_ice.png")
 const PINE := preload("res://art/props/snow/pine_tree.png")
 const SNOWMAN := preload("res://art/props/snow/snowman.png")
 const ICE_RIM_COLOUR := Color(0.78, 0.88, 0.97)
+## Candy land (§34).
+const CANDY_GROUND := preload("res://art/tiles/candy.png")
+const CHOCOLATE := preload("res://art/tiles/chocolate.png")
+const CANDY_KERB := preload("res://art/tiles/candy/kerb.png")
+const LOLLIPOP := preload("res://art/props/candy/lollipop.png")
+const CUPCAKE := preload("res://art/props/candy/cupcake.png")
+const DONUT := preload("res://art/props/candy/donut.png")
+const GUMDROP := preload("res://art/props/candy/gumdrop.png")
+const ICING_RIM_COLOUR := Color(1.0, 0.97, 0.98)
+const JELLY_COLOURS: Array[Color] = [Color(0.93, 0.2, 0.32), Color(0.35, 0.8, 0.3), Color(1.0, 0.6, 0.12), Color(0.62, 0.33, 0.88)]
 const PARAPET := Color(0.62, 0.64, 0.7)
 const FOAM := Color(1, 1, 1, 0.8)
 const PAD_COLOUR := Color(0.24, 0.59, 0.86, 0.92)
@@ -204,6 +216,7 @@ func _ready() -> void:
 	_build_harbour()
 	_build_sea()
 	_build_snow()
+	_build_candy()
 	_build_extras()
 	_plan_parking()
 
@@ -225,7 +238,7 @@ func world_rect() -> Rect2:
 
 ## The island and all its sea: the camera's limits.
 func map_rect() -> Rect2:
-	return Island.map_rect().merge(SnowIsland.map_rect())
+	return Island.map_rect().merge(SnowIsland.map_rect()).merge(CandyIsland.map_rect())
 
 
 ## Everything inside the outer ring road's pavement: where the town is.
@@ -264,7 +277,10 @@ func surface_at(pos: Vector2) -> StringName:
 func _coast_surface(pos: Vector2) -> StringName:
 	if SnowIsland.contains(pos):
 		return SnowIsland.surface(pos)
-	if Island.QUAY.has_point(pos) or _drive_rect().has_point(pos) or SnowIsland.bridge_rect().has_point(pos):
+	if CandyIsland.contains(pos):
+		return CandyIsland.surface(pos)
+	if Island.QUAY.has_point(pos) or _drive_rect().has_point(pos) or SnowIsland.bridge_rect().has_point(pos) \
+			or CandyIsland.bridge_rect().has_point(pos):
 		return &"asphalt"
 	if Geometry2D.is_point_in_polygon(pos, _grass_line):
 		return &"grass"
@@ -786,6 +802,7 @@ func _build_coast_ground() -> void:
 	_ground.add_child(_textured(Island.outline(-Island.WET), BEACH))
 	_ground.add_child(_textured(_grass_line, GRASS))
 	_build_snow_ground()
+	_build_candy_ground()
 
 
 ## Palms where the grass meets the sand, parasols and beach balls along the beach, a few
@@ -794,13 +811,13 @@ func _build_coast_ground() -> void:
 func _build_coast() -> void:
 	var palms := Island.outline(-Island.BEACH - 60.0)
 	for i in range(0, palms.size(), 9):
-		if not _near_harbour(palms[i], 300.0) and not SnowIsland.bridge_rect().grow(200.0).has_point(palms[i]):
+		if not _near_harbour(palms[i], 300.0) and not _near_bridge(palms[i], 200.0):
 			var palm := _sprite(PALM, palms[i], 220.0 * _rng.randf_range(0.85, 1.1), _rng.randf() * TAU)
 			palm.z_index = TREE_Z
 			_add_circle(palms[i], TREE_TRUNK)
 	var sand := Island.outline(-Island.BEACH * 0.45)
 	for i in range(5, sand.size(), 37):
-		if not _near_harbour(sand[i], 500.0) and not SnowIsland.bridge_rect().grow(300.0).has_point(sand[i]):
+		if not _near_harbour(sand[i], 500.0) and not _near_bridge(sand[i], 300.0):
 			_sprite(PARASOL, sand[i], 190.0)
 			beach_balls.append(sand[i] + Vector2(150, 60))  # a ball to kick about (§23): the screen puts it there
 	# A few round trees on the grass between the ring road and the beach.
@@ -813,16 +830,26 @@ func _build_coast() -> void:
 		if _keep_clear.any(func(r: Rect2) -> bool: return r.grow(120.0).has_point(spot)):
 			continue
 		_tree(spot, _rng.randf_range(0.8, 1.1))
-	# Boats stop all round the island; cars too, except where the bridge to the snowy hill
-	# leaves it (§33), and its rails keep them on the deck (boats sail under).
+	# Boats stop all round the island; cars too, except where the bridges to the snowy hill
+	# (§33) and candy land (§34) leave it, and their rails keep them on the deck (boats sail
+	# under).
 	_wall_line(_wall(Car.LAYER_LAND_EDGE, "Shore"), Island.shoreline())
 	var shore := _wall(Car.LAYER_SEA_EDGE, "ShoreForCars")
-	var main := _gap(Island.shoreline(), true)
-	var snow := _gap(SnowIsland.outline(0.0), false)
-	_wall_open(shore, main)
-	_wall_open(shore, snow)
-	_wall_open(shore, PackedVector2Array([main[main.size() - 1], snow[0]]))  # the north rail
-	_wall_open(shore, PackedVector2Array([main[0], snow[snow.size() - 1]]))  # the south rail
+	var bridges := _bridges()
+	var main := _gaps(Island.shoreline(), _under_bridge, bridges)
+	var snow := _gaps(SnowIsland.outline(0.0), func(p: Vector2) -> bool:
+		return p.x < SnowIsland.CENTRE.x and absf(p.y - SnowIsland.BRIDGE_Y) < SnowIsland.BRIDGE_HALF, bridges)
+	var candy := _gaps(CandyIsland.outline(0.0), func(p: Vector2) -> bool:
+		return p.x < CandyIsland.CENTRE.x and absf(p.y - CandyIsland.BRIDGE_Y) < CandyIsland.BRIDGE_HALF, bridges)
+	for run in main + snow + candy:
+		_wall_open(shore, run)
+	for far: Array[PackedVector2Array] in [snow, candy]:
+		for b in bridges:
+			for edge in [b.x - b.y, b.x + b.y]:  # the north rail, the south rail
+				var from := _end_on(main, edge)
+				var to := _end_on(far, edge)
+				if to != Vector2.INF:
+					_wall_open(shore, PackedVector2Array([from, to]))
 
 
 ## The harbour (§21.2): a road down from the ring road to a stone quay, the harbour master's
@@ -956,30 +983,48 @@ func _build_snow_ground() -> void:
 	var lane := PackedVector2Array([SnowIsland.SLED_FROM + across, SnowIsland.SLED_TO + across,
 		SnowIsland.SLED_TO - across, SnowIsland.SLED_FROM - across])
 	_ground.add_child(_textured(lane, ROAD_ICE))
-	# The road: kerbs and asphalt from the ring road to the snow, a dashed line down the
-	# middle, and over the water the bridge's stone parapets and the shadows of its piers.
-	var road := SnowIsland.bridge_rect()
-	var water_from := TownLayout.world_size().x + Island.COAST - 120.0
+	# The road out to it from the ring road, over the bridge.
+	_bridge_road(SnowIsland.bridge_rect(), SnowIsland.shore_x())
+
+
+## A road out over the water to a district (§33, §34): kerbs and asphalt from the ring road,
+## a dashed line down the middle, and over the water the bridge's stone parapets (up to
+## `shore_x`, where it comes ashore) and the shadows of its piers.
+func _bridge_road(road: Rect2, shore_x: float) -> void:
+	var y := road.get_center().y
+	var water_from := _coast_x(y) - 120.0
 	var x := water_from + 200.0
-	while x < road.end.x - 300.0:
+	while x < shore_x - 300.0:
 		_ground.add_child(_flat(_rect_points(Rect2(x - 70.0, road.position.y - 40.0, 140.0, road.size.y + 80.0)), Color(0.1, 0.2, 0.35, 0.35)))
 		x += 700.0
 	_ground.add_child(_flat(_rect_points(road.grow_individual(0, 7, 0, 7)), KERB_COLOUR))
 	_ground.add_child(_textured(_rect_points(road), ASPHALT))
 	var dash := Line2D.new()
-	dash.points = PackedVector2Array([Vector2(road.position.x + 60.0, SnowIsland.BRIDGE_Y), Vector2(road.end.x - 60.0, SnowIsland.BRIDGE_Y)])
+	dash.points = PackedVector2Array([Vector2(road.position.x + 60.0, y), Vector2(road.end.x - 60.0, y)])
 	dash.width = 10.0
 	dash.texture = _dash_texture()
 	dash.texture_mode = Line2D.LINE_TEXTURE_TILE
 	dash.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	_ground.add_child(dash)
 	for side in [-1.0, 1.0]:
-		var edge: float = SnowIsland.BRIDGE_Y + side * (SnowIsland.BRIDGE_HALF + 4.0)
-		_ground.add_child(_flat(_rect_points(Rect2(water_from, edge - 14.0, SnowIsland.shore_x() - water_from, 28.0)), PARAPET))
+		var edge: float = y + side * (road.size.y / 2.0 + 4.0)
+		_ground.add_child(_flat(_rect_points(Rect2(water_from, edge - 14.0, shore_x - water_from, 28.0)), PARAPET))
 		var post := water_from
-		while post < SnowIsland.shore_x():
+		while post < shore_x:
 			_ground.add_child(_flat(_rect_points(Rect2(post - 18.0, edge - 20.0, 36.0, 40.0)), PARAPET.darkened(0.25)))
 			post += 350.0
+
+
+## Where the island's waterline crosses the line across the screen at `y`, on its east side.
+static func _coast_x(y: float) -> float:
+	var best := TownLayout.world_size().x + Island.COAST
+	var loop := Island.outline(0.0)
+	for i in loop.size():
+		var a := loop[i]
+		var b := loop[(i + 1) % loop.size()]
+		if (a.y - y) * (b.y - y) <= 0.0 and a.y != b.y and minf(a.x, b.x) > TownLayout.world_size().x * 0.5:
+			best = lerpf(a.x, b.x, (y - a.y) / (b.y - a.y))
+	return best
 
 
 ## A finer disc than _disc, for the big hill's rings.
@@ -1075,6 +1120,180 @@ func _flag(at: Vector2, colour: Color, size: float) -> Node2D:
 	return flag
 
 
+## Candy land's ground (§34): pale water and foam round it, a rim of white icing, the pink;
+## the road over the bridge and on to Candy Lane, the lane itself with red-and-white kerbs and
+## a dashed middle line, and the chocolate lake inside it.
+func _build_candy_ground() -> void:
+	for k in 3:
+		var band := _textured(CandyIsland.outline(CandyIsland.SHALLOWS * (1.0 - 0.3 * k)), SHALLOWS)
+		band.color = Color(1, 1, 1, 0.25)
+		_ground.add_child(band)
+	var foam := Line2D.new()
+	foam.points = CandyIsland.outline(18.0)
+	foam.closed = true
+	foam.width = 26.0
+	foam.default_color = FOAM
+	_ground.add_child(foam)
+	_ground.add_child(_flat(CandyIsland.outline(0.0), ICING_RIM_COLOUR))
+	_ground.add_child(_textured(CandyIsland.outline(-CandyIsland.ICING_RIM), CANDY_GROUND))
+	_bridge_road(CandyIsland.bridge_rect(), CandyIsland.shore_x())
+	# Candy Lane: asphalt between two ovals, the pink again inside, kerbs along both edges.
+	var outer := PackedVector2Array()
+	var inner := PackedVector2Array()
+	var middle := CandyIsland.lane_line()
+	for p in middle:
+		var out := (p - CandyIsland.CENTRE).normalized()
+		outer.append(p + out * CandyIsland.LANE_HALF)
+		inner.append(p - out * CandyIsland.LANE_HALF)
+	_ground.add_child(_textured(outer, ASPHALT))
+	_ground.add_child(_textured(inner, CANDY_GROUND))
+	for edge in [outer, inner]:
+		var kerb := Line2D.new()
+		kerb.points = edge
+		kerb.closed = true
+		kerb.width = 26.0
+		kerb.texture = CANDY_KERB
+		kerb.texture_mode = Line2D.LINE_TEXTURE_TILE
+		kerb.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		_ground.add_child(kerb)
+	var dash := Line2D.new()
+	dash.points = middle
+	dash.closed = true
+	dash.width = 10.0
+	dash.texture = _dash_texture()
+	dash.texture_mode = Line2D.LINE_TEXTURE_TILE
+	dash.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_ground.add_child(dash)
+	# The chocolate lake: a darker bank, then the chocolate.
+	var lake := PackedVector2Array()
+	var bank := PackedVector2Array()
+	for k in 48:
+		var a := TAU * k / 48.0
+		lake.append(CandyIsland.LAKE + Vector2(cos(a), sin(a)) * CandyIsland.LAKE_RADII)
+		bank.append(CandyIsland.LAKE + Vector2(cos(a), sin(a)) * (CandyIsland.LAKE_RADII + Vector2(40, 40)))
+	_ground.add_child(_flat(bank, Color(0.36, 0.2, 0.12)))
+	_ground.add_child(_textured(lake, CHOCOLATE))
+
+
+## Candy land's things (§34): jelly pads on Candy Lane that bounce a car into the air, candy
+## canes either side of the way in, lollipop trees, giant cupcakes and donuts, and gumdrops.
+## Their own random numbers, so the rest of the town stays where it was.
+func _build_candy() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3434
+	for i in CandyIsland.JELLY_ANGLES.size():
+		var a: float = CandyIsland.JELLY_ANGLES[i]
+		_jelly(CandyIsland.lane_at(a), CandyIsland.lane_along(a), JELLY_COLOURS[i % JELLY_COLOURS.size()])
+	# Candy canes where the road meets Candy Lane (the one below the road stands further off,
+	# so it does not lean over the road).
+	var gate_x := CandyIsland.CENTRE.x - CandyIsland.LANE_RADII.x - CandyIsland.LANE_HALF - 90.0
+	for side in [-1.0, 1.0]:
+		var at := Vector2(gate_x, CandyIsland.BRIDGE_Y + side * CandyIsland.BRIDGE_HALF + (-50.0 if side < 0 else 230.0))
+		var cane := _candy_cane(at, 190.0, side)
+		cane.z_index = TREE_Z
+		_things.add_child(cane)
+		_add_circle(at, 22.0)
+	var keep_off: Array[Rect2] = []
+	for gate in gates:
+		if gate["track_id"] == CandyIsland.CANDY_LANE:
+			keep_off.append(gate["area"].grow(260.0))
+			keep_off.append(Rect2(gate["at"] - Vector2(1100, 260), Vector2(560, 520)))  # its stopwatch
+	var placed: Array[Vector2] = []
+	var clear := func(spot: Vector2, gap: float) -> bool:
+		if not Geometry2D.is_point_in_polygon(spot, CandyIsland.outline(-CandyIsland.ICING_RIM - 120.0)):
+			return false
+		if CandyIsland.surface(spot) != &"candy" or CandyIsland.bridge_rect().grow(gap).has_point(spot):
+			return false
+		if absf(((spot - CandyIsland.CENTRE) / CandyIsland.LANE_RADII).length() - 1.0) * CandyIsland.LANE_RADII.y < CandyIsland.LANE_HALF + gap:
+			return false
+		if ((spot - CandyIsland.LAKE) / (CandyIsland.LAKE_RADII + Vector2.ONE * gap)).length() < 1.0:
+			return false
+		if placed.any(func(p: Vector2) -> bool: return p.distance_to(spot) < gap + 120.0):
+			return false
+		return not keep_off.any(func(r: Rect2) -> bool: return r.grow(gap).has_point(spot))
+	var scatter := func(count: int, texture: Texture2D, size: float, solid: float, gap: float, z: int) -> void:
+		var made := 0
+		for i in 800:
+			if made >= count:
+				break
+			var spot := CandyIsland.CENTRE + Vector2(rng.randf_range(-1.0, 1.0), rng.randf_range(-1.0, 1.0)) * CandyIsland.RADII
+			if not clear.call(spot, gap):
+				continue
+			placed.append(spot)
+			var sprite := _sprite(texture, spot, size * rng.randf_range(0.85, 1.1), rng.randf_range(-0.3, 0.3))
+			sprite.z_index = z
+			_add_circle(spot, solid)
+			made += 1
+	scatter.call(6, CUPCAKE, 240.0, 80.0, 120.0, 0)
+	scatter.call(6, DONUT, 230.0, 75.0, 120.0, 0)
+	scatter.call(45, LOLLIPOP, 210.0, 26.0, 80.0, TREE_Z)
+	scatter.call(24, GUMDROP, 100.0, 30.0, 60.0, 0)
+
+
+## A jelly pad on Candy Lane: a wobbly square of jelly across the road; a car driving over it
+## goes up in the air with a boing (like a jump ramp's hop, either way along the lane).
+func _jelly(at: Vector2, along: Vector2, colour: Color) -> void:
+	var area := Area2D.new()
+	area.name = "Jelly"
+	area.position = at
+	area.rotation = along.angle()
+	area.monitorable = false
+	area.collision_layer = 0
+	area.collision_mask = Car.LAYER_CARS_GROUND
+	var trigger := CollisionShape2D.new()
+	var box := RectangleShape2D.new()
+	box.size = CandyIsland.JELLY_SIZE
+	trigger.shape = box
+	area.add_child(trigger)
+	var jelly := Node2D.new()
+	jelly.name = "Picture"
+	var half := CandyIsland.JELLY_SIZE / 2.0
+	jelly.add_child(_flat(_rect_points(Rect2(-half + Vector2(8, 10), CandyIsland.JELLY_SIZE), 34.0), Color(0, 0, 0, 0.2)))
+	jelly.add_child(_flat(_rect_points(Rect2(-half, CandyIsland.JELLY_SIZE), 34.0), colour))
+	jelly.add_child(_flat(_rect_points(Rect2(-half + Vector2(16, 16), CandyIsland.JELLY_SIZE - Vector2(32, 32)), 24.0), colour.lightened(0.25)))
+	jelly.add_child(_flat(_rect_points(Rect2(-half + Vector2(26, 24), Vector2(34, 60)), 14.0), Color(1, 1, 1, 0.55)))
+	area.add_child(jelly)
+	area.body_entered.connect(func(body: Node2D) -> void:
+		if body is Car and not body is Boat and not body is Kid and body.velocity.length() > 150.0:
+			CarHop.launch(body)
+			var wobble := jelly.create_tween()
+			wobble.tween_property(jelly, "scale", Vector2(1.25, 0.8), 0.08)
+			wobble.tween_property(jelly, "scale", Vector2(0.88, 1.12), 0.12)
+			wobble.tween_property(jelly, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT))
+	_things.add_child(area)
+
+
+## A candy cane stood on end, seen from above and a little from the side: a striped pole and
+## its hook, curling `side` (-1 left, 1 right).
+func _candy_cane(at: Vector2, size: float, side: float) -> Node2D:
+	var cane := Node2D.new()
+	cane.position = at
+	var points := PackedVector2Array([Vector2.ZERO, Vector2(0, -size * 0.75)])
+	for k in range(1, 9):
+		var a := PI * k / 8.0
+		points.append(Vector2(side * size * 0.16 * (1.0 - cos(a)), -size * 0.75 - sin(a) * size * 0.16))
+	var line := Line2D.new()
+	line.points = points
+	line.width = size * 0.11
+	line.texture = _cane_texture()
+	line.texture_mode = Line2D.LINE_TEXTURE_TILE
+	line.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	line.joint_mode = Line2D.LINE_JOINT_ROUND
+	line.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	line.end_cap_mode = Line2D.LINE_CAP_ROUND
+	cane.add_child(line)
+	return cane
+
+
+## Red and white stripes for a candy cane.
+static func _cane_texture() -> ImageTexture:
+	var image := Image.create(32, 16, false, Image.FORMAT_RGBA8)
+	for y in 16:
+		for x in 32:
+			image.set_pixel(x, y, Color(0.9, 0.16, 0.22) if (x + y) % 32 < 16 else Color(1, 0.97, 0.97))
+	return ImageTexture.create_from_image(image)
+
+
 ## Out at sea (§21.5): the lighthouse's islet, the ramp islets, the slalom, the wreck, and
 ## the outer limit's ring of buoys and rocks.
 func _build_sea() -> void:
@@ -1123,14 +1342,21 @@ func _build_sea() -> void:
 	# The outer limit: red buoys all round, clumps of rock, and a wall a boat bounces off.
 	var limit := Island.limit_outline()
 	for i in range(0, limit.size(), 15):
-		_things.add_child(_buoy(limit[i], 30.0, Color(0.9, 0.27, 0.24)))
+		if not _near_bridge(limit[i], 120.0):
+			_things.add_child(_buoy(limit[i], 30.0, Color(0.9, 0.27, 0.24)))
 	for i in range(7, limit.size(), 60):
 		for k in 3:
-			_sprite(ROCK, limit[i] + Vector2(_rng.randf_range(-120, 120), _rng.randf_range(-120, 120)), 150.0, _rng.randf() * TAU)
-	# The bridge to the snowy hill crosses the outer limit: a gap for cars, closed to boats.
-	var outer := _gap(limit, true)
-	_wall_open(_wall(Car.LAYER_WORLD, "OuterLimit"), outer)
-	_wall_open(_wall(Car.LAYER_LAND_EDGE, "OuterLimitUnderBridge"), PackedVector2Array([outer[outer.size() - 1], outer[0]]))
+			var rock := _sprite(ROCK, limit[i] + Vector2(_rng.randf_range(-120, 120), _rng.randf_range(-120, 120)), 150.0, _rng.randf() * TAU)
+			rock.visible = not _near_bridge(limit[i], 400.0)  # none on a bridge's deck
+	# The bridges to the districts cross the outer limit: a gap for cars, closed to boats.
+	var bridges := _bridges()
+	var outer := _gaps(limit, _under_bridge, bridges)
+	var wall := _wall(Car.LAYER_WORLD, "OuterLimit")
+	for run in outer:
+		_wall_open(wall, run)
+	var under := _wall(Car.LAYER_LAND_EDGE, "OuterLimitUnderBridge")
+	for b in bridges:
+		_wall_open(under, PackedVector2Array([_end_on(outer, b.x - b.y), _end_on(outer, b.x + b.y)]))
 
 
 ## An islet: pale water round it, sand, rocks and palms; solid to a boat.
@@ -1211,6 +1437,11 @@ func _near_harbour(at: Vector2, margin: float) -> bool:
 	return at.y > world_rect().end.y - 400.0 and at.x > Island.HARBOUR_X.x - margin and at.x < Island.HARBOUR_X.y + margin
 
 
+## Is `at` within `margin` of a bridge's road out to a district?
+static func _near_bridge(at: Vector2, margin: float) -> bool:
+	return SnowIsland.bridge_rect().grow(margin).has_point(at) or CandyIsland.bridge_rect().grow(margin).has_point(at)
+
+
 static func _clear_of(x: float, rect: Rect2) -> bool:
 	return x < rect.position.x - 40.0 or x > rect.end.x + 40.0
 
@@ -1242,31 +1473,54 @@ func _wall_open(body: StaticBody2D, points: PackedVector2Array) -> void:
 		body.add_child(piece)
 
 
-## A closed line round the main island (`east`: cut on its east side) or the snowy hill (cut
-## on its west side) opened where the bridge's road crosses it, as a line from one side of
-## the road round to the other. It starts on the road's south edge and ends on its north one.
-static func _gap(loop: PackedVector2Array, east: bool) -> PackedVector2Array:
-	var half := SnowIsland.BRIDGE_HALF
-	var y := SnowIsland.BRIDGE_Y
-	var cut := func(p: Vector2) -> bool:
-		return absf(p.y - y) < half and (p.x > TownLayout.world_size().x if east else p.x < SnowIsland.CENTRE.x)
-	var first := -1
-	for i in loop.size():
-		if cut.call(loop[i]) and not cut.call(loop[(i + 1) % loop.size()]):
-			first = (i + 1) % loop.size()  # the first point past the cut
-	var out := PackedVector2Array()
-	var k := first
-	while not cut.call(loop[k]):
-		out.append(loop[k])
-		k = (k + 1) % loop.size()
-	# Square the ends onto the road's edges, so the rails meet them.
-	var start := out[0]
-	var end := out[out.size() - 1]
-	var start_y := y + half if start.y > y else y - half
-	var end_y := y + half if end.y > y else y - half
-	out.insert(0, Vector2(start.x, start_y))
-	out.append(Vector2(end.x, end_y))
+## A closed line round an island opened where the bridges' roads cross it: what is left, as
+## open lines, each end squared onto the edge of the road it stops at, so the rails meet it.
+## `cut` says which of the loop's points lie on a road; `bridges` are the roads' (y, half width).
+static func _gaps(loop: PackedVector2Array, cut: Callable, bridges: Array[Vector2]) -> Array[PackedVector2Array]:
+	var out: Array[PackedVector2Array] = []
+	var n := loop.size()
+	for i in n:
+		if not (cut.call(loop[i]) and not cut.call(loop[(i + 1) % n])):
+			continue
+		var run := PackedVector2Array()
+		var k := (i + 1) % n  # the first point past this cut, up to the next one
+		while not cut.call(loop[k]):
+			run.append(loop[k])
+			k = (k + 1) % n
+		run.insert(0, _square(run[0], bridges))
+		run.append(_square(run[run.size() - 1], bridges))
+		out.append(run)
 	return out
+
+
+## `p` moved straight up or down onto the edge of the nearest bridge's road.
+static func _square(p: Vector2, bridges: Array[Vector2]) -> Vector2:
+	var road := bridges[0]
+	for b in bridges:
+		if absf(p.y - b.x) < absf(p.y - road.x):
+			road = b
+	return Vector2(p.x, road.x + road.y if p.y > road.x else road.x - road.y)
+
+
+## Of `runs`, the end lying on the road edge at `edge_y`.
+static func _end_on(runs: Array[PackedVector2Array], edge_y: float) -> Vector2:
+	for run in runs:
+		for p in [run[0], run[run.size() - 1]]:
+			if absf(p.y - edge_y) < 0.5:
+				return p
+	return Vector2.INF
+
+
+## The bridges out to the districts (§33, §34), as (y, half width) for _gaps.
+static func _bridges() -> Array[Vector2]:
+	return [Vector2(SnowIsland.BRIDGE_Y, SnowIsland.BRIDGE_HALF), Vector2(CandyIsland.BRIDGE_Y, CandyIsland.BRIDGE_HALF)]
+
+
+## Is `p`, east of the town's square, under one of the bridges?
+static func _under_bridge(p: Vector2) -> bool:
+	if p.x <= TownLayout.world_size().x:
+		return false
+	return _bridges().any(func(b: Vector2) -> bool: return absf(p.y - b.x) < b.y)
 
 
 ## A closed line as a wall: solid along its edges only, so it holds things on either side.
@@ -1399,6 +1653,7 @@ func _plan_extras() -> void:
 	rocket_pad = Rect2(TownLayout.ROCKET_PAD - Vector2.ONE * ROCKET_PAD_RADIUS, Vector2.ONE * ROCKET_PAD_RADIUS * 2.0)
 	_keep_clear.append(rocket_pad.grow(120.0))
 	_keep_clear.append(SnowIsland.bridge_rect().grow(150.0))
+	_keep_clear.append(CandyIsland.bridge_rect().grow(150.0))
 
 
 ## A rectangle round `centre`, `length` along `along` and `depth` across it.

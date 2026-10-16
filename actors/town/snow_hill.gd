@@ -41,7 +41,7 @@ func _physics_process(delta: float) -> void:
 	if player == null:
 		return
 	var at := player.global_position
-	var near := at.x > SnowIsland.shore_x() - SNOW_REACH and \
+	var near := at.x > SnowIsland.shore_x() - SNOW_REACH and not CandyIsland.this_side(at) and \
 		Rect2(SnowIsland.CENTRE - SnowIsland.RADII, SnowIsland.RADII * 2.0).grow(SNOW_REACH).has_point(at)
 	if near != snowing:
 		snowing = near

@@ -2517,7 +2517,7 @@ the junction by the trophy house) along a road that becomes a long bridge over t
   piers. Its rails keep cars (and Vicky on foot) on the deck; boats sail under it, and the outer
   limit's buoys still keep them in where the bridge crosses it. Walls: the town's shore is two
   walls now, one for boats all the way round, one for cars with a gap where the road leaves; the
-  same for the outer limit (`Town._gap`, `Town._wall_open`).
+  same for the outer limit (`Town._gaps`, `Town._wall_open`).
 - **The island** (`SnowIsland`, data like `Island`): snow ground with an icy rim and shallows,
   about 5,800 × 4,800 px. Snow falls while the player is out there and stops back over the
   bridge (`SnowHill`, reusing `Weather.make_snow`).
@@ -2544,3 +2544,44 @@ pictures for it (a ski hut, sledges) can come as ComfyUI seed variants.
 
 Dev flags for the town: `--start=snow` (on the bridge, nearly there), `--start=hill` (on its
 slope), `--start=gate2` (the Snowy Peak gate).
+
+## 34. Candy land: the second district
+*(Phase 33, the open-world plan's idea 7; Daniel picked candy after the snowy hill.)* A candy
+island south-east of the town, reached by driving east off the ring road's south-east corner
+along a road that becomes a bridge over the sea, like the snowy hill's.
+
+- **The bridge**: as the snowy hill's (`Town._bridge_road`). The town's shore and the outer
+  limit now have a gap for each bridge (`Town._gaps` cuts a closed line wherever a bridge's road
+  crosses it; `Town._bridges` lists them). Boats sail under it, and the outer limit still keeps
+  them in. The buoys and rocks of the outer limit stay off the decks.
+- **The island** (`CandyIsland`, data like `SnowIsland`): pink icing (the `candy` surface, soft
+  and slow like sand) with a white icing rim and shallows, about 5,000 × 3,500 px. Sprinkles in
+  every colour fall while the player is out there and stop back over the bridge
+  (`CandyLand.make_sprinkles`). The snow stays on the snowy hill's side of the water between
+  them, the sprinkles on candy land's (`CandyIsland.this_side`).
+- **Candy Lane**: the road over the bridge runs on to an oval road round the island, asphalt
+  with red-and-white candy kerbs and a dashed middle line. Four **jelly pads** sit across it
+  (red, green, orange, purple): driving over one, either way, bounces the car into the air (a
+  jump ramp's hop, `CarHop`) and the jelly wobbles.
+- **The chocolate lake** inside the lane: the `chocolate` surface, gooey and slow. Driving in
+  says CHOCOLATE LAKE!
+- Lollipop trees, giant cupcakes and donuts, and gumdrops (all solid), two candy canes where the
+  road meets Candy Lane; the **Candy Lane race gate** moved here from the grass south of the
+  town (its stopwatch too); five more golden stars (60 in all, the earlier 55 keep their
+  numbers): in the chocolate lake, just past a jelly pad, on the far shore, by the candy canes
+  and on the bridge. CANDY LAND on the big map, and the minimap switches to the island while out
+  there.
+- First visit each drive: CANDY LAND across the screen.
+
+Built from the Candy Lane track's own art (candy and chocolate tiles, the candy kerb,
+lollipops, cupcakes, donuts, gumdrops); the jelly pads and candy canes are drawn in code.
+
+| What | Where |
+| --- | --- |
+| Where everything is | [`town/candy_island.gd`](../town/candy_island.gd) |
+| Ground, Candy Lane, jelly pads, sweets | `Town._build_candy_ground`, `Town._build_candy` in [`town/town.gd`](../town/town.gd) |
+| Sprinkles, the signs | [`actors/town/candy_land.gd`](../actors/town/candy_land.gd) |
+| Checks | [`tests/candy_test.gd`](../tests/candy_test.gd) |
+
+Dev flags for the town: `--start=candy` (on the bridge, nearly there), `--start=jelly` (on
+Candy Lane before the first jelly pad), `--start=gate5` (the Candy Lane gate).
