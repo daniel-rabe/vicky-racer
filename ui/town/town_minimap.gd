@@ -32,6 +32,7 @@ var _islets: Array[PackedVector2Array] = []
 var _snow := PackedVector2Array()
 var _candy := PackedVector2Array()
 var _jungle := PackedVector2Array()
+var _toys := PackedVector2Array()
 var _district := &""
 const SNOW := Color(0.95, 0.97, 1.0)
 const ICE := Color(0.7, 0.85, 0.97)
@@ -40,6 +41,8 @@ const CHOCOLATE := Color(0.45, 0.27, 0.17)
 const JUNGLE := Color(0.27, 0.55, 0.24)
 const MUD := Color(0.42, 0.3, 0.18)
 const STONE := Color(0.7, 0.66, 0.56)
+const MAT := Color(0.98, 0.8, 0.75)
+const RAILS := Color(0.55, 0.36, 0.2)
 
 
 func _ready() -> void:
@@ -73,6 +76,8 @@ func _fit() -> void:
 		area = Rect2(CandyIsland.CENTRE - CandyIsland.RADII, CandyIsland.RADII * 2.0).grow(300.0)
 	elif _district == &"jungle" and not _sailing:
 		area = Rect2(JungleIsland.CENTRE - JungleIsland.RADII, JungleIsland.RADII * 2.0).grow(300.0)
+	elif _district == &"toys" and not _sailing:
+		area = Rect2(ToyIsland.CENTRE - ToyIsland.RADII, ToyIsland.RADII * 2.0).grow(300.0)
 	var room := size - Vector2(PADDING, PADDING) * 2.0
 	_scale = minf(room.x / area.size.x, room.y / area.size.y)
 	_origin = Vector2(PADDING, PADDING) + (room - area.size * _scale) / 2.0 - area.position * _scale
@@ -84,15 +89,18 @@ func _fit() -> void:
 	_snow = _mapped(SnowIsland.outline(0.0))
 	_candy = _mapped(CandyIsland.outline(0.0))
 	_jungle = _mapped(JungleIsland.outline(0.0))
+	_toys = _mapped(ToyIsland.outline(0.0))
 
 
-## Which district the player is out over the water in or near: &"snow", &"candy", &"jungle"
-## or &"".
+## Which district the player is out over the water in or near: &"snow", &"candy", &"jungle",
+## &"toys" or &"".
 func _out_in_district() -> StringName:
 	if not is_instance_valid(_player):
 		return &""
 	if _player.global_position.y < JungleIsland.shore_y() + 1200.0:
 		return &"jungle"
+	if _player.global_position.y > ToyIsland.shore_y() - 1200.0:
+		return &"toys"
 	if _player.global_position.x < SnowIsland.shore_x() - 1200.0:
 		return &""
 	return &"candy" if CandyIsland.this_side(_player.global_position) else &"snow"
@@ -153,7 +161,18 @@ func _draw() -> void:
 		draw_circle(_map(JungleIsland.trail_at(a)), JungleIsland.MUD_RADII.x * _scale, MUD)
 	var court := JungleIsland.courtyard().merge(JungleIsland.pyramid())
 	draw_rect(Rect2(_map(court.position), court.size * _scale), STONE)
-	for bridge in [SnowIsland.bridge_rect(), CandyIsland.bridge_rect(), JungleIsland.bridge_rect()]:
+	draw_colored_polygon(_toys, MAT)
+	var rails := PackedVector2Array()
+	for p in ToyIsland.rails_line():
+		rails.append(_map(p))
+	rails.append(rails[0])
+	draw_polyline(rails, RAILS, maxf(60.0 * _scale, 1.5))
+	var toy_road := PackedVector2Array()
+	for p in ToyIsland.road_line():
+		toy_road.append(_map(p))
+	toy_road.append(toy_road[0])
+	draw_polyline(toy_road, STREET, ToyIsland.ROAD_HALF * 2.0 * _scale)
+	for bridge in [SnowIsland.bridge_rect(), CandyIsland.bridge_rect(), JungleIsland.bridge_rect(), ToyIsland.bridge_rect()]:
 		draw_rect(Rect2(_map(bridge.position), bridge.size * _scale), STREET)
 	var streets := _town.streets_rect()
 	draw_rect(Rect2(_map(streets.position), streets.size * _scale), STREET)

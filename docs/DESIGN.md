@@ -2625,3 +2625,40 @@ boulders, flowers); the temple, the pillars and the mud on a car are drawn in co
 Dev flags for the town: `--start=jungle` (on the bridge, nearly there), `--start=mud` (on the
 trail before the first mud pool; `muddy` already muddy), `--start=temple` (before the temple),
 `--start=gate4` (the Jungle Run gate).
+
+## 36. Toy town: the fourth district
+*(Phase 35, the open-world plan's idea 7; Daniel picked toy town after the jungle.)* A toy
+island south of the town, reached by driving south off the ring road's south-west corner along
+a road that becomes a bridge over the sea (the first bridge going south).
+
+- **The island** (`ToyIsland`, data like `SnowIsland`): a strip of sand by the sea round a giant
+  play mat of patchwork squares with stitched seams (the `playmat` surface: soft, a little
+  slower than the road), about 5,200 × 4,000 px. Confetti drifts down while the player is out
+  there and stops back over the bridge (`ToyTown.make_confetti`).
+- **The toy road**: the bridge's road runs on to a road printed round the mat like a children's
+  car rug, a rounded rectangle with red-and-white kerbs, a dashed middle line and zebra
+  crossings, with toy houses along it (solid).
+- **The toy train** (`ToyTrain`): an engine and three wagons loaded with bricks going round and
+  round their own track inside the road, puffing smoke. Each carriage is solid and moves as a
+  body, so it nudges a car (or a ball) standing on the track out of its way. Pulling up beside
+  it says CHOO CHOO!
+- **Giant letter blocks** (`ToyBlock`, solid, some stacked) and **bouncy balls** to kick about
+  (they work like the beach balls).
+- The **Toy Town race gate** moved here from the grass east of the town (its stopwatch too);
+  five more golden stars (70 in all, the earlier 65 keep their numbers). TOY TOWN on the big
+  map, and the minimap switches to the island while out there.
+- First visit each drive: TOY TOWN across the screen.
+
+All drawn in code: the mat, the rails, the train, the blocks; the houses use the town's house
+picture.
+
+| What | Where |
+| --- | --- |
+| Where everything is | [`town/toy_island.gd`](../town/toy_island.gd) |
+| Mat, road, rails, houses, blocks, balls | `Town._build_toy_ground`, `Town._build_toys` in [`town/town.gd`](../town/town.gd), [`town/toy_block.gd`](../town/toy_block.gd) |
+| The train, confetti, the signs | [`actors/town/toy_train.gd`](../actors/town/toy_train.gd), [`actors/town/toy_town.gd`](../actors/town/toy_town.gd) |
+| Checks | [`tests/toy_test.gd`](../tests/toy_test.gd) |
+
+Dev flags for the town: `--start=toy` (on the bridge, nearly there), `--start=train` (beside
+the toy train's track), `--start=gate3` (the Toy Town gate).
+

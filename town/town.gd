@@ -19,7 +19,7 @@ extends Node2D
 ## (gates; the gates themselves, with their racers, are RaceGate), the doors of the garage and the
 ## trophy house (doors), and the rocket pad on the west side.
 ## Over bridges from the ring road lie the districts: the snowy hill (§33, SnowIsland), candy
-## land (§34, CandyIsland) and the jungle (§35, JungleIsland).
+## land (§34, CandyIsland), the jungle (§35, JungleIsland) and toy town (§36, ToyIsland).
 ##
 ## It is also the traffic's map. Junctions are grid cells (Vector2i); lane_points() and
 ## turn_points() give the line a car follows along a road and through a junction, on the
@@ -86,6 +86,14 @@ const BOULDER := preload("res://art/props/jungle/boulder.png")
 const JUNGLE_FLOWER := preload("res://art/props/jungle/jungle_flower.png")
 const STONE := Color(0.7, 0.66, 0.56)
 const MOSS := Color(0.36, 0.56, 0.26)
+## Toy town (§36).
+const TOWN_KERB := preload("res://art/tiles/town/kerb.png")
+const TOY_HOUSE := preload("res://art/props/town/toy_house.png")
+const MAT_COLOURS: Array[Color] = [Color(0.98, 0.72, 0.72), Color(0.7, 0.85, 1.0), Color(1.0, 0.92, 0.6),
+	Color(0.75, 0.93, 0.7), Color(0.88, 0.78, 1.0), Color(1.0, 0.82, 0.62)]
+const BLOCK_COLOURS: Array[Color] = [Color(0.92, 0.27, 0.3), Color(0.25, 0.55, 0.95), Color(0.98, 0.75, 0.15),
+	Color(0.3, 0.75, 0.35), Color(0.65, 0.4, 0.9)]
+const RAIL_COLOUR := Color(0.55, 0.36, 0.2)
 const PARAPET := Color(0.62, 0.64, 0.7)
 const FOAM := Color(1, 1, 1, 0.8)
 const PAD_COLOUR := Color(0.24, 0.59, 0.86, 0.92)
@@ -160,6 +168,8 @@ var gates: Array[Dictionary] = []
 var doors: Array[Dictionary] = []
 ## The rocket pad: driving onto it opens the Hangar.
 var rocket_pad := Rect2()
+## Toy town's train (§36), going round its track.
+var train: ToyTrain
 ## The rocket on it, which lifts off with the car inside (§31).
 var rocket: Sprite2D
 ## Driveways (§29): cars parked on the lawn beside a house, nose to the street, free to borrow.
@@ -227,6 +237,7 @@ func _ready() -> void:
 	_build_snow()
 	_build_candy()
 	_build_jungle()
+	_build_toys()
 	_build_extras()
 	_plan_parking()
 
@@ -248,7 +259,7 @@ func world_rect() -> Rect2:
 
 ## The island and all its sea: the camera's limits.
 func map_rect() -> Rect2:
-	return Island.map_rect().merge(SnowIsland.map_rect()).merge(CandyIsland.map_rect()).merge(JungleIsland.map_rect())
+	return Island.map_rect().merge(SnowIsland.map_rect()).merge(CandyIsland.map_rect()).merge(JungleIsland.map_rect()).merge(ToyIsland.map_rect())
 
 
 ## Everything inside the outer ring road's pavement: where the town is.
@@ -291,8 +302,11 @@ func _coast_surface(pos: Vector2) -> StringName:
 		return CandyIsland.surface(pos)
 	if JungleIsland.contains(pos):
 		return JungleIsland.surface(pos)
+	if ToyIsland.contains(pos):
+		return ToyIsland.surface(pos)
 	if Island.QUAY.has_point(pos) or _drive_rect().has_point(pos) or SnowIsland.bridge_rect().has_point(pos) \
-			or CandyIsland.bridge_rect().has_point(pos) or JungleIsland.bridge_rect().has_point(pos):
+			or CandyIsland.bridge_rect().has_point(pos) or JungleIsland.bridge_rect().has_point(pos) \
+			or ToyIsland.bridge_rect().has_point(pos):
 		return &"asphalt"
 	if Geometry2D.is_point_in_polygon(pos, _grass_line):
 		return &"grass"
@@ -816,6 +830,7 @@ func _build_coast_ground() -> void:
 	_build_snow_ground()
 	_build_candy_ground()
 	_build_jungle_ground()
+	_build_toy_ground()
 
 
 ## Palms where the grass meets the sand, parasols and beach balls along the beach, a few
@@ -844,11 +859,12 @@ func _build_coast() -> void:
 			continue
 		_tree(spot, _rng.randf_range(0.8, 1.1))
 	# Boats stop all round the island; cars too, except where the bridges to the districts
-	# (§33–§35) leave it, and their rails keep them on the deck (boats sail under).
+	# (§33–§36) leave it, and their rails keep them on the deck (boats sail under).
 	_wall_line(_wall(Car.LAYER_LAND_EDGE, "Shore"), Island.shoreline())
 	var shore := _wall(Car.LAYER_SEA_EDGE, "ShoreForCars")
 	var main := _gaps(Island.shoreline())
-	var districts: Array[Array] = [_gaps(SnowIsland.outline(0.0)), _gaps(CandyIsland.outline(0.0)), _gaps(JungleIsland.outline(0.0))]
+	var districts: Array[Array] = [_gaps(SnowIsland.outline(0.0)), _gaps(CandyIsland.outline(0.0)), _gaps(JungleIsland.outline(0.0)),
+		_gaps(ToyIsland.outline(0.0))]
 	for run in main:
 		_wall_open(shore, run)
 	for far in districts:
@@ -998,32 +1014,33 @@ func _build_snow_ground() -> void:
 	_bridge_road(SnowIsland.bridge_rect(), SnowIsland.shore_x())
 
 
-## A road out over the water to a district (§33–§35): kerbs and asphalt from the ring road,
+## A road out over the water to a district (§33–§36): kerbs and asphalt from the ring road,
 ## a dashed line down the middle, and over the water the bridge's stone parapets (up to
 ## `shore`, the x (a road going east) or y (going north) where it comes ashore) and the
 ## shadows of its piers.
 func _bridge_road(road: Rect2, shore: float) -> void:
-	var north := road.size.y > road.size.x
-	# Worked out as for a road going east, then turned for one going north: along is x
-	# (east) or -y (north), across is y or x.
+	# Worked out along the road (from the town outwards) and across it, then turned to the way
+	# it goes.
+	var way := _bridge_way(road)
+	var side_way := way.orthogonal()
 	var turn := func(along: float, across: float) -> Vector2:
-		return Vector2(-across, -along) if north else Vector2(along, across)
+		return way * along + side_way * across
 	var span := func(along_from: float, along_to: float, across_from: float, across_to: float) -> Rect2:
 		return Rect2(turn.call(along_from, across_from), Vector2.ZERO).expand(turn.call(along_to, across_to))
-	var middle := -road.get_center().x if north else road.get_center().y
-	var half := (road.size.x if north else road.size.y) / 2.0
-	var land := _coast_along(road)
-	var water_from := (-land.y if north else land.x) - 120.0
-	var reach := -shore if north else shore
+	var middle := road.get_center().dot(side_way)
+	var half := absf(road.size.dot(side_way)) / 2.0
+	var water_from := _coast_along(road).dot(way) - 120.0
+	var reach := shore * (way.x + way.y)
 	var at := water_from + 200.0
 	while at < reach - 300.0:
 		_ground.add_child(_flat(_rect_points(span.call(at - 70.0, at + 70.0, middle - half - 40.0, middle + half + 40.0)), Color(0.1, 0.2, 0.35, 0.35)))
 		at += 700.0
-	_ground.add_child(_flat(_rect_points(road.grow_individual(7, 7, 7, 7) if north else road.grow_individual(0, 7, 0, 7)), KERB_COLOUR))
+	var kerb := Vector2(absf(side_way.x), absf(side_way.y)) * 7.0
+	_ground.add_child(_flat(_rect_points(road.grow_individual(kerb.x, kerb.y, kerb.x, kerb.y)), KERB_COLOUR))
 	_ground.add_child(_textured(_rect_points(road), ASPHALT))
 	var dash := Line2D.new()
 	var centre := road.get_center()
-	var long := (Vector2(0, road.size.y / 2.0 - 60.0) if north else Vector2(road.size.x / 2.0 - 60.0, 0))
+	var long := way * (absf(road.size.dot(way)) / 2.0 - 60.0)
 	dash.points = PackedVector2Array([centre - long, centre + long])
 	dash.width = 10.0
 	dash.texture = _dash_texture()
@@ -1039,22 +1056,30 @@ func _bridge_road(road: Rect2, shore: float) -> void:
 			post += 350.0
 
 
-## Where the town's island's waterline crosses the middle of a bridge's road: the furthest
-## crossing east (a road going east) or north (going north).
+## Which way a bridge's road goes out from the town: east, north or south.
+static func _bridge_way(road: Rect2) -> Vector2:
+	if road.size.x > road.size.y:
+		return Vector2.RIGHT
+	return Vector2.UP if road.get_center().y < TownLayout.world_size().y / 2.0 else Vector2.DOWN
+
+
+## Where the town's island's waterline crosses the middle of a bridge's road: the crossing
+## furthest out the way the road goes.
 static func _coast_along(road: Rect2) -> Vector2:
-	var north := road.size.y > road.size.x
-	var centre := road.get_center()
+	var way := _bridge_way(road)
+	var across := way.orthogonal()
+	var middle := road.get_center().dot(across)
 	var best := Vector2.INF
 	var loop := Island.outline(0.0)
 	for i in loop.size():
 		var a := loop[i]
 		var b := loop[(i + 1) % loop.size()]
-		var da := (a.x - centre.x) if north else (a.y - centre.y)
-		var db := (b.x - centre.x) if north else (b.y - centre.y)
+		var da := a.dot(across) - middle
+		var db := b.dot(across) - middle
 		if da * db > 0.0 or da == db:
 			continue
 		var p := a.lerp(b, da / (da - db))
-		if best == Vector2.INF or (p.y < best.y if north else p.x > best.x):
+		if best == Vector2.INF or p.dot(way) > best.dot(way):
 			best = p
 	return best
 
@@ -1472,6 +1497,185 @@ func _build_jungle() -> void:
 	scatter.call(40, JUNGLE_FLOWER, 110.0, 0.0, 30.0, 120.0, 0)
 
 
+## Toy town's ground (§36): pale water and foam round it, a strip of sand, then the play mat in
+## patchwork squares with stitched edges; the road over the bridge and on round the mat with
+## kerbs, a dashed middle line and zebra crossings; and the toy train's track inside it.
+func _build_toy_ground() -> void:
+	for k in 3:
+		var band := _textured(ToyIsland.outline(ToyIsland.SHALLOWS * (1.0 - 0.3 * k)), SHALLOWS)
+		band.color = Color(1, 1, 1, 0.25)
+		_ground.add_child(band)
+	var foam := Line2D.new()
+	foam.points = ToyIsland.outline(18.0)
+	foam.closed = true
+	foam.width = 26.0
+	foam.default_color = FOAM
+	_ground.add_child(foam)
+	_ground.add_child(_textured(ToyIsland.outline(0.0), BEACH))
+	var mat := ToyIsland.outline(-ToyIsland.SAND_RIM)
+	_ground.add_child(_flat(mat, MAT_COLOURS[0]))
+	var corner := ToyIsland.CENTRE - ToyIsland.RADII
+	var patch := ToyIsland.PATCH
+	var stitches := _stitch_texture()
+	for row in int(ceilf(ToyIsland.RADII.y * 2.0 / patch)):
+		for col in int(ceilf(ToyIsland.RADII.x * 2.0 / patch)):
+			var square := _rect_points(Rect2(corner + Vector2(col, row) * patch, Vector2.ONE * patch))
+			for piece in Geometry2D.intersect_polygons(square, mat):
+				_ground.add_child(_flat(piece, MAT_COLOURS[(row * 2 + col * 3) % MAT_COLOURS.size()]))
+				var seam := Line2D.new()
+				seam.points = piece
+				seam.closed = true
+				seam.width = 6.0
+				seam.texture = stitches
+				seam.texture_mode = Line2D.LINE_TEXTURE_TILE
+				seam.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+				_ground.add_child(seam)
+	_bridge_road(ToyIsland.bridge_rect(), ToyIsland.shore_y())
+	# The road: asphalt between two rounded rectangles, the mat again inside, kerbs on both.
+	var outer := ToyIsland.rounded_line(ToyIsland.ROAD_HALF_SIZE, ToyIsland.ROAD_CORNER, ToyIsland.ROAD_HALF)
+	var inner := ToyIsland.rounded_line(ToyIsland.ROAD_HALF_SIZE, ToyIsland.ROAD_CORNER, -ToyIsland.ROAD_HALF)
+	_ground.add_child(_textured(outer, ASPHALT))
+	var middle_mat := Geometry2D.intersect_polygons(inner, mat)
+	for piece in middle_mat:
+		_ground.add_child(_flat(piece, MAT_COLOURS[3]))
+	for edge in [outer, inner]:
+		var kerb := Line2D.new()
+		kerb.points = edge
+		kerb.closed = true
+		kerb.width = 26.0
+		kerb.texture = TOWN_KERB
+		kerb.texture_mode = Line2D.LINE_TEXTURE_TILE
+		kerb.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		_ground.add_child(kerb)
+	var dash := Line2D.new()
+	dash.points = ToyIsland.road_line()
+	dash.closed = true
+	dash.width = 10.0
+	dash.texture = _dash_texture()
+	dash.texture_mode = Line2D.LINE_TEXTURE_TILE
+	dash.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_ground.add_child(dash)
+	# Zebra crossings half way along each side.
+	var half := ToyIsland.ROAD_HALF_SIZE
+	for crossing: Array in [[Vector2(0, half.y), 0.0], [Vector2(half.x, 0), PI / 2.0], [Vector2(-half.x, 0), PI / 2.0]]:
+		var at: Vector2 = ToyIsland.CENTRE + crossing[0]
+		for k in range(-3, 4):
+			var stripe := Polygon2D.new()
+			stripe.polygon = _rect_points(Rect2(-14.0 + k * 40.0, -ToyIsland.ROAD_HALF + 10.0, 24.0, ToyIsland.ROAD_HALF * 2.0 - 20.0))
+			stripe.color = Color(1, 1, 1, 0.9)
+			stripe.position = at
+			stripe.rotation = crossing[1]
+			_ground.add_child(stripe)
+	# The train's track: a bed of wooden sleepers and two rails.
+	var rails := ToyIsland.rails_line()
+	var sleepers := Line2D.new()
+	sleepers.points = rails
+	sleepers.closed = true
+	sleepers.width = 96.0
+	sleepers.texture = _sleeper_texture()
+	sleepers.texture_mode = Line2D.LINE_TEXTURE_TILE
+	sleepers.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_ground.add_child(sleepers)
+	for offset in [-26.0, 26.0]:
+		var rail := Line2D.new()
+		rail.points = ToyIsland.rounded_line(ToyIsland.RAILS_HALF_SIZE, ToyIsland.RAILS_CORNER, offset)
+		rail.closed = true
+		rail.width = 9.0
+		rail.default_color = Color(0.6, 0.62, 0.68)
+		_ground.add_child(rail)
+
+
+## Little white stitches, for the seams of the play mat.
+static func _stitch_texture() -> ImageTexture:
+	var image := Image.create(24, 4, false, Image.FORMAT_RGBA8)
+	for x in 24:
+		for y in 4:
+			image.set_pixel(x, y, Color(1, 1, 1, 0.8) if x < 12 else Color(1, 1, 1, 0))
+	return ImageTexture.create_from_image(image)
+
+
+## Wooden sleepers across the train's track.
+static func _sleeper_texture() -> ImageTexture:
+	var image := Image.create(20, 32, false, Image.FORMAT_RGBA8)
+	for x in 20:
+		for y in 32:
+			image.set_pixel(x, y, RAIL_COLOUR if x < 8 else Color(0, 0, 0, 0))
+	return ImageTexture.create_from_image(image)
+
+
+## Toy town's things (§36): the train on its track, toy houses along the outside of the road,
+## giant letter blocks (some stacked), and bouncy balls (the screen puts them there). Their
+## own random numbers, so the rest of the town stays where it was.
+func _build_toys() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3636
+	train = ToyTrain.new()
+	train.name = "ToyTrain"
+	train.rails = ToyIsland.rails_line()
+	_things.add_child(train)
+	# Houses face the road from outside it, all the way round, with gaps for the bridge's road.
+	var road := ToyIsland.rounded_line(ToyIsland.ROAD_HALF_SIZE, ToyIsland.ROAD_CORNER, ToyIsland.ROAD_HALF + 190.0)
+	var houses: Array[Vector2] = []
+	for i in range(0, road.size(), 4):
+		var at := road[i]
+		if ToyIsland.bridge_rect().grow(160.0).has_point(at) or houses.any(func(p: Vector2) -> bool: return p.distance_to(at) < 320.0):
+			continue
+		if not Geometry2D.is_point_in_polygon(at, ToyIsland.outline(-ToyIsland.SAND_RIM - 120.0)):
+			continue
+		houses.append(at)
+		var house := _sprite(TOY_HOUSE, at, 220.0)
+		house.z_index = TREE_Z
+		_add_box(Rect2(at - Vector2(80, 70), Vector2(160, 140)))
+	var keep_off: Array[Rect2] = []
+	for gate in gates:
+		if gate["track_id"] == ToyIsland.TOY_TOWN:
+			keep_off.append(gate["area"].grow(200.0))
+			keep_off.append(Rect2(gate["at"] - Vector2(1100, 260), Vector2(560, 520)))  # its stopwatch
+	var placed: Array[Vector2] = houses.duplicate()
+	var clear := func(spot: Vector2, room: float) -> bool:
+		if ToyIsland.surface(spot) != &"playmat" or ToyIsland.bridge_rect().grow(room).has_point(spot):
+			return false
+		if absf(ToyIsland.rounded_distance(spot, ToyIsland.ROAD_HALF_SIZE, ToyIsland.ROAD_CORNER)) < ToyIsland.ROAD_HALF + room:
+			return false
+		if absf(ToyIsland.rounded_distance(spot, ToyIsland.RAILS_HALF_SIZE, ToyIsland.RAILS_CORNER)) < 140.0 + room:
+			return false
+		if not Geometry2D.is_point_in_polygon(spot, ToyIsland.outline(-ToyIsland.SAND_RIM - 100.0)):
+			return false
+		if placed.any(func(p: Vector2) -> bool: return p.distance_to(spot) < room + 160.0):
+			return false
+		return not keep_off.any(func(r: Rect2) -> bool: return r.grow(room).has_point(spot))
+	var letters := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	var made := 0
+	for i in 2000:
+		if made >= 16:
+			break
+		var spot := ToyIsland.CENTRE + Vector2(rng.randf_range(-1.0, 1.0), rng.randf_range(-1.0, 1.0)) * ToyIsland.RADII
+		if not clear.call(spot, 90.0):
+			continue
+		placed.append(spot)
+		var stack := 2 if made % 4 == 0 else 1
+		for k in stack:
+			var block := ToyBlock.new()
+			block.letter = letters[(made * 7 + k * 3) % letters.length()]
+			block.colour = BLOCK_COLOURS[(made + k) % BLOCK_COLOURS.size()]
+			block.position = spot + Vector2(18.0, -40.0) * k
+			block.rotation = rng.randf_range(-0.25, 0.25)
+			block.z_index = k
+			_things.add_child(block)
+		_add_box(Rect2(spot - Vector2.ONE * ToyBlock.SIZE / 2.0, Vector2.ONE * ToyBlock.SIZE))
+		made += 1
+	var balls := 0
+	for i in 2000:
+		if balls >= 5:
+			break
+		var spot := ToyIsland.CENTRE + Vector2(rng.randf_range(-1.0, 1.0), rng.randf_range(-1.0, 1.0)) * ToyIsland.RADII
+		if not clear.call(spot, 140.0):
+			continue
+		placed.append(spot)
+		beach_balls.append(spot)  # a ball to kick about: the screen puts it there
+		balls += 1
+
+
 ## Out at sea (§21.5): the lighthouse's islet, the ramp islets, the slalom, the wreck, and
 ## the outer limit's ring of buoys and rocks.
 func _build_sea() -> void:
@@ -1695,10 +1899,10 @@ static func _end_on(runs: Array, road: Rect2, side: int) -> Vector2:
 	return Vector2.INF
 
 
-## The roads out over the water to the districts (§33–§35), each from the ring road to the
+## The roads out over the water to the districts (§33–§36), each from the ring road to the
 ## district's own roads.
 static func _bridges() -> Array[Rect2]:
-	return [SnowIsland.bridge_rect(), CandyIsland.bridge_rect(), JungleIsland.bridge_rect()]
+	return [SnowIsland.bridge_rect(), CandyIsland.bridge_rect(), JungleIsland.bridge_rect(), ToyIsland.bridge_rect()]
 
 
 static func _under_bridge(p: Vector2) -> bool:
@@ -1837,6 +2041,7 @@ func _plan_extras() -> void:
 	_keep_clear.append(SnowIsland.bridge_rect().grow(150.0))
 	_keep_clear.append(CandyIsland.bridge_rect().grow(150.0))
 	_keep_clear.append(JungleIsland.bridge_rect().grow(150.0))
+	_keep_clear.append(ToyIsland.bridge_rect().grow(150.0))
 
 
 ## A rectangle round `centre`, `length` along `along` and `depth` across it.

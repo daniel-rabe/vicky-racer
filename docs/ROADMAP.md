@@ -42,6 +42,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 32 | The snowy hill | The first district: a snow island over a bridge, a hill, ice, Snowy Peak | L |
 | 33 | Candy land | The second district: Candy Lane with jelly pads, a chocolate lake, Candy Lane's gate | L |
 | 34 | The jungle | The third district: a jungle trail, mud that makes cars muddy, a temple, Jungle Run's gate | L |
+| 35 | Toy town | The fourth district: a play mat, a toy road, a toy train, letter blocks, Toy Town's gate | L |
 
 ---
 
@@ -564,6 +565,17 @@ Idea 7 from the open-world plan, the third district; Daniel picked the jungle. D
   golden stars (65). The bridges' walls work for a bridge going north too.
   `tests/jungle_test.gd` is new.
 - **Open:** the other districts (beach, toy district, ring road); idea 8's gentle unlocks.
+
+## Phase 35 — Toy town ✅ done
+
+Idea 7 from the open-world plan, the fourth district; Daniel picked toy town. DESIGN §36.
+
+- **Built:** a toy island south of town over a bridge from the ring road's south-west corner: a
+  patchwork play mat, a toy road round it with zebra crossings and toy houses, a toy train going
+  round its own track (it nudges cars out of its way, CHOO CHOO!), giant letter blocks, bouncy
+  balls, confetti, the Toy Town gate moved onto it, five more golden stars (70). The bridges'
+  walls work for a bridge going south too. `tests/toy_test.gd` is new.
+- **Open:** the other districts (beach, ring road); idea 8's gentle unlocks.
 
 ---
 

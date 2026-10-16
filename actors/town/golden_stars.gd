@@ -8,10 +8,10 @@ extends Node2D
 ## finding them all pays ALL_PAY. The pause map shows the count. Where they are is worked out
 ## from the town itself with a fixed seed, so it is the same island every time.
 
-const COUNT := 65
-## The first ISLAND_COUNT are round the town's island; then five on the snowy hill (§33), five in
-## candy land (§34) and five in the jungle (§35), each added after the last so the earlier ones
-## keep their numbers in old saves.
+const COUNT := 70
+## The first ISLAND_COUNT are round the town's island; then five each on the snowy hill (§33), in
+## candy land (§34), in the jungle (§35) and in toy town (§36), each five added after the last so
+## the earlier ones keep their numbers in old saves.
 const ISLAND_COUNT := 50
 const PAY := 3
 const ALL_PAY := 50
@@ -26,10 +26,11 @@ const SIZE := 46.0
 const GOLD := Color(1.0, 0.8, 0.18)
 const GOLD_EDGE := Color(0.72, 0.45, 0.05)
 const CHIME := "res://art/sfx/sticker.wav"
-## Where the Candy Lane and Jungle Run gates' paving was before they moved to candy land (§34)
-## and the jungle (§35): still kept clear, so the island's stars stay where they were and keep
-## their numbers in old saves.
-const OLD_GATE_AREAS: Array[Rect2] = [Rect2(2050.0, 7695.0, 700.0, 470.0), Rect2(7150.0, 7695.0, 700.0, 470.0)]
+## Where the Candy Lane, Jungle Run and Toy Town gates' paving was before they moved to candy
+## land (§34), the jungle (§35) and toy town (§36): still kept clear, so the island's stars stay
+## where they were and keep their numbers in old saves.
+const OLD_GATE_AREAS: Array[Rect2] = [Rect2(2050.0, 7695.0, 700.0, 470.0), Rect2(7150.0, 7695.0, 700.0, 470.0),
+	Rect2(9295.0, 5650.0, 470.0, 700.0)]
 
 ## The town screen (TownScreen): the player, the HUD, paying.
 var screen: Node
@@ -177,6 +178,17 @@ static func plan(town: Town) -> Array[Vector2]:
 			JungleIsland.CENTRE + Vector2(-JungleIsland.RADII.x * 0.78, 0),
 			JungleIsland.CENTRE + Vector2(JungleIsland.RADII.x, -JungleIsland.RADII.y) * 0.66,
 			Vector2(JungleIsland.BRIDGE_X, (JungleIsland.shore_y() + Island.world().position.y) / 2.0)]:
+		for k in 9:
+			var at := spot + (Vector2.from_angle(k * TAU / 8.0) * 140.0 if k > 0 else Vector2.ZERO)
+			if _clear(town, at, out, 300.0):
+				out.append(at)
+				break
+	# Toy town: in the middle of the train's track, on the far south of the mat, out on its
+	# east and west sides, and halfway over the bridge.
+	var mid := ToyIsland.CENTRE
+	for spot: Vector2 in [mid + Vector2(-500, -350), mid + Vector2(0, ToyIsland.RADII.y - 420.0),
+			mid + Vector2(ToyIsland.RADII.x - 520.0, -200), mid + Vector2(-ToyIsland.RADII.x + 520.0, 300),
+			Vector2(ToyIsland.BRIDGE_X, (ToyIsland.shore_y() + Island.world().end.y) / 2.0)]:
 		for k in 9:
 			var at := spot + (Vector2.from_angle(k * TAU / 8.0) * 140.0 if k > 0 else Vector2.ZERO)
 			if _clear(town, at, out, 300.0):

@@ -78,6 +78,8 @@ const SURFACES := {
 	&"ring_dust": {"speed_mult": 0.35, "grip_mult": 0.6},
 	&"nebula_cloud": {"speed_mult": 0.35, "grip_mult": 0.6},
 	&"cotton_candy": {"speed_mult": 0.35, "grip_mult": 0.6},
+	# Free Drive's toy town (docs/DESIGN.md §36): the play mat, soft but quick.
+	&"playmat": {"speed_mult": 0.8, "grip_mult": 0.85},
 }
 const ASPHALT := preload("res://art/tiles/asphalt.png")
 const KERB := preload("res://art/tiles/kerb.png")
