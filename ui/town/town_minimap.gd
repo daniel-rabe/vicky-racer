@@ -46,6 +46,9 @@ const MAT := Color(0.98, 0.8, 0.75)
 const RAILS := Color(0.55, 0.36, 0.2)
 const PLANKS := Color(0.75, 0.53, 0.33)
 const TUNNEL := Color(0.3, 0.52, 0.22)
+## The districts over the bridges, by the name the map knows them by.
+var _districts := {&"snow": SnowIsland, &"candy": CandyIsland, &"jungle": JungleIsland, &"toys": ToyIsland,
+	&"beach": BeachIsland}
 
 
 func _ready() -> void:
@@ -72,17 +75,9 @@ func _notification(what: int) -> void:
 
 func _fit() -> void:
 	_district = _out_in_district()
-	var area := Island.map_rect().grow(-600.0) if _sailing else _town.streets_rect().grow(400.0)
-	if _district == &"snow" and not _sailing:
-		area = Rect2(SnowIsland.CENTRE - SnowIsland.RADII, SnowIsland.RADII * 2.0).grow(300.0)
-	elif _district == &"candy" and not _sailing:
-		area = Rect2(CandyIsland.CENTRE - CandyIsland.RADII, CandyIsland.RADII * 2.0).grow(300.0)
-	elif _district == &"jungle" and not _sailing:
-		area = Rect2(JungleIsland.CENTRE - JungleIsland.RADII, JungleIsland.RADII * 2.0).grow(300.0)
-	elif _district == &"toys" and not _sailing:
-		area = Rect2(ToyIsland.CENTRE - ToyIsland.RADII, ToyIsland.RADII * 2.0).grow(300.0)
-	elif _district == &"beach" and not _sailing:
-		area = Rect2(BeachIsland.CENTRE - BeachIsland.RADII, BeachIsland.RADII * 2.0).grow(300.0)
+	var area := Island.map_rect().grow(-600.0) if _sailing else _town_area()
+	if _district != &"" and not _sailing:
+		area = _district_area(_district)
 	var room := size - Vector2(PADDING, PADDING) * 2.0
 	_scale = minf(room.x / area.size.x, room.y / area.size.y)
 	_origin = Vector2(PADDING, PADDING) + (room - area.size * _scale) / 2.0 - area.position * _scale
@@ -98,20 +93,36 @@ func _fit() -> void:
 	_beach = _mapped(BeachIsland.outline(0.0))
 
 
-## Which district the player is out over the water in or near: &"snow", &"candy", &"jungle",
-## &"toys", &"beach" or &"".
+## Which district the map shows: &"" while the player is in town (on the map's town view),
+## else the island they are on or on their way to over its bridge: &"snow", &"candy",
+## &"jungle", &"toys" or &"beach". Once off the town's view the island's view takes over at
+## once, so the island is on the map the whole way over the bridge.
 func _out_in_district() -> StringName:
-	if not is_instance_valid(_player):
+	if not is_instance_valid(_player) or _town_area().has_point(_player.global_position):
 		return &""
-	if _player.global_position.y < JungleIsland.shore_y() + 1200.0:
-		return &"jungle"
-	if _player.global_position.y > ToyIsland.shore_y() - 1200.0:
-		return &"toys"
-	if _player.global_position.x < BeachIsland.shore_x() + 1200.0:
-		return &"beach"
-	if _player.global_position.x < SnowIsland.shore_x() - 1200.0:
-		return &""
-	return &"candy" if CandyIsland.this_side(_player.global_position) else &"snow"
+	var at := _player.global_position
+	for district: StringName in _districts:
+		if _districts[district].contains(at):
+			return district
+	var best := &""
+	for district: StringName in _districts:
+		if _district_area(district).has_point(at) and (best == &"" \
+				or at.distance_to(_districts[district].CENTRE) < at.distance_to(_districts[best].CENTRE)):
+			best = district
+	return best
+
+
+## The town's view: its streets and a little round them.
+func _town_area() -> Rect2:
+	return _town.streets_rect().grow(400.0)
+
+
+## A district's view: its island, and its bridge back to where the town's view ends.
+func _district_area(district: StringName) -> Rect2:
+	var island = _districts[district]
+	var town := _town_area()
+	var area := Rect2(island.CENTRE - island.RADII, island.RADII * 2.0).grow(300.0)
+	return area.expand(island.CENTRE.clamp(town.position, town.end))
 
 
 func _process(_delta: float) -> void:
