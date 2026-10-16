@@ -44,6 +44,7 @@ Milestones are in the recommended order. Each one is playable on its own when it
 | 34 | The jungle | The third district: a jungle trail, mud that makes cars muddy, a temple, Jungle Run's gate | L |
 | 35 | Toy town | The fourth district: a play mat, a toy road, a toy train, letter blocks, Toy Town's gate | L |
 | 36 | Sunny Beach | The fifth district: a boardwalk, surf that pushes cars, sandcastles to knock down, crabs, Sunny Beach's gate | L |
+| 37 | The ring road | The sixth district: a tunnel with an echo, a stream under the road, a fuel station, a speed sign | M |
 
 ---
 
@@ -589,6 +590,18 @@ Idea 7 from the open-world plan, the fifth district; Daniel picked the beach. DE
   it, five more golden stars (75). The bridges work for a bridge going west too.
   `tests/beach_test.gd` is new.
 - **Open:** the ring road district; idea 8's gentle unlocks.
+
+## Phase 37 — The ring road ✅ done
+
+Idea 7 from the open-world plan, the sixth district; Daniel picked the ring road. DESIGN §38.
+
+- **Built:** sights along the town's outer ring road: a tunnel through a grassy hill on the east
+  side (it fades while you are inside, a horn echoes), a stream from the south-west pond under
+  the road out to the sea, a fuel station on the north side where you fill up at the pump, and
+  a speed sign on the south side (WOW! when very fast); five more golden stars (80).
+  `tests/ring_test.gd` is new.
+- **Open:** every district from idea 7 except the meadow is built; idea 8's gentle unlocks;
+  ComfyUI art for the drawn-in-code things.
 
 ---
 

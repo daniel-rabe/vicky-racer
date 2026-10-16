@@ -8,10 +8,11 @@ extends Node2D
 ## finding them all pays ALL_PAY. The pause map shows the count. Where they are is worked out
 ## from the town itself with a fixed seed, so it is the same island every time.
 
-const COUNT := 75
+const COUNT := 80
 ## The first ISLAND_COUNT are round the town's island; then five each on the snowy hill (§33), in
-## candy land (§34), in the jungle (§35), in toy town (§36) and on Sunny Beach (§37), each five
-## added after the last so the earlier ones keep their numbers in old saves.
+## candy land (§34), in the jungle (§35), in toy town (§36), on Sunny Beach (§37) and along the
+## ring road (§38), each five added after the last so the earlier ones keep their numbers in old
+## saves.
 const ISLAND_COUNT := 50
 const PAY := 3
 const ALL_PAY := 50
@@ -201,6 +202,16 @@ static func plan(town: Town) -> Array[Vector2]:
 			beach + Vector2(-600, -450), beach + Vector2(500, BeachIsland.RADII.y - 330.0),
 			beach + Vector2(-300, -BeachIsland.RADII.y + 330.0),
 			Vector2((Island.world().position.x + BeachIsland.shore_x()) / 2.0, BeachIsland.BRIDGE_Y)]:
+		for k in 9:
+			var at := spot + (Vector2.from_angle(k * TAU / 8.0) * 140.0 if k > 0 else Vector2.ZERO)
+			if _clear(town, at, out, 300.0):
+				out.append(at)
+				break
+	# The ring road: hidden in the tunnel, on the stream's bridge, where the stream meets the sea,
+	# on the road past the fuel station and in front of the speed sign.
+	for spot: Vector2 in [RingRoad.TUNNEL.get_center(), RingRoad.STREAM_BRIDGE.get_center(), Vector2(150.0, 7150.0),
+			Vector2(RingRoad.FUEL_YARD.end.x + 400.0, TownLayout.junction(Vector2i.ZERO).y),
+			Vector2(RingRoad.SPEED_SIGN.x, TownLayout.junction(Vector2i(0, TownLayout.ROWS)).y)]:
 		for k in 9:
 			var at := spot + (Vector2.from_angle(k * TAU / 8.0) * 140.0 if k > 0 else Vector2.ZERO)
 			if _clear(town, at, out, 300.0):

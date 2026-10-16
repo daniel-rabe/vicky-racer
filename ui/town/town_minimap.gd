@@ -45,6 +45,7 @@ const STONE := Color(0.7, 0.66, 0.56)
 const MAT := Color(0.98, 0.8, 0.75)
 const RAILS := Color(0.55, 0.36, 0.2)
 const PLANKS := Color(0.75, 0.53, 0.33)
+const TUNNEL := Color(0.3, 0.52, 0.22)
 
 
 func _ready() -> void:
@@ -194,6 +195,16 @@ func _draw() -> void:
 		draw_rect(Rect2(_map(lawn.position), lawn.size * _scale), LAWN)
 	for pond in _town.ponds:
 		draw_circle(_map(Vector2(pond.x, pond.y)), pond.z * _scale, POND)
+	# The ring road's sights (§38): the stream under the road, the fuel station's yard, the
+	# tunnel's hill.
+	var stream := PackedVector2Array()
+	for p in RingRoad.STREAM:
+		stream.append(_map(p))
+	draw_polyline(stream, POND, maxf(RingRoad.STREAM_HALF * 2.0 * _scale, 2.0))
+	var bridge := RingRoad.STREAM_BRIDGE
+	draw_rect(Rect2(_map(bridge.position), bridge.size * _scale), STREET)
+	draw_rect(Rect2(_map(RingRoad.FUEL_YARD.position), RingRoad.FUEL_YARD.size * _scale), STREET)
+	draw_rect(Rect2(_map(RingRoad.TUNNEL.position), RingRoad.TUNNEL.size * _scale), TUNNEL)
 	draw_rect(Rect2(_map(Island.QUAY.position), Island.QUAY.size * _scale), STREET)
 	# The harbour, where the car and the boat swap: a yellow ring.
 	var harbour := _map(Island.MOORING.get_center())

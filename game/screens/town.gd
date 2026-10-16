@@ -47,6 +47,8 @@ extends Node2D
 ## Toy town (§36): a play-mat island over a bridge south of town (ToyIsland, ToyTown, ToyTrain).
 ## Sunny Beach (§37): a sandy island over a bridge west of town (BeachIsland, SunnyBeach,
 ## BeachSurf, SandCastle, BeachCrab).
+## The ring road (§38): a tunnel, a stream under the road, a fuel station, a speed sign
+## (RingRoad, RingRoadFun).
 ##
 ## Escape / Start pauses (RESUME / MAP / SETTINGS / GARAGE; the Boat Dock while sailing).
 ##
@@ -88,6 +90,9 @@ extends Node2D
 ##                 train's track
 ##   --start=beach  start on the bridge, about to reach Sunny Beach; --start=surf up the beach
 ##                 from the surf; --start=castle just before a sandcastle
+##   --start=tunnel  start on the ring road just before the tunnel; --start=fuel at the fuel
+##                 station's pump; --start=stream on the road just before the stream's bridge;
+##                 --start=speed on the road before the speed sign
 
 const CAR_SCENE := preload("res://actors/car/car.tscn")
 const BOAT_SCENE := preload("res://actors/boat/boat.tscn")
@@ -253,6 +258,8 @@ var jungle: JungleWoods
 var toy_town: ToyTown
 ## Sunny Beach (§37): the waves' push and its banners.
 var sunny_beach: SunnyBeach
+## The ring road (§38): the tunnel, the fuel station, the speed sign.
+var ring_road: RingRoadFun
 
 @onready var _world: Node2D = $World
 @onready var _cars: Node2D = $World/Cars
@@ -426,6 +433,11 @@ func _add_fun(args: PackedStringArray) -> void:
 	sunny_beach.screen = self
 	add_child(sunny_beach)
 	move_child(sunny_beach, hud.get_index())
+	ring_road = RingRoadFun.new()
+	ring_road.name = "RingRoadFun"
+	ring_road.screen = self
+	add_child(ring_road)
+	move_child(ring_road, hud.get_index())
 	for walker in _walkers.get_children():
 		if walker is Walker:
 			walker.petted.connect(func(_w: Walker) -> void: job(&"pet"))
@@ -1693,6 +1705,18 @@ func _dev_start(where: String) -> void:
 	elif where == "toy":
 		at = Vector2(ToyIsland.BRIDGE_X + 70.0, ToyIsland.shore_y() - 500.0)
 		player.rotation = PI / 2.0
+	elif where == "tunnel":
+		at = Vector2(TownLayout.junction(Vector2i(TownLayout.COLS, 0)).x + 80.0, RingRoad.TUNNEL.position.y - 250.0)
+		player.rotation = PI / 2.0
+	elif where == "fuel":
+		at = RingRoad.FILL_PADS[0].get_center()
+		player.rotation = -PI / 2.0
+	elif where == "stream":
+		at = Vector2(TownLayout.junction(Vector2i.ZERO).x - 80.0, RingRoad.STREAM_BRIDGE.position.y - 450.0)
+		player.rotation = PI / 2.0
+	elif where == "speed":
+		at = Vector2(RingRoad.SPEED_READS.position.x + 200.0, TownLayout.junction(Vector2i(0, TownLayout.ROWS)).y + 80.0)
+		player.rotation = 0.0
 	elif where == "beach":
 		at = Vector2(BeachIsland.shore_x() + 500.0, BeachIsland.BRIDGE_Y - 70.0)
 		player.rotation = PI

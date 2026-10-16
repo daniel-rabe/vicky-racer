@@ -20,7 +20,8 @@ extends Node2D
 ## trophy house (doors), and the rocket pad on the west side.
 ## Over bridges from the ring road lie the districts: the snowy hill (§33, SnowIsland), candy
 ## land (§34, CandyIsland), the jungle (§35, JungleIsland), toy town (§36, ToyIsland) and Sunny
-## Beach (§37, BeachIsland).
+## Beach (§37, BeachIsland). Along the ring road itself (§38, RingRoad): a tunnel, a stream under
+## the road, a fuel station and a speed sign.
 ##
 ## It is also the traffic's map. Junctions are grid cells (Vector2i); lane_points() and
 ## turn_points() give the line a car follows along a road and through a junction, on the
@@ -180,6 +181,10 @@ var train: ToyTrain
 var surf: BeachSurf
 var castles: Array[SandCastle] = []
 var crabs: Array[BeachCrab] = []
+## The ring road (§38): the tunnel's hill, the fuel station's pump island, the speed sign.
+var tunnel: TunnelHill
+var pump: FuelPump
+var speed_sign: SpeedSign
 ## The rocket on it, which lifts off with the car inside (§31).
 var rocket: Sprite2D
 ## Driveways (§29): cars parked on the lawn beside a house, nose to the street, free to borrow.
@@ -249,6 +254,7 @@ func _ready() -> void:
 	_build_jungle()
 	_build_toys()
 	_build_beach()
+	_build_ring_road()
 	_build_extras()
 	_plan_parking()
 
@@ -282,6 +288,10 @@ func streets_rect() -> Rect2:
 
 
 func surface_at(pos: Vector2) -> StringName:
+	if RingRoad.in_water(pos):
+		return &"water"
+	if RingRoad.FUEL_YARD.has_point(pos):
+		return &"asphalt"
 	for pond in ponds:
 		if pos.distance_to(Vector2(pond.x, pond.y)) < pond.z - 20.0:
 			return &"water"
@@ -1867,6 +1877,89 @@ func _build_beach() -> void:
 		made += 1
 
 
+## Along the ring road (§38): the stream from the pond in the south-west block out to the sea,
+## with the road's deck over it; the tunnel's hill over the east side; the fuel station's yard,
+## pump island and sign on the north side; the speed sign on the south side. Drawn last on the
+## ground, over the lawns and the roads.
+func _build_ring_road() -> void:
+	for layer: Array in [[RingRoad.STREAM_HALF * 2.0 + 24.0, WATER_EDGE], [RingRoad.STREAM_HALF * 2.0, WATER]]:
+		var stream := Line2D.new()
+		stream.points = PackedVector2Array(RingRoad.STREAM)
+		stream.width = layer[0]
+		stream.default_color = layer[1]
+		stream.joint_mode = Line2D.LINE_JOINT_ROUND
+		stream.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		_ground.add_child(stream)
+	var ripples := Line2D.new()
+	ripples.points = PackedVector2Array(RingRoad.STREAM)
+	ripples.width = 8.0
+	ripples.default_color = Color(1, 1, 1, 0.35)
+	ripples.texture = _dash_texture()
+	ripples.texture_mode = Line2D.LINE_TEXTURE_TILE
+	ripples.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_ground.add_child(ripples)
+	# The deck: pavements, the road with its middle line, and low walls along its edges.
+	var deck := RingRoad.STREAM_BRIDGE
+	var half := TownLayout.ROAD_HALF
+	var road_x := TownLayout.junction(Vector2i.ZERO).x
+	_ground.add_child(_textured(_rect_points(deck), PAVEMENT))
+	_ground.add_child(_flat(_rect_points(Rect2(road_x - half - 7.0, deck.position.y, 2.0 * half + 14.0, deck.size.y)), KERB_COLOUR))
+	_ground.add_child(_textured(_rect_points(Rect2(road_x - half, deck.position.y, 2.0 * half, deck.size.y)), ASPHALT))
+	var dash := Line2D.new()
+	dash.points = PackedVector2Array([Vector2(road_x, deck.position.y), Vector2(road_x, deck.end.y)])
+	dash.width = 10.0
+	dash.texture = _dash_texture()
+	dash.texture_mode = Line2D.LINE_TEXTURE_TILE
+	dash.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	dash.default_color = DASH_COLOUR
+	_ground.add_child(dash)
+	for x in [deck.position.x, deck.end.x]:
+		_ground.add_child(_flat(_rect_points(Rect2(x - 10.0, deck.position.y + 30.0, 20.0, deck.size.y - 60.0)), PARAPET))
+	# The tunnel.
+	tunnel = TunnelHill.new()
+	tunnel.name = "Tunnel"
+	tunnel.size = RingRoad.TUNNEL.size
+	tunnel.position = RingRoad.TUNNEL.get_center()
+	tunnel.z_index = TREE_Z + 1
+	_things.add_child(tunnel)
+	# The fuel station: its yard (from the pavement up), the pump island (solid) and a sign.
+	var yard := RingRoad.FUEL_YARD
+	_ground.add_child(_flat(_rect_points(yard.grow(7.0), 30.0), KERB_COLOUR))
+	_ground.add_child(_textured(_rect_points(yard, 24.0), ASPHALT))
+	for pad in RingRoad.FILL_PADS:
+		var mark := Line2D.new()
+		mark.points = _rect_points(pad)
+		mark.closed = true
+		mark.width = 8.0
+		mark.default_color = Color(1.0, 0.85, 0.25, 0.9)
+		_ground.add_child(mark)
+	pump = FuelPump.new()
+	pump.name = "FuelPump"
+	pump.size = RingRoad.PUMP.size
+	pump.position = RingRoad.PUMP.get_center()
+	pump.z_index = 1
+	_things.add_child(pump)
+	_add_box(RingRoad.PUMP)
+	var board := _flat(_rect_points(Rect2(-90, -60, 180, 120), 16.0), Color(0.9, 0.25, 0.25))
+	board.position = Vector2(yard.end.x - 70.0, yard.position.y + 70.0)
+	board.z_index = TREE_Z
+	_things.add_child(board)
+	var label := Label.new()
+	label.text = "FUEL"
+	label.add_theme_font_size_override("font_size", 56)
+	label.add_theme_color_override("font_color", Color.WHITE)
+	label.position = Vector2(-80, -40)
+	label.size = Vector2(160, 80)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	board.add_child(label)
+	speed_sign = SpeedSign.new()
+	speed_sign.name = "SpeedSign"
+	speed_sign.position = RingRoad.SPEED_SIGN
+	speed_sign.z_index = TREE_Z
+	_things.add_child(speed_sign)
+
+
 ## Out at sea (§21.5): the lighthouse's islet, the ramp islets, the slalom, the wreck, and
 ## the outer limit's ring of buoys and rocks.
 func _build_sea() -> void:
@@ -2235,6 +2328,9 @@ func _plan_extras() -> void:
 	_keep_clear.append(JungleIsland.bridge_rect().grow(150.0))
 	_keep_clear.append(ToyIsland.bridge_rect().grow(150.0))
 	_keep_clear.append(BeachIsland.bridge_rect().grow(150.0))
+	_keep_clear.append_array(RingRoad.stream_boxes())
+	_keep_clear.append(RingRoad.FUEL_YARD.grow(60.0))
+	_keep_clear.append(Rect2(RingRoad.SPEED_SIGN - Vector2(200, 120), Vector2(400, 260)))
 
 
 ## A rectangle round `centre`, `length` along `along` and `depth` across it.

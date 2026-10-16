@@ -2699,3 +2699,41 @@ Dev flags for the town: `--start=beach` (on the bridge, nearly there), `--start=
 beach from the surf), `--start=castle` (just before a sandcastle), `--start=gate1` (the Sunny
 Beach gate).
 
+## 38. The ring road: the sixth district
+*(Phase 37, the open-world plan's idea 7; Daniel picked the ring road after Sunny Beach.)* No
+island this time: sights along the outer ring road round the town itself (`RingRoad`,
+`RingRoadFun`).
+
+- **The tunnel**: on the east side, the road runs through a grassy hill for a stretch, with stone
+  mouths at both ends. The hill is drawn over the cars; while the player is inside it fades so
+  the car can still be seen, and lamps show along the roof. Going in says TUNNEL! (not more
+  often than every 20 seconds), and a horn in there echoes back twice.
+- **The stream**: from the pond in the south-west block a stream runs under the west side of the
+  ring road (a little bridge with low walls), round the Moon Base gate's stopwatch and out to
+  the sea. It is wading water like the pond; the road over it is a road.
+- **The fuel station**: on the north side, where the Sunny Beach gate's paving was, a paved yard
+  with a pump island (solid) and a place to fill up either side of it. Standing still there
+  fills the tank: the pump's gauge goes round, then FULL TANK! (again once the car has left
+  and come back).
+- **The speed sign**: on the south side, where the Candy Lane gate's paving was. It shows the
+  speed of the player going by in big green numbers with a smiley (a car at top speed reads
+  about 110), and WOW! in orange from 100.
+- Five more golden stars (80 in all, the earlier 75 keep their numbers): one hidden in the
+  tunnel, on the stream's bridge, where the stream meets the sea, on the road past the fuel
+  station, and in front of the speed sign. The minimap shows the stream, the yard and the
+  tunnel's hill.
+
+All drawn in code: the hill, the pump, the signs; the stream and the bridge use the pond's and
+the roads' looks.
+
+| What | Where |
+| --- | --- |
+| Where everything is | [`town/ring_road.gd`](../town/ring_road.gd) |
+| Stream, bridge, tunnel, fuel station, speed sign | `Town._build_ring_road` in [`town/town.gd`](../town/town.gd), [`town/tunnel_hill.gd`](../town/tunnel_hill.gd), [`town/fuel_pump.gd`](../town/fuel_pump.gd), [`town/speed_sign.gd`](../town/speed_sign.gd) |
+| The fading, the echo, filling up, the speed | [`actors/town/ring_road_fun.gd`](../actors/town/ring_road_fun.gd) |
+| Checks | [`tests/ring_test.gd`](../tests/ring_test.gd) |
+
+Dev flags for the town: `--start=tunnel` (on the road just before it), `--start=fuel` (at the
+pump), `--start=stream` (on the road before its bridge), `--start=speed` (on the road by the
+sign).
+
